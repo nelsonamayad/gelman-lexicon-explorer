@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#22** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/).
+Entry **#22** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayes, Jeffreys, prior distributions, and the philosophy of statistics](https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Fallacy](../kinds/fallacies.qmd).
 

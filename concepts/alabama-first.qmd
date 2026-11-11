@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#14** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/).
+Entry **#14** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Unalphabetize!](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 
@@ -152,5 +152,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Unalphabetize](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/) (2008).
+- Andrew Gelman, [Unalphabetize!](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/) (2008).
 - Howard Wainer, [*Graphic Discovery*](https://doi.org/10.1515/9781400849277) (2005).

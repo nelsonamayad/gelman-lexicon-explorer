@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#88** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [They're not looking for a needle in a haystack, they're looking for a needle in a pile of needles](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/).
+Entry **#88** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“Positive Claims get Publicity, Refutations do Not: Evidence from the 2020 Flu”](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/).
 
 Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -150,5 +150,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [They're not looking for a needle in a haystack, they're looking for a needle in a pile of needles](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/) (2020).
+- Andrew Gelman, [“Positive Claims get Publicity, Refutations do Not: Evidence from the 2020 Flu”](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/) (2020).
 - Lilley, Lilley and Rinaldi, ["Public health interventions and economic growth: Revisiting the Spanish flu evidence"](https://doi.org/10.2139/ssrn.3590008) (2020), a comment on Correia, Luck and Verner, "Pandemics depress the economy, public health interventions do not".

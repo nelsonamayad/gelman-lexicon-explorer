@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#25** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/).
+Entry **#25** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Multiple comparisons: my talk at the London School of Economics on Monday](https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/).
 
 Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -161,5 +161,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Multiple comparisons](https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/) (2009).
+- Andrew Gelman, [Multiple comparisons: my talk at the London School of Economics on Monday](https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/) (2009).
 - Gelman, Hill and Yajima, ["Why we (usually) don't have to worry about multiple comparisons"](https://doi.org/10.1080/19345747.2011.618213), *Journal of Research on Educational Effectiveness* (2012).

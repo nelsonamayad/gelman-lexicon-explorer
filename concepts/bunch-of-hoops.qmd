@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#93** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Reflections after reading 2578 papers](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/).
+Entry **#93** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [My thoughts on “What’s Wrong with Social Science and How to Fix It: Reflections After Reading 2578 Papers”](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -147,4 +147,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [My thoughts on what's wrong with social science and how to fix it: reflections after reading 2578 papers](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/) (2021).
+- Andrew Gelman, [My thoughts on “What’s Wrong with Social Science and How to Fix It: Reflections After Reading 2578 Papers”](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/) (2021).

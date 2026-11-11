@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#134** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hierarchical model for golf putting: a struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/).
+Entry **#134** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hierarchical model golf putting struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 
@@ -182,5 +182,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Hierarchical model for golf putting: a struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/) (2022).
+- Andrew Gelman, [Hierarchical model golf putting struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/) (2022).
 - Gelman et al., ["Bayesian workflow"](https://arxiv.org/abs/2011.01808) (2020), section 10 (the golf example).

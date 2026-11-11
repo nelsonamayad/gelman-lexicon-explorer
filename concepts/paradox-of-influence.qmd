@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#68** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/).
+Entry **#68** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [One more thought on Hoover historian Niall Ferguson’s thing about Keynes being gay and marrying a ballerina and talking about poetry](https://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -147,4 +147,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [One more thought on Hoover historian Niall Ferguson](https://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/) (2013).
+- Andrew Gelman, [One more thought on Hoover historian Niall Ferguson’s thing about Keynes being gay and marrying a ballerina and talking about poetry](https://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/) (2013).

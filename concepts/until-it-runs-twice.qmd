@@ -12,7 +12,7 @@ source-note: "The post is about where the quote comes from; the reading of runni
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#129** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Who said: "I don't trust anything until it runs. In fact, I don't trust anything until it runs twice"?](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/)
+Entry **#129** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Where does this quote come from? “I don’t trust anything until it runs. In fact, I don’t trust anything until it runs twice.”](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/)
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -145,4 +145,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Who said: "I don't trust anything until it runs. In fact, I don't trust anything until it runs twice"?](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/) (2022).
+- Andrew Gelman, [Where does this quote come from? “I don’t trust anything until it runs. In fact, I don’t trust anything until it runs twice.”](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/) (2022).

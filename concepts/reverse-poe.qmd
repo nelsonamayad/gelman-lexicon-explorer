@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#63** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/).
+Entry **#63** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It comes down to reality and it’s fine with me cause I’ve let it slide](https://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -134,4 +134,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [It comes down to reality and it's fine with me cause I've let it slide](https://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/) (2016).
+- Andrew Gelman, [It comes down to reality and it’s fine with me cause I’ve let it slide](https://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/) (2016).

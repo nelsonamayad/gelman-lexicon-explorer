@@ -12,7 +12,7 @@ source-note: "Gelman's example is about tail probabilities; the extrapolation si
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#26** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/).
+Entry **#26** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Just one of these little things](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -164,4 +164,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Just one of the many ways...](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/) (2009).
+- Andrew Gelman, [Just one of these little things](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/) (2009).

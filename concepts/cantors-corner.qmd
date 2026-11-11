@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#69** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Solution to the puzzle: why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way?](https://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/)
+Entry **#69** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The puzzle: Why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way? The answer: We’re trained to do this during the process of responding to peer review.](https://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/)
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -152,4 +152,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Solution to the puzzle: why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way?](https://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/) (2018).
+- Andrew Gelman, [The puzzle: Why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way? The answer: We’re trained to do this during the process of responding to peer review.](https://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/) (2018).

@@ -12,7 +12,7 @@ source-note: "Gelman's example is copy editors; the other examples and mechanism
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#6** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/).
+Entry **#6** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The pinch-hitter syndrome: a general principle?](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -151,4 +151,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The pinch-hitter syndrome](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/) (2005).
+- Andrew Gelman, [The pinch-hitter syndrome: a general principle?](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/) (2005).

@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#106** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/).
+Entry **#106** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“If you could invite 5 authors (dead or alive) to a dinner party – who would they be and why?”](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -149,4 +149,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [If you could invite 5 authors, dead or alive, to a dinner party...](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/) (2022).
+- Andrew Gelman, [“If you could invite 5 authors (dead or alive) to a dinner party – who would they be and why?”](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/) (2022).

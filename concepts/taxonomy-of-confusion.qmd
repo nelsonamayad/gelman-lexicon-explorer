@@ -12,7 +12,7 @@ source-note: "The taxonomy is Rachel's, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#19** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/).
+Entry **#19** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Taxonomy of confusion](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
 

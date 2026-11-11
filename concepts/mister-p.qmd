@@ -12,7 +12,7 @@ source-note: "The linked post mentions the method in passing; the explanation of
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#1** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/).
+Entry **#1** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Next Supreme Court Justice](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/).
 
 Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd).
 
@@ -236,5 +236,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The next Supreme Court justice](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/) (2009), on the analysis by John Kastellec, Jeff Lax and Justin Phillips.
+- Andrew Gelman, [The Next Supreme Court Justice](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/) (2009), on the analysis by John Kastellec, Jeff Lax and Justin Phillips.
 - Gelman and Little, ["Poststratification into many categories using hierarchical logistic regression"](https://sites.stat.columbia.edu/gelman/research/published/poststrat3.pdf), *Survey Methodology* (1997).

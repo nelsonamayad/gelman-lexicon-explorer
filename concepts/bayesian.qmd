@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#23** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/).
+Entry **#23** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayes, Bayesians](https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -158,4 +158,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Bayes, Bayesians, and the subjective/objective debate](https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/) (2008).
+- Andrew Gelman, [Bayes, Bayesians](https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/) (2008).

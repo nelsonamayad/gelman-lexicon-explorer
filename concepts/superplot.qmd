@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#3** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/11/income_matters/).
+Entry **#3** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Income matters a lot in "red states," not so much in "blue states": What's the matter with Connecticut?](https://statmodeling.stat.columbia.edu/2005/11/income_matters/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Method or technique](../kinds/methods.qmd).
 
@@ -174,5 +174,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Income matters](https://statmodeling.stat.columbia.edu/2005/11/income_matters/) (2005).
+- Andrew Gelman, [Income matters a lot in "red states," not so much in "blue states": What's the matter with Connecticut?](https://statmodeling.stat.columbia.edu/2005/11/income_matters/) (2005).
 - Gelman, Park, Shor, Bafumi and Cortina, [*Red State, Blue State, Rich State, Poor State*](https://doi.org/10.1515/9781400832118) (2008).

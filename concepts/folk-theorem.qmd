@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#5** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/).
+Entry **#5** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The folk theorem of statistical computing](https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 

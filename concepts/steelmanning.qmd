@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#142** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The challenge of bending over backward to see things from the other person's point of view](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/).
+Entry **#142** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Why I’m skeptical of “steelmanning”: By bending over backward to see things from the other person’s point of view, you’re implicitly dismissing other perspectives.](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -137,4 +137,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The challenge of bending over backward to see things from the other person's point of view](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/) (2022).
+- Andrew Gelman, [Why I’m skeptical of “steelmanning”: By bending over backward to see things from the other person’s point of view, you’re implicitly dismissing other perspectives.](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/) (2022).

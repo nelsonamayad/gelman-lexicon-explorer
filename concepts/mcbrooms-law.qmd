@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#95** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/).
+Entry **#95** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods.”](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -144,4 +144,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/) (2021).
+- Andrew Gelman, [“Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods.”](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/) (2021).

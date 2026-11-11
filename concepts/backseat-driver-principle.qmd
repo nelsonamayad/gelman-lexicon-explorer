@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#10** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/).
+Entry **#10** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The backseat driver principle](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 

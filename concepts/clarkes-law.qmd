@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#59** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Clarke's law of research](https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/).
+Entry **#59** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Clarke’s Law: Any sufficiently crappy research is indistinguishable from fraud](https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -143,5 +143,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Clarke's law of research](https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/) (2016).
+- Andrew Gelman, [Clarke’s Law: Any sufficiently crappy research is indistinguishable from fraud](https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/) (2016).
 - Brown and Heathers, ["The GRIM test"](https://doi.org/10.1177/1948550616673876), *Social Psychological and Personality Science* (2017).

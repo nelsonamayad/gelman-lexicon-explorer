@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#13** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/).
+Entry **#13** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The fallacy of the one-sided bet (for example, risk, God, torture, and lottery tickets)](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 
@@ -163,4 +163,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The fallacy of the one-sided bet](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/) (2007).
+- Andrew Gelman, [The fallacy of the one-sided bet (for example, risk, God, torture, and lottery tickets)](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/) (2007).

@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#61** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/).
+Entry **#61** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [When does peer review make no damn sense?](https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -144,4 +144,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Peer review make no damn sense](https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/) (2016).
+- Andrew Gelman, [When does peer review make no damn sense?](https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/) (2016).

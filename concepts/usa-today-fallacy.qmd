@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#15** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/).
+Entry **#15** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Overrepresentation of small states/provinces, and the USA Today effect](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/).
 
 Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 
@@ -153,4 +153,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Overrepresentation of small states](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/) (2004).
+- Andrew Gelman, [Overrepresentation of small states/provinces, and the USA Today effect](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/) (2004).

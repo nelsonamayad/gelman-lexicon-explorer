@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#12** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/).
+Entry **#12** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How to tell the diference between a theoretical statistician and an applied statistician](https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -156,4 +156,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [How to tell the difference between a theoretical and an applied statistician](https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/) (2007).
+- Andrew Gelman, [How to tell the diference between a theoretical statistician and an applied statistician](https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/) (2007).

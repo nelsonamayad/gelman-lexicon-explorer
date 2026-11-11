@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#4** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/).
+Entry **#4** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Institutional decision analysis](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -194,5 +194,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Institutional decision making](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/) (2004).
+- Andrew Gelman, [Institutional decision analysis](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/) (2004).
 - Lin, Gelman, Price and Krantz, ["Analysis of local decisions using hierarchical modeling, applied to home radon measurement and remediation"](https://doi.org/10.1214/ss/1009212411), *Statistical Science* (1999).

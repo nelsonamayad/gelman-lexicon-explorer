@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#57** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More power posing](https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/).
+Entry **#57** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The time-reversal heuristic—a new way to think about a published finding that is followed up by a large, preregistered replication (in context of claims about power pose)](https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -163,4 +163,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [More power posing](https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/) (2016).
+- Andrew Gelman, [The time-reversal heuristic—a new way to think about a published finding that is followed up by a large, preregistered replication (in context of claims about power pose)](https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/) (2016).

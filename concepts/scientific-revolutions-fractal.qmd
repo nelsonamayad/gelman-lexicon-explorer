@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#145** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Self-similarity of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/).
+Entry **#145** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The fractal nature of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -129,4 +129,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Self-similarity of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/) (2005).
+- Andrew Gelman, [The fractal nature of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/) (2005).

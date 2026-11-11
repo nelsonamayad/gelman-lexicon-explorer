@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#92** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/).
+Entry **#92** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Stasi’s back in town. (My last post on Cass Sunstein and Richard Epstein.)](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -142,5 +142,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Stasis back in town](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/) (2020).
+- Andrew Gelman, [Stasi’s back in town. (My last post on Cass Sunstein and Richard Epstein.)](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/) (2020).
 - Weisberg, Keil, Goodstein, Rawson and Gray, ["The seductive allure of neuroscience explanations"](https://doi.org/10.1162/jocn.2008.20040), *Journal of Cognitive Neuroscience* (2008).

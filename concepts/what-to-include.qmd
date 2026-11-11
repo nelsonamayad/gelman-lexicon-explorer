@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#108** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/).
+Entry **#108** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: ["For better or for worse, academics are fascinated by academic rankings . . ."](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 
@@ -139,4 +139,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Statistical modeling of citation exchange among statistics journals](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/) (2015).
+- Andrew Gelman, ["For better or for worse, academics are fascinated by academic rankings . . ."](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/) (2015).

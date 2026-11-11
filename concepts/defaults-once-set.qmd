@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#39** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/).
+Entry **#39** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Defaults, once set, are hard to change.](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -141,4 +141,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Defaults, once set, are hard to change](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/) (2015).
+- Andrew Gelman, [Defaults, once set, are hard to change.](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/) (2015).

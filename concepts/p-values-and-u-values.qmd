@@ -12,7 +12,7 @@ source-note: "Checked against the post, which points to Gelman (2003) for the de
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#8** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/).
+Entry **#8** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I hate the so-called Fisher exact test: a pointer to one of my favorite articles](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/).
 
 Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -162,6 +162,6 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [P-values and u-values](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/) (2009).
+- Andrew Gelman, [I hate the so-called Fisher exact test: a pointer to one of my favorite articles](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/) (2009).
 - Andrew Gelman, ["Two simple examples for understanding posterior p-values whose distributions are far from uniform"](https://doi.org/10.1214/13-EJS854), *Electronic Journal of Statistics* (2013).
 - Andrew Gelman, ["A Bayesian formulation of exploratory data analysis and goodness-of-fit testing"](https://doi.org/10.1111/j.1751-5823.2003.tb00203.x), *International Statistical Review* (2003), sections 2.3 and 3.3.

@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
+Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ya don't know Bayes, Jack](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -151,4 +151,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Hey dude, ya don't...](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/) (2010).
+- Andrew Gelman, [Ya don't know Bayes, Jack](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/) (2010).

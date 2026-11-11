@@ -12,7 +12,7 @@ source-note: "The source post is the abstract of Gelman's talk on bayesglm."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#7** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/).
+Entry **#7** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How to set tuning parameters](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 
@@ -201,5 +201,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [How to set up a weakly informative prior](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/) (2008).
+- Andrew Gelman, [How to set tuning parameters](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/) (2008).
 - Gelman, Jakulin, Pittau and Su, ["A weakly informative default prior distribution for logistic and other regression models"](https://doi.org/10.1214/08-AOAS191), *Annals of Applied Statistics* (2008).

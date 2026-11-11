@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#17** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/).
+Entry **#17** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The "all else equal fallacy," one more time (this time using econ jargon), and also a discussion of the perils of "crossover" arguments](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/).
 
 Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 
@@ -154,4 +154,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The "all else equal" fallacy](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/) (2008).
+- Andrew Gelman, [The "all else equal fallacy," one more time (this time using econ jargon), and also a discussion of the perils of "crossover" arguments](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/) (2008).

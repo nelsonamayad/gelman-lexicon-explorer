@@ -12,7 +12,7 @@ source-note: "The post doesn't expand the acronym; our reading of it is labeled 
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#11** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/).
+Entry **#11** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Can our book be used in an econ course??](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -161,5 +161,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Can our book be improved?](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/) (2007).
+- Andrew Gelman, [Can our book be used in an econ course??](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/) (2007).
 - Gelman and Hill, [*Data Analysis Using Regression and Multilevel/Hierarchical Models*](https://doi.org/10.1017/CBO9780511790942) (2007), chapters 9–10.

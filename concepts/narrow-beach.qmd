@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#135** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics in the sweet spot](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/).
+Entry **#135** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“The narrow beach between the continent of clear effects and the sea of confusion”: that sweet spot between signals that are so clear you don’t need statistics, and signals that are so weak that statistical analysis can’t help](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -148,4 +148,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Statistics in the sweet spot between signals that are so clear you don't need statistics and signals that are so weak that statistical analysis can't help](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/) (2023).
+- Andrew Gelman, [“The narrow beach between the continent of clear effects and the sea of confusion”: that sweet spot between signals that are so clear you don’t need statistics, and signals that are so weak that statistical analysis can’t help](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/) (2023).

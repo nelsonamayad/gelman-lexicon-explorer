@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#54** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Let's say uncertainty intervals](https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/).
+Entry **#54** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Instead of “confidence interval,” let’s say “uncertainty interval”](https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 
@@ -145,4 +145,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Let's say uncertainty intervals](https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/) (2010).
+- Andrew Gelman, [Instead of “confidence interval,” let’s say “uncertainty interval”](https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/) (2010).

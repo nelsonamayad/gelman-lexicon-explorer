@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#123** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It's worse than it sounds: passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/).
+Entry **#123** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It’s worse than you might think: Passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -140,4 +140,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [It's worse than it sounds: passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/) (2023).
+- Andrew Gelman, [It’s worse than you might think: Passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/) (2023).

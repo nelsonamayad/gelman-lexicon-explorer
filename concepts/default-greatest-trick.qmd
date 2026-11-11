@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#38** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/).
+Entry **#38** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How feminism has made me a better scientist](https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
@@ -149,4 +149,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [How feminism made me a better scientist](https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/) (2018).
+- Andrew Gelman, [How feminism has made me a better scientist](https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/) (2018).

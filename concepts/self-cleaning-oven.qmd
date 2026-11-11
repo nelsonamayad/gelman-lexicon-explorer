@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#18** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/).
+Entry **#18** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Style guide for R code](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 
@@ -152,5 +152,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Style guide for R packages](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/) (2007).
+- Andrew Gelman, [Style guide for R code](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/) (2007).
 - Cook, Gelman and Rubin, ["Validation of software for Bayesian models using posterior quantiles"](https://doi.org/10.1198/106186006X136976), *JCGS* (2006).

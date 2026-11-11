@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#101** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/).
+Entry **#101** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The most important formula in statistics: sqrt(12\^2+5\^2)=13](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -135,4 +135,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The most important formula in statistics?](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/) (2008).
+- Andrew Gelman, [The most important formula in statistics: sqrt(12\^2+5\^2)=13](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/) (2008).

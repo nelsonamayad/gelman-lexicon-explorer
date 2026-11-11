@@ -12,7 +12,7 @@ source-note: "The post is a song parody; the explanation of it is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#86** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/).
+Entry **#86** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [‘Sumps and rigor](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -147,4 +147,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Assumptions and rigor](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/) (2019).
+- Andrew Gelman, [‘Sumps and rigor](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/) (2019).

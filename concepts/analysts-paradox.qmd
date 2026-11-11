@@ -11,7 +11,7 @@ verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#127** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2024/01/27/pt/).
+Entry **#127** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The paradox of replication studies: A good analyst has special data analysis and interpretation skills. But it’s considered a bad or surprising thing that if you give the same data to different analysts, they come to different conclusions.](https://statmodeling.stat.columbia.edu/2024/01/27/pt/).
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
@@ -132,5 +132,5 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [The analyst's paradox](https://statmodeling.stat.columbia.edu/2024/01/27/pt/) (2024).
+- Andrew Gelman, [The paradox of replication studies: A good analyst has special data analysis and interpretation skills. But it’s considered a bad or surprising thing that if you give the same data to different analysts, they come to different conclusions.](https://statmodeling.stat.columbia.edu/2024/01/27/pt/) (2024).
 - Silberzahn et al., ["Many analysts, one data set"](https://doi.org/10.1177/2515245917747646), *Advances in Methods and Practices in Psychological Science* (2018).
