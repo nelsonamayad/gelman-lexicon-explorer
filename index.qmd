@@ -3,10 +3,6 @@ title: "Andrew Gelman Statistical Lexicon Explorer"
 date: 2026-11-09
 description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
 subtitle: "Every entry in Andrew Gelman's Handy Statistical Lexicon, explained with an interactive simulation to help you understand it a bit better"
-author:
-  - name: Nelson Amaya D.
-    url: https://github.com/nelsonamayad
-  - name: Claude Opus 5.5
 sidebar: false
 toc: false
 page-layout: full

@@ -84,7 +84,7 @@ website:
   # The sidebar (entries grouped by theme) is generated into _sidebar.yml by
   # scripts/build_groups.py and merged in through metadata-files below.
   page-footer:
-    left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Explanations and simulations by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5. An independent study aid, not affiliated with or endorsed by Andrew Gelman."
+    left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). An independent study aid, not affiliated with or endorsed by Andrew Gelman."
     right:
       - text: About
         href: about.qmd

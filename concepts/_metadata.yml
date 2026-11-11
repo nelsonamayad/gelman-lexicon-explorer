@@ -6,7 +6,3 @@
 execute:
   echo: false
 
-author:
-  - name: Nelson Amaya D
-    url: https://github.com/nelsonamayad
-  - name: Claude Opus 5.5
