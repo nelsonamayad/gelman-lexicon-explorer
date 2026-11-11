@@ -1,8 +1,12 @@
 ---
 title: "Andrew Gelman Statistical Lexicon Explorer"
 date: 2026-11-09
-description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
-subtitle: "Every entry in Andrew Gelman's Handy Statistical Lexicon, explained with an interactive simulation to help you understand it a bit better"
+subtitle: "An homage"
+description-meta: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
+open-graph:
+  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
+twitter-card:
+  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
 sidebar: false
 toc: false
 page-layout: full
