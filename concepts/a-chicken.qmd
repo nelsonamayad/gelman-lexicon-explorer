@@ -1,0 +1,100 @@
+---
+title: "A chicken"
+date: 2026-11-09
+description: "An egg's way of making another egg. (Model checking and workflow.)"
+order: 118
+categories: [Modeling workflow, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2016/05/09/bill-james-does-model-checking/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#118** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bill James does model checking](https://statmodeling.stat.columbia.edu/2016/05/09/bill-james-does-model-checking/).
+:::
+
+## What it is
+
+Samuel Butler's quip is that "a hen is only an egg's way of making another egg." Gelman applies it to statistical models, through a post on how baseball writer Bill James checks models. A fitted model is the data's way of making *more data*. A good model, run forward, produces replicated datasets that look like the real one. Comparing the replications with the actual data, the **posterior predictive check**, is the heart of model checking and Bayesian workflow.
+
+## Why it matters
+
+Parameter estimates and fit statistics can look fine for a model that is badly wrong. Simulating fake data from the fitted model and setting it beside the real data shows what the model *believes the world looks like*. If the replications lack features the real data have, such as bimodality, heavy tails, excess zeros or a trend, the model is missing something, whatever its p-values or R² say.
+
+## How it works
+
+1. Fit the model and get the posterior, or a point estimate, for its parameters.
+2. Simulate $y^{\text{rep}}$ from the model several times.
+3. Plot $y^{\text{rep}}$ against $y$. Systematic differences point to model failures.
+4. Expand the model to fix the failure and repeat. The chicken makes another egg, which hatches into a better chicken.
+
+## Simulated example
+
+The data are bimodal, a mix of two groups. Fit either a single normal or a two-component mixture, then compare replicated datasets with the real one.
+
+```{ojs}
+import {rng, range, mean, sd, dnorm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof model = Inputs.radio(["Single normal", "Two-component mixture"], {value: "Single normal", label: "Model"})
+viewof sep = Inputs.range([0, 6], {value: 3.5, step: 0.25, label: "Separation of the two groups in the truth"})
+viewof seed = Inputs.range([1, 500], {value: 118, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+egg = {
+  const r = rng(seed);
+  const y = range(400).map(() => r() < 0.4 ? r.normal(-sep / 2, 1) : r.normal(sep / 2, 1));
+  let fit;
+  if (model === "Single normal") fit = {draw: () => r.normal(mean(y), sd(y))};
+  else {
+    // A few EM iterations for a two-component normal mixture.
+    let w = 0.5, m1 = Math.min(...y) / 2, m2 = Math.max(...y) / 2, s1 = 1, s2 = 1;
+    for (let it = 0; it < 60; it++) {
+      const g = y.map(v => { const a = w * dnorm(v, m1, s1), b = (1 - w) * dnorm(v, m2, s2); return a / (a + b); });
+      const sg = g.reduce((s, v) => s + v, 0);
+      w = sg / y.length;
+      m1 = y.reduce((s, v, i) => s + g[i] * v, 0) / sg; m2 = y.reduce((s, v, i) => s + (1 - g[i]) * v, 0) / (y.length - sg);
+      s1 = Math.sqrt(y.reduce((s, v, i) => s + g[i] * (v - m1) ** 2, 0) / sg) || 1; s2 = Math.sqrt(y.reduce((s, v, i) => s + (1 - g[i]) * (v - m2) ** 2, 0) / (y.length - sg)) || 1;
+    }
+    fit = {draw: () => r() < w ? r.normal(m1, s1) : r.normal(m2, s2)};
+  }
+  const reps = range(8).flatMap(k => range(400).map(() => ({k, v: fit.draw()})));
+  return {y, reps};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "y", domain: [-8, 8]},
+  y: {label: "Density", grid: true},
+  marks: [
+    Plot.lineY(egg.reps, Plot.binX({y: "proportion"}, {x: "v", z: "k", stroke: "#2166ac", strokeOpacity: 0.35, thresholds: 40, domain: [-8, 8]})),
+    Plot.lineY(egg.y, Plot.binX({y: "proportion"}, {x: d => d, stroke: "currentColor", strokeWidth: 2.5, thresholds: 40, domain: [-8, 8]}))
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Black: the real data. Blue: 8 datasets replicated from the fitted **${model.toLowerCase()}**. ${model === "Single normal" && sep > 2 ? "The replications are one bump and the data are two. The chicken lays the wrong kind of egg. Switch to the mixture." : "The replications look like the data. This model can make another egg like the one it came from."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A model is a way of generating data. Use it to make fake data and compare with the real data.
+- Posterior predictive checks show failures that summary statistics hide.
+- Model building is a cycle: fit, simulate, compare, expand.
+:::
+
+## Related entries
+
+- [Cantor's Corner](cantors-corner.qmd)
+- [Seeds of its own destruction](seeds-of-its-own-destruction.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+- [P-values and U-values](p-values-and-u-values.qmd)
+
+## Source
+
+- Andrew Gelman, [Bill James does model checking](https://statmodeling.stat.columbia.edu/2016/05/09/bill-james-does-model-checking/) (2016).

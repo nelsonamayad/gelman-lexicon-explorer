@@ -1,0 +1,85 @@
+---
+title: "The house"
+date: 2026-11-09
+description: "It's stronger than the foundations."
+order: 138
+categories: [Philosophy of statistics, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#138** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The house is stronger than the foundations](https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/).
+:::
+
+## What it is
+
+Statistics' philosophical foundations are still debated: what probability means, how to justify priors, whether p-values make sense. Yet the *practice* built on them works remarkably well. Regression, hierarchical models and sampling methods give useful answers in thousands of applications. The house stands even though the foundations are contested. In Gelman's image, the house is stronger than the foundations.
+
+## Why it matters
+
+Practitioners sometimes take foundational disputes to mean the methods are unreliable. Others defend methods only by their foundations. Both miss the point: a method's track record and its robustness to violated assumptions are evidence in their own right. Equally, a method that works in practice doesn't need a perfect philosophical justification, as long as its limits are understood and checked.
+
+## How it works
+
+A concrete case. Least squares regression is often "founded" on the assumption of normally distributed errors. But the coefficient estimates are unbiased, and with moderate samples the usual intervals are nearly calibrated, for a wide range of *non-normal* error distributions. The foundation is shaky, since errors are rarely normal, and the house still stands. Gauss–Markov conditions and the central limit theorem carry most of the weight.
+
+## Simulated example
+
+Fit a regression with errors drawn from increasingly non-normal distributions and check whether the 95% intervals still cover the true slope.
+
+```{ojs}
+import {rng, range, lm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof errDist = Inputs.radio(["Normal (the foundation)", "Skewed (exponential)", "Heavy-tailed (t, 3 df)", "Bimodal"], {value: "Skewed (exponential)", label: "Error distribution"})
+viewof n = Inputs.range([10, 300], {value: 50, step: 10, label: "Sample size"})
+viewof seed = Inputs.range([1, 500], {value: 138, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+house = {
+  const r = rng(seed);
+  const err = () => errDist.startsWith("Normal") ? r.normal() : errDist.startsWith("Skewed") ? r.exponential(1) - 1 : errDist.startsWith("Heavy") ? r.t(3) / Math.sqrt(3) : (r() < 0.5 ? -1 : 1) + r.normal(0, 0.3);
+  const reps = range(1500).map(() => {
+    const x = r.normals(n), y = x.map(v => 1 + 0.5 * v + err());
+    const f = lm(x, y);
+    return {b: f.b, cover: Math.abs(f.b - 0.5) < 1.96 * f.seB};
+  });
+  return {reps, residSample: range(800).map(() => err())};
+}
+```
+
+```{ojs}
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
+${Plot.plot({width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
+</div>`
+```
+
+```{ojs}
+//| echo: false
+{
+  const cov = house.reps.filter(d => d.cover).length / house.reps.length;
+  return html`<div class="sim-readout">${md`With **${errDist.toLowerCase()}** errors and n = ${n}, the "normal-errors" 95% interval covers the true slope **${pct(cov, 1)}** of the time, and the estimates are centred on the truth. The foundation (normality) is false, and the house stands anyway. Shrink n to 10 to find where it starts to creak.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Statistical practice is often more robust than its textbook justifications suggest.
+- Judge methods by their performance and robustness, not only by their foundations.
+- Know where the house creaks, as with very small samples or extreme violations, and check there.
+:::
+
+## Related entries
+
+- [Probability](probability.qmd)
+- [When researchers say "guarantee"](guarantee-is-assumption.qmd)
+- [Camel that is the likelihood](camel-likelihood.qmd)
+- [The Pluralist's Dilemma](pluralists-dilemma.qmd)
+
+## Source
+
+- Andrew Gelman, [The house is stronger than the foundations](https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/) (2017).

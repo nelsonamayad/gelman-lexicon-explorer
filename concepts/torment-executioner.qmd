@@ -1,0 +1,97 @@
+---
+title: "Torment executioner"
+date: 2026-11-09
+description: "Pain killer in Reno, Nevada."
+order: 130
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#130** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Torment executioners in Reno, Nevada](https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/).
+:::
+
+## What it is
+
+"Torment executioners" is what "pain killer" became in a paper that, as Gelman traced it, had apparently copied a paragraph from an earlier, obscure article and run it through software that swapped words for synonyms, perhaps to evade plagiarism detectors. The journal's editor had insisted its contents were "all original." Reconstructing the word map, Gelman found swaps like these:
+
+- "intensity of pain" → "concentration of torment"
+- "pain killer" → "torment executioners"
+- "repetitive movements" → "tedious developments"
+- "agreed to the fact" → "concurred to the truth"
+
+The result, as he put it, takes "an already difficult-to-read passage and make[s] it nearly incomprehensible." Researchers have called these **tortured phrases**. They are a known sign of machine-paraphrased and paper-mill text. Other documented examples include "counterfeit consciousness" for *artificial intelligence* and "profound learning" for *deep learning*.
+
+## Why it matters
+
+Tortured phrases show that some published "research" was never read carefully by its authors, reviewers or editors, since any expert would have stopped at "torment executioner." They are also useful: because technical terms are fixed multi-word expressions, word-by-word synonym swaps break them in recognizable ways, and screening tools can flag suspicious papers automatically.
+
+## How it works
+
+A technical term of $k$ words survives a synonym spinner only if *every* word is left alone. If each word is replaced with probability $p$, then
+
+$$
+\Pr(\text{term intact}) = (1 - p)^k.
+$$
+
+At $p = 0.5$, a two-word term survives a quarter of the time and a four-word term about 6% of the time. Longer, more specialized terms are almost always mangled, which is what makes them good detectors.
+
+## Simulated example
+
+A toy synonym spinner with a small dictionary. Spin some technical phrases and see what comes out, along with how often terms of different lengths survive.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof p = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Probability each word is swapped"})
+viewof seed = Inputs.range([1, 500], {value: 130, step: 1, label: "Random seed (spin again)"})
+```
+
+```{ojs}
+synonyms = ({pain: "torment", killer: "executioners", intensity: "concentration", of: "of", repetitive: "tedious", movements: "developments", artificial: "counterfeit", intelligence: "consciousness", deep: "profound", big: "colossal", data: "information", random: "irregular", forest: "woodland", neural: "neural", network: "organization", mean: "normal", square: "square", error: "blunder", standard: "standard", deviation: "deviation", machine: "machine", learning: "learning", signal: "flag", noise: "commotion"})
+phrases = ["pain killer", "intensity of pain", "repetitive movements", "artificial intelligence", "deep learning", "big data", "random forest", "neural network", "mean square error", "signal to noise"]
+spun = {
+  const r = rng(seed);
+  return phrases.map(ph => ({orig: ph, out: ph.split(" ").map(w => synonyms[w] && synonyms[w] !== w && r() < p ? synonyms[w] : w).join(" ")}));
+}
+```
+
+```{ojs}
+html`<table class="table table-sm" style="max-width: 520px;"><thead><tr><th>Technical term</th><th>After the spinner</th></tr></thead>
+<tbody>${spun.map(d => html`<tr><td>${d.orig}</td><td style="${d.out !== d.orig ? "color:#d6604d; font-weight:600" : ""}">${d.out}</td></tr>`)}</tbody></table>`
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  x: {label: "Words in the technical term (k)"},
+  y: {label: "Pr(term survives intact)", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [Plot.line(range(6).map(k => ({k: k + 1, s: (1 - p) ** (k + 1)})), {x: "k", y: "s", stroke: "#2166ac", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`At p = ${p}, a two-word term survives **${pct((1 - p) ** 2)}** of the time and a four-word term **${pct((1 - p) ** 4, 1)}**. ${spun.filter(d => d.out !== d.orig).length} of ${phrases.length} phrases came out tortured this time. A real expert would never write "torment executioner." A paraphrasing tool does so routinely.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Tortured phrases are a fingerprint of machine-paraphrased or paper-mill text.
+- Multi-word technical terms are fragile under word-by-word synonym swaps, which makes them good detectors.
+- Their appearance in published papers shows that nobody, including authors, reviewers and editors, read the text closely.
+:::
+
+## Related entries
+
+- [Clarke's Law](clarkes-law.qmd)
+- [Reverse Poe](reverse-poe.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+
+## Source
+
+- Andrew Gelman, [Torment executioners in Reno, Nevada](https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/) (2024).
+- Cabanac, Labbé and Magazinov, "Tortured phrases: A dubious writing style emerging in science" (2021).

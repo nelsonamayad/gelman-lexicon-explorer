@@ -1,0 +1,86 @@
+---
+title: "The wedding, never about the marriage"
+date: 2026-11-09
+description: "With scientific journals, what it's all about."
+order: 60
+categories: [Research culture]
+source: "http://statmodeling.stat.columbia.edu/2016/07/06/29481/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#60** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2016/07/06/29481/).
+:::
+
+## What it is
+
+Scientific journals treat publication like a wedding: one big celebration, followed by little interest in how things go afterwards. Acceptance, press release and citations are the event. Whether the finding holds up, gets corrected or quietly falls apart, the "marriage," gets almost no attention. Corrections are rare, slow and hard to find. Retractions reach a small fraction of the people who saw the original.
+
+## Why it matters
+
+Science is supposed to correct itself, but the correction process happens out of public view. Readers keep citing papers with known flaws. Meta-analyses include results that later failed. Journalists report the wedding and never the divorce. Incentives favour the event over the long-term health of the result, so the scientific record stays more optimistic than the evidence supports.
+
+## How it works
+
+A toy model of attention. A paper gets a burst of attention at publication that decays over time. Some fraction of papers have serious errors that are discovered after a delay. The correction gets its own, much smaller burst. The share of the original audience who ever hear about the correction is the ratio of the two areas under the attention curves.
+
+## Simulated example
+
+A flawed paper is published and its error is discovered later. Change how quickly the error is found and how loud the correction is compared with the original fanfare.
+
+```{ojs}
+import {range, sum, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof delay = Inputs.range([1, 60], {value: 24, step: 1, label: "Months until the error is found"})
+viewof loudness = Inputs.range([0.01, 1], {value: 0.08, step: 0.01, label: "Correction attention relative to the original"})
+viewof decay = Inputs.range([1, 24], {value: 6, step: 1, label: "Attention half-life (months)"})
+```
+
+```{ojs}
+attention = range(121).map(t => {
+  const lam = Math.log(2) / decay;
+  const wedding = 100 * Math.exp(-lam * t);
+  const marriage = t >= delay ? 100 * loudness * Math.exp(-lam * (t - delay)) : 0;
+  return [{t, kind: "Original publication", a: wedding}, {t, kind: "Correction", a: marriage}];
+}).flat()
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Months since publication"},
+  y: {label: "Attention (arbitrary units)", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Correction", "Original publication"]},
+  marks: [Plot.areaY(attention, {x: "t", y: "a", fill: "kind", fillOpacity: 0.5, z: "kind"}), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const tot = k => sum(attention.filter(d => d.kind === k).map(d => d.a));
+  const lam = Math.log(2) / decay;
+  const before = 1 - Math.exp(-lam * delay);
+  return html`<div class="sim-readout">${md`The correction gets **${pct(tot("Correction") / tot("Original publication"), 1)}** as much attention as the original. By the time the error is found, **${pct(before)}** of all the attention the paper will ever get has already been spent. The wedding gets the guests. The marriage gets a footnote.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Publication is the start of a result's life, not the end of it.
+- Corrections reach only a small fraction of a finding's audience.
+- Readers should ask whether a result has been followed up, not just whether it was published.
+:::
+
+## Related entries
+
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+- [The problem with peer review](problem-with-peer-review.qmd)
+- [Arrow's Other Theorem (strong form)](arrows-other-theorem-strong.qmd)
+- [Replication and firefighting](replication-and-firefighting.qmd)
+
+## Source
+
+- Andrew Gelman, [The wedding, never about the marriage](http://statmodeling.stat.columbia.edu/2016/07/06/29481/) (2016).

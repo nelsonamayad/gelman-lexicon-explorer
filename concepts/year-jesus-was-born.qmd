@@ -1,0 +1,93 @@
+---
+title: "The year Jesus was born"
+date: 2026-11-09
+description: "Be careful when centering and scaling your regression predictors."
+order: 147
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2025/03/11/what-does-jesus-have-to-do-with-linear-regression/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#147** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What does Jesus have to do with linear regression?](https://statmodeling.stat.columbia.edu/2025/03/11/what-does-jesus-have-to-do-with-linear-regression/)
+:::
+
+## What it is
+
+Gelman's example: regress the world record time in the mile run (1913–1999) on year. The slope makes sense: the record dropped by about 0.4 seconds per year. The intercept is about 1006 seconds, which is the predicted record time "in the year that Jesus was born," two thousand years outside the data. The lesson is to **center** (and sensibly scale) predictors, so that coefficients describe something inside the data.
+
+## Why it matters
+
+An intercept, or any coefficient, is evaluated where the other predictors equal zero. With raw calendar years, zero is far away. The intercept becomes a meaningless extrapolation, its standard error is inflated by the distance, and in models with interactions the "main effects" are evaluated at year 0 too. Centering changes none of the fitted values or predictions. It changes whether the reported numbers mean anything.
+
+## How it works
+
+Fit $y = a + b\,(\text{year} - c)$. With $c = 0$, $a$ is the prediction for year 0. With $c = 1950$, $a$ is the prediction for 1950, in the middle of the data, and its standard error is small. The slope $b$ is the same either way. Rescaling, for example years to decades, changes the units of $b$ to make it readable. In models with interactions, centering is what makes the main effects interpretable.
+
+## Simulated example
+
+Simulated mile records following Gelman's fitted line (slope about −0.39 seconds per year, residual sd about 1.4 seconds). Choose where to center the year and compare the coefficients.
+
+```{ojs}
+import {rng, range, lm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof center = Inputs.radio(["Year 0 (no centering)", "Year 1950", "Mean year of the data"], {value: "Year 0 (no centering)", label: "Center year at"})
+viewof seed = Inputs.range([1, 500], {value: 147, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+mile = {
+  const r = rng(seed);
+  const years = range(30).map(i => Math.round(1913 + i * 86 / 29));
+  const rows = years.map(year => ({year, time: 1006.2 - 0.39 * year + r.normal(0, 1.4)}));
+  const meanYear = years.reduce((a, b) => a + b, 0) / years.length;
+  const c = center.startsWith("Year 0") ? 0 : center === "Year 1950" ? 1950 : meanYear;
+  const f = lm(rows.map(d => d.year - c), rows.map(d => d.time));
+  return {rows, c, f};
+}
+```
+
+```{ojs}
+html`<table class="table table-sm" style="max-width: 460px;"><thead><tr><th>Coefficient</th><th style="text-align:right">Estimate</th><th style="text-align:right">SE</th><th>Meaning</th></tr></thead>
+<tbody>
+<tr><td>Intercept</td><td style="text-align:right">${fmt(mile.f.a, 1)}</td><td style="text-align:right">${fmt(mile.f.seA, 2)}</td><td>record time in year ${fmt(mile.c, 0)}</td></tr>
+<tr><td>Year</td><td style="text-align:right">${fmt(mile.f.b, 3)}</td><td style="text-align:right">${fmt(mile.f.seB, 3)}</td><td>seconds per year</td></tr>
+</tbody></table>`
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Year", tickFormat: "d", grid: true},
+  y: {label: "World record, mile (seconds)", grid: true},
+  marks: [
+    Plot.dot(mile.rows, {x: "year", y: "time", fill: "#2166ac", r: 3}),
+    Plot.line([1913, 1999].map(x => ({x, y: mile.f.a + mile.f.b * (x - mile.c)})), {x: "x", y: "y", stroke: "#d6604d", strokeWidth: 2}),
+    Plot.ruleX([mile.c], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`${mile.c === 0 ? `The intercept says the mile record was **${fmt(mile.f.a, 0)} seconds**, nearly 17 minutes, in the year Jesus was born. That's an extrapolation of 19 centuries, with a standard error of ${fmt(mile.f.seA, 1)} seconds.` : `Centered at ${fmt(mile.c, 0)}, the intercept is **${fmt(mile.f.a, 1)} seconds**, the record around that year, with a standard error of just ${fmt(mile.f.seA, 2)}.`} The slope (${fmt(mile.f.b, 3)} s/year) and the fitted line are identical either way.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Coefficients are evaluated where the other predictors equal zero. Make zero meaningful.
+- Center continuous predictors such as years, ages or incomes at a sensible reference value, and scale them to readable units.
+- Centering changes interpretation, not predictions.
+:::
+
+## Related entries
+
+- [If zero is in the neighborhood](zero-in-the-neighborhood.qmd)
+- [The Speed Racer Principle](speed-racer-principle.qmd)
+- [Marginal](marginal.qmd)
+
+## Source
+
+- Andrew Gelman, [What does Jesus have to do with linear regression?](https://statmodeling.stat.columbia.edu/2025/03/11/what-does-jesus-have-to-do-with-linear-regression/) (2025).

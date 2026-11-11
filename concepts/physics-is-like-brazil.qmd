@@ -1,0 +1,87 @@
+---
+title: "Physics is like Brazil"
+date: 2026-11-09
+description: "Statistics is like Chile."
+order: 143
+categories: [Philosophy of statistics, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2024/11/27/physics-is-like-brazil-statistics-is-like-chile/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#143** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Physics is like Brazil, statistics is like Chile](https://statmodeling.stat.columbia.edu/2024/11/27/physics-is-like-brazil-statistics-is-like-chile/).
+:::
+
+## What it is
+
+This is a metaphor about how far the research frontier is from where you start. In physics, Gelman writes, you take years of math and physics classes and more in grad school before you reach open problems: "It's like Brazil: you land on the beach, go through the city and the farms, and it takes a long time before you reach uncharted territory." In statistics, "the open problems are much more accessible", and "you're on the beach and it's just a few steps to the mountains." Even routine applied work regularly runs into live research questions.
+
+## Why it matters
+
+The metaphor says something encouraging about statistics: people with subject-matter knowledge can contribute to the field almost immediately, because hard work on nearly any applied problem leads to foundational questions. Gelman made the same point in 2007: "Statistics, unlike (say) physics, is a new field, and its depths are close to the surface." It also links to [the capacity to be upset](capacity-to-be-upset.qmd). You only find the mountains behind the beach if you notice when routine work turns up something that doesn't fit.
+
+## How it works
+
+A toy model of the metaphor, our construction rather than Gelman's. Newcomers enter each field. In "Brazil," a newcomer must first spend $T$ years crossing the interior before any project can reach the frontier. In "Chile," every applied project, from the first one on, has some chance $p$ of running into an open research problem. Track the share of newcomers who have reached the frontier by each year.
+
+## Simulated example
+
+There are 1,000 newcomers in each field. Set how long the trek is in Brazil and how often routine projects in Chile run into open problems.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof trek = Inputs.range([1, 12], {value: 8, step: 1, label: "Brazil: years of study before reaching the frontier"})
+viewof pHit = Inputs.range([0.05, 0.6], {value: 0.25, step: 0.05, label: "Chile: chance a routine project hits an open problem"})
+viewof seed = Inputs.range([1, 500], {value: 143, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+frontier = {
+  const r = rng(seed);
+  const run = (label, firstYear, p) => {
+    const reached = range(1000).map(() => { for (let y = 1; y <= 15; y++) if (y >= firstYear && r() < p) return y; return Infinity; });
+    return range(16).map(y => ({year: y, label, share: reached.filter(v => v <= y).length / 1000}));
+  };
+  return [...run("Physics (Brazil)", trek, 0.35), ...run("Statistics (Chile)", 1, pHit)];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Years since entering the field"},
+  y: {label: "Share who have reached an open research problem", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#5aae61", "#2166ac"]},
+  marks: [Plot.line(frontier, {x: "year", y: "share", stroke: "label", strokeWidth: 2.5, curve: "step-after"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const at = (l, y) => frontier.find(d => d.label === l && d.year === y).share;
+  return html`<div class="sim-readout">${md`After 2 years, **${pct(at("Statistics (Chile)", 2))}** of newcomers to statistics have run into a live research problem, compared with **${pct(at("Physics (Brazil)", 2))}** in physics. After ${trek + 1} years, the figures are ${pct(at("Statistics (Chile)", Math.min(15, trek + 1)))} and ${pct(at("Physics (Brazil)", Math.min(15, trek + 1)))}. In Chile the mountains are right behind the beach. You just have to notice them.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- In statistics the research frontier is close to everyday applied work.
+- Newcomers with subject-matter knowledge can contribute right away.
+- Look out for the anomalies in routine work, because they're often the way into research problems.
+:::
+
+## Related entries
+
+- [The capacity to be upset](capacity-to-be-upset.qmd)
+- [Theoretical statistics](theoretical-statistics.qmd)
+- [God is in Every Leaf of Every Tree](god-is-in-every-leaf.qmd)
+- [Scientific revolutions](scientific-revolutions-fractal.qmd)
+
+## Source
+
+- Andrew Gelman, [Physics is like Brazil, statistics is like Chile](https://statmodeling.stat.columbia.edu/2024/11/27/physics-is-like-brazil-statistics-is-like-chile/) (2024).
+- Gelman and Jakulin, "Bayes: radical, liberal, or conservative?" *Statistica Sinica* (2007).

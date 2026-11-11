@@ -1,0 +1,91 @@
+---
+title: "Defaults, once set"
+date: 2026-11-09
+description: "Hard to change."
+order: 39
+categories: [Research culture, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#39** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/).
+:::
+
+## What it is
+
+Once a default is established, such as the 0.05 significance threshold, a software setting, a standard table format or a conventional prior, it becomes very hard to dislodge, even after better alternatives are known. Users have built workflows around it. Reviewers expect it. Changing it creates incompatibility with past work. So the first default often wins for decades.
+
+## Why it matters
+
+Because defaults are sticky, the moment of *setting* them deserves extra care. A careless default chosen for convenience can shape a field long after its inventor would have changed it. Changing an entrenched default, as with moving away from p < 0.05 or from flat priors in software, takes coordinated effort, because individuals who switch alone pay a cost: their work looks non-standard.
+
+## How it works
+
+A toy model of path dependence. Each period, every user of the old default considers switching. The benefit of switching is the quality gap between the methods *plus* a coordination term that grows with the share of others who have already switched. The cost is a fixed switching cost. Early on, almost nobody has switched, so the coordination benefit is small and few people move. Change is slow at first and then sudden, or it never happens.
+
+## Simulated example
+
+The new method is objectively better. Vary the switching cost and the strength of the coordination effect. Watch how long the old default survives.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof gap = Inputs.range([0, 1], {value: 0.3, step: 0.05, label: "Quality advantage of the new method"})
+viewof cost = Inputs.range([0, 2], {value: 0.8, step: 0.05, label: "Individual switching cost"})
+viewof coord = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Coordination benefit (others switched)"})
+viewof seed = Inputs.range([1, 500], {value: 39, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+adoption = {
+  const r = rng(seed);
+  const N = 1000;
+  let switched = new Array(N).fill(false);
+  switched = switched.map(() => r() < 0.02);       // a few early adopters
+  const path = [];
+  for (let t = 0; t <= 60; t++) {
+    const share = switched.filter(Boolean).length / N;
+    path.push({t, share});
+    switched = switched.map(s => s || (gap + coord * share - cost + r.normal(0, 0.3) > 0 && r() < 0.3));
+  }
+  return path;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Years after the better method appears"},
+  y: {label: "Share using the new method", domain: [0, 1], grid: true, tickFormat: "%"},
+  marks: [Plot.line(adoption, {x: "t", y: "share", stroke: "#2166ac", strokeWidth: 2}), Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const half = adoption.find(d => d.share >= 0.5);
+  return html`<div class="sim-readout">${md`${half ? `Half the field switches after **${half.t} years**.` : "Within 60 years, the field **never** reaches half adoption, even though the new method is better."} Final share: **${fmt(100 * adoption.at(-1).share, 0)}%**. Raise the switching cost a little and the old default persists. Once set, defaults are hard to change.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Defaults persist through coordination and switching costs, not because they are good.
+- Take special care when *setting* a default. You may be choosing for a generation.
+- Changing an entrenched default needs coordinated, institutional action, not just individual persuasion.
+:::
+
+## Related entries
+
+- [Defaults](defaults.qmd)
+- [Default, the greatest trick it ever pulled](default-greatest-trick.qmd)
+- [Conservatism](conservatism.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+
+## Source
+
+- Andrew Gelman, [Defaults, once set, are hard to change](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/) (2015).

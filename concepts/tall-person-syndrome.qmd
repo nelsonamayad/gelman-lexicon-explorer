@@ -1,0 +1,79 @@
+---
+title: "Tall-Person Syndrome"
+date: 2026-11-09
+description: "the problem that some people of above-average height have, that they think they're more important than other people because they literally look down on them."
+order: 110
+categories: [Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#110** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How tall is Jon Lee Anderson?](https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/)
+:::
+
+## What it is
+
+A tongue-in-cheek entry from a postscript to a blog post about a journalist's ungracious tweet. Gelman says outright that it's "just speculation" and that he has "lots of tall friends who are completely reasonable people." Some tall people come to feel more important than others, literally because they look down on them. Behind the joke is a familiar statistical pattern: a *physical* or *positional* advantage that has a small real association with outcomes gets read, by the person who has it, as a large difference in worth.
+
+## Why it matters
+
+Height does show modest associations with outcomes such as earnings in many datasets, but the individual variation around those averages is huge. Treating a small average difference as a big personal one is a [schoolyard](schoolyard-evolutionary-biology.qmd)-style error. It confuses a weak population association with a strong individual trait, and confuses where you stand with what you're worth.
+
+## How it works
+
+This is a toy model, in keeping with the joke. Let an outcome depend weakly on height: $y = \beta\,h + \epsilon$, with $\beta$ small and $\epsilon$ large. Let *self-assessed importance* depend strongly on height, because the view from up there is persuasive. The gap between the two slopes is the syndrome: the perceived advantage far exceeds the real one.
+
+## Simulated example
+
+There are 1,000 people. Compare how much height actually predicts an outcome with how much it predicts how important people *feel*.
+
+```{ojs}
+import {rng, range, lm, cor, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof realSlope = Inputs.range([0, 0.5], {value: 0.1, step: 0.01, label: "Real association: outcome per sd of height"})
+viewof perceived = Inputs.range([0, 1.5], {value: 0.8, step: 0.05, label: "Perceived importance per sd of height"})
+viewof seed = Inputs.range([1, 500], {value: 110, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+tall = {
+  const r = rng(seed);
+  return range(1000).map(() => {
+    const h = r.normal();
+    return {h, outcome: realSlope * h + r.normal(), feel: perceived * h + r.normal(0, 0.5)};
+  });
+}
+```
+
+```{ojs}
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({width: 320, height: 260, title: "What height actually predicts", grid: true, x: {label: "Height (sd)"}, y: {label: "Outcome", domain: [-4, 4]}, marks: [Plot.dot(tall, {x: "h", y: "outcome", r: 1.5, fill: "#2166ac", fillOpacity: 0.4}), Plot.linearRegressionY(tall, {x: "h", y: "outcome", stroke: "#2166ac"})]})}
+${Plot.plot({width: 320, height: 260, title: "What height makes people feel", grid: true, x: {label: "Height (sd)"}, y: {label: "Felt importance", domain: [-4, 4]}, marks: [Plot.dot(tall, {x: "h", y: "feel", r: 1.5, fill: "#d6604d", fillOpacity: 0.4}), Plot.linearRegressionY(tall, {x: "h", y: "feel", stroke: "#d6604d"})]})}
+</div>`
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Correlation of height with the actual outcome: **${fmt(cor(tall.map(d => d.h), tall.map(d => d.outcome)))}**. With felt importance: **${fmt(cor(tall.map(d => d.h), tall.map(d => d.feel)))}**. The view from up there exaggerates the advantage.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A small average association is not a large individual difference.
+- Don't confuse your vantage point with your importance, or your sample with the population.
+- It's a joke entry, but the gap between perceived and real effects isn't.
+:::
+
+## Related entries
+
+- [Schoolyard Evolutionary Biology](schoolyard-evolutionary-biology.qmd)
+- [Second-Order Availability Bias](second-order-availability-bias.qmd)
+- [Brilliance](brilliance.qmd)
+- [The Status-Reversal Heuristic](status-reversal-heuristic.qmd)
+
+## Source
+
+- Andrew Gelman, [How tall is Jon Lee Anderson?](https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/) (2013).

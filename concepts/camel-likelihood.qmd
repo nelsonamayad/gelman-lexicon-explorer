@@ -1,0 +1,94 @@
+---
+title: "Camel that is the likelihood"
+date: 2026-11-09
+description: "What skeptics and subjectivists alike swallow while straining on the gnat of the prior distribution."
+order: 99
+categories: [Bayesian inference, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2015/01/27/perhaps-merely-accident-history-skeptics-subjectivists-alike-strain-gnat-prior-distribution-swallowing-camel-likelihood/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#99** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Perhaps merely an accident of history that skeptics and subjectivists alike strain on the gnat of the prior distribution while swallowing the camel that is the likelihood](https://statmodeling.stat.columbia.edu/2015/01/27/perhaps-merely-accident-history-skeptics-subjectivists-alike-strain-gnat-prior-distribution-swallowing-camel-likelihood/).
+:::
+
+## What it is
+
+The phrase echoes "straining at a gnat and swallowing a camel." Debates about Bayesian statistics focus on the prior: is it subjective, is it justified, how sensitive are the results to it? Meanwhile the **likelihood**, the data model, is accepted with little scrutiny. Yet the likelihood typically encodes far stronger assumptions: normal errors, independence, linearity, a particular link function, no measurement error. Those assumptions often matter far more than the prior.
+
+## Why it matters
+
+Sensitivity analyses that vary the prior while keeping the likelihood fixed can give false reassurance: "our results are robust to the prior!" Meanwhile a single outlier or a heavy-tailed error distribution can change the conclusion entirely under a different but equally reasonable likelihood. Frequentist methods also rest on likelihoods, or equivalent assumptions, so the camel is swallowed on both sides of the debate.
+
+## How it works
+
+Take estimating a location parameter from data that contain a few outliers. Changing the prior on the location from $\mathrm{N}(0, 1)$ to $\mathrm{N}(0, 10)$ hardly moves the posterior when $n$ is moderate. Changing the likelihood from normal to Student-$t$ with 3 degrees of freedom can move it a lot, because the normal likelihood lets outliers pull the estimate while the $t$ likelihood down-weights them.
+
+## Simulated example
+
+Data come from a normal distribution centred at 1, with a few gross outliers added. Compute the posterior mean under two priors × two likelihoods (by grid approximation) and compare how much each choice matters.
+
+```{ojs}
+import {rng, range, dnorm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nOut = Inputs.range([0, 8], {value: 3, step: 1, label: "Number of outliers"})
+viewof outSize = Inputs.range([2, 20], {value: 10, step: 1, label: "Outlier size"})
+viewof seed = Inputs.range([1, 500], {value: 99, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+camel = {
+  const r = rng(seed);
+  const y = [...r.normals(30, 1, 1), ...range(nOut).map(() => outSize + r.normal(0, 1))];
+  const grid = range(801).map(i => -4 + i * 0.02);
+  const logT3 = z => -2 * Math.log(1 + z * z / 3);
+  const post = (priorSd, like) => {
+    const lp = grid.map(m => Math.log(dnorm(m, 0, priorSd)) + y.reduce((s, v) => s + (like === "Normal" ? -0.5 * (v - m) ** 2 : logT3(v - m)), 0));
+    const mx = Math.max(...lp), w = lp.map(v => Math.exp(v - mx)), tot = w.reduce((a, b) => a + b, 0);
+    return w.reduce((s, wi, i) => s + wi * grid[i], 0) / tot;
+  };
+  return ["Normal", "Student-t (3 df)"].flatMap(like => [1, 10].map(ps => ({like, prior: `Prior N(0, ${ps})`, mean: post(ps, like)})));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 120,
+  fy: {label: null},
+  x: {label: "Posterior mean of the location (truth = 1)", grid: true},
+  y: {label: null},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.dot(camel, {fy: "like", y: "prior", x: "mean", fill: "prior", r: 7}), Plot.ruleX([1], {stroke: "currentColor", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = (l, p) => camel.find(d => d.like === l && d.prior === p).mean;
+  const priorEffect = Math.abs(g("Normal", "Prior N(0, 1)") - g("Normal", "Prior N(0, 10)"));
+  const likeEffect = Math.abs(g("Normal", "Prior N(0, 10)") - g("Student-t (3 df)", "Prior N(0, 10)"));
+  return html`<div class="sim-readout">${md`Changing the prior (sd 1 → 10) moves the posterior mean by **${fmt(priorEffect, 3)}** (the gnat). Changing the likelihood (normal → t) moves it by **${fmt(likeEffect, 3)}** (the camel). With ${nOut} outliers, the choice of data model matters far more than the prior.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- The likelihood usually carries stronger assumptions than the prior.
+- Do sensitivity analysis on the data model, not just the prior.
+- Robust likelihoods, model checking and measurement models deserve as much scrutiny as priors.
+:::
+
+## Related entries
+
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [The Bayesian cringe](bayesian-cringe.qmd)
+- [The most important aspect of a statistical method](what-data-it-uses.qmd)
+- [A chicken](a-chicken.qmd)
+
+## Source
+
+- Andrew Gelman, [Perhaps merely an accident of history...](https://statmodeling.stat.columbia.edu/2015/01/27/perhaps-merely-accident-history-skeptics-subjectivists-alike-strain-gnat-prior-distribution-swallowing-camel-likelihood/) (2015).

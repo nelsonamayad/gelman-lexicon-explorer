@@ -1,0 +1,85 @@
+---
+title: "The Horse"
+date: 2026-11-09
+description: "Keep beating it; it's never really dead."
+order: 81
+categories: [Research culture, Communication]
+source: "https://statmodeling.stat.columbia.edu/2019/05/02/one-should-always-beat-a-dead-horse-because-the-horse-is-never-really-dead/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#81** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [One should always beat a dead horse because the horse is never really dead](https://statmodeling.stat.columbia.edu/2019/05/02/one-should-always-beat-a-dead-horse-because-the-horse-is-never-really-dead/).
+:::
+
+## What it is
+
+"Don't beat a dead horse" means don't keep arguing a settled point. The aphorism "One should always beat a dead horse because the horse is never really dead" comes from Paul Alper. He coined it after reading a news investigation into prominent doctors who failed to disclose payments from drug companies in their journal articles, a problem that keeps coming back however often it's exposed. In science, too, the horse is never really dead. Refuted findings keep being cited, debunked methods keep being taught, and settled criticisms have to be made again for each new audience. So keep beating it.
+
+## Why it matters
+
+Refutations travel more slowly and less widely than original claims (see [The wedding, never about the marriage](wedding-not-marriage.qmd)). New researchers, journalists and students come across the original finding without its refutation. If critics stop repeating the critique because "everyone knows," the refuted idea simply carries on among people who don't.
+
+## How it works
+
+A toy model. Each year, new citers learn about a finding, in proportion to its recent citations. Only a fraction $q$ of them also learn about its refutation, and those stop citing it uncritically. The uncritical citation rate then decays at a rate that depends on $q$. If critics keep "beating the horse," $q$ stays high. If they stop, $q$ drifts down and the horse gets back on its feet.
+
+## Simulated example
+
+A finding is refuted in year 0. Compare a world where critics keep repeating the refutation with one where they decide the horse is dead and move on.
+
+```{ojs}
+import {range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof qBeat = Inputs.range([0.1, 0.9], {value: 0.5, step: 0.05, label: "Share of new citers who learn of the refutation (critics keep at it)"})
+viewof qStop = Inputs.range([0, 0.5], {value: 0.1, step: 0.05, label: "Same share if critics stop"})
+viewof growth = Inputs.range([1, 1.5], {value: 1.15, step: 0.01, label: "Citation growth factor"})
+```
+
+```{ojs}
+horse = {
+  const sim = (q, label) => {
+    let c = 100;
+    return range(26).map(t => { const row = {t, label, citations: c}; c = c * growth * (1 - q); return row; });
+  };
+  return [...sim(qBeat, "Critics keep beating the horse"), ...sim(qStop, "Critics stop: 'everyone knows'")];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Years after refutation"},
+  y: {label: "Uncritical citations per year", type: "log", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(horse, {x: "t", y: "citations", stroke: "label", strokeWidth: 2})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = l => horse.filter(d => d.label === l).at(-1).citations;
+  return html`<div class="sim-readout">${md`After 25 years, uncritical citations per year: **${fmt(end("Critics keep beating the horse"), 1)}** if critics keep at it, **${fmt(end("Critics stop: 'everyone knows'"), 1)}** if they stop. When growth × (1 − q) > 1, the refuted finding keeps spreading. The horse isn't dead, so keep beating it.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Refuted ideas keep circulating among people who never heard the refutation.
+- Repeating a critique isn't redundant when the audience keeps changing.
+- "Everyone knows" usually means "my circle knows."
+:::
+
+## Related entries
+
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+- [More Vampirical Than Empirical](more-vampirical-than-empirical.qmd)
+- [The Javert Paradox](javert-paradox.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+
+## Source
+
+- Andrew Gelman, [One should always beat a dead horse because the horse is never really dead](https://statmodeling.stat.columbia.edu/2019/05/02/one-should-always-beat-a-dead-horse-because-the-horse-is-never-really-dead/) (2019).

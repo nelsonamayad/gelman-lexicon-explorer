@@ -1,0 +1,99 @@
+---
+title: "Deference Trap"
+date: 2026-11-09
+description: "Without meta-science, what we get caught in."
+order: 87
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2020/05/30/the-turtles-stop-here-why-we-meta-science-a-meta-meta-science-manifesto/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#87** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The turtles stop here. Why we meta-science: a meta-meta-science manifesto](https://statmodeling.stat.columbia.edu/2020/05/30/the-turtles-stop-here-why-we-meta-science-a-meta-meta-science-manifesto/).
+:::
+
+## What it is
+
+Science builds on earlier science. Every researcher defers to published results they don't have time to check. That's necessary, but without systematic checking of the literature itself, meaning meta-science (replication, re-analysis, studying how research is done), deference becomes a trap. Errors in foundational papers spread into everything built on them, and nobody is in a position to notice.
+
+## Why it matters
+
+Each researcher's deference is individually rational: you can't re-derive every result you cite. Collectively, though, it means the reliability of a literature can be much lower than the reliability of any researcher's own work. Meta-science is how a field audits itself. Fields that dismiss it as "attacking science" are the ones most deeply in the trap.
+
+## How it works
+
+A toy model. Each new study builds on a few earlier ones. If any foundation is wrong, the new study's conclusion is compromised with some probability. Without checking, contamination accumulates over generations. With meta-science, a fraction of studies get checked, and when one is found wrong its descendants stop deferring to it. Contamination is then contained.
+
+## Simulated example
+
+Run 15 generations of a literature, with 100 studies per generation. Each builds on three earlier studies. Compare a field with no meta-science with one that checks a fraction of studies.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof baseError = Inputs.range([0, 0.3], {value: 0.1, step: 0.01, label: "Chance a new study is wrong on its own"})
+viewof inherit = Inputs.range([0, 1], {value: 0.4, step: 0.05, label: "Chance a wrong foundation compromises a study"})
+viewof checkRate = Inputs.range([0, 0.5], {value: 0.2, step: 0.05, label: "Share of studies checked by meta-science"})
+viewof seed = Inputs.range([1, 500], {value: 87, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+trap = {
+  const r = rng(seed);
+  const run = (check, label) => {
+    let pool = range(100).map(() => ({wrong: r() < baseError, flagged: false}));
+    const out = [{gen: 0, label, share: mean(pool.map(s => +s.wrong))}];
+    for (let g = 1; g <= 15; g++) {
+      pool.forEach(s => { if (check > 0 && s.wrong && r() < check) s.flagged = true; });
+      const usable = pool.filter(s => !s.flagged);
+      const next = range(100).map(() => {
+        let wrong = r() < baseError;
+        for (let k = 0; k < 3; k++) { const f = r.pick(usable.length ? usable : pool); if (f.wrong && r() < inherit) wrong = true; }
+        return {wrong, flagged: false};
+      });
+      pool = [...pool.slice(-200), ...next];
+      out.push({gen: g, label, share: mean(next.map(s => +s.wrong))});
+    }
+    return out;
+  };
+  return [...run(0, "No meta-science (pure deference)"), ...run(checkRate, "With meta-science checking")];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Generation of studies"},
+  y: {label: "Share of new studies compromised", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(trap, {x: "gen", y: "share", stroke: "label", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = l => trap.filter(d => d.label === l).at(-1).share;
+  return html`<div class="sim-readout">${md`After 15 generations: **${pct(end("No meta-science (pure deference)"))}** of new studies are compromised under pure deference, compared with **${pct(end("With meta-science checking"))}** when ${pct(checkRate)} of studies get checked. Each study on its own is only ${pct(baseError)} likely to be wrong. The trap is in the inheritance.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Deference to the literature is necessary and, unchecked, dangerous.
+- Errors spread through citation chains. Meta-science is how a field contains them.
+- Replication and re-analysis are maintenance, not attacks.
+:::
+
+## Related entries
+
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+- [Replication and firefighting](replication-and-firefighting.qmd)
+- [The problem with peer review](problem-with-peer-review.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+
+## Source
+
+- Andrew Gelman, [The turtles stop here. Why we meta-science: a meta-meta-science manifesto](https://statmodeling.stat.columbia.edu/2020/05/30/the-turtles-stop-here-why-we-meta-science-a-meta-meta-science-manifesto/) (2020).

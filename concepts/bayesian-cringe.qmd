@@ -1,0 +1,88 @@
+---
+title: "The Bayesian cringe"
+date: 2026-11-09
+description: "The attitude that we need to apologize for using prior information."
+order: 97
+categories: [Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2021/09/15/the-bayesian-cringe/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#97** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Bayesian cringe](https://statmodeling.stat.columbia.edu/2021/09/15/the-bayesian-cringe/).
+:::
+
+## What it is
+
+Many Bayesian analysts carefully explain that their priors are "noninformative," "objective" or "only weakly informative," as if using real prior knowledge were embarrassing. That is the Bayesian cringe. Gelman's view is that prior information is *information*. Knowing that effects in a field are typically small, or that a parameter must be positive and below some bound, is knowledge, and leaving it out is a choice to analyze with less information than you have.
+
+## Why it matters
+
+The cringe has costs. In fields where true effects are small and studies are noisy, flat priors produce inflated, unstable estimates: the [significance filter](statistical-significance-filter.qmd) and [Type M errors](kangaroo.qmd). A prior that encodes "effects in this field are usually small" pulls noisy estimates toward realistic values and greatly improves accuracy. Apologizing for that is like apologizing for using a pre-test score as a covariate.
+
+## How it works
+
+Suppose effects in a field follow roughly $\theta \sim \mathrm{N}(0, \tau^2)$, with $\tau$ known from many past studies. A new study estimates $\hat\theta \sim \mathrm{N}(\theta, \text{se}^2)$. The flat-prior estimate is $\hat\theta$. The informed estimate is $\frac{\tau^2}{\tau^2 + \text{se}^2}\,\hat\theta$. When $\text{se} > \tau$, which is common in practice, the informed estimate has much lower error, and the reduction comes entirely from using what the field already knows.
+
+## Simulated example
+
+There are 2,000 studies in a field with small typical effects. Compare the error of flat-prior ("cringing") estimates with estimates that use the field's prior information.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0.05, 1], {value: 0.15, step: 0.05, label: "Typical effect size in the field τ"})
+viewof se = Inputs.range([0.05, 1], {value: 0.3, step: 0.05, label: "Standard error of a typical study"})
+viewof seed = Inputs.range([1, 500], {value: 97, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+cringe = {
+  const r = rng(seed);
+  const B = tau * tau / (tau * tau + se * se);
+  return range(2000).map(() => { const theta = r.normal(0, tau), y = r.normal(theta, se); return {theta, flat: y, informed: B * y}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  grid: true,
+  x: {label: "True effect"},
+  y: {label: "Estimate"},
+  color: {legend: true, domain: ["Flat prior (cringe)", "Uses prior information"], range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.dot(cringe.slice(0, 500), {x: "theta", y: "flat", r: 1.5, fill: () => "Flat prior (cringe)", fillOpacity: 0.4}),
+    Plot.dot(cringe.slice(0, 500), {x: "theta", y: "informed", r: 1.5, fill: () => "Uses prior information", fillOpacity: 0.6}),
+    Plot.line([[-4 * tau, -4 * tau], [4 * tau, 4 * tau]], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const rm = k => Math.sqrt(mean(cringe.map(d => (d[k] - d.theta) ** 2)));
+  return html`<div class="sim-readout">${md`Root-mean-square error: flat prior **${fmt(rm("flat"), 3)}**, informed prior **${fmt(rm("informed"), 3)}**. That's a ${fmt(100 * (1 - rm("informed") / rm("flat")), 0)}% reduction in error from using what the field already knows. Nothing to apologize for.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Prior information is information. Use it, and state it openly.
+- Flat priors aren't neutral. They ignore knowledge and inflate noisy estimates.
+- Justify priors with evidence, without apologizing for having them.
+:::
+
+## Related entries
+
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [Camel that is the likelihood](camel-likelihood.qmd)
+- [The Edlin Factor](edlin-factor.qmd)
+- [Bayesian](bayesian.qmd)
+
+## Source
+
+- Andrew Gelman, [The Bayesian cringe](https://statmodeling.stat.columbia.edu/2021/09/15/the-bayesian-cringe/) (2021).

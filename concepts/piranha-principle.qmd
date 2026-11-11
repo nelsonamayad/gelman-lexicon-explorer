@@ -1,0 +1,87 @@
+---
+title: "The Piranha Principle"
+date: 2026-11-09
+description: "These large effects can't all coherently coexist."
+order: 74
+categories: [Significance & noise, Reasoning & fallacies]
+source: "http://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#74** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The piranha problem in social psychology / behavioral economics](http://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/). (Spelled "Pinciple" in the original list.)
+:::
+
+## What it is
+
+Imagine a tank full of piranhas. They can't all be thriving, because they'd eat each other. Some literatures claim that many small, incidental factors each have a *large* effect on the same outcome. Examples include a word you read, the weather, a smiley face, the temperature of a cup you held, the date of your birthday, and a picture on the wall. If all those effects were as large as reported, they would interfere with each other, and the outcome would be dominated by trivia. They can't all be true at once.
+
+## Why it matters
+
+Each claim gets evaluated alone, as if it were the only factor in the world. The piranha argument gives a *joint* check that needs no replication. Outcomes have finite variance, so the effects that explain them have to fit inside that budget. A field claiming dozens of large independent nudges is claiming something mathematically impossible. Tosh, Greengard, Goodrich, Gelman, Vehtari and Hsu formalized this as "the piranha problem."
+
+## How it works
+
+If predictors $x_1, \dots, x_K$ are roughly independent and each has correlation $r$ with outcome $y$, then
+
+$$
+R^2 = \sum_{k=1}^K r_k^2 = K r^2 \le 1,
+$$
+
+so at most $K \le 1/r^2$ such effects can coexist. Ten effects of $r = 0.4$ would explain 160% of the variance, which is impossible. Correlated predictors loosen the constraint only somewhat, and in a way that undermines the claim that each effect is separate.
+
+## Simulated example
+
+Choose how many large-effect claims a literature makes and how big each claims to be. The plot shows the share of outcome variance they would jointly explain.
+
+```{ojs}
+import {range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof r = Inputs.range([0.05, 0.6], {value: 0.3, step: 0.01, label: "Claimed correlation of each factor"})
+viewof K = Inputs.range([1, 50], {value: 20, step: 1, label: "Number of claimed independent factors"})
+```
+
+```{ojs}
+budget = range(50).map(i => ({k: i + 1, r2: (i + 1) * r * r}))
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Number of large effects claimed"},
+  y: {label: "Implied share of variance explained (R²)", grid: true},
+  marks: [
+    Plot.rect([0], {x1: 0, x2: 51, y1: 1, y2: Math.max(1.05, 50 * r * r), fill: "#d6604d", fillOpacity: 0.12}),
+    Plot.text([0], {x: 2, y: Math.max(1.05, 50 * r * r) * 0.95, text: () => "impossible: R² > 1", textAnchor: "start", fill: "#d6604d"}),
+    Plot.line(budget, {x: "k", y: "r2", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(budget.filter(d => d.k === K), {x: "k", y: "r2", r: 7, fill: "#2166ac"}),
+    Plot.ruleY([1], {stroke: "currentColor"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`${K} independent factors with r = ${fmt(r)} would jointly explain **${fmt(100 * K * r * r, 0)}%** of the variance in the outcome. At most **${Math.floor(1 / (r * r))}** such effects can coexist. ${K * r * r > 1 ? "This literature is claiming the impossible: the piranhas would eat each other." : "This set of claims fits in the variance budget, but leaves little room for anything else."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Large effects compete for a finite variance budget. They can't all be large.
+- Use the joint constraint as a sanity check on literatures full of "powerful nudges."
+- When effects are claimed one at a time, ask what the whole collection implies.
+:::
+
+## Related entries
+
+- [Looking for a needle in a pile of needles](needle-in-pile-of-needles.qmd)
+- [Anthropic principle](anthropic-principle.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+- [Reverse Poe](reverse-poe.qmd)
+
+## Source
+
+- Andrew Gelman, [The piranha problem in social psychology / behavioral economics](http://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/) (2017).
+- Tosh, Greengard, Goodrich, Gelman, Vehtari and Hsu, "The piranha problem: Large effects swimming in a small pond" (2021).

@@ -1,0 +1,98 @@
+---
+title: "The Edlin Factor"
+date: 2026-11-09
+description: "How much you should scale down published estimates."
+order: 51
+categories: [Significance & noise, Bayesian inference]
+source: "http://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#51** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Edlin's rule for routinely scaling down published estimates](http://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/).
+:::
+
+## What it is
+
+Economist Aaron Edlin suggested that readers should routinely shrink published effect estimates, mentally multiplying them by some factor less than 1. Gelman named that multiplier the **Edlin factor**. A published estimate passed through the [significance filter](statistical-significance-filter.qmd) and other selection, so the best guess for the true effect is smaller than the number in the abstract.
+
+## Why it matters
+
+Policy decisions, power calculations for new studies and cost-benefit analyses all use published effect sizes as inputs. Taken at face value, they produce plans that are too optimistic: under-powered replications, over-promised interventions. Applying an Edlin factor is a crude but useful correction, especially where studies are small and noisy.
+
+## How it works
+
+If true effects across a literature are $\theta \sim \mathrm{N}(0, \tau^2)$ and estimates are $\hat\theta \sim \mathrm{N}(\theta, \text{se}^2)$, the best guess for the truth given an estimate is
+
+$$
+\mathrm{E}(\theta \mid \hat\theta) = E \cdot \hat\theta, \qquad E = \frac{\tau^2}{\tau^2 + \text{se}^2}.
+$$
+
+Under this normal model the factor is the same for every estimate, published or not. Selection matters because it guarantees that the estimates you *see* are the large ones. That is where the gap between $\hat\theta$ and $E\hat\theta$ is biggest in absolute terms, and why the published record overstates effects. Under more realistic priors, with many effects near zero and a few large ones, the right factor is smaller still for estimates that only just reach significance. Values Gelman has discussed range from about 0.9 in well-powered fields to 0.1 or less in very noisy ones.
+
+## Simulated example
+
+A literature of 5,000 studies. True effects vary with spread τ and are estimated with standard error se. Only the significant estimates get published. Fit a line through the origin of true effect on published estimate. Its slope is the Edlin factor. Compare it with the theoretical τ²/(τ² + se²).
+
+```{ojs}
+import {rng, range, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0.05, 1], {value: 0.2, step: 0.05, label: "Spread of true effects τ"})
+viewof se = Inputs.range([0.05, 1], {value: 0.25, step: 0.05, label: "Standard error of each study"})
+viewof seed = Inputs.range([1, 500], {value: 51, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+lit = {
+  const r = rng(seed);
+  return range(5000).map(() => { const theta = r.normal(0, tau), est = r.normal(theta, se); return {theta, est, pub: Math.abs(est) > 1.96 * se}; });
+}
+edlin = {
+  const pub = lit.filter(d => d.pub);
+  return {
+    factor: sum(pub.map(d => d.theta * d.est)) / sum(pub.map(d => d.est * d.est)),
+    n: pub.length,
+    theory: tau * tau / (tau * tau + se * se),
+    absEst: sum(pub.map(d => Math.abs(d.est))) / pub.length,
+    absTrue: sum(pub.map(d => Math.abs(d.theta))) / pub.length
+  };
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "Published estimate", grid: true},
+  y: {label: "True effect", grid: true},
+  marks: [
+    Plot.dot(lit.filter(d => d.pub).slice(0, 1200), {x: "est", y: "theta", r: 1.5, fill: "#2166ac", fillOpacity: 0.4}),
+    Plot.line([[-3, -3], [3, 3]].map(([x, y]) => ({x: x * se * 1.5, y: y * se * 1.5})), {x: "x", y: "y", stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line([-4, 4].map(x => ({x: x * se, y: x * se * edlin.factor})), {x: "x", y: "y", stroke: "#d6604d", strokeWidth: 2})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Of 5,000 studies, **${edlin.n}** were published. Their estimates average **${fmt(edlin.absEst, 2)}** in magnitude, while their true effects average only **${fmt(edlin.absTrue, 2)}**. The Edlin factor, the slope of truth on published estimate (red), is **${fmt(edlin.factor, 2)}**, matching the theoretical ${fmt(edlin.theory, 2)}. Rule of thumb for this literature: mentally multiply every published estimate by about ${fmt(edlin.factor, 1)}.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Published estimates are biased upward by selection. Scale them down.
+- The right factor depends on power: close to 1 for precise studies, far below 1 for noisy ones.
+- Use shrunken estimates when planning replications or making decisions.
+:::
+
+## Related entries
+
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [The 80% Power Lie](80-percent-power-lie.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [The Time-Reversal Heuristic](time-reversal-heuristic.qmd)
+
+## Source
+
+- Andrew Gelman, [Edlin's rule for routinely scaling down published estimates](http://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/) (2014).

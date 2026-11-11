@@ -1,0 +1,99 @@
+---
+title: "Eureka bias"
+date: 2026-11-09
+description: "When you think you made a discovery and then you don't want to give it up, even if it turns out you interpreted your data wrong."
+order: 72
+categories: [Reasoning & fallacies, Research culture]
+source: "http://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#72** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Eureka bias](http://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/).
+:::
+
+## What it is
+
+The thrill of discovery creates attachment. Once you believe you've found something, the excitement, the sense of ownership and the effort already invested all make it hard to let go, even when it turns out you misread the data. Eureka bias is that reluctance: continuing to defend a "discovery" after the evidence for it has dissolved.
+
+## Why it matters
+
+Discoveries are often made at the moment you know the least: early, with the first data, in exploratory analysis. Treating that moment as decisive locks in errors. Researchers with eureka bias explain away failed replications, treat corrections as attacks and stretch the original interpretation to cover new data. The bias also leads others astray, since the discoverer is the person others turn to for the evidence.
+
+## How it works
+
+A toy model. A researcher spots the largest of many noisy patterns (a "discovery") and forms a belief about its size. New data then arrive. A neutral updater combines the evidence by precision. A eureka-biased updater gives new evidence only a fraction $\phi < 1$ of its proper weight. They aren't ignoring it, just discounting it. Their belief stays anchored to the exciting first look.
+
+## Simulated example
+
+The true effect is zero, but the "discovery" is the biggest of 20 noisy initial estimates. Twenty follow-up datasets come in. Compare the two updaters.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof phi = Inputs.range([0.01, 1], {value: 0.05, step: 0.01, label: "Weight eureka-biased researcher gives new data (φ)"})
+viewof seed = Inputs.range([1, 500], {value: 72, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+eureka = {
+  const r = rng(seed);
+  const se0 = 0.3;
+  const first = Math.max(...r.normals(20, 0, se0));            // the "discovery"
+  let nm = first, nw = 1 / se0 ** 2, em = first, ew = 1 / se0 ** 2;
+  const path = [{k: 0, who: "Neutral updater", m: nm}, {k: 0, who: "Eureka-biased", m: em}];
+  for (let k = 1; k <= 20; k++) {
+    const se = 0.3, y = r.normal(0, se), w = 1 / se ** 2;
+    nm = (nm * nw + y * w) / (nw + w); nw += w;
+    em = (em * ew + y * w * phi) / (ew + w * phi); ew += w * phi;
+    path.push({k, who: "Neutral updater", m: nm}, {k, who: "Eureka-biased", m: em});
+  }
+  // Average final beliefs over many simulated "careers" with the same settings.
+  let sumN = 0, sumE = 0;
+  for (let rep = 0; rep < 500; rep++) {
+    const f = Math.max(...r.normals(20, 0, se0)), ys = r.normals(20, 0, 0.3);
+    const w0 = 1 / se0 ** 2, w = 1 / 0.09, s = ys.reduce((a, b) => a + b, 0);
+    sumN += (f * w0 + s * w) / (w0 + 20 * w);
+    sumE += (f * w0 + s * w * phi) / (w0 + 20 * w * phi);
+  }
+  return {first, path, avgN: sumN / 500, avgE: sumE / 500};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Follow-up datasets"},
+  y: {label: "Believed effect size", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(eureka.path, {x: "k", y: "m", stroke: "who", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0], {stroke: "currentColor", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = w => eureka.path.filter(d => d.who === w).at(-1).m;
+  return html`<div class="sim-readout">${md`The "discovery" was **${fmt(eureka.first)}**, the largest of 20 noisy looks at a true effect of zero. After 20 follow-ups, the neutral updater believes **${fmt(end("Neutral updater"))}** and the eureka-biased one still believes **${fmt(end("Eureka-biased"))}**. Averaged over 500 simulated runs, the final beliefs are **${fmt(eureka.avgN)}** (neutral) and **${fmt(eureka.avgE)}** (eureka-biased). Discounting the new evidence keeps a dead discovery alive.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- The moment of discovery is often when you know the least.
+- Watch for discounting of evidence against your own findings.
+- Ask colleagues with no stake in the result to judge the follow-up evidence.
+:::
+
+## Related entries
+
+- [More Vampirical Than Empirical](more-vampirical-than-empirical.qmd)
+- [Mistakes](mistakes.qmd)
+- [Cantor's Corner](cantors-corner.qmd)
+- [Story Time](story-time.qmd)
+
+## Source
+
+- Andrew Gelman, [Eureka bias](http://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/) (2018).

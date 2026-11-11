@@ -1,0 +1,101 @@
+---
+title: "Ockhamite Tendencies"
+date: 2026-11-09
+description: "The irritating habit of trying to get other people to use oversimplified models."
+order: 22
+categories: [Philosophy of statistics, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#22** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/).
+:::
+
+## What it is
+
+Ockham's razor says not to multiply entities beyond necessity. As a heuristic for scientific explanation it has its uses. Gelman objects to its use as a *statistical modeling rule*: the reflex to drop terms, set small effects to exactly zero, and push collaborators toward the simplest model that "fits." In the social and biological sciences especially, effects are rarely exactly zero. The real question is how to estimate many small, uncertain effects well, not how to pick which ones to pretend don't exist.
+
+## Why it matters
+
+Simplifying by deletion, through stepwise selection, dropping non-significant terms or insisting on a single predictor, produces models that are overconfident and biased. The surviving coefficients are inflated by the [significance filter](statistical-significance-filter.qmd), and the deleted ones are set to an exact zero that nobody believes. Predictions suffer, and so does understanding. The alternative is *continuous model expansion*: include the plausible terms and use partial pooling or priors to keep them in check.
+
+## How it works
+
+Compare two ways of handling $K$ candidate effects $\beta_1, \dots, \beta_K$, most of them small but not zero:
+
+- **Ockhamite selection.** Estimate each one, keep it if $|\hat\beta_k / \text{se}_k| > 2$, and otherwise set it to 0.
+- **Partial pooling.** Shrink every estimate toward zero by a common factor learned from the data, $\tilde\beta_k = \frac{\tau^2}{\tau^2 + \text{se}^2}\,\hat\beta_k$, keeping all of them.
+
+Selection is a hard, discontinuous version of shrinkage. It is too aggressive for most effects and not aggressive enough for the few lucky ones it keeps.
+
+## Simulated example
+
+Forty effects are drawn from a normal distribution, so most are small. Each is estimated with noise. Compare the error of the simplify-by-selection approach with the error of keeping everything and partially pooling.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0.05, 1.5], {value: 0.4, step: 0.05, label: "Spread of true effects τ"})
+viewof se = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Standard error of each estimate"})
+viewof seed = Inputs.range([1, 500], {value: 22, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+effects = {
+  const r = rng(seed);
+  const raw = range(40).map(k => {
+    const truth = r.normal(0, tau), est = r.normal(truth, se);
+    return {k, truth, est};
+  });
+  const tau2hat = Math.max(0.0001, mean(raw.map(d => d.est ** 2)) - se * se);
+  return raw.map(d => ({
+    ...d,
+    selected: Math.abs(d.est / se) > 2 ? d.est : 0,
+    pooled: tau2hat / (tau2hat + se * se) * d.est
+  }));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "True effect", grid: true},
+  y: {label: "Estimate used", grid: true},
+  color: {legend: true, domain: ["Ockhamite selection", "Partial pooling"], range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.line([[-3 * tau, -3 * tau], [3 * tau, 3 * tau]], {stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.dot(effects, {x: "truth", y: "selected", fill: () => "Ockhamite selection", r: 3.5}),
+    Plot.dot(effects, {x: "truth", y: "pooled", fill: () => "Partial pooling", r: 3.5})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const rm = k => Math.sqrt(mean(effects.map(d => (d[k] - d.truth) ** 2)));
+  const kept = effects.filter(d => d.selected !== 0).length;
+  return html`<div class="sim-readout">${md`The Ockhamite model keeps **${kept}** of 40 effects and zeroes the rest. Root-mean-square error: selection **${fmt(rm("selected"), 3)}**, partial pooling **${fmt(rm("pooled"), 3)}**, raw estimates **${fmt(rm("est"), 3)}**. The red dots on the horizontal line at 0 are real effects that were deleted, and the red dots off it are inflated survivors.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- In most applied fields effects are rarely exactly zero. Deleting them is a modeling assumption, and usually a bad one.
+- Prefer continuous model expansion with regularization to discrete simplification.
+- Simplicity is a virtue in *communication*. It is not a reason to distort estimates.
+:::
+
+## Related entries
+
+- [The Blessing of Dimensionality](blessing-of-dimensionality.qmd)
+- [Between regularization and discovery](regularization-and-discovery.qmd)
+- [Mathematical Simplicity](mathematical-simplicity.qmd)
+- [Looking for a needle in a pile of needles](needle-in-pile-of-needles.qmd)
+
+## Source
+
+- Andrew Gelman, [Bayes, Jeffreys, prior distributions, and the philosophy of statistics](https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/) (2009).

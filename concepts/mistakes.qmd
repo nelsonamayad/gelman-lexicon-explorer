@@ -1,0 +1,94 @@
+---
+title: "Mistakes"
+date: 2026-11-09
+description: "We all make them; what's important is to learn from them."
+order: 96
+categories: [Research culture, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2018/05/24/admire-authors-simply-admitting-made-error-stating-clearly-without-equivocation-original-conclusions-not-substantiated/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#96** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I admire these authors for simply admitting they made an error](https://statmodeling.stat.columbia.edu/2018/05/24/admire-authors-simply-admitting-made-error-stating-clearly-without-equivocation-original-conclusions-not-substantiated/).
+:::
+
+## What it is
+
+Every researcher makes mistakes: coding errors, wrong assumptions, overconfident interpretations. The question isn't whether you make them but what happens next. Gelman praised authors who simply admitted an error and stated plainly that their original conclusions were not supported, with no hedging and no "the main point still stands." That response turns a mistake into learning, for the authors and for the field.
+
+## Why it matters
+
+Admitting errors costs something in the short term and pays off in the long term. Researchers and fields that hide or minimize mistakes repeat them. Those that acknowledge mistakes find the systematic causes, such as weak workflows, missing checks or bad defaults, and fix them. Admitting errors also gives the work that follows more credibility (see [McBroom's Law](mcbrooms-law.qmd)).
+
+## How it works
+
+A toy model of a research career. Each project has some chance of containing an error. When an error is found, a researcher who *learns from it* fixes the underlying cause, for example by adding a check to their workflow, which lowers their future error rate. A researcher who *denies* the error keeps the same error rate. Over many projects, the gap in total errors grows steadily.
+
+## Simulated example
+
+Researchers start with the same error rate and work on 50 projects. Some learn from each discovered error and some don't. The curves average over 200 simulated careers of each kind.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof baseRate = Inputs.range([0.05, 0.5], {value: 0.25, step: 0.01, label: "Initial chance a project has an error"})
+viewof learning = Inputs.range([0, 0.5], {value: 0.2, step: 0.01, label: "Error-rate reduction per lesson learned"})
+viewof seed = Inputs.range([1, 500], {value: 96, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+career = {
+  const r = rng(seed);
+  // Average cumulative mistakes over 200 simulated careers of 50 projects each.
+  const run = (learns, who) => {
+    const totals = new Array(50).fill(0), rates = new Array(50).fill(0);
+    for (let c = 0; c < 200; c++) {
+      let rate = baseRate, total = 0;
+      for (let t = 0; t < 50; t++) {
+        if (r() < rate) { total++; if (learns && r() < 0.8) rate *= (1 - learning); }
+        totals[t] += total / 200; rates[t] += rate / 200;
+      }
+    }
+    return totals.map((total, t) => ({t: t + 1, who, total, rate: rates[t]}));
+  };
+  return [...run(true, "Admits and learns"), ...run(false, "Denies and repeats")];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Project number"},
+  y: {label: "Average cumulative mistakes (200 careers)", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(career, {x: "t", y: "total", stroke: "who", strokeWidth: 2})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = w => career.filter(d => d.who === w).at(-1);
+  return html`<div class="sim-readout">${md`After 50 projects, averaged over 200 careers: researchers who learn made **${fmt(end("Admits and learns").total, 1)}** mistakes, and their error rate fell to **${fmt(100 * end("Admits and learns").rate, 0)}%**. Those who deny made **${fmt(end("Denies and repeats").total, 1)}**, still at ${fmt(100 * baseRate, 0)}%. Both made mistakes. Only one learned from them.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Everyone makes mistakes. The response is what matters.
+- Admit errors plainly, find their causes and change your workflow.
+- A culture that punishes admitting errors makes sure they are repeated.
+:::
+
+## Related entries
+
+- [Making errors is inevitable](making-errors-inevitable.qmd)
+- [McBroom's Law](mcbrooms-law.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+- [Eureka bias](eureka-bias.qmd)
+
+## Source
+
+- Andrew Gelman, [I admire these authors for simply admitting they made an error](https://statmodeling.stat.columbia.edu/2018/05/24/admire-authors-simply-admitting-made-error-stating-clearly-without-equivocation-original-conclusions-not-substantiated/) (2018).

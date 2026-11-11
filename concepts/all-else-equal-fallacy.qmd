@@ -1,0 +1,97 @@
+---
+title: "The \"All Else Equal\" Fallacy"
+date: 2026-11-09
+description: "Assuming that everything else is held constant, even when it's not gonna be."
+order: 17
+categories: [Causal inference, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#17** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/).
+:::
+
+## What it is
+
+A regression coefficient tells you how the outcome differs when one predictor changes *and the other predictors in the model stay the same*. The "all else equal" fallacy is reading that coefficient as the effect of a real-world change, when in reality other variables will not stay fixed. They respond to the change.
+
+## Why it matters
+
+Policy and personal decisions are about interventions, and interventions ripple. Raise a price and demand shifts. Change a school's funding and enrolment, teacher hiring and parental choices adjust. Tell people that a variable predicts health "holding everything else constant" and they may assume changing it will change health by that amount. The coefficient's thought experiment is often impossible, or at least not what will actually happen.
+
+## How it works
+
+Suppose $Y = \beta X + \gamma Z + \epsilon$ and, in the world, $Z$ itself responds to $X$: $Z = \delta X + \nu$. The coefficient on $X$ in the full regression is $\beta$, the "all else equal" effect. An intervention that moves $X$ by one unit moves $Y$ by
+
+$$
+\beta + \gamma\,\delta,
+$$
+
+the *total* effect. Depending on the signs, the total can be larger, smaller or opposite to $\beta$. Which number you want depends on the question, and "all else equal" is often the wrong one.
+
+## Simulated example
+
+$X$ affects $Y$ directly, and also through a variable $Z$ that responds to $X$. We fit $Y \sim X + Z$ and read off the "all else equal" coefficient. Then we simulate an actual intervention that raises $X$ by one unit and let $Z$ respond.
+
+```{ojs}
+import {rng, range, mean, ols, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof beta = Inputs.range([-1, 1], {value: 0.5, step: 0.05, label: "Direct effect of X on Y (β)"})
+viewof delta = Inputs.range([-1.5, 1.5], {value: -1, step: 0.05, label: "How Z responds to X (δ)"})
+viewof gamma = Inputs.range([-1, 1], {value: 0.8, step: 0.05, label: "Effect of Z on Y (γ)"})
+viewof seed = Inputs.range([1, 500], {value: 17, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+aee = {
+  const r = rng(seed);
+  const gen = (shift) => range(2000).map(() => {
+    const x = r.normal(0, 1) + shift;
+    const z = delta * x + r.normal(0, 1);
+    return {x, z, y: beta * x + gamma * z + r.normal(0, 1)};
+  });
+  const obs = gen(0);
+  const coef = ols(obs.map(d => [d.x, d.z]), obs.map(d => d.y)).coef[1];
+  const after = gen(1);
+  const total = mean(after.map(d => d.y)) - mean(obs.map(d => d.y));
+  return [
+    {what: "Regression coefficient (all else equal)", value: coef},
+    {what: "Actual effect of raising X by 1", value: total}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 160,
+  marginLeft: 250,
+  x: {label: "Change in Y", grid: true, domain: [-2.5, 2.5]},
+  y: {label: null},
+  marks: [Plot.barX(aee, {y: "what", x: "value", fill: (d, i) => i ? "#d6604d" : "#2166ac"}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Regression coefficient: **${fmt(aee[0].value)}**. Real intervention: **${fmt(aee[1].value)}**. Theory predicts β + γδ = **${fmt(beta + gamma * delta)}**. With these settings, the "all else equal" answer ${Math.sign(aee[0].value) !== Math.sign(aee[1].value) ? "gets even the *direction* wrong" : "gets the size wrong"}.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A coefficient answers a hypothetical question in which other variables are frozen. Ask whether they would really stay put.
+- For policy questions, you usually want the total effect, including how everything else responds.
+- Controlling for a variable that lies on the causal path between X and Y changes what the coefficient means.
+:::
+
+## Related entries
+
+- [The One-Way Street Fallacy](one-way-street-fallacy.qmd)
+- [Marginal](marginal.qmd)
+- [The Causal Identification Kool-Aid](causal-identification-kool-aid.qmd)
+
+## Source
+
+- Andrew Gelman, [The "all else equal" fallacy](https://statmodeling.stat.columbia.edu/2008/03/the_all_else_eq_1/) (2008).

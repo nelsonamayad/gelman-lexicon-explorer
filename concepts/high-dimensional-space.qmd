@@ -1,0 +1,94 @@
+---
+title: "In high-dimensional space"
+date: 2026-11-09
+description: "No one can hear you scream."
+order: 132
+categories: [Computing, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#132** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The typical set and its relevance to Bayesian computation](https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/).
+:::
+
+## What it is
+
+A play on the *Alien* tagline, "In space no one can hear you scream." Intuitions from one, two or three dimensions fail badly in high dimensions. The most striking case is that in a high-dimensional distribution, **almost none of the probability mass is near the mode**. Draws from a 100-dimensional standard normal are almost never near the origin, even though the origin has the highest density. They sit in a thin shell, the **typical set**, at radius about $\sqrt{d}$.
+
+## Why it matters
+
+The typical set explains a lot about Bayesian computation. Optimizers find the mode, which is unrepresentative. Random-walk samplers struggle because almost all of the space is empty. Hamiltonian Monte Carlo, as used in Stan, works because it is designed to move along the typical set. It also explains why posterior modes (MAP estimates) can be misleading summaries in high-dimensional models such as hierarchical models with many groups.
+
+## How it works
+
+For $x \sim \mathrm{N}(0, I_d)$, the squared distance from the mode is $\lVert x \rVert^2 \sim \chi^2_d$, with mean $d$ and standard deviation $\sqrt{2d}$. So
+
+$$
+\lVert x \rVert \approx \sqrt{d} \pm \tfrac{1}{\sqrt{2}}.
+$$
+
+As $d$ grows, the radius grows and the *relative* width of the shell shrinks. The density is highest at the origin, but the volume there is tiny. The mass sits where moderate density meets enormous volume.
+
+## Simulated example
+
+Draw 5,000 points from a $d$-dimensional standard normal and look at their distances from the mode.
+
+```{ojs}
+import {rng, range, mean, sd, quantile, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof d = Inputs.range([1, 500], {value: 100, step: 1, label: "Dimension d"})
+viewof seed = Inputs.range([1, 500], {value: 132, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+shell = {
+  const r = rng(seed);
+  return range(5000).map(() => { let s = 0; for (let j = 0; j < d; j++) { const z = r.normal(); s += z * z; } return {dist: Math.sqrt(s)}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Distance from the mode", grid: true, domain: [0, Math.max(4, Math.sqrt(d) + 4)]},
+  y: {label: "Draws"},
+  marks: [
+    Plot.rectY(shell, Plot.binX({y: "count"}, {x: "dist", fill: "#2166ac", thresholds: 60})),
+    Plot.ruleX([0], {stroke: "#d6604d", strokeWidth: 3}),
+    Plot.text([0], {x: 0, y: 0, text: () => "mode", dx: 6, dy: -10, textAnchor: "start", fill: "#d6604d"}),
+    Plot.ruleX([Math.sqrt(d)], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const ds = shell.map(x => x.dist);
+  const near = ds.filter(v => v < 1).length / ds.length;
+  return html`<div class="sim-readout">${md`In ${d} dimensions, draws sit at distance **${fmt(mean(ds), 2)} ± ${fmt(sd(ds), 2)}** from the mode (√d = ${fmt(Math.sqrt(d), 2)}). Share of draws within distance 1 of the mode: **${pct(near, 2)}**. The mode is the most likely *point* and an atypical *place*. No one can hear you scream there.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- In high dimensions, almost all probability mass is far from the mode, in the typical set.
+- Mode-based summaries and optimizers can badly misrepresent high-dimensional posteriors.
+- Good samplers, such as Hamiltonian Monte Carlo, are built to explore the typical set.
+:::
+
+## Related entries
+
+- [The Folk Theorem of Statistical Computing](folk-theorem.qmd)
+- [The Blessing of Dimensionality](blessing-of-dimensionality.qmd)
+- [Until it runs twice](until-it-runs-twice.qmd)
+- [What were you doing before you had any data?](before-you-had-any-data.qmd)
+
+## Source
+
+- Andrew Gelman, [The typical set and its relevance to Bayesian computation](https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/) (2020).
+- Michael Betancourt, "A conceptual introduction to Hamiltonian Monte Carlo" (2017).

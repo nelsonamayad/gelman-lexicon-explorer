@@ -1,0 +1,88 @@
+---
+title: "The Click-Through Solution"
+date: 2026-11-09
+description: "Start with a visually grabby graphic effect to suck the viewer in. Then click and get a suite of statistical graphs that allow more direct visual comparisons. Then click again to get a spreadsheet with all the numbers and a list of sources."
+order: 125
+categories: [Statistical graphics, Communication]
+source: "https://statmodeling.stat.columbia.edu/2015/08/26/vizzy-vizzy-vizzy-viz/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#125** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Vizzy vizzy vizzy viz](https://statmodeling.stat.columbia.edu/2015/08/26/vizzy-vizzy-vizzy-viz/).
+:::
+
+## What it is
+
+Infographics and statistical graphics serve different goals. Infographics grab attention. Statistical graphics support careful comparison. Rather than forcing one display to do both badly, Gelman proposes layering them:
+
+1. a **grabby** graphic that draws the viewer in;
+2. a click to a set of **statistical graphs** for real comparisons;
+3. another click to a **spreadsheet** with all the numbers and sources.
+
+## Why it matters
+
+Debates between "data art" and "data analysis" often assume a single display has to choose. Interactive media remove that constraint. Each audience gets what it needs: casual readers get the hook, interested readers get the comparisons, and skeptics get the data. Each layer also makes the others more trustworthy, because the grabby graphic can be checked against the precise ones.
+
+## How it works
+
+The same dataset is shown three ways. The grabby layer uses salient visual encodings, such as bubble area and colour, that attract attention but are hard to compare precisely. The statistical layer uses position on a common scale, such as dot plots and small multiples, which is the most accurate perceptual channel. The data layer is a table with sources, for anyone who wants to check or reuse it.
+
+## Simulated example
+
+Simulated data on 12 cities. Click through the three layers.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof layer = Inputs.radio(["1. Grab attention", "2. Compare", "3. Check the numbers"], {value: "1. Grab attention", label: "Layer"})
+viewof seed = Inputs.range([1, 500], {value: 125, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+cities = {
+  const r = rng(seed);
+  const names = ["Avalon", "Brookfield", "Cedar Falls", "Dunmore", "Eastport", "Fairview", "Glenwood", "Harbor City", "Ironton", "Juniper", "Kingsley", "Lakeside"];
+  return names.map(name => ({name, y2015: r.uniform(20, 80), region: r.pick(["North", "South", "Coast"])})).map(d => ({...d, y2025: d.y2015 + r.normal(5, 8)}));
+}
+```
+
+```{ojs}
+layer.startsWith("1")
+  ? Plot.plot({height: 340, x: {axis: null}, y: {axis: null}, r: {range: [5, 45]}, color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
+      marks: [Plot.dot(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), r: "y2025", fill: "region", fillOpacity: 0.7}),
+              Plot.text(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), text: "name", fill: "white", fontWeight: "bold", fontSize: 10})]})
+  : layer.startsWith("2")
+  ? Plot.plot({height: 360, marginLeft: 90, x: {label: "Index (2015 → 2025)", grid: true}, y: {label: null, domain: cities.slice().sort((a, b) => b.y2025 - a.y2025).map(d => d.name)},
+      color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
+      marks: [Plot.link(cities, {y1: "name", y2: "name", x1: "y2015", x2: "y2025", stroke: "#bbb", markerEnd: "arrow"}), Plot.dot(cities, {y: "name", x: "y2025", fill: "region", r: 5}), Plot.dot(cities, {y: "name", x: "y2015", stroke: "#999", r: 3})]})
+  : html`<table class="table table-sm" style="max-width: 520px;"><thead><tr><th>City</th><th>Region</th><th style="text-align:right">2015</th><th style="text-align:right">2025</th><th style="text-align:right">Change</th></tr></thead>
+      <tbody>${cities.map(d => html`<tr><td>${d.name}</td><td>${d.region}</td><td style="text-align:right">${fmt(d.y2015, 1)}</td><td style="text-align:right">${fmt(d.y2025, 1)}</td><td style="text-align:right">${fmt(d.y2025 - d.y2015, 1)}</td></tr>`)}</tbody></table>
+      <p><small>Source: simulated data, generated in your browser (seed ${seed}).</small></p>`
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`${layer.startsWith("1") ? "Eye-catching, but try to tell which city grew most from bubble areas. You can't. Click through to compare." : layer.startsWith("2") ? "Position on a common scale makes the comparisons precise: the ranking, the changes and the regional patterns." : "Every number and its source, for checking and reuse."} Three layers, three audiences, one dataset.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Grabbing attention and supporting comparison are different goals. Layer them.
+- Interactive displays let each audience go as deep as it wants.
+- Always give access to the underlying numbers and sources.
+:::
+
+## Related entries
+
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [The Ramanujan Principle](ramanujan-principle.qmd)
+- [The Chris Rock Effect](chris-rock-effect.qmd)
+- [What to include](what-to-include.qmd)
+
+## Source
+
+- Andrew Gelman, [Vizzy vizzy vizzy viz](https://statmodeling.stat.columbia.edu/2015/08/26/vizzy-vizzy-vizzy-viz/) (2015).
+- Gelman and Unwin, "Infovis and statistical graphics: Different goals, different looks," *JCGS* (2013).

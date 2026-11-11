@@ -1,0 +1,99 @@
+---
+title: "The John Yoo Line"
+date: 2026-11-09
+description: "The point at which nothing you write gets taken seriously, and so you might as well become a hack because you have no scholarly reputation remaining."
+order: 41
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2012/09/12/niall-ferguson-the-john-yoo-line-and-the-paradox-of-influence/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#41** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Niall Ferguson, the John Yoo line, and the paradox of influence](https://statmodeling.stat.columbia.edu/2012/09/12/niall-ferguson-the-john-yoo-line-and-the-paradox-of-influence/).
+:::
+
+## What it is
+
+Gelman named this after the legal scholar whose government memos damaged his academic standing. The idea is that a scholar's reputation is an asset that makes careful work worth doing: people listen, so accuracy pays. Once the reputation is gone, so that nothing you write will be taken seriously, the incentive to be careful disappears. Past that point you "might as well become a hack," writing for whichever audience still rewards you.
+
+## Why it matters
+
+The concept explains why some public intellectuals seem to get *worse* after a credibility crisis instead of trying to rebuild. The incentives have flipped. It also warns readers that once a source has crossed the line, the usual assumption that a credentialed expert is trying to be accurate no longer holds.
+
+## How it works
+
+Model the audience's belief that the author is *reliable* rather than a *hack* as a posterior probability, updated after each piece of work by whether it held up. Above the line, readers pay attention and every piece counts. Below it, they mostly stop reading, so careful new work is rarely even noticed and trust cannot rebuild. The return to carefulness collapses, which is the line. This is a toy model of the incentive, not a claim about any particular person.
+
+## Simulated example
+
+An author publishes 60 pieces. Each piece is accurate with probability equal to their care level, which drops partway through. The audience updates its trust only when it is paying attention. Watch trust cross the line and see how slowly it recovers once care returns.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof lapseStart = Inputs.range([5, 40], {value: 15, step: 1, label: "When the author gets careless (piece #)"})
+viewof lapseLength = Inputs.range([0, 30], {value: 12, step: 1, label: "How long the lapse lasts"})
+viewof line = Inputs.range([0.2, 0.8], {value: 0.5, step: 0.05, label: "Trust threshold (the line)"})
+viewof seed = Inputs.range([1, 500], {value: 41, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+trust = {
+  const r = rng(seed);
+  // Audience belief that the author is reliable (accurate 90% of the time)
+  // rather than a hack (accurate 30%). Below the line, readers mostly stop
+  // paying attention, so new work is rarely noticed.
+  let logOdds = 3;                      // starts as a respected scholar
+  return range(60).map(t => {
+    const care = t >= lapseStart && t < lapseStart + lapseLength ? 0.3 : 0.9;
+    const good = r() < care;
+    const p = 1 / (1 + Math.exp(-logOdds));
+    const noticed = p >= line || r() < 0.15;
+    if (noticed) logOdds += good ? Math.log(0.9 / 0.3) : Math.log(0.1 / 0.7);
+    logOdds = Math.max(-12, Math.min(12, logOdds));
+    return {t: t + 1, trust: 1 / (1 + Math.exp(-logOdds)), care, good, noticed};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Piece number"},
+  y: {label: "Audience trust", domain: [0, 1], grid: true},
+  marks: [
+    Plot.rect([0], {x1: lapseStart + 0.5, x2: lapseStart + lapseLength + 0.5, y1: 0, y2: 1, fill: "#d6604d", fillOpacity: 0.08}),
+    Plot.line(trust, {x: "t", y: "trust", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(trust, {x: "t", y: d => d.good ? 0.03 : 0.0, fill: d => d.good ? "#2166ac" : "#d6604d", r: 2.5}),
+    Plot.ruleY([line], {stroke: "currentColor", strokeDasharray: "5 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const below = trust.filter(d => d.trust < line);
+  const back = trust.find(d => d.t > lapseStart + lapseLength && d.trust >= line);
+  return html`<div class="sim-readout">${md`${below.length ? `Trust crosses the line at piece **${below[0].t}**.` : "Trust never crosses the line here."} ${below.length ? (back ? `After care resumes, it takes until piece **${back.t}** to climb back.` : "Even after care resumes, trust **never** recovers within 60 pieces. From the author's point of view, careful work has stopped paying.") : ""} Shaded: the careless stretch.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Reputation creates the incentive for careful work. When it's lost, so is the incentive.
+- Credibility is slow to rebuild once enough evidence of error has accumulated.
+- Readers should update on track records and not assume every credentialed author is trying to be accurate.
+:::
+
+## Related entries
+
+- [The Paradox of Influence](paradox-of-influence.qmd)
+- [McBroom's Law](mcbrooms-law.qmd)
+- [Clarke's Law](clarkes-law.qmd)
+
+## Source
+
+- Andrew Gelman, [Niall Ferguson, the John Yoo line, and the paradox of influence](https://statmodeling.stat.columbia.edu/2012/09/12/niall-ferguson-the-john-yoo-line-and-the-paradox-of-influence/) (2012).

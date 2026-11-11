@@ -1,0 +1,99 @@
+project:
+  type: website
+  output-dir: _site
+  # Only .qmd files are pages; README.md, TODO.md and CLAUDE.md stay out of the site.
+  render:
+    - "**/*.qmd"
+  resources:
+    - js/stats.js
+    - assets/
+
+website:
+  title: "Andrew Gelman Statistical Lexicon Explorer"
+  description: "All 153 entries in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation."
+  # Set this to the Netlify URL (or custom domain) once the site exists;
+  # it is used for the sitemap and social-media preview cards.
+  # site-url: https://YOUR-SITE.netlify.app
+  favicon: assets/logo.svg
+  search:
+    location: navbar
+    type: overlay
+  page-navigation: true
+  back-to-top-navigation: true
+  bread-crumbs: true
+  open-graph: true
+  twitter-card: true
+  navbar:
+    logo: assets/logo.svg
+    logo-alt: "Lexicon Explorer logo"
+    title: "Statistical Lexicon Explorer"
+    left:
+      - href: index.qmd
+        text: Browse all
+      - text: Topics
+        menu:
+          - href: topics/bayesian-inference.qmd
+          - href: topics/significance-and-noise.qmd
+          - href: topics/causal-inference.qmd
+          - href: topics/modeling-workflow.qmd
+          - href: topics/statistical-graphics.qmd
+          - href: topics/surveys-and-mrp.qmd
+          - text: "---"
+          - href: topics/research-culture.qmd
+          - href: topics/reasoning-and-fallacies.qmd
+          - href: topics/philosophy-of-statistics.qmd
+          - href: topics/communication.qmd
+          - href: topics/computing.qmd
+      - href: start-here.qmd
+        text: Start here
+      - href: random.qmd
+        text: Random entry
+      - href: about.qmd
+        text: About
+    right:
+      - icon: github
+        href: https://github.com/nelsonamayad
+        aria-label: Nelson Amaya D on GitHub
+      - icon: box-arrow-up-right
+        href: https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/
+        aria-label: Gelman's original lexicon
+  sidebar:
+    - id: entries
+      title: "Entries"
+      style: docked
+      collapse-level: 1
+      contents:
+        - section: "All 153 entries, in Gelman's order"
+          contents:
+            - auto: "concepts/*.qmd"
+  page-footer:
+    left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Explanations and simulations by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5, an independent study aid."
+    right:
+      - text: About
+        href: about.qmd
+      - icon: shuffle
+        href: random.qmd
+        aria-label: Random entry
+
+brand: _brand.yml
+
+# Every page shows its published date (`date` in each file's front matter) and
+# its last-modified date, taken from the file's modification time. The publish
+# workflow restores modification times from git history so this is accurate on
+# Netlify builds.
+date-modified: last-modified
+date-format: long
+
+format:
+  html:
+    css: styles.css
+    toc: true
+    toc-title: "On this page"
+    code-fold: true
+    code-summary: "Show simulation code"
+    code-tools: false
+    smooth-scroll: true
+    anchor-sections: true
+
+execute:
+  echo: true

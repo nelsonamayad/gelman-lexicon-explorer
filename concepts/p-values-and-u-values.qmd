@@ -1,0 +1,103 @@
+---
+title: "P-values and U-values"
+date: 2026-11-09
+description: "They're different."
+order: 8
+categories: [Significance & noise, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#8** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/).
+:::
+
+## What it is
+
+A **p-value** is a probability: the chance, under some model, of seeing a test statistic as or more extreme than the observed one. A **u-value** is any statistic that has a *uniform(0, 1)* distribution when the model is true. Gelman's point is that the two are different things. Classical p-values for simple continuous tests happen to be u-values. Many perfectly sensible p-values are not, and posterior predictive p-values are the leading example.
+
+## Why it matters
+
+People calibrate their reactions to p-values by assuming uniformity: "under the null, p < 0.05 happens 5% of the time." That works for u-values. A posterior predictive p-value, used to check a Bayesian model, is typically *concentrated near 0.5* when the model is true, because the same data are used to fit the model and to check it. Treating it as uniform gives the wrong impression of how surprising a result is. Conversely, a non-uniform p-value is not "broken." It is still a valid probability statement about the replicated data.
+
+## How it works
+
+For a test statistic $T$:
+
+- Classical p-value: $p = \Pr(T(y^{\text{rep}}) \ge T(y) \mid \theta_0)$. If $\theta_0$ is fixed and $T$ is continuous, $p \sim \mathrm{U}(0, 1)$ under the null, so it is a u-value.
+- Posterior predictive p-value: $p_B = \Pr(T(y^{\text{rep}}) \ge T(y) \mid y)$, which averages over the posterior for $\theta$. Because the posterior is centered near the data, $y^{\text{rep}}$ resembles $y$. The resulting p-values pile up near 0.5. For a statistic the model fits directly, such as the sample mean, they can be exactly 0.5 every time.
+
+## Simulated example
+
+We generate 300 datasets from a normal model with known variance and compute two checks on each. One is a classical z-test p-value at the true mean. The other is a posterior predictive p-value under a vague prior, for a chosen test statistic. The model is *true* in every dataset.
+
+```{ojs}
+import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof stat = Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"})
+viewof n = Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"})
+viewof seed = Inputs.range([1, 500], {value: 4, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pvals = {
+  const r = rng(seed);
+  const T = y => stat === "Sample mean" ? mean(y) : stat === "Sample maximum" ? Math.max(...y) : mean(y.map(v => (v - mean(y)) ** 2));
+  return range(300).map(k => {
+    const theta = 0;
+    const y = r.normals(n, theta, 1), ybar = mean(y);
+    const classical = 1 - pnorm((ybar - theta) * Math.sqrt(n));
+    const tObs = T(y);
+    let exceed = 0;
+    for (let s = 0; s < 200; s++) {
+      const th = r.normal(ybar, 1 / Math.sqrt(n));     // posterior under flat prior
+      if (T(r.normals(n, th, 1)) >= tObs) exceed++;
+    }
+    return {k, classical, ppp: exceed / 200};
+  });
+}
+pLong = pvals.flatMap(d => [{type: "Classical p-value (a u-value)", p: d.classical}, {type: "Posterior predictive p-value", p: d.ppp}])
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  facet: {data: pLong, y: "type", marginRight: 190},
+  x: {label: "p", domain: [0, 1]},
+  y: {label: "Datasets", grid: true},
+  marks: [
+    Plot.rectY(pLong, Plot.binX({y: "count"}, {x: "p", fill: "type", thresholds: 20, domain: [0, 1]})),
+    Plot.ruleY([300 / 20], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ],
+  color: {range: ["#2166ac", "#d6604d"]}
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const tail = v => v.filter(p => p < 0.05 || p > 0.95).length / v.length;
+  return html`<div class="sim-readout">${md`The model is correct in every dataset. Share of p-values in the outer 10% (below 0.05 or above 0.95): classical **${fmt(100 * tail(pvals.map(d => d.classical)), 0)}%** (about 10% expected for a u-value), posterior predictive **${fmt(100 * tail(pvals.map(d => d.ppp)), 0)}%**. The dashed line is what a uniform distribution would give.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A p-value is a probability. A u-value is a statistic that is uniform under the model. Classical tests blur the two.
+- Posterior predictive p-values are usually *not* uniform. Extreme values are rarer than the nominal level suggests, so an extreme one is especially telling.
+- Interpret a p-value by asking what it is a probability *of*, not by assuming uniformity.
+:::
+
+## Related entries
+
+- [A chicken](a-chicken.qmd)
+- [Salad Tongs](salad-tongs.qmd)
+- [Seeds of its own destruction](seeds-of-its-own-destruction.qmd)
+
+## Source
+
+- Andrew Gelman, [P-values and u-values](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/) (2009).
+- Andrew Gelman, "Two simple examples for understanding posterior p-values whose distributions are far from uniform," *Electronic Journal of Statistics* (2013).

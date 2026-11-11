@@ -1,0 +1,94 @@
+---
+title: "Default, the greatest trick it ever pulled"
+date: 2026-11-09
+description: "Convincing the world it didn't exist."
+order: 38
+categories: [Philosophy of statistics, Modeling workflow]
+source: "http://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#38** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/).
+:::
+
+## What it is
+
+A paraphrase of the line from *The Usual Suspects* ("the greatest trick the Devil ever pulled was convincing the world he didn't exist"). Defaults are choices, but because nobody actively makes them, they feel like the absence of a choice. The post where this entry appears is about how noticing unstated defaults in society, such as assumptions about who the "typical" person is, carries over to noticing unstated defaults in science.
+
+## Why it matters
+
+Analyses are full of defaults that silently shape results. Software drops rows with missing values. A reference category is chosen alphabetically. Outcomes are assumed to be on a linear scale. Interactions are excluded. A sample is assumed to represent "people in general." Because these choices are invisible, they are rarely defended, rarely varied in robustness checks, and rarely mentioned when results are reported, even when they drive the conclusion.
+
+## How it works
+
+Take one common invisible default: **complete-case analysis**. Most regression software silently drops any row with a missing value. That is harmless only if the data are missing completely at random. If missingness depends on the outcome, for example if people with low incomes skip the income question, the complete-case estimate is biased. The analyst never "chose" this. The software did, and the choice doesn't appear anywhere in the write-up.
+
+## Simulated example
+
+We estimate average income from a survey. Low-income respondents are more likely to skip the question. The default "just drop missing rows" gives one answer, and imputation using a related covariate gives another.
+
+```{ojs}
+import {rng, range, mean, lm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof missStrength = Inputs.range([0, 3], {value: 1.5, step: 0.1, label: "How strongly low income predicts skipping"})
+viewof seed = Inputs.range([1, 500], {value: 38, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+survey = {
+  const r = rng(seed);
+  return range(2000).map(() => {
+    const educ = r.normal(0, 1);
+    const income = 50 + 12 * educ + r.normal(0, 10);
+    const pMiss = 1 / (1 + Math.exp(-(-1.5 - missStrength * (income - 50) / 12)));
+    return {educ, income, missing: r() < pMiss};
+  });
+}
+est = {
+  const obs = survey.filter(d => !d.missing);
+  const f = lm(obs.map(d => d.educ), obs.map(d => d.income));
+  const imputed = survey.map(d => d.missing ? f.predict(d.educ) : d.income);
+  return {truth: mean(survey.map(d => d.income)), dropped: mean(obs.map(d => d.income)), imputed: mean(imputed), share: 1 - obs.length / survey.length};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 190,
+  x: {label: "Estimated mean income ($1000s)", domain: [40, 60], grid: true},
+  y: {label: null},
+  marks: [
+    Plot.dot([
+      {m: "Truth", v: est.truth}, {m: "Default: drop missing rows", v: est.dropped}, {m: "Model-based imputation", v: est.imputed}
+    ], {y: "m", x: "v", r: 7, fill: d => d.m === "Truth" ? "currentColor" : d.m.startsWith("Default") ? "#d6604d" : "#2166ac"}),
+    Plot.ruleX([est.truth], {strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`**${fmt(100 * est.share, 0)}%** of respondents skipped the question. Silently dropping them gives **${fmt(est.dropped, 1)}**, imputing from education gives **${fmt(est.imputed, 1)}**, and the truth is **${fmt(est.truth, 1)}**. The default was a modeling assumption (missing completely at random) that nobody wrote down.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Defaults are choices that hide in plain sight.
+- List the defaults in your analysis, such as missing-data handling, reference categories, scales and sample frame, and ask which ones matter.
+- A choice nobody made can still be wrong, and nobody will defend it.
+:::
+
+## Related entries
+
+- [Defaults](defaults.qmd)
+- [Defaults, once set](defaults-once-set.qmd)
+- [The Speed Racer Principle](speed-racer-principle.qmd)
+- [When researchers say "guarantee"](guarantee-is-assumption.qmd)
+
+## Source
+
+- Andrew Gelman, [How feminism made me a better scientist](http://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/) (2018).

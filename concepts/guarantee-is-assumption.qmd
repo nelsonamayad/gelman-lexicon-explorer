@@ -1,0 +1,90 @@
+---
+title: "When researchers say \"guarantee\""
+date: 2026-11-09
+description: "They're really talking about an assumption."
+order: 115
+categories: [Philosophy of statistics, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2019/07/22/guarantee-is-another-word-for-assumption/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#115** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: ["Guarantee" is another word for "assumption"](https://statmodeling.stat.columbia.edu/2019/07/22/guarantee-is-another-word-for-assumption/).
+:::
+
+## What it is
+
+Statistical methods are often sold with guarantees: "this interval is guaranteed to have 95% coverage," "randomization guarantees unbiasedness," "this procedure controls the false discovery rate." Each guarantee is a theorem, and theorems have hypotheses. When you hear "guarantee," Gelman says, translate it as "assumption," and then ask whether the assumption holds.
+
+## Why it matters
+
+The word "guarantee" makes conditional results sound unconditional. Users then rely on methods in settings where the guarantee doesn't apply: small samples, skewed data, dependence, model misspecification. Those are exactly the settings where you'd most want protection, and the guarantee doesn't give it.
+
+## How it works
+
+The classic $t$-interval $\bar{y} \pm t_{n-1}\,s/\sqrt{n}$ "guarantees" 95% coverage of the mean when the data are **normal**. For moderately skewed data with large $n$, the central limit theorem approximately rescues it. For heavily skewed data, such as log-normal incomes or response times, with small $n$, coverage can fall well below 95%. The guarantee was the normality assumption all along.
+
+## Simulated example
+
+Simulate the coverage of the "guaranteed" 95% t-interval for a mean when the data are log-normal. Vary the skewness and the sample size.
+
+```{ojs}
+import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof skew = Inputs.range([0.01, 2], {value: 1.2, step: 0.01, label: "Skewness (log-normal sigma)"})
+viewof n = Inputs.range([5, 200], {value: 15, step: 5, label: "Sample size"})
+viewof seed = Inputs.range([1, 500], {value: 115, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+tq = ({5: 2.776, 10: 2.262, 15: 2.145, 20: 2.093, 25: 2.064, 30: 2.045})
+guarantee = {
+  const r = rng(seed);
+  const trueMean = Math.exp(skew * skew / 2);
+  const tcrit = tq[n] || 1.96 + 2.4 / n;
+  const reps = range(3000).map(() => {
+    const y = range(n).map(() => r.lognormal(0, skew));
+    const m = mean(y), half = tcrit * sd(y) / Math.sqrt(n);
+    return {miss: m + half < trueMean ? "Interval too low" : m - half > trueMean ? "Interval too high" : "Covers"};
+  });
+  return {reps, trueMean};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 180,
+  marginLeft: 120,
+  x: {label: "Share of 3,000 replications", tickFormat: "%", domain: [0, 1], grid: true},
+  y: {label: null},
+  marks: [Plot.barX(guarantee.reps, Plot.groupY({x: "proportion"}, {y: "miss", fill: d => d.miss === "Covers" ? "#2166ac" : "#d6604d"})), Plot.ruleX([0.95], {stroke: "currentColor", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const cov = guarantee.reps.filter(d => d.miss === "Covers").length / guarantee.reps.length;
+  const low = guarantee.reps.filter(d => d.miss === "Interval too low").length / guarantee.reps.length;
+  return html`<div class="sim-readout">${md`"Guaranteed" coverage: 95%. Actual coverage: **${pct(cov, 1)}**. Misses are lopsided: **${pct(low, 1)}** of intervals sit entirely below the true mean, because skewed samples usually miss the long right tail. Set skewness near 0 to restore the guarantee, which means restoring the assumption.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A statistical guarantee is a theorem, and theorems have assumptions.
+- When you hear "guaranteed," ask: under what conditions?
+- Check by simulation whether the guarantee holds for data like yours.
+:::
+
+## Related entries
+
+- [Assumptions and Rigor](assumptions-and-rigor.qmd)
+- [Uncertainty Interval](uncertainty-interval.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+
+## Source
+
+- Andrew Gelman, ["Guarantee" is another word for "assumption"](https://statmodeling.stat.columbia.edu/2019/07/22/guarantee-is-another-word-for-assumption/) (2019).

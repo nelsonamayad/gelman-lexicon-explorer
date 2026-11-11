@@ -1,0 +1,107 @@
+---
+title: "As They Say in the Stagecoach Business"
+date: 2026-11-09
+description: "Remove the padding from the seats and you get a bumpy ride."
+order: 28
+categories: [Communication]
+source: "https://statmodeling.stat.columbia.edu/2010/04/rhythm_vs_meani/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#28** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Rhythm vs. meaning](https://statmodeling.stat.columbia.edu/2010/04/rhythm_vs_meani/).
+:::
+
+## What it is
+
+This entry is about *writing*. Standard advice says to cut every unnecessary word. Gelman observes that "unnecessary" words often do real work. They set the rhythm, signal transitions and give the reader time to absorb a point. Strip all the padding from the seats and the ride gets bumpy. Prose that is too compressed is hard to read even when every word carries meaning.
+
+## Why it matters
+
+Statistical writing is especially prone to over-compression: dense sentences, stacked qualifiers, results crammed into one paragraph. Readers then misread or skim. A little redundancy, such as restating the main finding, a signpost sentence or a concrete example, makes technical writing easier to follow. The aim is not the fewest words. It is the most understanding per minute of reading.
+
+## How it works
+
+The simulation is an **analogy**: the tradeoff between rhythm and meaning looks a lot like the tradeoff between smoothness and fidelity in signal processing. Treat a text's "information" as a signal and the reader's experience as a moving average over it.
+
+- **No padding** (window size 1): every bump of the raw signal comes through, and the ride is jarring.
+- **Too much padding** (a huge window): the ride is smooth but the meaning, the actual shape of the signal, is lost.
+- **The right amount:** the shape survives and the noise is absorbed.
+
+This is a toy picture of the writing advice, not a model of prose.
+
+## Simulated example
+
+A smooth underlying "message" is observed with noise. Vary the amount of padding, meaning the smoothing window, and watch the error between what the reader experiences and the true message.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof padding = Inputs.range([1, 61], {value: 1, step: 2, label: "Padding (smoothing window)"})
+viewof seed = Inputs.range([1, 500], {value: 28, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+ride = {
+  const r = rng(seed);
+  const n = 200;
+  const msg = range(n).map(i => Math.sin(i / 18) + 0.5 * Math.sin(i / 7));
+  const obs = msg.map(v => v + r.normal(0, 0.6));
+  const smooth = w => obs.map((_, i) => {
+    const lo = Math.max(0, i - (w - 1) / 2), hi = Math.min(n - 1, i + (w - 1) / 2);
+    return mean(obs.slice(lo, hi + 1));
+  });
+  const err = w => Math.sqrt(mean(smooth(w).map((v, i) => (v - msg[i]) ** 2)));
+  const curve = range(31).map(k => 2 * k + 1).map(w => ({w, err: err(w)}));
+  return {series: smooth(padding).map((v, i) => ({i, reader: v, msg: msg[i], raw: obs[i]})), curve};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 240,
+  x: {label: "Position in text"},
+  y: {label: "Signal", grid: true},
+  marks: [
+    Plot.dot(ride.series, {x: "i", y: "raw", r: 1, fill: "#bbb"}),
+    Plot.line(ride.series, {x: "i", y: "msg", stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.line(ride.series, {x: "i", y: "reader", stroke: "#2166ac", strokeWidth: 2})
+  ]
+})
+```
+
+```{ojs}
+Plot.plot({
+  height: 180,
+  x: {label: "Padding (window size)"},
+  y: {label: "Error vs true message", grid: true},
+  marks: [Plot.line(ride.curve, {x: "w", y: "err", stroke: "#2166ac"}), Plot.dot(ride.curve.filter(d => d.w === padding), {x: "w", y: "err", r: 6, fill: "#d6604d"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const best = ride.curve.reduce((a, b) => a.err < b.err ? a : b);
+  return html`<div class="sim-readout">${md`At padding ${padding}, the error is **${fmt(ride.curve.find(d => d.w === padding).err, 3)}**. The best ride is at a window of about **${best.w}** (error ${fmt(best.err, 3)}): some padding helps, and too much loses the message. As the analogy says: don't strip prose of every word that doesn't carry new information.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- "Omit needless words" can be overdone. Rhythm and redundancy help readers.
+- In technical writing, signposts, restatements and examples are padding that makes the ride smoother.
+- The goal is understanding per minute of reading, not the fewest words.
+:::
+
+## Related entries
+
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [What to include](what-to-include.qmd)
+- [That toothpaste feeling](toothpaste-feeling.qmd)
+
+## Source
+
+- Andrew Gelman, [Rhythm vs. meaning](https://statmodeling.stat.columbia.edu/2010/04/rhythm_vs_meani/) (2010).

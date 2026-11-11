@@ -1,0 +1,104 @@
+---
+title: "WWJD"
+date: 2026-11-09
+description: "What I think of when I'm stuck on an applied statistics problem."
+order: 11
+categories: [Modeling workflow, Causal inference]
+source: "https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#11** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/).
+:::
+
+## What it is
+
+"What Would Jennifer Do?" Jennifer Hill is Gelman's co-author on *Data Analysis Using Regression and Multilevel/Hierarchical Models*. When stuck on an applied problem, Gelman imagines how a thoughtful, practical colleague would approach it. The idea generalizes: keep a mental model of a specific expert whose judgment you trust, and ask what they would check first.
+
+## Why it matters
+
+When stuck, analysts tend to reach for more complicated machinery. A good applied statistician more often reaches for something basic. Look at the raw data. Check whether treated and control units are actually comparable. Ask what the estimand is. Imagining a concrete person helps you step outside your own rut and recall the checks you know you should do.
+
+## How it works
+
+The heuristic is a perspective shift, not an algorithm. A typical WWJD checklist for a causal question might be:
+
+1. What is the treatment, and what is the comparison?
+2. Do treated and control units **overlap** on the important covariates, or is the regression extrapolating into empty space?
+3. What does a simple graph of outcome against key covariates by group show?
+4. Would the conclusion survive restricting to the region of common support?
+
+Hill's research on causal inference emphasizes exactly these overlap and balance checks, so they make a fitting illustration.
+
+## Simulated example
+
+An observational study where the treated units sit at high values of a covariate and the control units are spread more widely. The true treatment effect is exactly 1. The outcome curves with the covariate, but the naive model is linear and fits everyone, so it extrapolates into regions where one group has no data. The WWJD move is to check overlap and estimate the effect only where both groups have data.
+
+```{ojs}
+import {rng, range, mean, ols, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof separation = Inputs.range([0, 3], {value: 2, step: 0.1, label: "Covariate gap between groups"})
+viewof curvature = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Nonlinearity in outcome"})
+viewof seed = Inputs.range([1, 500], {value: 6, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+obs = {
+  const r = rng(seed);
+  return range(600).map(() => {
+    const z = r.bernoulli(0.5);
+    const x = z ? r.normal(separation, 0.6) : r.normal(0, 1.2);
+    const effect = 1;                          // true treatment effect
+    const y = curvature * x * x + effect * z + r.normal(0, 1);
+    return {x, z, y, effect, group: z ? "Treated" : "Control"};
+  });
+}
+results = {
+  const all = ols(obs.map(d => [d.z, d.x]), obs.map(d => d.y)).coef[1];
+  const lo = Math.max(...["Treated", "Control"].map(g => Math.min(...obs.filter(d => d.group === g).map(d => d.x))));
+  const hi = Math.min(...["Treated", "Control"].map(g => Math.max(...obs.filter(d => d.group === g).map(d => d.x))));
+  const cs = obs.filter(d => d.x >= lo && d.x <= hi);
+  const restricted = ols(cs.map(d => [d.z, d.x, d.x * d.x]), cs.map(d => d.y)).coef[1];
+  return {all, restricted, lo, hi, nCS: cs.length, trueCS: mean(cs.map(d => d.effect))};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "Covariate x", grid: true},
+  y: {label: "Outcome y", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Control", "Treated"]},
+  marks: [
+    Plot.rect([0], {x1: results.lo, x2: results.hi, y1: -4, y2: 14, fill: "#999", fillOpacity: 0.1}),
+    Plot.dot(obs, {x: "x", y: "y", stroke: "group", r: 2, strokeOpacity: 0.6}),
+    Plot.text([0], {x: (results.lo + results.hi) / 2, y: 13.5, text: () => "common support"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Naive linear regression on all units: estimated effect **${fmt(results.all)}**. Restricted to the shaded region of overlap (${results.nCS} units), with a quadratic term: **${fmt(results.restricted)}**, against a true effect of **1.00**. Widen the covariate gap or raise the nonlinearity and the naive estimate leans harder on extrapolation. Set nonlinearity to 0 and the naive model is fine.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- When stuck, picture a specific, sensible expert and ask what they would check first.
+- The answer is usually something basic: plot the data, check overlap, define the estimand.
+- In causal problems, overlap and balance checks often matter more than the choice of model.
+:::
+
+## Related entries
+
+- [The Taxonomy of Confusion](taxonomy-of-confusion.qmd)
+- [What would you do if you had all the data?](if-you-had-all-the-data.qmd)
+- [Theoretical and Applied Statisticians](theoretical-vs-applied-statisticians.qmd)
+
+## Source
+
+- Andrew Gelman, [Can our book be improved?](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/) (2007).
+- Gelman and Hill, *Data Analysis Using Regression and Multilevel/Hierarchical Models* (2007), chapters 9–10.

@@ -1,0 +1,93 @@
+---
+title: "That toothpaste feeling"
+date: 2026-11-09
+description: "A spoonful of jargon with our factoids serves a similar function as the stuff in the toothpaste that gives you that tingly feeling when you brush: it has no direct function, but it conveys that it's doing something."
+order: 92
+categories: [Communication, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#92** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/).
+:::
+
+## What it is
+
+Some toothpaste contains ingredients whose main job is to make your mouth tingle. They don't clean your teeth, but the tingle tells you something is happening. Technical jargon added to a claim, such as "Bayesian," "neural," "behavioural," "evidence-based" or "statistically significant," often works the same way. It adds no information, but it signals rigor and makes the claim *feel* more credible.
+
+## Why it matters
+
+Jargon that tingles is persuasive whether or not the claim is good. Research on the "seductive allure" of scientific explanations (for example, Weisberg and colleagues' 2008 study of neuroscience explanations) found that adding irrelevant technical content can make *weak* explanations seem more satisfying to non-experts. When statistical vocabulary does this, readers are pushed toward over-trusting claims dressed in technical language, and away from asking what the evidence actually shows.
+
+## How it works
+
+A toy model. An explanation's real quality is $Q$. A reader's rating is $Q$ plus a jargon bonus $J$, which is larger for readers who can't evaluate the content. The jargon doesn't change $Q$, so it can't change how often the claim is right. It only moves ratings up, and it moves them most for the poor explanations that most need scrutiny.
+
+## Simulated example
+
+Explanations of varying quality are shown with and without a sprinkle of technical jargon. Compare readers' ratings with the explanations' actual accuracy.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tingle = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Jargon boost to ratings"})
+viewof seed = Inputs.range([1, 500], {value: 92, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+paste = {
+  const r = rng(seed);
+  return range(2000).map(i => {
+    const jargon = i % 2 === 0;
+    const quality = r.normal(0, 1);
+    const good = quality > 0;
+    const boost = jargon ? tingle * (good ? 0.4 : 1) : 0;    // weak explanations gain more
+    return {jargon: jargon ? "With jargon" : "Plain", good: good ? "Good explanation" : "Bad explanation", rating: 4 + quality + boost + r.normal(0, 0.5), correct: r() < (good ? 0.85 : 0.3)};
+  });
+}
+summary = ["Good explanation", "Bad explanation"].flatMap(g => ["Plain", "With jargon"].map(j => {
+  const s = paste.filter(d => d.good === g && d.jargon === j);
+  return {good: g, jargon: j, rating: mean(s.map(d => d.rating)), accuracy: mean(s.map(d => +d.correct))};
+}))
+```
+
+```{ojs}
+Plot.plot({
+  height: 240,
+  marginLeft: 120,
+  fy: {label: null},
+  x: {label: "Average reader rating", grid: true},
+  y: {label: null},
+  color: {legend: true, range: ["#999", "#d6604d"]},
+  marks: [Plot.barX(summary, {fy: "good", y: "jargon", x: "rating", fill: "jargon"}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = (q, j, k) => summary.find(d => d.good === q && d.jargon === j)[k];
+  return html`<div class="sim-readout">${md`Jargon raises ratings of *bad* explanations from **${fmt(g("Bad explanation", "Plain", "rating"))}** to **${fmt(g("Bad explanation", "With jargon", "rating"))}**, while their accuracy stays at **${fmt(100 * g("Bad explanation", "With jargon", "accuracy"), 0)}%**. The tingle feels like cleaning and does no cleaning.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Technical vocabulary can raise perceived credibility without adding information.
+- The effect is strongest for weak claims, which are the ones that most need scrutiny.
+- Strip out the jargon and ask what the evidence actually shows.
+:::
+
+## Related entries
+
+- [Story Time](story-time.qmd)
+- [A bunch of hoops to jump through](bunch-of-hoops.qmd)
+- [As They Say in the Stagecoach Business](stagecoach-business.qmd)
+
+## Source
+
+- Andrew Gelman, [Stasis back in town](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/) (2020).
+- Weisberg, Keil, Goodstein, Rawson and Gray, "The seductive allure of neuroscience explanations," *Journal of Cognitive Neuroscience* (2008).

@@ -1,0 +1,85 @@
+---
+title: "Context"
+date: 2026-11-09
+description: "A story doesn't exist on its own, it exists in . . ."
+order: 111
+categories: [Communication, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#111** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/).
+:::
+
+## What it is
+
+A number or a story taken by itself means little. "Crime rose 8% this year" could be alarming or routine depending on how much the rate usually moves from year to year. "The treatment improved scores by 3 points" depends on the scale, the spread and what other interventions achieve. A statistic exists in context: its history, its natural variability and its comparison points.
+
+## Why it matters
+
+Journalism and research communication often report changes without the baseline needed to interpret them. Readers can't tell a meaningful shift from ordinary fluctuation, so every uptick becomes a trend and every downturn a crisis. Giving context, such as the typical year-to-year change, the long-run range or a comparable effect, turns a factoid into information.
+
+## How it works
+
+Judge a change $\Delta$ relative to the distribution of changes you would expect anyway. With historical year-to-year changes $\Delta_1, \dots, \Delta_T$, the percentile of the new $\Delta$ among them, or $\Delta / \mathrm{sd}(\Delta_t)$, tells you whether it is unusual. The same $\Delta$ is huge in a stable series and trivial in a volatile one.
+
+## Simulated example
+
+Every headline reports the same "+8% this year." Choose how volatile the underlying series is and see what that 8% actually means.
+
+```{ojs}
+import {rng, range, sd, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof volatility = Inputs.range([1, 20], {value: 3, step: 0.5, label: "Typical year-to-year change (%)"})
+viewof headline = Inputs.range([0, 30], {value: 8, step: 0.5, label: "This year's reported change (%)"})
+viewof seed = Inputs.range([1, 500], {value: 111, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+history = {
+  const r = rng(seed);
+  return range(40).map(t => ({year: 1985 + t, change: r.normal(0, volatility)}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Year", tickFormat: "d"},
+  y: {label: "Year-to-year change (%)", grid: true},
+  marks: [
+    Plot.ruleX(history, {x: "year", y: "change", stroke: "#999", strokeWidth: 4}),
+    Plot.ruleX([{year: 2025, change: headline}], {x: "year", y: "change", stroke: "#d6604d", strokeWidth: 6}),
+    Plot.text([{year: 2025, change: headline}], {x: "year", y: "change", text: () => "this year", dy: -10, fill: "#d6604d"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const larger = history.filter(d => Math.abs(d.change) >= headline).length;
+  return html`<div class="sim-readout">${md`In the past 40 years, **${larger}** years had a change at least as large as this year's ${headline}%. This year is **${fmt(headline / sd(history.map(d => d.change)), 1)} sd** from zero. ${larger > 6 ? "In context, it's routine." : "In context, it really is unusual."} Same headline, different stories.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A statistic means something only against its context: history, variability and comparisons.
+- Report how unusual a change is, not just its size.
+- When you see a bare number, ask what it should be compared with.
+:::
+
+## Related entries
+
+- [Story Time](story-time.qmd)
+- [The Chris Rock Effect](chris-rock-effect.qmd)
+- [Salad Tongs](salad-tongs.qmd)
+
+## Source
+
+- Andrew Gelman, [Saying things in place](https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/) (2014).

@@ -1,0 +1,96 @@
+---
+title: "Kangaroo"
+date: 2026-11-09
+description: "When it is vigorously jumping up and down, don't use a bathroom scale to weigh a feather that is resting loosely in its pouch."
+order: 52
+categories: [Significance & noise]
+source: "http://statmodeling.stat.columbia.edu/2015/04/21/feather-bathroom-scale-kangaroo/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#52** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The feather, the bathroom scale, and the kangaroo](http://statmodeling.stat.columbia.edu/2015/04/21/feather-bathroom-scale-kangaroo/).
+:::
+
+## What it is
+
+Gelman's image for studies that try to detect a tiny effect (the feather) using crude measurements (a bathroom scale) in the presence of large, uncontrolled variation (the jumping kangaroo). The study can't learn anything about the feather. Whatever it reports is dominated by the kangaroo's bouncing. If it reports a "significant" result, the estimate is wildly exaggerated and may have the wrong sign.
+
+## Why it matters
+
+Many published studies have exactly this structure. Subtle psychological manipulations are measured with noisy self-reports, between-subject designs face huge person-to-person variation, and sample sizes are small. Such studies aren't just "underpowered": they are *uninformative*, and their significant results are mostly noise. More data of the same kind doesn't help much. What's needed is better measurement, within-person designs or more precise theory.
+
+## How it works
+
+A feather weighing $\theta$ is read by a scale whose readings vary with sd $\sigma$ from the bouncing. With $n$ readings, the estimate's standard error is $\sigma/\sqrt{n}$. If $\theta \ll \sigma/\sqrt{n}$:
+
+- power is barely above 5%;
+- a significant estimate must exceed $1.96\,\sigma/\sqrt{n}$, which may be thousands of times $\theta$;
+- about half of the significant estimates have the wrong sign, since they are essentially noise.
+
+## Simulated example
+
+A feather weighs 5 grams. The kangaroo's bouncing makes each bathroom-scale reading vary by several kilograms. We weigh the kangaroo with and without the feather, many times, and repeat the whole experiment 1,000 times.
+
+```{ojs}
+import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof bounce = Inputs.range([0.01, 5], {value: 3, step: 0.01, label: "Kangaroo bounce (sd of a reading, kg)"})
+viewof n = Inputs.range([5, 500], {value: 30, step: 5, label: "Readings with and without the feather"})
+viewof seed = Inputs.range([1, 500], {value: 52, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+weighings = {
+  const r = rng(seed);
+  const feather = 0.005;
+  return range(1000).map(() => {
+    const est = mean(r.normals(n, 40 + feather, bounce)) - mean(r.normals(n, 40, bounce));
+    const se = bounce * Math.sqrt(2 / n);
+    return {est, sig: Math.abs(est) > 1.96 * se};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Estimated feather weight (kg)", grid: true},
+  y: {label: "Experiments"},
+  marks: [
+    Plot.rectY(weighings, Plot.binX({y: "count"}, {x: "est", fill: d => d.sig ? "#d6604d" : "#bbb", thresholds: 50})),
+    Plot.ruleX([0.005], {stroke: "#2166ac", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const sig = weighings.filter(d => d.sig);
+  const ratio = sig.length ? mean(sig.map(d => Math.abs(d.est))) / 0.005 : NaN;
+  const wrong = sig.filter(d => d.est < 0).length;
+  return html`<div class="sim-readout">${md`The true feather weight is 0.005 kg (blue line). **${sig.length}** of 1,000 experiments were "significant" (red). Their estimates average **${fmt(ratio, 0)}×** the feather's real weight, and **${wrong}** of them say the feather has *negative* weight. Reduce the bounce to 0.01 kg (a calm kangaroo, a precise scale) and the experiment starts to work.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- When noise dwarfs the effect, a study is uninformative, and its significant results are mostly noise.
+- The fix is better measurement and design, not just a bigger n.
+- Before running a study, compare the plausible effect size with the realistic noise. If the feather is lost in the bounce, don't weigh it.
+:::
+
+## Related entries
+
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [The "What does not kill my statistical significance makes it stronger" fallacy](what-does-not-kill.qmd)
+- [Random in](random-in-random-out.qmd)
+- [That narrow beach](narrow-beach.qmd)
+
+## Source
+
+- Andrew Gelman, [The feather, the bathroom scale, and the kangaroo](http://statmodeling.stat.columbia.edu/2015/04/21/feather-bathroom-scale-kangaroo/) (2015).

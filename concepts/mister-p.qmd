@@ -1,0 +1,143 @@
+---
+title: "Mister P"
+date: 2026-11-09
+description: "Multilevel regression and poststratification."
+order: 1
+categories: [Surveys & MRP, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#1** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/).
+:::
+
+## What it is
+
+"Mister P" (MRP) is a two-step method for turning a survey sample that is non-representative or thin into estimates for a population and its subgroups, such as states, age groups or districts.
+
+1. **Multilevel regression.** Model the survey response as a function of demographics and geography. Group-level effects are *partially pooled*: a state with 15 respondents borrows strength from the other states, while a state with 1,500 mostly speaks for itself.
+2. **Poststratification.** Use the model to predict every demographic-by-geography cell. Then average those predictions, weighted by how many people the census says live in each cell.
+
+## Why it matters
+
+Nearly every real survey is unrepresentative. Some groups answer more than others, and most small areas have too few respondents for a direct estimate. Raw subgroup means are noisy, while simple weighting fixes the demographics but becomes unstable when cells are small or empty. MRP handles both problems at once. It is the standard tool for state-level opinion from national polls, for election forecasting from opt-in panels, and for small-area estimation generally.
+
+## How it works
+
+For cell $j$ (for example, *young people in state s*), the regression gives a predicted outcome $\hat\theta_j$. With census counts $N_j$, the estimate for any larger group $S$ is
+
+$$
+\hat\theta_S^{\text{MRP}} = \frac{\sum_{j \in S} N_j\, \hat\theta_j}{\sum_{j \in S} N_j}.
+$$
+
+The multilevel part pulls each state's intercept toward the overall mean. It pulls harder when the state has few respondents, which keeps small-sample noise out of the estimates. The poststratification part corrects for the sample having the wrong demographic mix. The simulation below uses a simplified version of both steps: empirical-Bayes shrinkage of the state effects, plus a common age effect.
+
+## Simulated example
+
+Fifty states have different true support for a policy, and young people support it more than old people. The survey over-samples older respondents, and some states get only a handful of interviews. Compare the raw state means with MRP estimates.
+
+```{ojs}
+import {rng, range, mean, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nTotal = Inputs.range([300, 5000], {value: 1200, step: 100, label: "Total sample size"})
+viewof oldShare = Inputs.range([0.3, 0.9], {value: 0.75, step: 0.05, label: "Share of sample that is old"})
+viewof seed = Inputs.range([1, 500], {value: 7, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+mrp = {
+  const r = rng(seed);
+  const S = 50, ageGap = 0.15;           // young support 15 points higher than old
+  const states = range(S).map(s => {
+    const base = 0.45 + r.normal(0, 0.08); // old-person support in the state
+    const youngShare = r.uniform(0.3, 0.6); // census share young
+    const size = r.lognormal(0, 0.8);       // relative population
+    const truth = youngShare * (base + ageGap) + (1 - youngShare) * base;
+    return {s, base, youngShare, size, truth};
+  });
+  const totalSize = sum(states.map(d => d.size));
+  // Draw respondents: state proportional to size, age skewed old.
+  const resp = range(nTotal).map(() => {
+    let u = r() * totalSize, s = 0;
+    while (u > states[s].size) { u -= states[s].size; s++; }
+    const young = r() > oldShare ? 1 : 0;
+    const p = states[s].base + ageGap * young;
+    return {s, young, y: r.bernoulli(p)};
+  });
+  // Step 1a: common age effect from pooled data (difference of within-state means is overkill here).
+  const yy = resp.filter(d => d.young), yo = resp.filter(d => !d.young);
+  const ageEff = mean(yy.map(d => d.y)) - mean(yo.map(d => d.y));
+  // Step 1b: state intercepts on the "old" scale, partially pooled.
+  const rows = states.map(st => {
+    const rs = resp.filter(d => d.s === st.s);
+    const n = rs.length;
+    const raw = n ? mean(rs.map(d => d.y)) : NaN;
+    const resid = n ? mean(rs.map(d => d.y - ageEff * d.young)) : NaN;
+    return {...st, n, raw, resid};
+  });
+  const ok = rows.filter(d => d.n > 0);
+  const mu = sum(ok.map(d => d.resid * d.n)) / sum(ok.map(d => d.n));
+  const v = 0.25;
+  const tau2 = Math.max(0.0005, mean(ok.map(d => (d.resid - mu) ** 2)) - mean(ok.map(d => v / d.n)));
+  return rows.map(d => {
+    const w = d.n ? tau2 / (tau2 + v / d.n) : 0;
+    const old = mu + w * ((d.n ? d.resid : mu) - mu);
+    // Step 2: poststratify with census age shares.
+    const mrpEst = d.youngShare * (old + ageEff) + (1 - d.youngShare) * old;
+    return {...d, mrpEst, shrink: 1 - w};
+  });
+}
+```
+
+```{ojs}
+long = mrp.flatMap(d => [
+  {method: "Raw state mean", truth: d.truth, est: d.raw, n: d.n},
+  {method: "MRP", truth: d.truth, est: d.mrpEst, n: d.n}
+]).filter(d => Number.isFinite(d.est))
+```
+
+```{ojs}
+Plot.plot({
+  height: 340,
+  grid: true,
+  facet: {data: long, x: "method"},
+  x: {label: "True state support", domain: [0.2, 0.9]},
+  y: {label: "Estimate", domain: [0, 1]},
+  r: {range: [1.5, 8]},
+  marks: [
+    Plot.line([[0.2, 0.2], [0.9, 0.9]], {stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.dot(long, {x: "truth", y: "est", r: "n", fill: d => d.method === "MRP" ? "#2166ac" : "#d6604d", fillOpacity: 0.6})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const rmse = m => Math.sqrt(mean(long.filter(d => d.method === m).map(d => (d.est - d.truth) ** 2)));
+  const empty = mrp.filter(d => d.n === 0).length;
+  return html`<div class="sim-readout">${md`Root-mean-square error across states: raw means **${fmt(rmse("Raw state mean"), 3)}**, MRP **${fmt(rmse("MRP"), 3)}**. ${empty} state(s) got no respondents at all. The raw approach has nothing to say about them, while MRP still produces an estimate. Dot size is the state's sample size: the small dots are where pooling helps most.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Partial pooling stabilizes estimates for small groups without throwing away the information that large groups provide.
+- Poststratification corrects for a sample with the wrong demographic mix, as long as you model the variables that drive non-response.
+- MRP is only as good as its adjustment variables (see [The Groovy Grandma Problem](groovy-grandma-problem.qmd)).
+:::
+
+## Related entries
+
+- [The Groovy Grandma Problem](groovy-grandma-problem.qmd)
+- [Canary variable](canary-variable.qmd)
+- [Multiple Comparisons](multiple-comparisons.qmd)
+- [The USA Today Fallacy](usa-today-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [the original "Mister P" post](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/) (2009).
+- Gelman and Little, "Poststratification into many categories using hierarchical logistic regression," *Survey Methodology* (1997).

@@ -1,0 +1,88 @@
+---
+title: "Random in"
+date: 2026-11-09
+description: "Random out."
+order: 79
+categories: [Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2019/06/19/random-patterns-in-data-yield-random-conclusions/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#79** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Random patterns in data yield random conclusions](https://statmodeling.stat.columbia.edu/2019/06/19/random-patterns-in-data-yield-random-conclusions/).
+:::
+
+## What it is
+
+A version of "garbage in, garbage out." When the data are mostly noise, any conclusion drawn from them, whether a significant predictor, an interesting subgroup or a surprising interaction, is mostly noise too. Run the same analysis on a fresh draw of the same kind of data and you get a *different* conclusion. The method didn't fail. It faithfully turned random input into random output.
+
+## Why it matters
+
+Each noisy dataset yields *some* pattern, and the researcher reports it with all the trappings of a finding. Readers see one realization and can't tell it apart from a robust result. The tell-tale sign is instability: different samples, different years or different research groups get different "findings." A literature full of inconsistent results on the same question is often random-in, random-out.
+
+## How it works
+
+Regress an outcome on $K$ candidate predictors, none of which has any real effect. In each dataset, about $0.05K$ predictors will be "significant," and they will be *different* ones each time. If you report the significant ones and tell a story about them, the story changes with every new sample.
+
+## Simulated example
+
+There are ten candidate predictors, all with zero true effect, and the analysis is repeated on 25 independent datasets. Each row of the grid is one dataset, and filled cells are the predictors that came out "significant."
+
+```{ojs}
+import {rng, range, ols, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([30, 500], {value: 80, step: 10, label: "Observations per dataset"})
+viewof realEffect = Inputs.range([0, 0.5], {value: 0, step: 0.05, label: "True effect of predictor #1 (others zero)"})
+viewof seed = Inputs.range([1, 500], {value: 79, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+grid = {
+  const r = rng(seed);
+  return range(25).flatMap(rep => {
+    const X = range(n).map(() => r.normals(10));
+    const y = X.map(x => realEffect * x[0] + r.normal());
+    const f = ols(X, y);
+    return range(10).map(j => ({rep: rep + 1, pred: `x${j + 1}`, sig: Math.abs(f.coef[j + 1] / f.se[j + 1]) > 1.96, est: f.coef[j + 1]}));
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 380,
+  x: {label: "Predictor", domain: range(10).map(j => `x${j + 1}`)},
+  y: {label: "Dataset (replication)", reverse: true},
+  marks: [Plot.cell(grid, {x: "pred", y: "rep", fill: d => d.sig ? (d.est > 0 ? "#2166ac" : "#d6604d") : "#f0f0f0", inset: 1})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const perRep = range(25).map(k => grid.filter(d => d.rep === k + 1 && d.sig).map(d => d.pred));
+  const withFinding = perRep.filter(v => v.length > 0).length;
+  const x1 = grid.filter(d => d.pred === "x1" && d.sig).length;
+  return html`<div class="sim-readout">${md`**${withFinding}** of 25 datasets produced at least one "significant" predictor, and they rarely agree on which one. ${realEffect > 0 ? `The real effect (x1) shows up in ${x1} of 25 datasets. Consistency across replications is how you tell signal from noise.` : "All of these findings are noise. Set a real effect for x1 and see what consistency looks like."}`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Noisy data produce findings that change with every sample.
+- Instability across replications is the signature of random-in, random-out.
+- Look for consistency across datasets before trusting any single pattern.
+:::
+
+## Related entries
+
+- [Correlation](correlation-does-not-imply-correlation.qmd)
+- [Story Time](story-time.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [Until it runs twice](until-it-runs-twice.qmd)
+
+## Source
+
+- Andrew Gelman, [Random patterns in data yield random conclusions](https://statmodeling.stat.columbia.edu/2019/06/19/random-patterns-in-data-yield-random-conclusions/) (2019).

@@ -1,0 +1,97 @@
+---
+title: "Web of Trust"
+date: 2026-11-09
+description: "In statistics and programming, it's not enough to get the right answer; you also want to know it's right."
+order: 106
+categories: [Computing, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#106** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/).
+:::
+
+## What it is
+
+A result that happens to be correct is not much use if you can't tell it's correct. Gelman's "web of trust" is the network of checks that gives you confidence: simulations with known answers, alternative computations, comparisons with simpler models, sanity checks against outside knowledge, and agreement among different methods. Each strand may be weak, but together they support the result.
+
+## Why it matters
+
+Code fails silently and models fail quietly. One check, such as "the sampler converged" or "the coefficient has the expected sign," catches some errors and misses others. Several *independent* checks catch far more. Without such a web, a correct result and an incorrect one look the same to the analyst, and so do their published versions.
+
+## How it works
+
+If check $k$ catches a given error with probability $p_k$, and checks fail independently, the chance that an error gets past all $K$ checks is
+
+$$
+\prod_{k=1}^K (1 - p_k).
+$$
+
+Five checks that each catch only 40% of errors together miss fewer than 8%. If the checks are *correlated*, for example because they all reuse the same buggy function, the product rule overstates the protection. That is why the strands of the web should be as different from each other as possible.
+
+## Simulated example
+
+An analysis may contain a bug. Add independent checks, each with modest power, and see how often a buggy result gets through. Increase the correlation between checks to see how protection weakens.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pCatch = Inputs.range([0.1, 0.9], {value: 0.4, step: 0.05, label: "Power of each check"})
+viewof shared = Inputs.range([0, 1], {value: 0, step: 0.05, label: "Correlation between checks (shared blind spots)"})
+viewof seed = Inputs.range([1, 500], {value: 106, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+web = {
+  const r = rng(seed);
+  return range(9).map(K => {
+    let missed = 0;
+    for (let i = 0; i < 4000; i++) {
+      const blind = r() < shared;                  // the bug sits in a blind spot common to all checks
+      let caught = false;
+      for (let k = 0; k < K; k++) if (!blind && r() < pCatch) caught = true;
+      if (!caught) missed++;
+    }
+    return {K, missed: missed / 4000, theory: (1 - pCatch) ** K};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Number of checks"},
+  y: {label: "Share of bugs that get through", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [
+    Plot.line(web, {x: "K", y: "theory", stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line(web, {x: "K", y: "missed", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(web, {x: "K", y: "missed", fill: "#2166ac"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With one check, **${pct(web[1].missed)}** of bugs get through. With five, **${pct(web[5].missed)}**. With eight, **${pct(web[8].missed)}**. The dashed line is the independent-checks ideal. ${shared > 0 ? `Shared blind spots put a floor of about ${pct(shared)} on the miss rate, however many checks you add.` : "Make the checks share blind spots and the web gets weaker."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Getting the right answer isn't enough. You need reasons to believe it's right.
+- Several weak but independent checks give strong protection.
+- Diversify the checks, since checks with shared blind spots give false comfort.
+:::
+
+## Related entries
+
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+- [Until it runs twice](until-it-runs-twice.qmd)
+- [Scaffolding](scaffolding.qmd)
+- [The problem with peer review](problem-with-peer-review.qmd)
+
+## Source
+
+- Andrew Gelman, [If you could invite 5 authors, dead or alive, to a dinner party...](https://statmodeling.stat.columbia.edu/2022/09/06/if-you-could-invite-5-authors-dead-or-alive-to-a-dinner-party-who-would-they-be-and-why/) (2022).

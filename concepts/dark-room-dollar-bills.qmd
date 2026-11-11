@@ -1,0 +1,92 @@
+---
+title: "In a dark room with many of the lights covered up by opaque dollar bills"
+date: 2026-11-09
+description: "Even a weak and intermittent beam can appear brilliant, if you look right at it."
+order: 140
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#140** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/)
+:::
+
+## What it is
+
+How bright a light looks depends on how dark the room is. In a room where most of the other lights are covered up, here by "opaque dollar bills," meaning money, prestige and institutional interests that keep alternatives out of view, even a weak, flickering beam looks brilliant if you stare at it. Gelman uses the image in a post about "ancestor worship" in academia, where certain figures or ideas are revered partly because the competing ones have been kept out of sight.
+
+## Why it matters
+
+Perceived excellence is *relative to what is visible*. When funding, gatekeeping or tradition hides alternative ideas, methods or people, mediocre work can look outstanding simply because there is nothing to compare it with. Judging quality requires asking what the room would look like with the bills removed.
+
+## How it works
+
+A toy model. Each idea has a true brightness. An observer sees the focal idea plus only the uncovered fraction $v$ of the others, and judges the focal idea by its rank among what is visible. As $v$ falls, a mediocre idea's *perceived* percentile rises, even though its true brightness hasn't changed.
+
+## Simulated example
+
+There are 200 ideas in a field, and the focal one is truly middling, at the 40th percentile. Cover up more and more of the alternatives and watch its apparent standing.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof truePct = Inputs.range([0.05, 0.95], {value: 0.4, step: 0.05, label: "True percentile of the focal idea"})
+viewof favoured = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "How much covering favours weaker rivals"})
+viewof seed = Inputs.range([1, 500], {value: 140, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+room = {
+  const r = rng(seed);
+  const others = r.normals(199).sort((a, b) => a - b);
+  const focal = others[Math.floor(truePct * 198)];
+  return range(20).map(k => {
+    const visible = 1 - k * 0.05;
+    let sum = 0;
+    for (let rep = 0; rep < 200; rep++) {
+      // Covering hits brighter rivals harder (they threaten the incumbent).
+      const c = 1 - visible;
+      const seen = others.filter(v => r() >= Math.min(1, c * (v > focal ? 1 + favoured : 1 - favoured)));
+      sum += seen.length ? seen.filter(v => v < focal).length / seen.length : 1;
+    }
+    return {visible, apparent: sum / 200};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Share of rival lights left uncovered", tickFormat: "%", reverse: true},
+  y: {label: "Share of visible rivals the focal idea outshines", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [
+    Plot.line(room, {x: "visible", y: "apparent", stroke: "#e6ab02", strokeWidth: 3}),
+    Plot.ruleY([truePct], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The focal idea truly outshines **${pct(truePct)}** of its rivals (dashed line). With every light visible, it outshines **${pct(room[0].apparent)}** of what you can see. With most of the room covered, it appears to outshine **${pct(room.at(-1).apparent)}**. The beam didn't get brighter. The room got darker.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Reputations are relative to the alternatives people can see.
+- Hiding alternatives with money, gatekeeping or tradition makes mediocre work look brilliant.
+- Before revering a figure or idea, ask what has been kept out of view.
+:::
+
+## Related entries
+
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+- [Brilliance](brilliance.qmd)
+- [Meritocracy won't happen](meritocracy.qmd)
+
+## Source
+
+- Andrew Gelman, [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/) (2024).

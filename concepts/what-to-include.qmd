@@ -1,0 +1,90 @@
+---
+title: "What to include"
+date: 2026-11-09
+description: "Just as we should not publish include any sentences that we do not want to be read, we also should avoid publishing numbers that will not be of any use to a reader."
+order: 108
+categories: [Communication, Statistical graphics]
+source: "https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#108** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/).
+:::
+
+## What it is
+
+Every sentence in a paper should be there to be read. The same standard applies to numbers. Statistical output often reports estimates to six decimal places, tables of nuisance coefficients, test statistics nobody will use, and digits far below the level of uncertainty. Those numbers aren't neutral. They take up the reader's attention and suggest a precision that isn't there.
+
+## Why it matters
+
+Readers can't tell which numbers matter unless you show them. A table of 40 coefficients to four decimals buries the two estimates that answer the question. Digits beyond the standard error are noise presented as signal: if the se is 0.3, the third decimal place is random. Showing fewer, better-chosen numbers makes a paper easier to read and harder to misread.
+
+## How it works
+
+A rule of thumb: an estimate with standard error $\text{se}$ deserves roughly one significant digit of the se, and the estimate should be reported to the same decimal place. Report $1.37 \pm 0.31$ as "1.4 (0.3)." Digits beyond that change from one replication to the next and carry no information. A quick way to see it is to replicate the study and watch which digits stay put.
+
+## Simulated example
+
+The same estimate from 15 replications of a study, printed to six decimals. Digits that change across replications are shown in red: they are noise. Change the standard error and see how many digits are worth reporting.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof se = Inputs.range([0.001, 2], {value: 0.3, step: 0.001, label: "Standard error of the estimate"})
+viewof seed = Inputs.range([1, 500], {value: 108, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+reps = {
+  const r = rng(seed);
+  return range(15).map(i => ({i: i + 1, est: 3.141593 + r.normal(0, se)}));
+}
+stableDigits = {
+  const strs = reps.map(d => d.est.toFixed(6).padStart(10, " "));
+  let k = 0;
+  while (k < strs[0].length && strs.every(s => s[k] === strs[0][k])) k++;
+  return {strs, k};
+}
+```
+
+```{ojs}
+html`<table class="table table-sm" style="max-width: 280px; font-family: var(--bs-font-monospace);">
+<thead><tr><th>Replication</th><th style="text-align:right">Estimate</th></tr></thead>
+<tbody>${stableDigits.strs.map((s, i) => html`<tr><td>${i + 1}</td><td style="text-align:right; white-space:pre">${s.slice(0, stableDigits.k)}<span style="color:#d6604d">${s.slice(stableDigits.k)}</span></td></tr>`)}</tbody></table>`
+```
+
+```{ojs}
+Plot.plot({
+  height: 120,
+  x: {label: "Estimates across replications", grid: true},
+  marks: [Plot.dot(reps, {x: "est", fill: "#2166ac", r: 4}), Plot.ruleX([3.141593], {stroke: "currentColor", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const dec = Math.max(0, -Math.floor(Math.log10(se)));
+  return html`<div class="sim-readout">${md`With se = ${se}, the red digits change from replication to replication: they are noise. A sensible report is **${reps[0].est.toFixed(dec)} (${se.toFixed(dec)})**. Printing ${6 - dec} more decimal place(s) would publish numbers no reader can use.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Every published number should help the reader. Leave out the rest.
+- Round estimates to the precision their uncertainty supports.
+- Show the few numbers that answer the question, and put the rest in an appendix or a graph.
+:::
+
+## Related entries
+
+- [The Ramanujan Principle](ramanujan-principle.qmd)
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [The Click-Through Solution](click-through-solution.qmd)
+
+## Source
+
+- Andrew Gelman, [Statistical modeling of citation exchange among statistics journals](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/) (2015).

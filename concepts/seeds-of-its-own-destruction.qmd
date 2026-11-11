@@ -1,0 +1,77 @@
+---
+title: "Seeds of its own destruction"
+date: 2026-11-09
+description: "Any graph should contain these."
+order: 112
+categories: [Statistical graphics]
+source: "https://statmodeling.stat.columbia.edu/2021/05/06/any-graph-should-contain-the-seeds-of-its-own-destruction/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#112** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Any graph should contain the seeds of its own destruction](https://statmodeling.stat.columbia.edu/2021/05/06/any-graph-should-contain-the-seeds-of-its-own-destruction/).
+:::
+
+## What it is
+
+A good graph should show enough detail to reveal the limits of its own resolution. Gelman illustrates with four histograms of the same sample. The first averages away too much detail, the second (the default bins) is fine, and the fourth has so many bins that the pattern disappears. He prefers the third, with narrow enough bins that "we don't need confidence bands or anything else to get a sense of the uncertainty in the bar heights; we see that uncertainty in the visible noise of the graph itself." In his words: "My preferred graph here is not the smoothest or even the one that most closely approximates the underlying distribution ... rather, I like the graph that shows the data while at the same time giving a visual cue about its uncertainty."
+
+## Why it matters
+
+Smooth, polished displays invite readers to over-read them: every bump looks like a real feature. A graph whose own noise is visible tells the reader how seriously to take small wiggles, without a separate uncertainty display. That's what the graph's "seeds of its own destruction" are: built-in evidence of how far it can be trusted. The same idea applies beyond histograms. Show the raw points behind a fitted curve, and show replicated data beside model output.
+
+## How it works
+
+For a histogram with bin width $h$ and $n$ observations, each bar's height is a count with sampling noise of roughly $\sqrt{\text{count}}$. Wide bins average the noise away, and with it the detail. Very narrow bins let the noise swamp the shape. In between there's a width where the shape is clear *and* the bar-to-bar jitter shows the reader how big the noise is. That jitter is the seed.
+
+## Simulated example
+
+A sample of 1,000 draws from a standard normal, as in Gelman's post. Move the bin width and look for the histogram that shows the shape while still showing its own noise.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof bins = Inputs.range([5, 200], {value: 40, step: 1, label: "Number of bins between −4 and 4"})
+viewof n = Inputs.range([100, 10000], {value: 1000, step: 100, label: "Sample size"})
+viewof seed = Inputs.range([1, 500], {value: 112, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+sample = rng(seed).normals(n)
+```
+
+```{ojs}
+html`<div style="display:flex; gap:0.75rem; flex-wrap:wrap">
+${[["Too coarse", 8], ["Default-ish", 20], ["Your choice", bins], ["Too fine", 160]].map(([label, k]) =>
+  Plot.plot({width: 240, height: 180, title: `${label} (${k} bins)`, x: {domain: [-4, 4], label: null}, y: {label: null, ticks: 3},
+    marks: [Plot.rectY(sample, Plot.binX({y: "count"}, {x: d => d, thresholds: range(k + 1).map(i => -4 + 8 * i / k), fill: label === "Your choice" ? "#2166ac" : "#999"})), Plot.ruleY([0])]}))}
+</div>`
+```
+
+```{ojs}
+//| echo: false
+{
+  const perBin = n / bins * 0.4;    // rough count near the centre
+  return html`<div class="sim-readout">${md`With ${bins} bins, central bars hold about **${fmt(perBin, 0)}** points each, so their heights wobble by about ±${fmt(Math.sqrt(perBin), 0)} (${fmt(100 / Math.sqrt(perBin), 0)}%). ${perBin > 400 ? "The wobble is invisible: the graph looks more certain than it is." : perBin < 8 ? "The wobble swamps the shape." : "The shape is clear and the bar-to-bar jitter shows the reader how much to trust each bar. That jitter is the seed of its own destruction."}`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A good graph shows its own uncertainty through the visible noise in the data it displays.
+- Don't oversmooth. The smoothest display isn't the most honest one.
+- Show raw data alongside summaries so readers can see how far to trust them.
+:::
+
+## Related entries
+
+- [A chicken](a-chicken.qmd)
+- [Cantor's Corner](cantors-corner.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+- [If zero is in the neighborhood](zero-in-the-neighborhood.qmd)
+
+## Source
+
+- Andrew Gelman, [Any graph should contain the seeds of its own destruction](https://statmodeling.stat.columbia.edu/2021/05/06/any-graph-should-contain-the-seeds-of-its-own-destruction/) (2021).

@@ -1,0 +1,94 @@
+---
+title: "Brilliance"
+date: 2026-11-09
+description: "It represents an upper bound on the quality of your reasoning, but there is no lower bound."
+order: 105
+categories: [Reasoning & fallacies, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2022/06/08/how-can-a-top-scientist-be-so-confidently-wrong-r-a-fisher-and-smoking-example/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#105** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How can a top scientist be so confidently wrong? R. A. Fisher and smoking example](https://statmodeling.stat.columbia.edu/2022/06/08/how-can-a-top-scientist-be-so-confidently-wrong-r-a-fisher-and-smoking-example/).
+:::
+
+## What it is
+
+R. A. Fisher was arguably the greatest statistician of the twentieth century, and he argued confidently and wrongly that the link between smoking and lung cancer might not be causal. Gelman's lesson is that brilliance sets a *ceiling* on how good your reasoning can be, not a *floor*. A brilliant person who is motivated, stubborn or outside their expertise can reason as badly as anyone, and often more persuasively.
+
+## Why it matters
+
+People treat brilliance as a guarantee: "she's a genius, so she must be right." But the conditions that degrade reasoning, such as motivated reasoning, financial or ideological interest, overconfidence and loyalty to past positions, affect brilliant people too. Brilliance can even make things worse by supplying clever rationalizations. Judge the argument, not the reputation (see [the status-reversal heuristic](status-reversal-heuristic.qmd)).
+
+## How it works
+
+A toy model. The quality of a person's reasoning on a question is
+
+$$
+Q = B \times (1 - M),
+$$
+
+where $B$ is brilliance and $M \in [0, 1]$ is how compromised they are on this question by motivation, bias or being out of their field. $Q$ can never exceed $B$, which is the upper bound. When $M$ is close to 1, $Q$ falls toward zero however large $B$ is, so there is no lower bound. A scatterplot of $Q$ against $B$ fills a triangle under the diagonal.
+
+## Simulated example
+
+There are 1,000 thinkers with varying brilliance, each reasoning about a question on which some fraction are compromised. Plot reasoning quality against brilliance.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof compromised = Inputs.range([0, 1], {value: 0.3, step: 0.05, label: "Share compromised on this question"})
+viewof seed = Inputs.range([1, 500], {value: 105, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+thinkers = {
+  const r = rng(seed);
+  return range(1000).map(() => {
+    const B = r.beta(2, 2);
+    const comp = r() < compromised;
+    const M = comp ? r.beta(4, 1.5) : r.beta(1, 8);
+    return {B, Q: B * (1 - M), comp: comp ? "Compromised (motivated, out of field)" : "Not compromised"};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  grid: true,
+  x: {label: "Brilliance", domain: [0, 1]},
+  y: {label: "Quality of reasoning on this question", domain: [0, 1]},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line([[0, 0], [1, 1]], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.dot(thinkers, {x: "B", y: "Q", fill: "comp", r: 2, fillOpacity: 0.6})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const top = thinkers.filter(d => d.B > 0.8);
+  const bad = top.filter(d => d.Q < 0.3).length;
+  return html`<div class="sim-readout">${md`Nobody is above the dashed line, because brilliance is a ceiling. Yet **${bad}** of the ${top.length} most brilliant thinkers (brilliance > 0.8) reason worse than 0.3 on this question. There is no floor. Judge the argument, not the genius.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Brilliance limits how good reasoning can be, not how bad.
+- Motivated reasoning and overconfidence affect brilliant people too.
+- Evaluate arguments on their merits, especially when brilliant people are on opposite sides.
+:::
+
+## Related entries
+
+- [The Status-Reversal Heuristic](status-reversal-heuristic.qmd)
+- [The Methodological Attribution Problem](methodological-attribution-problem.qmd)
+- [Eureka bias](eureka-bias.qmd)
+- [Tall-Person Syndrome](tall-person-syndrome.qmd)
+
+## Source
+
+- Andrew Gelman, [How can a top scientist be so confidently wrong? R. A. Fisher and smoking example](https://statmodeling.stat.columbia.edu/2022/06/08/how-can-a-top-scientist-be-so-confidently-wrong-r-a-fisher-and-smoking-example/) (2022).

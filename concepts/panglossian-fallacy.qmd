@@ -1,0 +1,89 @@
+---
+title: "Panglossian Fallacy"
+date: 2026-11-09
+description: "The flip side of the hindsight fallacy."
+order: 116
+categories: [Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#116** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178).
+:::
+
+## What it is
+
+Dr. Pangloss, in Voltaire's *Candide*, insists that everything happens for the best in this best of all possible worlds. The **hindsight fallacy** is believing, after the fact, that what happened was predictable: "I knew it all along." The **Panglossian fallacy** is its flip side: believing that what happened was *right*, that a decision was good because it turned out well, or that an outcome was justified because it occurred.
+
+## Why it matters
+
+Judging decisions by their outcomes rewards luck and punishes bad fortune. A reckless bet that paid off gets praised as wise, and a sound decision that hit bad luck gets condemned. In research, a sloppy study whose result happened to replicate gets cited as exemplary. In policy, whatever happened gets rationalized as having been optimal. Both errors fail to separate the quality of a *decision* from the randomness of its *outcome*.
+
+## How it works
+
+A decision has an expected value $\mathrm{E}[V]$ and a realized outcome $V = \mathrm{E}[V] + \epsilon$. When the noise $\epsilon$ is large compared with differences in expected value, realized outcomes are a poor guide to decision quality. A Panglossian evaluator who rates decisions by $V$ will call many bad decisions (negative $\mathrm{E}[V]$) good, and many good ones bad.
+
+## Simulated example
+
+There are 2,000 decisions, half sound and half reckless, each with a noisy outcome. A Panglossian evaluator judges each decision by how it turned out. How often do they get it right?
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof gap = Inputs.range([0, 2], {value: 0.5, step: 0.05, label: "Difference in expected value (sound − reckless)"})
+viewof luck = Inputs.range([0.1, 3], {value: 1, step: 0.05, label: "Role of luck (sd of outcomes)"})
+viewof seed = Inputs.range([1, 500], {value: 116, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pangloss = {
+  const r = rng(seed);
+  return range(2000).map(i => {
+    const sound = i % 2 === 0;
+    const ev = sound ? gap / 2 : -gap / 2;
+    const outcome = r.normal(ev, luck);
+    return {kind: sound ? "Sound decision" : "Reckless decision", outcome, judged: outcome > 0 ? "Judged good" : "Judged bad"};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Realized outcome", grid: true},
+  y: {label: "Decisions"},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.rectY(pangloss, Plot.binX({y: "count"}, {x: "outcome", fill: "kind", fillOpacity: 0.55, thresholds: 50, mixBlendMode: "multiply"})), Plot.ruleX([0], {stroke: "currentColor"}), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const reckless = pangloss.filter(d => d.kind === "Reckless decision");
+  const praised = reckless.filter(d => d.judged === "Judged good").length / reckless.length;
+  const sound = pangloss.filter(d => d.kind === "Sound decision");
+  const blamed = sound.filter(d => d.judged === "Judged bad").length / sound.length;
+  return html`<div class="sim-readout">${md`Judging by outcomes, the Panglossian evaluator calls **${pct(praised)}** of reckless decisions good and **${pct(blamed)}** of sound decisions bad. When luck is large compared with skill, "it worked out" says little about whether it was right.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A good outcome doesn't prove a good decision, and a bad outcome doesn't prove a bad one.
+- Judge decisions by the information and reasoning available at the time.
+- Hindsight says "it was predictable." Pangloss says "it was right." Both mix up luck with judgment.
+:::
+
+## Related entries
+
+- [The Fallacy of the One-Sided Bet](one-sided-bet.qmd)
+- [Story Time](story-time.qmd)
+- [Institutional decision making](institutional-decision-making.qmd)
+
+## Source
+
+- Andrew Gelman, [blog comment](https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178) (2016).

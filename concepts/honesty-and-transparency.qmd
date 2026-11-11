@@ -1,0 +1,89 @@
+---
+title: "Honesty and transparency"
+date: 2026-11-09
+description: "They're not enough."
+order: 77
+categories: [Research culture, Significance & noise]
+source: "http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#77** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Honesty and transparency are not enough (PDF)](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf).
+:::
+
+## What it is
+
+The open-science reforms of preregistration, data sharing and full reporting are good. But an honest, fully transparent study can still be *useless* if its design can't answer the question. Noisy measurements, small samples, weak theory and tiny effects don't become informative because the researcher is open about them. Honesty and transparency are necessary, and they are not sufficient.
+
+## Why it matters
+
+Reform debates sometimes imply that bad science comes from bad behaviour, so better behaviour will fix it. But many unreplicable findings came from sincere researchers using standard practices on hopelessly noisy designs. Transparency makes problems *visible* without *solving* them. What matters most is measurement quality, sample size relative to plausible effects, and theory that connects the two.
+
+## How it works
+
+Consider a transparent researcher who preregisters and reports *every* estimate with its uncertainty interval. If the study's standard error is large compared with any plausible effect, the honest interval will span everything from "large harm" to "large benefit." The study is honest and uninformative. Worse, if anyone filters those honest reports by significance downstream, the familiar [significance filter](statistical-significance-filter.qmd) comes back.
+
+## Simulated example
+
+There are 200 honest, preregistered studies of a small true effect, each fully reported. Choose the measurement quality and sample size, and see how many of these honest studies are informative enough to tell a meaningful effect from zero.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof measNoise = Inputs.range([0.5, 5], {value: 3, step: 0.1, label: "Measurement noise (sd)"})
+viewof n = Inputs.range([20, 2000], {value: 60, step: 20, label: "Participants per arm"})
+viewof seed = Inputs.range([1, 500], {value: 77, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+honest = {
+  const r = rng(seed);
+  const theta = 0.2, se = measNoise * Math.sqrt(2 / n);
+  return range(200).map(k => { const est = r.normal(theta, se); return {k, est, lo: est - 1.96 * se, hi: est + 1.96 * se, se}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Study (all honestly reported; first 60 shown)"},
+  y: {label: "Estimate with 95% interval", grid: true},
+  marks: [
+    Plot.ruleY([-0.1, 0.1], {stroke: "#5aae61", strokeDasharray: "2 2"}),
+    Plot.ruleX(honest.slice(0, 60), {x: "k", y1: "lo", y2: "hi", stroke: "#2166ac", strokeOpacity: 0.6}),
+    Plot.dot(honest.slice(0, 60), {x: "k", y: "est", fill: "currentColor", r: 2}),
+    Plot.ruleY([0.2], {stroke: "#d6604d", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const width = 2 * 1.96 * honest[0].se;
+  const informative = honest.filter(d => d.lo > 0.05 || d.hi < 0.15).length / honest.length;
+  return html`<div class="sim-readout">${md`Every study is honest and transparent. Each interval is **${fmt(width)}** wide, against a true effect of 0.2 (red). Only **${pct(informative)}** of studies can tell a meaningful effect from a negligible one. Better measurement or more participants would help. More honesty can't.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Open science is necessary, and it doesn't make a noisy study informative.
+- Design quality, meaning measurement, sample size and theory, determines what a study can learn.
+- An honestly reported useless study is still useless. Plan for informativeness.
+:::
+
+## Related entries
+
+- [Kangaroo](kangaroo.qmd)
+- [Preregistration](preregistration.qmd)
+- [Random in](random-in-random-out.qmd)
+- [Clarke's Law](clarkes-law.qmd)
+
+## Source
+
+- Andrew Gelman, ["Honesty and transparency are not enough"](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf), *Chance* (2017).

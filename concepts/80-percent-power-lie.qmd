@@ -1,0 +1,95 @@
+---
+title: "The 80% Power Lie"
+date: 2026-11-09
+description: "None of this should be a surprise."
+order: 82
+categories: [Significance & noise, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#82** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 80% power lie](https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/).
+:::
+
+## What it is
+
+Grant proposals and preregistrations routinely claim "80% power." To get there, researchers plug in an effect size, usually taken from earlier published studies or chosen to make the required sample size affordable. Published effects are inflated by the [significance filter](statistical-significance-filter.qmd), and convenient effects are optimistic, so the *real* power is often far below 80%. Gelman's comment that "none of this should be a surprise" reflects how widely this is known and how rarely it is acknowledged.
+
+## Why it matters
+
+A study planned at "80% power" that actually has 20% power is likely to fail. If it succeeds, its estimate is likely to be badly exaggerated. Overstated power also misleads funders and reviewers into thinking a design is informative when it isn't. Failed replications then get blamed on hidden moderators instead of on the planning.
+
+## How it works
+
+Researcher plans: $n = \big((z_{0.975} + z_{0.8}) / d_{\text{assumed}}\big)^2 \times 2$ per group for a two-group comparison.
+If $d_{\text{assumed}}$ comes from a published estimate that passed the significance filter, $d_{\text{assumed}} \gg d_{\text{true}}$. Actual power is then
+
+$$
+1 - \Phi\Big(1.96 - \frac{d_{\text{true}}}{\sqrt{2/n}}\Big),
+$$
+
+which can be a fraction of the claimed 80%.
+
+## Simulated example
+
+There are 2,000 research teams. Each plans a study using a published effect size from an earlier small study that was significant. Compare their claimed 80% power with the real power at the true effect size.
+
+```{ojs}
+import {rng, range, mean, median, pnorm, qnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof dTrue = Inputs.range([0.05, 0.8], {value: 0.2, step: 0.05, label: "True effect size d"})
+viewof nPilot = Inputs.range([10, 200], {value: 30, step: 5, label: "n per group in the published original"})
+viewof seed = Inputs.range([1, 500], {value: 82, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+powerLie = {
+  const r = rng(seed);
+  const se0 = Math.sqrt(2 / nPilot), k = qnorm(0.975) + qnorm(0.8);
+  return range(2000).map(() => {
+    let pub; do { pub = r.normal(dTrue, se0); } while (pub < 1.96 * se0);   // published = significant
+    const nPlan = Math.ceil(2 * (k / pub) ** 2);
+    const actual = 1 - pnorm(1.96 - dTrue / Math.sqrt(2 / nPlan));
+    return {pub, nPlan, actual};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Actual power of studies planned for '80% power'", domain: [0, 1], tickFormat: "%"},
+  y: {label: "Studies", grid: true},
+  marks: [
+    Plot.rectY(powerLie, Plot.binX({y: "count"}, {x: "actual", fill: "#d6604d", thresholds: 40, domain: [0, 1]})),
+    Plot.ruleX([0.8], {stroke: "currentColor", strokeWidth: 2, strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The planning effect size (published) averaged **${fmt(mean(powerLie.map(d => d.pub)))}**, against a true effect of **${fmt(dTrue)}**. Claimed power: 80%. Median actual power: **${pct(median(powerLie.map(d => d.actual)))}**. None of this should be a surprise.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Power calculations based on published effects are inflated by the significance filter.
+- Base power on realistic, shrunken effect sizes (see [the Edlin factor](edlin-factor.qmd)).
+- Report the effect size assumed in power calculations, and justify it.
+:::
+
+## Related entries
+
+- [The Edlin Factor](edlin-factor.qmd)
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [16](sixteen.qmd)
+- [The (Lance) Armstrong Principle](armstrong-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [The 80% power lie](https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/) (2017).

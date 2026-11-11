@@ -1,0 +1,113 @@
+---
+title: "Uncertainty"
+date: 2026-11-09
+description: "It greases the wheels of commerce."
+order: 134
+categories: [Computing, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#134** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hierarchical model for golf putting: a struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/).
+:::
+
+## What it is
+
+The phrase comes from Gelman's work on a model of golf putting. The data were success rates of putts at different distances from professional tournaments, and the first few distance bins had enormous sample sizes. A binomial model therefore tried to fit those points almost exactly. That pinned down the parameters so tightly that Stan's sampler couldn't move through the posterior, and the chains mixed badly. The fix was to add an error term to the model, a little extra *uncertainty* for modeling error. In Gelman's words, he "needed to add an error term to grease the wheels of commerce", and it worked.
+
+## Why it matters
+
+Real models are never exactly right. When data are very precise, a slightly wrong model is forced to fit the most precise points as though it were exact. The result is a posterior squeezed into a thin, awkward region that samplers struggle to explore (compare [the folk theorem](folk-theorem.qmd)). Admitting some model error makes the computation work. It also makes the inference more honest, because the posterior no longer pretends the model is perfect at the high-precision points.
+
+## How it works
+
+Suppose observation $j$ is modeled as $y_j \sim \mathrm{N}(f(x_j; \theta), \text{se}_j)$, with tiny $\text{se}_j$ for the big bins. If $f$ is slightly misspecified, the likelihood is dominated by those bins and the posterior for $\theta$ is a narrow ridge. Adding an error term $\tau$,
+
+$$
+y_j \sim \mathrm{N}\big(f(x_j; \theta),\ \sqrt{\text{se}_j^2 + \tau^2}\big),
+$$
+
+widens the likelihood just enough that no single bin dominates. The sampler can move again, and the fit balances across all the data. In the golf case Gelman notes the independent error term was a "hack" that he later tried to improve, but it did its job.
+
+## Simulated example
+
+A straight-line model is fit to data that curve slightly, where the first bins are extremely precise, much like the golf data. Two Metropolis chains sample the slope. Slide the added error term τ up from zero and watch the chains loosen up and the fit change.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0, 0.08], {value: 0, step: 0.005, label: "Added error term τ"})
+viewof seed = Inputs.range([1, 500], {value: 134, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+grease = {
+  const r = rng(seed);
+  const xs = range(19).map(j => 2 + j), se = xs.map((x, j) => 0.003 * (1 + j / 3));
+  const y = xs.map((x, j) => 2 - 0.15 * x + 0.004 * x * x + r.normal(0, se[j]));
+  const lp = (a, b) => { let s = 0; for (let j = 0; j < 19; j++) s += -0.5 * (y[j] - a - b * xs[j]) ** 2 / (se[j] ** 2 + tau ** 2); return s; };
+  const run = (a, b, chain) => {
+    let l = lp(a, b), acc = 0;
+    const out = [];
+    for (let t = 0; t < 3000; t++) {
+      const a2 = a + r.normal(0, 0.02), b2 = b + r.normal(0, 0.002), l2 = lp(a2, b2);
+      if (Math.log(r()) < l2 - l) { a = a2; b = b2; l = l2; acc++; }
+      out.push({t, a, b, chain});
+    }
+    return {out, acc: acc / 3000};
+  };
+  const c1 = run(1.5, -0.1, "Chain 1"), c2 = run(2.5, -0.05, "Chain 2");
+  const draws = [...c1.out, ...c2.out].filter(d => d.t >= 1500);
+  return {xs, y, se, trace: [...c1.out, ...c2.out], acc: (c1.acc + c2.acc) / 2, aHat: mean(draws.map(d => d.a)), bHat: mean(draws.map(d => d.b))};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 240,
+  x: {label: "Iteration"},
+  y: {label: "Draws of the slope", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(grease.trace, {x: "t", y: "b", stroke: "chain", strokeWidth: 0.8})]
+})
+```
+
+```{ojs}
+Plot.plot({
+  height: 240,
+  x: {label: "Distance bin", grid: true},
+  y: {label: "Outcome", grid: true},
+  marks: [
+    Plot.ruleX(grease.xs.map((x, j) => ({x, lo: grease.y[j] - 2 * grease.se[j], hi: grease.y[j] + 2 * grease.se[j]})), {x: "x", y1: "lo", y2: "hi", stroke: "#999"}),
+    Plot.dot(grease.xs.map((x, j) => ({x, y: grease.y[j]})), {x: "x", y: "y", fill: "currentColor", r: 3}),
+    Plot.line([2, 20].map(x => ({x, y: grease.aHat + grease.bHat * x})), {x: "x", y: "y", stroke: "#d6604d", strokeWidth: 2})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With τ = ${tau}, the sampler accepts **${pct(grease.acc)}** of its proposals and the fitted slope is **${fmt(grease.bHat, 4)}**. ${tau === 0 ? "With no room for model error, the chains crawl, and the line is pinned to the very precise first bins while missing the later ones. Add a little uncertainty." : "Allowing some model error lets the chains move freely and lets the line balance all the bins. A little uncertainty greased the wheels."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Very precise data plus a slightly wrong model can jam the computation.
+- Adding an error term for model misfit often fixes both the sampling and the fit.
+- Treat it as a stopgap: the next step is to work out what the model is missing.
+:::
+
+## Related entries
+
+- [The Folk Theorem of Statistical Computing](folk-theorem.qmd)
+- [Mathematical Simplicity](mathematical-simplicity.qmd)
+- [In high-dimensional space](high-dimensional-space.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+
+## Source
+
+- Andrew Gelman, [Hierarchical model for golf putting: a struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/) (2022).
+- Gelman et al., "Bayesian workflow" (2020), section 10 (the golf example).

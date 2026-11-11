@@ -1,0 +1,98 @@
+---
+title: "The Paradox of Philosophizing"
+date: 2026-11-09
+description: "If philosophy is outlawed, only outlaws will do philosophy."
+order: 36
+categories: [Philosophy of statistics]
+source: "http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
+:::
+
+## What it is
+
+Many practitioners say they "don't do philosophy" and just analyze the data. But every analysis carries philosophical commitments: what counts as evidence, what a probability means, when to declare a discovery. Refusing to discuss these commitments doesn't remove them. It leaves them unexamined, chosen by default or by whoever is willing to argue. "If philosophy is outlawed, only outlaws will do philosophy."
+
+## Why it matters
+
+Implicit philosophies carry real consequences. "Report effects with p < 0.05" sounds neutral, but it implies a particular trade-off between false positives and false negatives. What that rule means in practice depends heavily on how often true effects occur in the field, which is the kind of prior the "no philosophy" analyst says they don't use. Making the philosophy explicit lets you see and debate those consequences.
+
+## How it works
+
+Take the rule "declare a discovery when p < α" in a field where a fraction $\pi$ of tested hypotheses are true and studies have power $1-\beta$. The share of declared discoveries that are false is
+
+$$
+\text{FDR} = \frac{\alpha(1-\pi)}{\alpha(1-\pi) + (1-\beta)\pi}.
+$$
+
+The analyst who refused to state a prior has still chosen a rule whose meaning depends on $\pi$. That is an implicit philosophy, an "outlaw" one.
+
+## Simulated example
+
+Simulate 5,000 studies in a field, apply the "philosophy-free" p < 0.05 rule, and see what fraction of discoveries are false. Vary the base rate and the power.
+
+```{ojs}
+import {rng, range, pnorm, qnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pi = Inputs.range([0.01, 0.9], {value: 0.1, step: 0.01, label: "Share of tested hypotheses that are true (π)"})
+viewof power = Inputs.range([0.1, 0.95], {value: 0.4, step: 0.05, label: "Power of each study"})
+viewof seed = Inputs.range([1, 500], {value: 36, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+field = {
+  const r = rng(seed);
+  const shift = qnorm(0.975) + qnorm(power);   // effect in se units giving that power
+  return range(5000).map(() => {
+    const real = r() < pi;
+    const z = r.normal(real ? shift : 0, 1);
+    return {real, sig: Math.abs(z) > 1.96};
+  });
+}
+counts = {
+  const sig = field.filter(d => d.sig);
+  return {sig: sig.length, falseDisc: sig.filter(d => !d.real).length};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 120,
+  x: {label: "Declared discoveries", grid: true},
+  y: {label: null},
+  color: {legend: true, domain: ["True effect", "No effect"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.barX(field.filter(d => d.sig), Plot.groupY({x: "count"}, {y: () => "p < 0.05", fill: d => d.real ? "True effect" : "No effect"}))]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const theory = 0.05 * (1 - pi) / (0.05 * (1 - pi) + power * pi);
+  return html`<div class="sim-readout">${md`Of **${counts.sig}** discoveries, **${counts.falseDisc}** (${pct(counts.falseDisc / Math.max(1, counts.sig))}) are false. Theory: ${pct(theory)}. The "philosophy-free" rule means something completely different when π = 0.5 than when π = 0.02. Ignoring that is itself a philosophical position.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Every analysis has a philosophy. The only choice is whether to examine it.
+- Default rules carry implicit priors and loss functions. Their consequences depend on what you claimed not to assume.
+- Discussing foundations openly is how practitioners stay in charge of their own methods.
+:::
+
+## Related entries
+
+- [The Pluralist's Dilemma](pluralists-dilemma.qmd)
+- [Default, the greatest trick it ever pulled](default-greatest-trick.qmd)
+- [Probability](probability.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+
+## Source
+
+- Andrew Gelman, [Hey dude, ya don't...](http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/) (2010).

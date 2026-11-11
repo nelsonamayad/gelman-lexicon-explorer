@@ -1,0 +1,104 @@
+---
+title: "The Time-Reversal Heuristic"
+date: 2026-11-09
+description: "How to think about a published finding that is followed up by a careful preregistered replication."
+order: 57
+categories: [Reasoning & fallacies, Significance & noise]
+source: "http://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#57** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More power posing](http://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/).
+:::
+
+## What it is
+
+A small, noisy study finds a dramatic effect and becomes famous. Later, a large, careful, preregistered replication finds nothing. People then argue that the original still stands, perhaps because of moderators or differences in context. The time-reversal heuristic asks you to **imagine the studies had come out in the opposite order**. A large careful study finds nothing, and *then* a small noisy study reports a big effect. Would you take the small study seriously? Almost certainly not. The order of publication shouldn't change the evidence.
+
+## Why it matters
+
+Being first gives a study an anchoring advantage it hasn't earned. The original becomes the default and the replication carries the burden of proof. This reverses the logic of evidence, because precise studies should count for more. Mentally reversing the order removes the anchoring and makes the weight of each study depend on its quality, not on when it appeared.
+
+## How it works
+
+With estimates $\hat\theta_1 \pm \text{se}_1$ (original) and $\hat\theta_2 \pm \text{se}_2$ (replication), the combined estimate under a common-effect model is
+
+$$
+\hat\theta = \frac{\hat\theta_1/\text{se}_1^2 + \hat\theta_2/\text{se}_2^2}{1/\text{se}_1^2 + 1/\text{se}_2^2},
+$$
+
+which is symmetric in the two studies. Order doesn't enter. If $\text{se}_2 \ll \text{se}_1$, the replication dominates. An "anchored" reader who updates as if the original were the established prior is in effect inflating its weight.
+
+## Simulated example
+
+The true effect is small. A small original study (selected to be significant) and a large replication are combined in three ways: correctly, with the anchored-on-the-original weighting, and in time-reversed order.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nOrig = Inputs.range([10, 100], {value: 20, step: 5, label: "Original study n per group"})
+viewof nRep = Inputs.range([100, 2000], {value: 800, step: 50, label: "Replication n per group"})
+viewof anchor = Inputs.range([1, 20], {value: 8, step: 1, label: "How much the anchored reader over-weights the original"})
+viewof seed = Inputs.range([1, 500], {value: 57, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+studies = {
+  const r = rng(seed);
+  const theta = 0.05;
+  const se1 = Math.sqrt(2 / nOrig), se2 = Math.sqrt(2 / nRep);
+  let est1; do { est1 = r.normal(theta, se1); } while (est1 < 1.96 * se1);   // the famous significant original
+  const est2 = r.normal(theta, se2);
+  const combine = (a, sa, b, sb, wa = 1) => (wa * a / sa ** 2 + b / sb ** 2) / (wa / sa ** 2 + 1 / sb ** 2);
+  return {
+    theta,
+    rows: [
+      {name: "Original (n = " + nOrig + ")", est: est1, lo: est1 - 1.96 * se1, hi: est1 + 1.96 * se1},
+      {name: "Replication (n = " + nRep + ")", est: est2, lo: est2 - 1.96 * se2, hi: est2 + 1.96 * se2},
+      {name: "Combined (either order)", est: combine(est1, se1, est2, se2)},
+      {name: "Anchored on the original", est: combine(est1, se1, est2, se2, anchor)}
+    ]
+  };
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 190,
+  x: {label: "Effect estimate", grid: true},
+  y: {label: null, domain: studies.rows.map(d => d.name)},
+  marks: [
+    Plot.ruleY(studies.rows.filter(d => d.lo !== undefined), {y: "name", x1: "lo", x2: "hi", stroke: "#999", strokeWidth: 2}),
+    Plot.dot(studies.rows, {y: "name", x: "est", r: 6, fill: (d, i) => i === 3 ? "#d6604d" : "#2166ac"}),
+    Plot.ruleX([studies.theta], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleX([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The original found **${fmt(studies.rows[0].est)}** and the replication **${fmt(studies.rows[1].est)}**. Weighted by precision, regardless of order: **${fmt(studies.rows[2].est)}** (truth ${studies.theta}). The anchored reader still believes **${fmt(studies.rows[3].est)}**. Reverse time: if the big study had come first, would anyone treat the small one as decisive?`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- The order in which studies appear shouldn't change how much they count.
+- Imagine the replication came first. Would the original still persuade you?
+- Weight studies by precision and quality, not by priority.
+:::
+
+## Related entries
+
+- [The Status-Reversal Heuristic](status-reversal-heuristic.qmd)
+- [The Error-Reversal Heuristic](error-reversal-heuristic.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+- [The Edlin Factor](edlin-factor.qmd)
+
+## Source
+
+- Andrew Gelman, [More power posing](http://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/) (2016).

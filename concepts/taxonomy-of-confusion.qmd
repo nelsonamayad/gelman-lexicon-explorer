@@ -1,0 +1,98 @@
+---
+title: "The Taxonomy of Confusion"
+date: 2026-11-09
+description: "What to do when you're stuck."
+order: 19
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#19** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/).
+:::
+
+## What it is
+
+When you are stuck, whether on a homework problem, a model that won't fit or a result you can't interpret, the first step is to work out *what kind* of stuck you are. Gelman's post sorts confusion into types, each with its own remedy. You might not understand the question. You might not understand the method. The computation might be failing. Or the results might not make sense. Read the original post for his own list. This page illustrates why naming the kind of confusion helps.
+
+## Why it matters
+
+Unclassified confusion leads to flailing: rerunning code, rereading the textbook from the start, or trying a fancier method at random. Each kind of confusion has a cheap, targeted fix. Unclear question? Write down the estimand. Shaky method? Work a tiny example by hand. Failing computation? Simulate fake data. Puzzling result? Plot the raw data. Diagnosing first turns an open-ended struggle into a short checklist.
+
+## How it works
+
+A toy model of being stuck: the confusion sits at one of several stages, each with a different probability. You can check stages one at a time, and each check has a cost.
+
+- **Flailing** checks stages in random order and sometimes re-checks a stage it already ruled out.
+- **Diagnosing** first asks which kind of confusion it is, a quick classification step that is right most of the time. It then checks stages from most to least likely.
+
+This simulation is our toy model of the idea, not Gelman's formalism.
+
+## Simulated example
+
+Each of 2,000 "stuck" episodes has its confusion in one of five stages. Compare how many checks it takes to get unstuck under the two strategies.
+
+```{ojs}
+import {rng, range, mean, quantile, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof diagAcc = Inputs.range([0.2, 1], {value: 0.7, step: 0.05, label: "Accuracy of the quick diagnosis"})
+viewof seed = Inputs.range([1, 500], {value: 19, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+stages = ["Question unclear", "Method unclear", "Computation failing", "Result puzzling", "Data problem"]
+confusion = {
+  const r = rng(seed);
+  const probs = [0.3, 0.15, 0.25, 0.2, 0.1];
+  const draw = () => { let u = r(), k = 0; while (u > probs[k]) { u -= probs[k]; k++; } return k; };
+  return range(2000).flatMap(i => {
+    const truth = draw();
+    // Flailing: random checks with replacement.
+    let flail = 0; for (;;) { flail++; if (r.int(0, 4) === truth) break; if (flail > 60) break; }
+    // Diagnosing: one classification step, then ordered checks.
+    const guess = r() < diagAcc ? truth : draw();
+    const ordered = [guess, ...[0, 2, 3, 1, 4].filter(k => k !== guess)];
+    const diag = 1 + ordered.indexOf(truth) + 1;
+    return [{i, strategy: "Flailing", checks: flail}, {i, strategy: "Diagnose first", checks: diag}];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  facet: {data: confusion, y: "strategy", marginRight: 110},
+  x: {label: "Checks needed to get unstuck", domain: [0, 20]},
+  y: {label: "Episodes", grid: true},
+  marks: [Plot.rectY(confusion.filter(d => d.checks <= 20), Plot.binX({y: "count"}, {x: "checks", fill: "strategy", interval: 1})), Plot.ruleY([0])],
+  color: {range: ["#2166ac", "#d6604d"]}
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const s = k => confusion.filter(d => d.strategy === k).map(d => d.checks);
+  return html`<div class="sim-readout">${md`Average checks: flailing **${fmt(mean(s("Flailing")), 1)}** (90th percentile ${fmt(quantile(s("Flailing"), 0.9), 0)}), diagnosing first **${fmt(mean(s("Diagnose first")), 1)}** (90th percentile ${fmt(quantile(s("Diagnose first"), 0.9), 0)}). Even a mediocre diagnosis beats flailing, because it turns repeated random searching into an ordered checklist.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Before trying to fix being stuck, name the kind of confusion.
+- Each kind has a cheap, specific remedy: define the estimand, work a toy example, simulate fake data, plot the raw data.
+- An ordered checklist beats random flailing, even when the first diagnosis is sometimes wrong.
+:::
+
+## Related entries
+
+- [WWJD](wwjd.qmd)
+- [The Folk Theorem of Statistical Computing](folk-theorem.qmd)
+- [Tell Me What You Don't Know](tell-me-what-you-dont-know.qmd)
+
+## Source
+
+- Andrew Gelman, [Taxonomy of confusion](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/) (2008).

@@ -1,0 +1,97 @@
+---
+title: "Replication and firefighting"
+date: 2026-11-09
+description: "Just as it is said that our modern megafires arise from having forests full of trees, all ready to ignite and preserved in that kindling-like state by firefighting policies that have favored preservation of existing trees over all else, so has the replication crisis been fueled by a decades-long supply of highly vulnerable research articles, kept in their pristine state through an active effort of leaders of the academic establishment to suppress criticism of any published work."
+order: 139
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2022/03/04/biology-as-a-cumulative-science-and-the-relevance-of-this-idea-to-replication/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#139** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Biology as a cumulative science, and the relevance of this idea to replication](https://statmodeling.stat.columbia.edu/2022/03/04/biology-as-a-cumulative-science-and-the-relevance-of-this-idea-to-replication/).
+:::
+
+## What it is
+
+Forest managers learned that putting out every small fire lets fuel build up until a megafire burns everything. Gelman applies the lesson to science. For decades, criticism of published work was discouraged. Small "fires" such as critiques, failed replications and re-analyses were put out to protect reputations. That let a huge stock of fragile findings accumulate, and when the replication crisis came, it burned through whole literatures at once.
+
+## Why it matters
+
+Suppressing criticism doesn't prevent the reckoning. It postpones it and makes it larger. A steady flow of small corrections keeps the stock of vulnerable work low, so no single event threatens a whole field. The analogy argues for treating routine criticism and replication as healthy maintenance, the controlled burns of science, rather than as attacks.
+
+## How it works
+
+A toy model of fuel. Each year, new fragile findings are added to the stock. Small fires, meaning routine critiques, remove a fraction $s$ of the stock each year, and suppression lowers $s$. At an unpredictable time a crisis ignites and burns whatever stock has built up. The size of the crisis is the accumulated fuel, which is roughly the inflow divided by $s$ in steady state. Suppression makes it bigger.
+
+## Simulated example
+
+Watch the stock of fragile findings over 60 years under different levels of criticism suppression. A crisis strikes at a random year and burns the accumulated stock.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof suppression = Inputs.range([0, 0.98], {value: 0.85, step: 0.01, label: "Suppression of routine criticism"})
+viewof seed = Inputs.range([1, 500], {value: 139, step: 1, label: "Random seed (timing of crisis)"})
+```
+
+```{ojs}
+fire = {
+  const r = rng(seed);
+  const crisisYear = r.int(30, 55);
+  const run = (sup, label) => {
+    let fuel = 10;
+    return range(61).map(t => {
+      let burned = 0;
+      if (t === crisisYear) { burned = fuel; fuel = 0; }
+      const row = {t, label, fuel, burned};
+      fuel = fuel + 20 - fuel * 0.25 * (1 - sup);
+      return row;
+    });
+  };
+  return {crisisYear, rows: [...run(suppression, "Your suppression level"), ...run(0, "No suppression (controlled burns)")]};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Year"},
+  y: {label: "Stock of fragile published findings", grid: true},
+  color: {legend: true, range: ["#5aae61", "#d6604d"], domain: ["No suppression (controlled burns)", "Your suppression level"]},
+  marks: [
+    Plot.areaY(fire.rows, {x: "t", y: "fuel", fill: "label", fillOpacity: 0.25, z: "label"}),
+    Plot.line(fire.rows, {x: "t", y: "fuel", stroke: "label", strokeWidth: 2}),
+    Plot.ruleX([fire.crisisYear], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.text([0], {x: fire.crisisYear, y: 0, text: () => "crisis", dy: -8, dx: 4, textAnchor: "start"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const burn = l => fire.rows.find(d => d.label === l && d.burned > 0)?.burned ?? 0;
+  return html`<div class="sim-readout">${md`When the crisis hits in year ${fire.crisisYear}, it burns **${fmt(burn("Your suppression level"), 0)}** findings at your suppression level, compared with **${fmt(burn("No suppression (controlled burns)"), 0)}** in a field that let small fires burn. Suppressing criticism didn't prevent the fire. It supplied the fuel.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Suppressing routine criticism lets fragile findings pile up.
+- Frequent small corrections prevent large, sudden collapses.
+- Treat critiques and replications as maintenance, not as threats.
+:::
+
+## Related entries
+
+- [Deference Trap](deference-trap.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+
+## Source
+
+- Andrew Gelman, [Biology as a cumulative science, and the relevance of this idea to replication](https://statmodeling.stat.columbia.edu/2022/03/04/biology-as-a-cumulative-science-and-the-relevance-of-this-idea-to-replication/) (2022).

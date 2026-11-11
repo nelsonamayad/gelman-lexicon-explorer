@@ -1,0 +1,94 @@
+---
+title: "The \"What does not kill my statistical significance makes it stronger\" fallacy"
+date: 2026-11-09
+description: "The belief that statistical significance is particularly impressive when it was obtained under noisy conditions."
+order: 62
+categories: [Significance & noise, Reasoning & fallacies]
+source: "http://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#62** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/).
+:::
+
+## What it is
+
+A common defense of a surprising finding goes: "We used a small sample and a noisy measure, *and we still got significance*, so the effect must be really strong." It sounds like a stress test passed. It is backwards. Noise doesn't make significance harder to reach in a way that filters for real effects. It makes significant estimates *more exaggerated* and *more often wrong in sign*.
+
+## Why it matters
+
+This argument has been used to defend many famous results that later failed to replicate. In a noisy study, the only way to reach significance is a big chance deviation. The significant estimates from noisy studies are therefore the *least* trustworthy, not the most. Researchers who believe the fallacy will under-invest in measurement quality and over-trust their luckiest results.
+
+## How it works
+
+For a true effect $\theta$ and standard error $\text{se}$, significance requires $|\hat\theta| > 1.96\,\text{se}$. As noise grows:
+
+- the threshold $1.96\,\text{se}$ grows, so significant estimates must be larger and the exaggeration ratio $|\hat\theta|/\theta$ grows;
+- the share of significant results with the wrong sign (Type S error) rises toward 50%.
+
+Getting significance despite noise is not evidence of a strong effect. It's evidence that you got lucky in the noise.
+
+## Simulated example
+
+Hold the true effect fixed and increase measurement noise. For each noise level, look only at the replications that came out significant. How exaggerated are they, and how often is the sign wrong?
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof theta = Inputs.range([0.05, 1], {value: 0.2, step: 0.05, label: "True effect θ"})
+viewof seed = Inputs.range([1, 500], {value: 62, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+noise = {
+  const r = rng(seed);
+  return [0.05, 0.1, 0.15, 0.2, 0.3, 0.4, 0.5, 0.75, 1].map(se => {
+    const sig = [];
+    for (let i = 0; i < 20000; i++) { const e = r.normal(theta, se); if (Math.abs(e) > 1.96 * se) sig.push(e); }
+    return {se, exaggeration: mean(sig.map(Math.abs)) / theta, typeS: sig.filter(e => e < 0).length / sig.length, power: sig.length / 20000};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Noise (standard error)", grid: true},
+  y: {label: "Exaggeration ratio of significant estimates", grid: true, type: "log"},
+  marks: [
+    Plot.line(noise, {x: "se", y: "exaggeration", stroke: "#d6604d", strokeWidth: 2}),
+    Plot.dot(noise, {x: "se", y: "exaggeration", fill: "#d6604d"}),
+    Plot.ruleY([1], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const lo = noise[0], hi = noise.at(-1);
+  return html`<div class="sim-readout">${md`At low noise (se = ${lo.se}), significant estimates overstate the effect by **${fmt(lo.exaggeration, 1)}×** and **${pct(lo.typeS, 1)}** have the wrong sign. At high noise (se = ${hi.se}), they overstate it by **${fmt(hi.exaggeration, 1)}×**, with **${pct(hi.typeS, 1)}** wrong-signed. Significance that "survived" the noise is *weaker* evidence, not stronger.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Significance under noisy conditions points to luck, not strength.
+- Noisy studies produce exaggerated and sometimes wrong-signed significant estimates.
+- Invest in measurement. A precise study with a modest result beats a noisy study with a dramatic one.
+:::
+
+## Related entries
+
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [Random in](random-in-random-out.qmd)
+- [The Edlin Factor](edlin-factor.qmd)
+
+## Source
+
+- Andrew Gelman, [The "What does not kill my statistical significance makes it stronger" fallacy](http://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/) (2017).
+- Loken and Gelman, "Measurement error and the replication crisis," *Science* (2017).

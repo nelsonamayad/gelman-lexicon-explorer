@@ -1,0 +1,97 @@
+---
+title: "Basketball, or knitting"
+date: 2026-11-09
+description: "Like these activities, statistics is hard."
+order: 98
+categories: [Communication, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2016/03/11/statistics-is-like-basketball-or-knitting/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#98** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics is like basketball, or knitting](https://statmodeling.stat.columbia.edu/2016/03/11/statistics-is-like-basketball-or-knitting/).
+:::
+
+## What it is
+
+Nobody expects to learn basketball or knitting by reading the rules. You learn them by doing them, badly at first, with feedback, over and over. Statistics is the same. Knowing the formulas is not the same as being able to analyze data, judge whether a pattern is real or spot a flawed design. Gelman's point is that statistics is *hard* in this skill-based way, and that teaching and practice should treat it that way.
+
+## Why it matters
+
+Treating statistics as rules to memorize produces people who can recite the definition of a p-value but can't tell a noisy result from a real one. Those people go on to design studies, review papers and make decisions. It also explains why short methods courses and checklists have limited effect: skill comes from many repetitions with feedback, not from exposure to concepts.
+
+## How it works
+
+A toy model of skill. A learner looks at scatterplots and has to judge whether there is a real relationship or just noise. Their decision threshold starts poorly calibrated. With **feedback** after each judgment, they adjust and their accuracy improves. Without feedback, from "reading the rules" only, the threshold is set once from a textbook heuristic and never improves.
+
+## Simulated example
+
+A learner judges 300 scatterplots of 20 points each. Half have a real correlation and half are noise. Compare learning with feedback against reading the rules only.
+
+```{ojs}
+import {rng, range, mean, cor, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof trueR = Inputs.range([0.1, 0.8], {value: 0.4, step: 0.05, label: "Correlation when the pattern is real"})
+viewof lr = Inputs.range([0.001, 0.05], {value: 0.01, step: 0.001, label: "How quickly feedback adjusts judgment"})
+viewof seed = Inputs.range([1, 500], {value: 98, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+practice = {
+  const r = rng(seed);
+  const trials = range(300).map(() => {
+    const real = r() < 0.5, rho = real ? trueR : 0;
+    const x = r.normals(20), y = x.map(v => rho * v + Math.sqrt(1 - rho * rho) * r.normal());
+    return {real, rObs: Math.abs(cor(x, y))};
+  });
+  let tFeedback = 0.05;                         // starts "seeing patterns everywhere"
+  const tRules = 0.05;
+  const out = [];
+  trials.forEach((t, i) => {
+    const sayF = t.rObs > tFeedback, sayR = t.rObs > tRules;
+    if (sayF !== t.real) tFeedback += (sayF ? 1 : -1) * lr;  // feedback nudges the threshold
+    out.push({i, feedback: +(sayF === t.real), rules: +(sayR === t.real)});
+  });
+  return range(15).flatMap(b => {
+    const blk = out.slice(b * 20, b * 20 + 20);
+    return [{block: b + 1, how: "Practice with feedback", acc: mean(blk.map(d => d.feedback))}, {block: b + 1, how: "Read the rules only", acc: mean(blk.map(d => d.rules))}];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Block of 20 judgments"},
+  y: {label: "Accuracy", domain: [0.3, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(practice, {x: "block", y: "acc", stroke: "how", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const last = h => mean(practice.filter(d => d.how === h && d.block > 10).map(d => d.acc));
+  return html`<div class="sim-readout">${md`Accuracy in the last 100 judgments: practice with feedback **${pct(last("Practice with feedback"))}**, rules only **${pct(last("Read the rules only"))}**. Chance is 50%. You don't learn basketball from the rulebook, and you don't learn to judge noise from the definition of a p-value.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Statistical skill is learned through practice with feedback, not by memorizing rules.
+- Expect it to be hard, and budget time for repetition.
+- Teach with many worked analyses and feedback, not just definitions.
+:::
+
+## Related entries
+
+- [Cheeseburger-snarfing diet gurus](cheeseburger-snarfing-diet-gurus.qmd)
+- [A bunch of hoops to jump through](bunch-of-hoops.qmd)
+- [Theoretical statistics](theoretical-statistics.qmd)
+
+## Source
+
+- Andrew Gelman, [Statistics is like basketball, or knitting](https://statmodeling.stat.columbia.edu/2016/03/11/statistics-is-like-basketball-or-knitting/) (2016).

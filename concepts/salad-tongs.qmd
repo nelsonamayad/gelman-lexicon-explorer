@@ -1,0 +1,84 @@
+---
+title: "Salad Tongs"
+date: 2026-11-09
+description: "Not to be used for painting."
+order: 50
+categories: [Significance & noise]
+source: "http://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#50** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Uri Simonsohn warns us not to be falsely reassured](http://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/).
+:::
+
+## What it is
+
+The phrase comes from a discussion of Uri Simonsohn's warning that analyzing *all* the p-values reported in a literature is "falsely reassuring." Gelman agreed, and added that if p-values are what we have, it makes sense to learn what we can from them. But "once we move to the goal of learning about underlying effects, I think we want to be analyzing raw data (and in the context of prior information), not merely pushing these p's around. P-values are crude data summaries, and a lot of information can be lost by moving from raw data to p-values. Doing science using published p-values is like trying to paint a picture using salad tongs." The simulation below shows one reason they are so crude: the same study, replicated, produces wildly different p-values.
+
+## Why it matters
+
+People treat p-values as precise measures of evidence. In fact the p-value from an exact replication of a study, with the same true effect and the same sample size, varies enormously from one replication to the next. A study with 50% power gives p-values anywhere from 0.0001 to 0.8. Conclusions like "the effect disappeared in the replication" or "the evidence is now stronger" are often just the tongs wobbling.
+
+## How it works
+
+If the true effect gives an expected z-statistic of $\delta$, then each replication's $z \sim \mathrm{N}(\delta, 1)$ and $p = 2(1 - \Phi(|z|))$. A z-score that varies by $\pm 2$ between replications, which is entirely typical, maps to p-values spanning several orders of magnitude. The difference between "significant" and "not significant" is itself usually not statistically significant.
+
+## Simulated example
+
+The same study is replicated 200 times with a fixed true effect. Look at how widely the p-values spread.
+
+```{ojs}
+import {rng, range, pnorm, qnorm, quantile, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof power = Inputs.range([0.1, 0.95], {value: 0.5, step: 0.05, label: "Power of the study"})
+viewof seed = Inputs.range([1, 500], {value: 50, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+dance = {
+  const r = rng(seed);
+  const delta = qnorm(0.975) + qnorm(power);
+  return range(200).map(i => { const z = r.normal(delta, 1); return {i, p: 2 * (1 - pnorm(Math.abs(z)))}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Replication"},
+  y: {type: "log", label: "p-value (log scale)", domain: [1e-6, 1], grid: true},
+  marks: [
+    Plot.dot(dance, {x: "i", y: "p", fill: d => d.p < 0.05 ? "#2166ac" : "#d6604d", r: 2.5}),
+    Plot.ruleY([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const ps = dance.map(d => d.p);
+  return html`<div class="sim-readout">${md`Identical studies, identical true effect. The middle 80% of p-values run from **${quantile(ps, 0.1).toExponential(1)}** to **${fmt(quantile(ps, 0.9), 3)}**, and **${pct(ps.filter(p => p < 0.05).length / ps.length)}** are below 0.05. Two replications of the same study routinely land on opposite sides of the line.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- p-values are highly variable across replications. Don't use them for fine-grained comparisons.
+- "Significant here, not there" is weak evidence that two studies differ.
+- Use estimates and uncertainty intervals, and compare studies directly.
+:::
+
+## Related entries
+
+- [P-values and U-values](p-values-and-u-values.qmd)
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [Premature collapsing of the wave function](premature-collapse.qmd)
+
+## Source
+
+- Andrew Gelman, [Uri Simonsohn warns us not to be falsely reassured](http://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/) (2015).
+- Gelman and Stern, "The difference between 'significant' and 'not significant' is not itself statistically significant," *The American Statistician* (2006).

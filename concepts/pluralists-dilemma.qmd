@@ -1,0 +1,98 @@
+---
+title: "The Pluralist's Dilemma"
+date: 2026-11-09
+description: "How to recognize that my philosophy is just one among many, that my own embrace of this philosophy is contingent on many things beyond my control, while still expressing the reasons why I prefer my philosophy to the alternatives (at least for the problems I work on)."
+order: 46
+categories: [Philosophy of statistics]
+source: "http://www.stat.columbia.edu/~gelman/research/published/copss.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#46** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How do we choose our default methods? (PDF)](http://www.stat.columbia.edu/~gelman/research/published/copss.pdf).
+:::
+
+## What it is
+
+A statistician's preferred approach, whether Bayesian, frequentist or machine learning, partly reflects where they trained, what problems they met and whom they worked with. An honest pluralist admits this contingency. Yet they still have *reasons* for their preference and want to state them. The dilemma is holding both views at once: "my approach is one of several reasonable ones" and "here is why I think mine is better, for the problems I work on."
+
+## Why it matters
+
+Statistical debates often fail in one of two ways. People assert universal superiority, or they retreat into "it's all a matter of taste." The pluralist's way out is to make claims *conditional on the problem domain*. Methods have different strengths. A method that excels with sparse hierarchical data may be overkill with large clean datasets, and the reverse also happens. Making the domain explicit turns a fight over identity into an empirical question.
+
+## How it works
+
+Characterize problems by features, such as how much the true effects vary relative to the measurement noise. Then compare methods across that space. Typically each method wins in some region. Your "philosophy" amounts to a bet about which region your problems fall in, and that bet can be checked.
+
+## Simulated example
+
+Two estimators compete across many problem types. An unbiased "separate estimates" method and a "partial pooling" method are applied to groups of effects. The x-axis is the ratio of true between-group variation to measurement noise. Where do *your* problems lie?
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof myRatio = Inputs.range([0.1, 5], {value: 0.7, step: 0.1, label: "Typical signal/noise in MY problems"})
+viewof J = Inputs.range([3, 50], {value: 8, step: 1, label: "Groups per problem"})
+viewof seed = Inputs.range([1, 500], {value: 46, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+landscape = {
+  const r = rng(seed);
+  const ratios = [0.1, 0.2, 0.3, 0.5, 0.7, 1, 1.5, 2, 3, 5];
+  return ratios.flatMap(ratio => {
+    let eSep = 0, ePool = 0;
+    for (let rep = 0; rep < 300; rep++) {
+      const th = r.normals(J, 0, ratio), y = th.map(t => r.normal(t, 1));
+      const m = mean(y), t2 = Math.max(0, mean(y.map(v => (v - m) ** 2)) - 1);
+      const B = t2 / (t2 + 1);
+      eSep += mean(y.map((v, j) => (v - th[j]) ** 2));
+      ePool += mean(y.map((v, j) => (m + B * (v - m) - th[j]) ** 2));
+    }
+    return [{ratio, method: "Separate estimates", rmse: Math.sqrt(eSep / 300)}, {ratio, method: "Partial pooling", rmse: Math.sqrt(ePool / 300)}];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {type: "log", label: "Between-group sd / measurement sd", grid: true},
+  y: {label: "RMSE", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.line(landscape, {x: "ratio", y: "rmse", stroke: "method", strokeWidth: 2}),
+    Plot.ruleX([myRatio], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.text([0], {x: myRatio, y: 1.05, text: () => "my problems", dx: 4, textAnchor: "start"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const near = landscape.reduce((a, b) => Math.abs(Math.log(b.ratio / myRatio)) < Math.abs(Math.log(a.ratio / myRatio)) ? b : a).ratio;
+  const at = m => landscape.find(d => d.ratio === near && d.method === m).rmse;
+  return html`<div class="sim-readout">${md`Near signal/noise ≈ ${near}: separate estimates have RMSE **${fmt(at("Separate estimates"), 3)}**, partial pooling **${fmt(at("Partial pooling"), 3)}**. The advantage of pooling is large when signal is weak and disappears when signal is strong. "My philosophy is better" is a claim *about where my problems lie*. That claim is checkable, and it can be stated without saying everyone else is wrong.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Admit that your methodological preferences are partly a product of history and circumstance.
+- State your reasons *conditionally*: better for which problems, and why.
+- Mapping methods' performance across problem types turns philosophical disputes into empirical ones.
+:::
+
+## Related entries
+
+- [Bayesian](bayesian.qmd)
+- [The Paradox of Philosophizing](paradox-of-philosophizing.qmd)
+- [The Foxhole Fallacy](foxhole-fallacy.qmd)
+- [Physics is like Brazil](physics-is-like-brazil.qmd)
+
+## Source
+
+- Andrew Gelman, ["How do we choose our default methods?"](http://www.stat.columbia.edu/~gelman/research/published/copss.pdf), in *Past, Present, and Future of Statistical Science* (COPSS 50th anniversary volume, 2014).

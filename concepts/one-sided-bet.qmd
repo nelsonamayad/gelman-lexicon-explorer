@@ -1,0 +1,102 @@
+---
+title: "The Fallacy of the One-Sided Bet"
+date: 2026-11-09
+description: "Pascal's wager, lottery tickets, and the rest."
+order: 13
+categories: [Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#13** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/).
+:::
+
+## What it is
+
+A one-sided bet is an argument that looks only at the upside of an action and ignores its costs, its downside, or the symmetric bet on the other side. Pascal's wager is the textbook case: believe in God, because the payoff if you're right is infinite and the cost if you're wrong is small. But that ignores the many other gods one could bet on, and the real costs of belief. Lottery tickets ("you can't win if you don't play") and "it can't hurt to try" interventions follow the same pattern.
+
+## Why it matters
+
+The fallacy shows up in policy and science as "even if the effect is uncertain, the intervention might help, so why not?" Every action has costs: money, side effects, opportunity costs, and the possibility of harm. When you list only the possible gains, any action looks good. In statistics, it is the habit of reporting only the direction that supports your story, as if an effect could only go one way.
+
+## How it works
+
+A decision depends on the full distribution of outcomes:
+
+$$
+\mathrm{E}[\text{gain}] = \sum_k p_k \cdot \text{payoff}_k - \text{cost}.
+$$
+
+The one-sided bettor computes the term for the attractive outcome ("I *might* win $10 million") and drops the rest. A lottery has a big payoff with tiny probability and a certain cost, and the expected value is negative. Repeating the bet does not rescue it. Most people who play every week for decades end up behind.
+
+## Simulated example
+
+A thousand people buy lottery tickets every week for a number of years. Tickets cost $2, and the payout structure has a small chance of small prizes and a tiny chance of a jackpot. See how the one-sided view ("someone wins big!") compares with what happens to the typical player.
+
+```{ojs}
+import {rng, range, mean, median, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof years = Inputs.range([1, 40], {value: 20, step: 1, label: "Years of weekly play"})
+viewof jackpotOdds = Inputs.range([4, 8], {value: 6, step: 0.5, label: "Jackpot odds: 1 in 10^"})
+viewof seed = Inputs.range([1, 500], {value: 30, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+players = {
+  const r = rng(seed);
+  const weeks = years * 52, pJack = 10 ** -jackpotOdds;
+  return range(1000).map(i => {
+    let net = 0;
+    for (let w = 0; w < weeks; w++) {
+      net -= 2;
+      const u = r();
+      if (u < pJack) net += 1e6;
+      else if (u < 0.01) net += 50;
+      else if (u < 0.1) net += 4;
+    }
+    return {i, net};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Net winnings after all those years ($)"},
+  y: {label: "Players", grid: true},
+  marks: [
+    Plot.rectY(players, Plot.binX({y: "count"}, {x: "net", fill: d => d.net > 0 ? "#2166ac" : "#d6604d", thresholds: 40})),
+    Plot.ruleX([0], {stroke: "currentColor"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const ahead = players.filter(d => d.net > 0).length;
+  const ev = -2 + 1e6 * 10 ** -jackpotOdds + 50 * (0.01 - 10 ** -jackpotOdds) + 4 * 0.09;
+  return html`<div class="sim-readout">${md`Expected value per ticket: **${fmt(ev)} dollars**. After ${years} years, **${pct(ahead / 1000, 1)}** of players are ahead. The median player is at **${fmt(median(players.map(d => d.net)), 0)} dollars**. The one-sided bet sees only the jackpot.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Evaluate a bet by its whole distribution of outcomes, including costs and downsides.
+- "It might help" is not an argument. "It might hurt" is equally available.
+- Symmetric alternatives (other gods, other tickets, the opposite effect) often cancel the one-sided argument.
+:::
+
+## Related entries
+
+- [The One-Way Street Fallacy](one-way-street-fallacy.qmd)
+- [Two sides, no vig](two-sides-no-vig.qmd)
+- [Institutional decision making](institutional-decision-making.qmd)
+
+## Source
+
+- Andrew Gelman, [The fallacy of the one-sided bet](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/) (2007).

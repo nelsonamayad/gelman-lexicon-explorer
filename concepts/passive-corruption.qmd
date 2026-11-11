@@ -1,0 +1,89 @@
+---
+title: "Passive Corruption"
+date: 2026-11-09
+description: "They know there's bad work but they don't do anything about it."
+order: 123
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#123** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It's worse than it sounds: passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/).
+:::
+
+## What it is
+
+Active corruption is producing bad work: fabricating, p-hacking, overclaiming. Passive corruption is *knowing* that bad work is out there, in your field, your journal or your department, and doing nothing about it. Leaders stay silent, editors don't publish corrections, colleagues keep citing it, and senior people protect friends. No single act is dramatic, but together these choices let bad work survive and spread.
+
+## Why it matters
+
+Science's self-correction depends on people who notice problems saying so. When the incentives push toward silence, through collegiality, fear of retaliation, protecting the field's reputation or plain inertia, bad work keeps its advantages: more citations, flashier claims, easier publication. Passive corruption turns an individual problem into a systemic one.
+
+## How it works
+
+A toy model. Bad work grows faster than good work because it is cheaper to produce and gets more attention, with relative growth advantage $a$. Each period, colleagues who know about a bad paper flag it with probability $s$, which removes its advantage. When $s$ is small (passive corruption), the share of bad work grows. Above a threshold, bad work is contained.
+
+## Simulated example
+
+Follow the share of bad work in a field over 40 years. Vary its growth advantage and how often people who know speak up.
+
+```{ojs}
+import {range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof adv = Inputs.range([0, 0.3], {value: 0.12, step: 0.01, label: "Growth advantage of bad work"})
+viewof speak = Inputs.range([0, 0.5], {value: 0.05, step: 0.01, label: "Pr(someone who knows speaks up) per year"})
+```
+
+```{ojs}
+field = {
+  const runs = [{s: speak, label: "Your setting"}, {s: 0, label: "Total silence"}, {s: 0.3, label: "Active correction"}];
+  return runs.flatMap(({s, label}) => {
+    let bad = 0.1;
+    return range(41).map(t => {
+      const row = {t, label, bad};
+      const b = bad * (1 + adv) * (1 - s), g = (1 - bad);
+      bad = b / (b + g);
+      return row;
+    });
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Years"},
+  y: {label: "Share of the literature that is bad work", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, domain: ["Your setting", "Total silence", "Active correction"], range: ["#2166ac", "#d6604d", "#5aae61"]},
+  marks: [Plot.line(field, {x: "t", y: "bad", stroke: "label", strokeWidth: d => d.label === "Your setting" ? 3 : 1.5})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = l => field.filter(d => d.label === l).at(-1).bad;
+  return html`<div class="sim-readout">${md`After 40 years, the share of bad work is **${pct(end("Your setting"))}** in your setting, **${pct(end("Total silence"))}** under total silence, and **${pct(end("Active correction"))}** with active correction. Bad work stops spreading when people speak up often enough to offset its advantage, here a ${pct(adv / (1 + adv))} chance per year.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Silence in the face of known bad work is a form of corruption with real effects.
+- Bad work has growth advantages, so containing it takes active correction.
+- Institutions, through editors, leaders and societies, set how costly it is to speak up.
+:::
+
+## Related entries
+
+- [Gresham's Law of bad science](greshams-law-bad-science.qmd)
+- [The Javert Paradox](javert-paradox.qmd)
+- [Deference Trap](deference-trap.qmd)
+- [Replication and firefighting](replication-and-firefighting.qmd)
+
+## Source
+
+- Andrew Gelman, [It's worse than it sounds: passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/) (2023).

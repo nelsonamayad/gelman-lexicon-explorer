@@ -1,0 +1,94 @@
+---
+title: "The Status-Reversal Heuristic"
+date: 2026-11-09
+description: "When you're evaluating a published claim by someone in a high-status profession or a high-status institution, imagine it was coming from someone of lower status."
+order: 58
+categories: [Reasoning & fallacies, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2019/10/16/the-status-reversal-heuristic/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#58** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The status-reversal heuristic](https://statmodeling.stat.columbia.edu/2019/10/16/the-status-reversal-heuristic/).
+:::
+
+## What it is
+
+A companion to the [time-reversal heuristic](time-reversal-heuristic.qmd). When a claim comes from a famous professor, a prestigious university or a high-status profession, imagine the identical claim, with the same data and the same argument, coming from an unknown researcher at a low-prestige institution. If you would be skeptical in the second case, you should be at least partly skeptical in the first.
+
+## Why it matters
+
+Status is a weak signal of quality that tends to be treated as a strong one. Reviewers, journalists and readers give high-status claims the benefit of the doubt and scrutinize low-status claims more. Weak work from prestigious sources then gets through, and good work from elsewhere gets ignored. The heuristic doesn't say status carries no information. It says the evidence in front of you should do most of the work.
+
+## How it works
+
+A toy model. Claims from high- and low-status sources have the *same* true rate of being correct, because they are of identical quality. Evaluators combine the actual evidence with a status-based prior boost. Their confidence in high-status claims is then systematically too high, and in low-status claims too low. A calibration plot shows the mismatch. Status reversal, meaning evaluating as if the source were low-status, removes the boost.
+
+## Simulated example
+
+There are 4,000 claims, half from high-status sources, all with the same distribution of evidence quality. Evaluators add a status bonus to their log-odds. Compare stated confidence with how often claims are actually true.
+
+```{ojs}
+import {rng, range, mean, invLogit, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof bonus = Inputs.range([0, 3], {value: 1.2, step: 0.1, label: "Status bonus (log-odds)"})
+viewof seed = Inputs.range([1, 500], {value: 58, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+claims = {
+  const r = rng(seed);
+  return range(4000).map(i => {
+    const high = i % 2 === 0;
+    const evidence = r.normal(0, 1.5);                       // what the paper actually shows
+    const trueP = invLogit(evidence);                        // calibrated probability given evidence
+    const judged = invLogit(evidence + (high ? bonus / 2 : -bonus / 2));
+    return {status: high ? "High-status source" : "Low-status source", judged, correct: r() < trueP};
+  });
+}
+calib = ["High-status source", "Low-status source"].flatMap(s => range(10).map(b => {
+  const pts = claims.filter(d => d.status === s && d.judged >= b / 10 && d.judged < (b + 1) / 10);
+  return {status: s, judged: (b + 0.5) / 10, actual: pts.length > 20 ? mean(pts.map(d => d.correct)) : NaN};
+}).filter(d => Number.isFinite(d.actual)))
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "Evaluator's confidence that the claim is true", domain: [0, 1], grid: true},
+  y: {label: "Share actually true", domain: [0, 1], grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.line([[0, 0], [1, 1]], {stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line(calib, {x: "judged", y: "actual", stroke: "status", strokeWidth: 2, marker: "circle"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const m = (s, k) => mean(claims.filter(d => d.status === s).map(d => +d[k]));
+  return html`<div class="sim-readout">${md`Average confidence: high-status claims **${pct(m("High-status source", "judged"))}**, low-status **${pct(m("Low-status source", "judged"))}**. Actual accuracy: **${pct(m("High-status source", "correct"))}** vs **${pct(m("Low-status source", "correct"))}**, which is the same. The red curve below the diagonal means overconfidence in high-status claims. Set the bonus to 0, which is what status reversal does, and both curves sit on the diagonal.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Imagine the same claim from a lower-status source. Would you still believe it?
+- Status is a weak signal. Let the evidence do the work.
+- The reversal protects against over-trusting prestige and under-trusting outsiders.
+:::
+
+## Related entries
+
+- [The Time-Reversal Heuristic](time-reversal-heuristic.qmd)
+- [The Error-Reversal Heuristic](error-reversal-heuristic.qmd)
+- [Brilliance](brilliance.qmd)
+- [Tall-Person Syndrome](tall-person-syndrome.qmd)
+
+## Source
+
+- Andrew Gelman, [The status-reversal heuristic](https://statmodeling.stat.columbia.edu/2019/10/16/the-status-reversal-heuristic/) (2019).

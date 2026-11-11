@@ -1,0 +1,96 @@
+---
+title: "Probability"
+date: 2026-11-09
+description: "A mathematical concept with no single correct foundation."
+order: 113
+categories: [Philosophy of statistics, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2018/12/26/what-is-probability/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#113** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What is probability?](https://statmodeling.stat.columbia.edu/2018/12/26/what-is-probability/)
+:::
+
+## What it is
+
+Probability is a mathematical object, a measure that satisfies Kolmogorov's axioms, that can be *interpreted* in several ways. It can be a long-run frequency, a degree of belief, a propensity of a physical system, a betting rate or a symmetry argument. Gelman's view is that none of these is the single correct foundation. Each is useful in some settings and strained in others. Practitioners use whichever interpretation fits the problem, often several in one analysis.
+
+## Why it matters
+
+Wars over the "true meaning" of probability, frequentist against subjectivist, generate more heat than light. In practice, a forecast's probability is checked by its frequency calibration, a prior is justified by a mix of belief and past frequencies, and a coin's 50% comes from symmetry. Insisting on one foundation means either distorting problems to fit it or refusing to use useful tools.
+
+## How it works
+
+Different routes to the same number:
+
+- **Frequency:** flip a coin many times, and the running proportion of heads settles toward $p$.
+- **Bayesian belief:** start with a prior on $p$, update after each flip, and the posterior concentrates on the same value.
+- **Symmetry:** before any flips, physical symmetry suggests $p = 0.5$.
+
+In well-behaved problems they agree. They come apart in one-off events, in small samples and when the model is wrong. That is where the choice of interpretation matters.
+
+## Simulated example
+
+Flip a biased coin. Watch the frequentist running proportion and a Bayesian posterior (uniform Beta(1, 1) prior) converge on the same number by different routes.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof p = Inputs.range([0.05, 0.95], {value: 0.3, step: 0.05, label: "True probability of heads"})
+viewof flips = Inputs.range([10, 1000], {value: 200, step: 10, label: "Number of flips"})
+viewof seed = Inputs.range([1, 500], {value: 10, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+coin = {
+  const r = rng(seed);
+  let heads = 0;
+  return range(flips).map(i => {
+    heads += r.bernoulli(p);
+    const n = i + 1, a = 1 + heads, b = 1 + n - heads;
+    const mean = a / (a + b), sdv = Math.sqrt(a * b / ((a + b) ** 2 * (a + b + 1)));
+    return {n, freq: heads / n, post: mean, lo: Math.max(0, mean - 1.645 * sdv), hi: Math.min(1, mean + 1.645 * sdv)};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Number of flips", type: "log"},
+  y: {label: "Probability of heads", domain: [0, 1], grid: true},
+  color: {legend: true, domain: ["Running frequency", "Bayesian posterior mean (90% band)"], range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.areaY(coin, {x: "n", y1: "lo", y2: "hi", fill: "#2166ac", fillOpacity: 0.15}),
+    Plot.line(coin, {x: "n", y: "freq", stroke: () => "Running frequency", strokeWidth: 1.5}),
+    Plot.line(coin, {x: "n", y: "post", stroke: () => "Bayesian posterior mean (90% band)", strokeWidth: 2}),
+    Plot.ruleY([p], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "1 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`After ${flips} flips: running frequency **${fmt(coin.at(-1).freq, 3)}**, posterior mean **${fmt(coin.at(-1).post, 3)}** (90% band ${fmt(coin.at(-1).lo, 2)}–${fmt(coin.at(-1).hi, 2)}). The truth is ${p}, and the dotted line is the symmetry argument's 0.5. Early on, with few flips, the interpretations disagree. With enough data they converge. No single foundation is needed to use probability well.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Probability is a mathematical tool with several valid interpretations.
+- Frequency, belief and symmetry often agree, and their disagreements are informative.
+- Choose the interpretation that fits the problem, and check calibration whatever you choose.
+:::
+
+## Related entries
+
+- [A probability isn't just a number](probability-not-just-a-number.qmd)
+- [Bayesians](bayesians-are-frequentists.qmd)
+- [The Pluralist's Dilemma](pluralists-dilemma.qmd)
+
+## Source
+
+- Andrew Gelman, [What is probability?](https://statmodeling.stat.columbia.edu/2018/12/26/what-is-probability/) (2018).

@@ -1,0 +1,87 @@
+---
+title: "The Ramanujan Principle"
+date: 2026-11-09
+description: "Tables are read as crude graphs."
+order: 35
+categories: [Statistical graphics, Communication]
+source: "http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#35** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tables as graphs: the Ramanujan principle](http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/).
+:::
+
+## What it is
+
+Srinivasa Ramanujan reportedly spotted deep patterns in tables of numbers. Most readers can't, but they still *look* at tables, and what they see is shape. A column of numbers is read like a crude bar chart: the lengths of the numbers, their leading digits and how they line up. Since tables will be read as graphs anyway, Gelman's advice is to design them as graphs. Round aggressively, align the digits, order rows meaningfully, and put the comparisons you want readers to make next to each other.
+
+## Why it matters
+
+Regression tables with six decimal places, unsorted rows and misaligned columns make the eye do work that a graph would do for free. Readers end up pattern-matching on noise: the digit lengths of $0.000123$ versus $0.0123$, or the position of a stray asterisk. Badly designed tables are badly designed graphs that nobody meant to draw.
+
+## How it works
+
+A number's printed width is approximately $\lfloor \log_{10}|x| \rfloor$ plus a constant, so a right-aligned column of integers *is* a log-scale bar chart. Decimal alignment makes magnitude visible. Rounding to two significant digits removes visual noise that conveys no information relative to the standard errors. Sorting by value turns the column into a ranked display.
+
+## Simulated example
+
+A table of simulated estimates spanning several orders of magnitude. Toggle rounding, alignment and sorting, and compare the table's "crude graph" with an actual graph of the same numbers.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof digits = Inputs.radio(["Raw (6 decimals)", "2 significant digits"], {value: "Raw (6 decimals)", label: "Rounding"})
+viewof sorted = Inputs.toggle({label: "Sort rows by value", value: false})
+viewof seed = Inputs.range([1, 500], {value: 35, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+rows = {
+  const r = rng(seed);
+  const names = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima"];
+  const d = names.map(name => ({name, value: Math.exp(r.normal(3, 2.2))}));
+  return sorted ? d.sort((a, b) => b.value - a.value) : d;
+}
+show = v => digits.startsWith("Raw") ? v.toFixed(6) : Number(v.toPrecision(2)).toLocaleString("en-US", {maximumFractionDigits: 3})
+```
+
+```{ojs}
+html`<table class="table table-sm" style="max-width: 360px; font-family: var(--bs-font-monospace);">
+<thead><tr><th>Item</th><th style="text-align:right">Estimate</th></tr></thead>
+<tbody>${rows.map(d => html`<tr><td>${d.name}</td><td style="text-align:right">${show(d.value)}</td></tr>`)}</tbody></table>`
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  marginLeft: 70,
+  x: {type: "log", label: "Estimate (log scale)", grid: true},
+  y: {label: null, domain: rows.map(d => d.name)},
+  marks: [Plot.barX(rows, {y: "name", x1: 0.01, x2: "value", fill: "#2166ac"}), Plot.text(rows, {y: "name", x: "value", text: d => show(d.value), dx: 4, textAnchor: "start", fontSize: 10})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Right-aligned, the table's number widths trace roughly the same profile as the log-scale bars. The table *is* a crude graph. ${digits.startsWith("Raw") ? "With six decimals the trailing digits add visual noise and no information. Switch to 2 significant digits." : "Rounded, the shape is cleaner."} ${sorted ? "Sorting turns it into a ranking." : "Turn on sorting to read it as a ranking."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Readers see tables as shapes, so design tables as graphs.
+- Round to the precision the uncertainty supports. Align digits. Sort meaningfully.
+- When a comparison really matters, draw the graph.
+:::
+
+## Related entries
+
+- [What to include](what-to-include.qmd)
+- [Alabama First](alabama-first.qmd)
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+
+## Source
+
+- Andrew Gelman, [Tables as graphs: the Ramanujan principle](http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/) (2011).

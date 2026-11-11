@@ -1,0 +1,86 @@
+---
+title: "Freedom"
+date: 2026-11-09
+description: "It's not user friendly."
+order: 102
+categories: [Computing, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#102** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Freedom is not user-friendly](https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/).
+:::
+
+## What it is
+
+Flexible tools such as probabilistic programming languages, general-purpose modeling software and open-ended analysis environments let you fit almost any model. That freedom has a price: you have to make decisions that a constrained, "user-friendly" tool would have made for you. Every degree of freedom is also an opportunity to get something wrong. Freedom is powerful and not user-friendly.
+
+## Why it matters
+
+There's a real tension in tool design. Constrained software with sensible defaults protects novices from many mistakes but stops experts from building the right model. Flexible software lets experts do excellent work and lets novices produce elaborate nonsense. Neither is better in general. The right choice depends on who is using the tool and how much support, such as defaults, checks and workflow guidance, comes with the freedom.
+
+## How it works
+
+A toy model. Analysis quality depends on matching the model to the problem. A **constrained** tool offers a few good default models, so its quality is moderate and fairly consistent regardless of skill. A **free** tool lets the analyst specify any model. Quality then depends on skill: experts land near the best model, and novices scatter widely, sometimes far below the constrained tool's floor.
+
+## Simulated example
+
+Simulate many analysts of varying skill using either a constrained or a free tool. Compare the distributions of analysis quality.
+
+```{ojs}
+import {rng, range, mean, quantile, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof skill = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Average analyst skill"})
+viewof seed = Inputs.range([1, 500], {value: 102, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+freedom = {
+  const r = rng(seed);
+  return range(2000).flatMap(() => {
+    const s = Math.min(1, Math.max(0, r.normal(skill, 0.2)));
+    const constrained = 0.65 + r.normal(0, 0.05);                 // good defaults, limited ceiling
+    const free = 0.95 - (1 - s) * Math.abs(r.normal(0, 0.6));     // ceiling high, floor depends on skill
+    return [{tool: "Constrained, user-friendly", q: constrained}, {tool: "Free, flexible", q: Math.max(-0.5, free)}];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  facet: {data: freedom, y: "tool", marginRight: 160},
+  x: {label: "Analysis quality (1 = best possible)", domain: [-0.5, 1]},
+  y: {label: "Analysts", grid: true},
+  marks: [Plot.rectY(freedom, Plot.binX({y: "count"}, {x: "q", fill: "tool", thresholds: 40, domain: [-0.5, 1]})), Plot.ruleY([0])],
+  color: {range: ["#999", "#2166ac"]}
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const q = (t, p) => quantile(freedom.filter(d => d.tool === t).map(d => d.q), p);
+  return html`<div class="sim-readout">${md`Median quality: constrained **${fmt(q("Constrained, user-friendly", 0.5))}**, free **${fmt(q("Free, flexible", 0.5))}**. Worst 10%: constrained ${fmt(q("Constrained, user-friendly", 0.1))}, free ${fmt(q("Free, flexible", 0.1))}. Raise the skill slider and freedom pays off. Lower it and the user-friendly tool wins. Freedom isn't user-friendly.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Flexibility lets you build the right model, and lets you build very wrong ones.
+- Constrained tools set a floor on quality. Free tools raise the ceiling.
+- Good flexible tools come with good defaults, checks and workflow guidance.
+:::
+
+## Related entries
+
+- [Defaults](defaults.qmd)
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+
+## Source
+
+- Andrew Gelman, [Freedom is not user-friendly](https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/) (2022).

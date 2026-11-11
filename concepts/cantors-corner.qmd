@@ -1,0 +1,97 @@
+---
+title: "Cantor's Corner"
+date: 2026-11-09
+description: "Where you want to be."
+order: 69
+categories: [Modeling workflow, Philosophy of statistics]
+source: "http://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#69** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Solution to the puzzle: why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way?](http://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/)
+:::
+
+## What it is
+
+The name alludes to Georg Cantor's diagonal argument, which builds exactly the item that isn't on your list. Gelman writes that "scientific research is all about discovery of the unexpected: to do research, you need to be open to new possibilities, to design experiments to force anomalies, and to learn from them. The sweet spot for any researcher is at Cantor's corner." (He points to section 7 of one of his articles for more on the Cantor connection.)
+
+The post's puzzle is that researchers are trained to be open to the unexpected, yet they respond to legitimate criticism of their own work "in an angry, defensive, closed, non-scientific way." Gelman's explanation is peer review. From their first submission, scientists receive sharp criticism and learn to respond "in the shallowest way possible", treating each reviewer comment as a hoop to jump through rather than a possible sign the paper is wrong. That habit carries over to post-publication criticism.
+
+## Why it matters
+
+Each critical comment is "potentially a sign that our paper is completely wrong." A researcher who treats criticism as obstacles never ends up in Cantor's corner, because they never let an anomaly change their claims. The researcher who does get there treats flaws as the most informative part of the analysis. In modeling terms, that means running checks *designed to force anomalies*, which is what the simulation below shows.
+
+## How it works
+
+Fit a model, then go down a list of features of the data, such as the mean, the variance, the share of zeros and the maximum. For each one, ask whether the model reproduces it. The diagonal move is to look specifically for the feature the model was *not* built to capture. When you find it, you are in Cantor's corner: you know something about your model's limits that the defensive researcher will never learn.
+
+## Simulated example
+
+Count data come from an overdispersed process with many zeros, and a Poisson model is fit. For each test statistic, compare the observed value with its distribution under the fitted model. The statistic the model fails on is your corner.
+
+```{ojs}
+import {rng, range, mean, variance, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof zeroInfl = Inputs.range([0, 0.5], {value: 0.25, step: 0.05, label: "Share of structural zeros in the truth"})
+viewof seed = Inputs.range([1, 500], {value: 69, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+corner = {
+  const r = rng(seed);
+  const y = range(300).map(() => r() < zeroInfl ? 0 : r.poisson(r.gamma(4, 1)));
+  const lam = mean(y);                                       // Poisson fit
+  const stats = {
+    "Mean": v => mean(v), "Variance": v => variance(v),
+    "Share of zeros": v => v.filter(x => x === 0).length / v.length, "Maximum": v => Math.max(...v)
+  };
+  return Object.entries(stats).map(([name, T]) => {
+    const obs = T(y);
+    const reps = range(400).map(() => T(range(300).map(() => r.poisson(lam))));
+    const p = reps.filter(t => t >= obs).length / reps.length;
+    return {name, obs, reps, p};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 360,
+  facet: {data: corner.flatMap(d => d.reps.map(v => ({name: d.name, v}))), y: "name", marginRight: 110},
+  x: {label: "Replicated statistic under the Poisson model (normalized)", grid: true},
+  y: {label: null, axis: null},
+  marks: [
+    Plot.rectY(corner.flatMap(d => { const m = mean(d.reps), s = Math.sqrt(variance(d.reps)) || 1; return d.reps.map(v => ({name: d.name, z: (v - m) / s})); }), Plot.binX({y: "count"}, {x: "z", fy: "name", fill: "#bbb", thresholds: 30})),
+    Plot.ruleX(corner.map(d => { const m = mean(d.reps), s = Math.sqrt(variance(d.reps)) || 1; return {name: d.name, z: (d.obs - m) / s}; }), {x: "z", fy: "name", stroke: "#d6604d", strokeWidth: 3})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const worst = corner.reduce((a, b) => Math.min(b.p, 1 - b.p) < Math.min(a.p, 1 - a.p) ? b : a);
+  return html`<div class="sim-readout">${md`The model reproduces the **mean** perfectly (p = ${fmt(corner[0].p, 2)}), which is the check it was built to pass. It fails on **${worst.name.toLowerCase()}** (p = ${fmt(worst.p, 3)}; the red line sits far outside the grey distribution). That is Cantor's corner: you've found the case your model misses, and with it the direction for improvement.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Look for the case your model gets wrong. Finding it is progress, not defeat.
+- Design checks to break your model, not checks it is sure to pass.
+- Researchers who look for their own counterexamples learn more than those who wait for critics to find them.
+:::
+
+## Related entries
+
+- [A chicken](a-chicken.qmd)
+- [The capacity to be upset](capacity-to-be-upset.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+- [Mistakes](mistakes.qmd)
+
+## Source
+
+- Andrew Gelman, [Solution to the puzzle: why do scientists typically respond to legitimate scientific criticism in an angry, defensive, closed, non-scientific way?](http://statmodeling.stat.columbia.edu/2018/01/13/solution-puzzle-scientists-typically-respond-legitimate-scientific-criticism-angry-defensive-closed-non-scientific-way/) (2018).

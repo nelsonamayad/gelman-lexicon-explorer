@@ -1,0 +1,89 @@
+---
+title: "End of novel. Beginning of job."
+date: 2026-11-09
+description: "That point at which you make the decision to stop thinking and start finishing."
+order: 131
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#131** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [End of novel. Beginning of job.](https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/)
+:::
+
+## What it is
+
+Every project has a moment when you stop exploring and start finishing. You stop adding models, trying alternatives and chasing new questions, and start writing up, cleaning code and producing the deliverable. Before that point, the work is open-ended, like writing a novel. After it, it's a job with a defined end. The skill is recognizing when to cross that line.
+
+## Why it matters
+
+Analysts err in both directions. Some never stop thinking: there's always another model, another robustness check, another dataset, and the project never ships. Others stop too soon and polish an analysis that hasn't been thought through. Since the returns to more exploration diminish while the costs of delay keep growing, there is a sensible time to switch, and it is earlier than perfectionists like and later than the impatient like.
+
+## How it works
+
+A toy model. The value of the analysis improves with thinking time $t$ with diminishing returns, $V(t) = V_{\max}(1 - e^{-t/\tau})$. Delay has a cost that grows linearly, $c\,t$, through missed decisions, stale data and other projects not done. Net value $V(t) - ct$ peaks at
+
+$$
+t^* = \tau \log\!\left(\frac{V_{\max}}{c\,\tau}\right),
+$$
+
+which is the moment to put the novel down and start the job.
+
+## Simulated example
+
+Vary how quickly further thinking pays off and how costly delay is. Find when to stop thinking and start finishing.
+
+```{ojs}
+import {range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([1, 20], {value: 6, step: 0.5, label: "Time scale of insight τ (weeks)"})
+viewof cost = Inputs.range([0.5, 10], {value: 2, step: 0.25, label: "Cost of delay per week"})
+```
+
+```{ojs}
+novel = range(161).map(i => {
+  const t = i * 0.25, V = 100 * (1 - Math.exp(-t / tau));
+  return {t, value: V, net: V - cost * t};
+})
+tStar = Math.max(0, tau * Math.log(100 / (cost * tau)))
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Weeks spent thinking before switching to finishing"},
+  y: {label: "Value", grid: true},
+  color: {legend: true, domain: ["Value of the analysis", "Net value (minus cost of delay)"], range: ["#999", "#2166ac"]},
+  marks: [
+    Plot.line(novel, {x: "t", y: "value", stroke: () => "Value of the analysis", strokeDasharray: "4 3"}),
+    Plot.line(novel, {x: "t", y: "net", stroke: () => "Net value (minus cost of delay)", strokeWidth: 2}),
+    Plot.ruleX([tStar], {stroke: "#d6604d", strokeWidth: 2}),
+    Plot.text([0], {x: tStar, y: 95, text: () => "end of novel", dx: 6, textAnchor: "start", fill: "#d6604d"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Stop thinking and start finishing after about **${fmt(tStar, 1)} weeks**. By then the analysis has reached **${fmt(100 * (1 - Math.exp(-tStar / tau)), 0)}%** of its potential value, and the last few percent aren't worth the delay. When further thinking pays off slowly or delay is expensive, the switch comes sooner.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Exploration has diminishing returns, and delay has growing costs.
+- Decide on purpose when to stop thinking and start finishing.
+- Not every remaining idea needs to go in this project. Write it down for the next one.
+:::
+
+## Related entries
+
+- [The Australia principle](australia-principle.qmd)
+- [Premature collapsing of the wave function](premature-collapse.qmd)
+- [Institutional decision making](institutional-decision-making.qmd)
+
+## Source
+
+- Andrew Gelman, [End of novel. Beginning of job.](https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/) (2020).

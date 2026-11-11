@@ -1,0 +1,93 @@
+---
+title: "The Freshman Fallacy"
+date: 2026-11-09
+description: "Just because a freshman might raise a question, that does not make the issue irrelevant."
+order: 43
+categories: [Reasoning & fallacies, Causal inference]
+source: "http://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#43** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Does it matter that a sample is unrepresentative? It depends on the size of the treatment interactions](http://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/).
+:::
+
+## What it is
+
+A first-year student reads a psychology study and asks, "But wasn't it just college students?" Experts tend to dismiss the question as naive: "Of course it's a convenience sample; randomization takes care of internal validity." The freshman fallacy is assuming that a question must be unimportant because a beginner could ask it. Sometimes the obvious question is the right one.
+
+## Why it matters
+
+Whether an unrepresentative sample matters for a randomized experiment **depends on treatment interactions**, that is, on whether the effect varies with characteristics in which the sample differs from the population. If effects are similar for everyone, a student sample is fine. If the effect differs with age, income or context, the student-sample estimate can be badly off for the population. Dismissing the question skips the analysis that answers it.
+
+## How it works
+
+Let the treatment effect for a person with covariate $x$ be $\tau(x) = \tau_0 + \gamma x$. The sample average effect is $\tau_0 + \gamma \bar{x}_{\text{sample}}$, and the population average is $\tau_0 + \gamma \bar{x}_{\text{pop}}$. The bias is
+
+$$
+\gamma\,(\bar{x}_{\text{sample}} - \bar{x}_{\text{pop}}),
+$$
+
+which is zero only if there is no interaction ($\gamma = 0$) or no difference in composition. Randomization within the sample does nothing to remove this term.
+
+## Simulated example
+
+A randomized experiment run only on 18–22-year-olds. The treatment effect changes with age at a rate you control. Compare the experiment's estimate with the population-average effect.
+
+```{ojs}
+import {rng, range, mean, fmt, twoGroup} from "../js/stats.js"
+```
+
+```{ojs}
+viewof gamma = Inputs.range([-0.03, 0.03], {value: -0.015, step: 0.001, label: "Change in effect per year of age (γ)"})
+viewof seed = Inputs.range([1, 500], {value: 43, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+fresh = {
+  const r = rng(seed);
+  const tau = age => 0.5 + gamma * (age - 20);
+  const sample = range(600).map(() => { const age = r.uniform(18, 22), z = r.bernoulli(0.5); return {age, z, y: tau(age) * z + r.normal(0, 1)}; });
+  const est = mean(sample.filter(d => d.z).map(d => d.y)) - mean(sample.filter(d => !d.z).map(d => d.y));
+  const popAges = range(5000).map(() => r.uniform(18, 80));
+  const curve = range(63).map(i => ({age: 18 + i, tau: tau(18 + i)}));
+  return {est, popEffect: mean(popAges.map(tau)), curve};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Age", grid: true},
+  y: {label: "True treatment effect", grid: true},
+  marks: [
+    Plot.rect([0], {x1: 18, x2: 22, y1: -1.5, y2: 2, fill: "#2166ac", fillOpacity: 0.1}),
+    Plot.line(fresh.curve, {x: "age", y: "tau", stroke: "currentColor"}),
+    Plot.ruleY([fresh.est], {stroke: "#2166ac", strokeDasharray: "5 3"}),
+    Plot.ruleY([fresh.popEffect], {stroke: "#d6604d", strokeDasharray: "5 3"}),
+    Plot.text([0], {x: 22.5, y: 1.8, text: () => "the sample", textAnchor: "start", fill: "#2166ac"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The experiment estimates **${fmt(fresh.est)}** (blue dashed). The population-average effect is **${fmt(fresh.popEffect)}** (red dashed). Set γ to 0 and the freshman's worry goes away. Otherwise it was exactly the right question.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A naive-sounding question can still point at a real problem.
+- Unrepresentative samples matter for experiments when treatment effects vary with characteristics the sample lacks.
+- Answer "it's just students" with an analysis of plausible interactions, not with a shrug.
+:::
+
+## Related entries
+
+- [The Groovy Grandma Problem](groovy-grandma-problem.qmd)
+- [Strongest-link Fallacy](strongest-link-fallacy.qmd)
+- [The Causal Identification Kool-Aid](causal-identification-kool-aid.qmd)
+
+## Source
+
+- Andrew Gelman, [Does it matter that a sample is unrepresentative? It depends on the size of the treatment interactions](http://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/) (2013).

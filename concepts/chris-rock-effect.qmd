@@ -1,0 +1,91 @@
+---
+title: "The Chris Rock Effect"
+date: 2026-11-09
+description: "Some graphs give the pleasant feature of visualizing things we already knew, shown so well that we get a shock of recognition, the joy of relearning what we already know, but seeing it in a new way that makes us think more deeply about all sorts of related topics."
+order: 42
+categories: [Statistical graphics]
+source: "http://statmodeling.stat.columbia.edu/2011/07/05/different_goals/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#42** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Different goals, different looks](http://statmodeling.stat.columbia.edu/2011/07/05/different_goals/).
+:::
+
+## What it is
+
+A good comedian like Chris Rock gets laughs by saying what everyone already knows in a way that makes them see it fresh. Some statistical graphics do the same. They show a pattern you already knew existed, such as fewer births on weekends or a dip on holidays, so vividly that you feel a "shock of recognition." Then you start asking questions you hadn't thought to ask: *why* exactly that dip? What about the day after?
+
+## Why it matters
+
+We often judge graphs by whether they reveal something *new*. Gelman points out that confirming the known has value too. It builds trust in the data, since if the familiar patterns show up the data are probably sound. It provides a reference frame for the surprising parts, and it invites deeper thinking. A graph that shows nothing you already knew is often a sign that something is wrong with the data or the display.
+
+## How it works
+
+The effect needs a display that preserves enough detail for the familiar patterns to stand out against the noise. For daily data, that might mean showing every day of the year rather than monthly averages, or separating the weekly cycle from the seasonal one. When the known patterns appear crisply, the reader trusts the graph and turns to the residual surprises.
+
+## Simulated example
+
+Simulated daily births over a year, built with a weekday/weekend cycle, a gentle seasonal wave and dips on major holidays. The raw series looks like noisy zigzags. Switch to "Day of year, averaged over weekdays" to get the moment of recognition.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof view = Inputs.radio(["Raw daily series", "Day of year, averaged over weekdays"], {value: "Raw daily series", label: "Display"})
+viewof seed = Inputs.range([1, 500], {value: 42, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+births = {
+  const r = rng(seed);
+  const holidays = {1: "New Year", 185: "July 4", 359: "Christmas", 327: "Thanksgiving*", 245: "Labor Day*", 304: "Halloween"};
+  const years = [2001, 2002, 2003, 2004, 2005];
+  return years.flatMap((yr, k) => range(365).map(doy => {
+    const dow = (doy + k) % 7;                          // shifts each year
+    const weekend = dow >= 5 ? -0.22 : 0;
+    const season = 0.05 * Math.sin(2 * Math.PI * (doy - 100) / 365);
+    const hol = holidays[doy + 1] ? (doy + 1 === 304 ? -0.05 : -0.3) : 0;
+    const near = (holidays[doy] || holidays[doy + 2]) && !holidays[doy + 1] ? -0.06 : 0;
+    return {yr, doy: doy + 1, dow, weekend: dow >= 5, births: 10000 * Math.exp(weekend + season + hol + near + r.normal(0, 0.025)), label: holidays[doy + 1]};
+  }));
+}
+avgDoy = range(365).map(d => {
+  const pts = births.filter(b => b.doy === d + 1 && !b.weekend);
+  return {doy: d + 1, births: pts.length ? mean(pts.map(p => p.births)) : NaN, label: births.find(b => b.doy === d + 1).label};
+}).filter(d => Number.isFinite(d.births))
+```
+
+```{ojs}
+view === "Raw daily series"
+  ? Plot.plot({height: 280, x: {label: "Day (5 years)"}, y: {label: "Births", grid: true},
+      marks: [Plot.line(births.map((d, i) => ({...d, i})), {x: "i", y: "births", stroke: "#2166ac", strokeWidth: 0.5})]})
+  : Plot.plot({height: 300, x: {label: "Day of year"}, y: {label: "Average weekday births", grid: true},
+      marks: [
+        Plot.line(avgDoy, {x: "doy", y: "births", stroke: "#2166ac"}),
+        Plot.text(avgDoy.filter(d => d.label), {x: "doy", y: "births", text: "label", dy: 12, fill: "#d6604d", fontSize: 10})
+      ]})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`${view === "Raw daily series" ? "The raw series is a blur of weekly zigzags. Switch displays." : "There it is: the holiday dips and the seasonal wave. You knew all of this, and now you *see* it, and the next question is about the dips on the days next to each holiday."} (Holidays marked * are placed at a fixed day for simplicity.)`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Graphs that show familiar patterns well build trust and prompt new questions.
+- If a graph shows none of the patterns you know should be there, suspect the data or the display.
+- Choose displays that separate known structure (cycles, seasons) so the surprises stand out.
+:::
+
+## Related entries
+
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [The Click-Through Solution](click-through-solution.qmd)
+- [Canary variable](canary-variable.qmd)
+
+## Source
+
+- Andrew Gelman, [Different goals, different looks](http://statmodeling.stat.columbia.edu/2011/07/05/different_goals/) (2011).

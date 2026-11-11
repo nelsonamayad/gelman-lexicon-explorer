@@ -1,0 +1,19 @@
+# The site is built by GitHub Actions (.github/workflows/publish.yml) and
+# uploaded with the Netlify CLI, so Netlify itself never builds anything.
+# If the repository is also linked in the Netlify UI, this tells Netlify to
+# skip its own builds.
+[build]
+  publish = "_site"
+  command = "echo 'Built by GitHub Actions'"
+  ignore = "exit 0"
+
+# Long-lived caching for static assets; HTML stays fresh.
+[[headers]]
+  for = "/site_libs/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=604800"

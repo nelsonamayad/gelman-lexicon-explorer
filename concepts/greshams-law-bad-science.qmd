@@ -1,0 +1,86 @@
+---
+title: "Gresham's Law of bad science"
+date: 2026-11-09
+description: "Every minute you spend staring at some bad paper, trying to figure out reasons why what they did is actually correct, is a minute you didn't spend looking at something more serious."
+order: 124
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2020/01/24/the-latest-perry-preschool-analysis-noisy-data-noisy-methods-flexible-summarizing-big-claims/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#124** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The latest Perry Preschool analysis: noisy data + noisy methods + flexible summarizing = big claims](https://statmodeling.stat.columbia.edu/2020/01/24/the-latest-perry-preschool-analysis-noisy-data-noisy-methods-flexible-summarizing-big-claims/).
+:::
+
+## What it is
+
+Gresham's law in economics says "bad money drives out good." When debased coins circulate alongside full-value ones, people spend the bad and hoard the good. Gelman's version is about attention. Bad papers take a lot of effort to evaluate, because you have to work out what they did, why it might be right and where it goes wrong. Every minute spent charitably decoding a bad paper is a minute *not* spent on serious work. Bad science drives out good by using up attention.
+
+## Why it matters
+
+Attention is the scarce resource in science. Flashy, flawed papers get press, invite responses and demand rebuttals, and the readers, reviewers and critics who engage with them have less time for careful, modest work. Even good-faith engagement, such as steelmanning a bad analysis, has an opportunity cost. Sometimes the right response to a paper that obviously can't support its claims is to say so briefly and move on.
+
+## How it works
+
+A toy model. A reader has a fixed weekly attention budget. Twenty papers arrive each week, and the reader takes them in random order until their time runs out. Good papers take an hour each. Bad papers take longer, because the reader tries to find a charitable reading. As the share of bad papers grows, the number of good papers read falls faster than the share alone would suggest.
+
+## Simulated example
+
+A reader with 20 hours a week faces a stream of papers. Vary the share of bad papers and how long the reader spends trying to make sense of each one.
+
+```{ojs}
+import {range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof badShare = Inputs.range([0, 0.8], {value: 0.3, step: 0.05, label: "Share of incoming papers that are bad"})
+viewof badTime = Inputs.range([1, 10], {value: 4, step: 0.5, label: "Hours spent on each bad paper (vs 1 for good)"})
+```
+
+```{ojs}
+gresham = range(17).map(k => {
+  const share = k * 0.05, budget = 20, incoming = 20;
+  const nBad = incoming * share, nGood = incoming * (1 - share);
+  const totalHours = nGood * 1 + nBad * badTime;           // papers read in random order until time runs out
+  const fracRead = Math.min(1, budget / totalHours);
+  const goodRead = nGood * fracRead;
+  return {share, goodRead, goodShareRead: fracRead};
+})
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Share of incoming papers that are bad", tickFormat: "%"},
+  y: {label: "Good papers actually read per week", grid: true},
+  marks: [
+    Plot.line(gresham, {x: "share", y: "goodRead", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.ruleX([badShare], {stroke: "#d6604d", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const me = gresham.reduce((a, b) => Math.abs(b.share - badShare) < Math.abs(a.share - badShare) ? b : a);
+  return html`<div class="sim-readout">${md`With ${pct(badShare)} bad papers taking ${badTime} hours each, the reader gets through **${fmt(me.goodRead, 1)}** good papers a week, which is **${pct(me.goodShareRead)}** of the good work coming in. Bad papers don't just add noise. They take time away from good ones.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Attention is finite, and bad papers use up a disproportionate share of it.
+- Charitable engagement with obviously flawed work has an opportunity cost.
+- Spend scrutiny where it counts, and say plainly when something can't support its claims.
+:::
+
+## Related entries
+
+- [Passive Corruption](passive-corruption.qmd)
+- [Steelmanning](steelmanning.qmd)
+- [Clarke's Law](clarkes-law.qmd)
+
+## Source
+
+- Andrew Gelman, [The latest Perry Preschool analysis](https://statmodeling.stat.columbia.edu/2020/01/24/the-latest-perry-preschool-analysis-noisy-data-noisy-methods-flexible-summarizing-big-claims/) (2020).

@@ -1,0 +1,105 @@
+---
+title: "Scaffolding"
+date: 2026-11-09
+description: "Understanding your model by comparing it to related models."
+order: 21
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2009/10/statistical_sca/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#21** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/10/statistical_sca/).
+:::
+
+## What it is
+
+A single fitted model is hard to understand on its own. Statistical scaffolding means fitting a *family* of related models, simpler and more complex versions of the one you care about, and comparing their results. Builders take down the scaffold once the building stands. Likewise, the extra models don't need to appear in the final report, but they are how you came to understand the final one.
+
+## Why it matters
+
+Complex models such as multilevel regressions, models with interactions or causal models produce numbers whose sources are hard to trace. By moving from simple to complex, you can see *which modeling choice moved which estimate*. A coefficient that flips sign when you add a predictor, or a group estimate that shrinks a lot under partial pooling, tells you how the data and the model interact. Without that, a single complex model is a black box that you cannot defend or debug.
+
+## How it works
+
+For a multilevel model of group means, a classic scaffold has three steps:
+
+1. **Complete pooling.** Ignore groups and use one overall mean.
+2. **No pooling.** Use each group's own mean.
+3. **Partial pooling.** Use the multilevel model, which lies between the two and pulls small groups further toward the overall mean.
+
+Plotting all three side by side shows how much each group is shrunk and why: shrinkage depends on group size and on the between-group variance. You can add further rungs, such as group-level predictors or varying slopes, the same way.
+
+## Simulated example
+
+Ten groups of very different sizes. The plot traces each group's estimate across the three rungs of the scaffold.
+
+```{ojs}
+import {rng, range, mean, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0.05, 1], {value: 0.3, step: 0.05, label: "True between-group sd"})
+viewof seed = Inputs.range([1, 500], {value: 21, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+scaffold = {
+  const r = rng(seed);
+  const sizes = [2, 3, 5, 8, 12, 20, 35, 60, 100, 200];
+  const raw = sizes.map((n, j) => {
+    const theta = r.normal(0, tau), y = r.normals(n, theta, 1);
+    return {group: `G${j + 1} (n=${n})`, n, theta, ybar: mean(y), v: 1 / n};
+  });
+  const grand = sum(raw.map(d => d.ybar * d.n)) / sum(raw.map(d => d.n));
+  const mu = sum(raw.map(d => d.ybar / d.v)) / sum(raw.map(d => 1 / d.v));
+  const tau2 = Math.max(0.002, mean(raw.map(d => (d.ybar - mu) ** 2)) - mean(raw.map(d => d.v)));
+  return raw.flatMap(d => [
+    {group: d.group, n: d.n, model: "1. Complete pooling", est: grand},
+    {group: d.group, n: d.n, model: "2. No pooling", est: d.ybar},
+    {group: d.group, n: d.n, model: "3. Partial pooling", est: mu + tau2 / (tau2 + d.v) * (d.ybar - mu)}
+  ]);
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 340,
+  x: {label: null, domain: ["1. Complete pooling", "2. No pooling", "3. Partial pooling"], padding: 0.3},
+  y: {label: "Estimated group mean", grid: true},
+  color: {type: "log", scheme: "blues", legend: true, label: "Group size"},
+  marks: [
+    Plot.line(scaffold, {x: "model", y: "est", z: "group", stroke: "n", strokeWidth: 1.5}),
+    Plot.dot(scaffold, {x: "model", y: "est", fill: "n", r: 4}),
+    Plot.text(scaffold.filter(d => d.model === "3. Partial pooling"), {x: "model", y: "est", text: "group", dx: 8, textAnchor: "start", fontSize: 9})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = k => scaffold.filter(d => d.group.startsWith(k + " "));
+  const small = g("G1"), big = g("G10");
+  const moved = s => Math.abs(s[2].est - s[1].est);
+  return html`<div class="sim-readout">${md`From no pooling to partial pooling, the smallest group (n = 2) moves **${fmt(moved(small))}** toward the centre, and the largest group (n = 200) moves **${fmt(moved(big))}**. The scaffold makes it visible that partial pooling mostly changes the small, noisy groups.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Understand a complex model by fitting the simpler models around it and comparing.
+- Trace how each estimate changes from rung to rung. Changes reveal what the model is doing.
+- The scaffold may not appear in the final paper, but it is how you know the paper is right.
+:::
+
+## Related entries
+
+- [The Secret Weapon](secret-weapon.qmd)
+- [Mister P](mister-p.qmd)
+- [The Australia principle](australia-principle.qmd)
+- [A chicken](a-chicken.qmd)
+
+## Source
+
+- Andrew Gelman, [Statistical scaffolding](https://statmodeling.stat.columbia.edu/2009/10/statistical_sca/) (2009).

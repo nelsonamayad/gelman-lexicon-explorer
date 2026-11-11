@@ -1,0 +1,87 @@
+---
+title: "The Error-Reversal Heuristic"
+date: 2026-11-09
+description: "How would you have reacted if the mistake had gone in the opposite direction?"
+order: 144
+categories: [Reasoning & fallacies, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2024/12/13/how-a-simple-math-error-sparked-a-panic-about-black-plastic-kitchen-utensils/#comment-2386053"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#144** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How a simple math error sparked a panic about black plastic kitchen utensils](https://statmodeling.stat.columbia.edu/2024/12/13/how-a-simple-math-error-sparked-a-panic-about-black-plastic-kitchen-utensils/#comment-2386053).
+:::
+
+## What it is
+
+When an error is found in a study, people often say "it doesn't change the conclusion." The error-reversal heuristic asks you to imagine the mistake had gone the *other* way. Suppose it made the risk look *smaller* rather than larger, or weakened the authors' preferred finding instead of strengthening it. Would it have been caught sooner? Would you shrug it off as easily? The context was a widely reported study on black plastic kitchen utensils, where an arithmetic error in a risk comparison was later reported.
+
+## Why it matters
+
+Errors aren't caught at random. Results that match what researchers, reviewers and readers expect or want get less scrutiny, so errors in the "convenient" direction survive and errors in the inconvenient direction get fixed. Over a literature, that asymmetry produces systematic bias even if each error, taken alone, was an honest mistake. Mentally reversing the error tests whether your reaction depends on the direction.
+
+## How it works
+
+A toy model. Each study has an error of random sign. Errors that push toward the desired conclusion are caught with probability $p_{\text{conv}}$, and errors that push against it with $p_{\text{inconv}} > p_{\text{conv}}$. Surviving errors are mostly in the convenient direction, so the published average is biased by roughly $\mathrm{E}|\text{error}| \cdot (p_{\text{inconv}} - p_{\text{conv}}) / 2$, even though the errors themselves are unbiased.
+
+## Simulated example
+
+There are 3,000 studies of an effect whose true value is zero, each with a possible error of random sign. Set how much harder people check inconvenient errors than convenient ones.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pConv = Inputs.range([0, 1], {value: 0.2, step: 0.05, label: "Pr(catch an error that helps the story)"})
+viewof pInconv = Inputs.range([0, 1], {value: 0.8, step: 0.05, label: "Pr(catch an error that hurts the story)"})
+viewof seed = Inputs.range([1, 500], {value: 144, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+reversal = {
+  const r = rng(seed);
+  return range(3000).map(() => {
+    const est = r.normal(0, 0.2);
+    const hasErr = r() < 0.3, err = hasErr ? r.normal(0, 0.6) : 0;
+    const caught = hasErr && r() < (err > 0 ? pConv : pInconv);
+    return {honest: est, published: est + (caught ? 0 : err)};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Published estimate (true effect = 0)", grid: true},
+  y: {label: "Studies"},
+  marks: [
+    Plot.rectY(reversal, Plot.binX({y: "count"}, {x: "published", fill: "#d6604d", fillOpacity: 0.6, thresholds: 60})),
+    Plot.ruleX([0], {stroke: "currentColor"}),
+    Plot.ruleX([mean(reversal.map(d => d.published))], {stroke: "#d6604d", strokeWidth: 2, strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The errors themselves are centred on zero. Because helpful errors are caught ${fmt(pConv)} of the time and harmful ones ${fmt(pInconv)}, the published literature averages **${fmt(mean(reversal.map(d => d.published)), 3)}** instead of 0. Make the two catch rates equal and the bias disappears. Ask yourself: would I have noticed if it had gone the other way?`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Imagine the error going the other way. Would you react the same?
+- Uneven checking turns unbiased errors into a biased literature.
+- Check convenient results at least as hard as inconvenient ones.
+:::
+
+## Related entries
+
+- [The Time-Reversal Heuristic](time-reversal-heuristic.qmd)
+- [The Status-Reversal Heuristic](status-reversal-heuristic.qmd)
+- [The One-Way Street Fallacy](one-way-street-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [How a simple math error sparked a panic about black plastic kitchen utensils](https://statmodeling.stat.columbia.edu/2024/12/13/how-a-simple-math-error-sparked-a-panic-about-black-plastic-kitchen-utensils/#comment-2386053) (2024).

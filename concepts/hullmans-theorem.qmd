@@ -1,0 +1,88 @@
+---
+title: "Hullman's Theorem"
+date: 2026-11-09
+description: "Any experimental measure of graphical perception will inevitably not measure what it's intended to measure."
+order: 94
+categories: [Statistical graphics]
+source: "https://statmodeling.stat.columbia.edu/2021/04/27/hullmans-theorem-of-graphical-perception/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#94** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hullman's theorem of graphical perception](https://statmodeling.stat.columbia.edu/2021/04/27/hullmans-theorem-of-graphical-perception/).
+:::
+
+## What it is
+
+Named for visualization researcher Jessica Hullman. Experiments on graphical perception measure something concrete, such as how accurately people read a value off a bar chart or how fast they spot the larger of two quantities. What we care about is less tangible: whether the graph helps people *understand* the data, make good decisions or notice the unexpected. The measurable proxy never quite matches the intended construct, so experimental rankings of chart types can mislead.
+
+## Why it matters
+
+Visualization guidelines ("use position, not angle"; "avoid pie charts") rest largely on perception experiments with narrow tasks. Those findings are real, but they may not carry over to the tasks people actually use graphs for. A chart that is worse for reading exact values might be better for seeing overall patterns, and the reverse. Treating proxy rankings as quality rankings can push design in the wrong direction.
+
+## How it works
+
+Each chart type $c$ has a value on the measured proxy, $P_c$ (say, value-reading accuracy), and a value on the intended construct, $T_c$ (say, decision quality). These are correlated at $\rho < 1$. An experiment estimates $P_c$ with noise. The ranking of chart types by the estimated $P_c$ agrees with the ranking by $T_c$ only partly, and the gap grows as $\rho$ falls.
+
+## Simulated example
+
+Eight chart types have true "decision value" and a correlated "perception accuracy." An experiment measures the latter. How well does the experimental ranking track what we actually care about?
+
+```{ojs}
+import {rng, range, cor, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof rho = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Correlation of proxy with intended construct ρ"})
+viewof noise = Inputs.range([0, 1], {value: 0.3, step: 0.05, label: "Experimental noise"})
+viewof seed = Inputs.range([1, 500], {value: 94, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+charts = {
+  const r = rng(seed);
+  const names = ["Bar", "Dot", "Line", "Pie", "Heatmap", "Stacked bar", "Area", "Slope"];
+  const rows = names.map(name => {
+    const target = r.normal(), proxy = rho * target + Math.sqrt(1 - rho * rho) * r.normal();
+    return {name, target, measured: proxy + r.normal(0, noise)};
+  });
+  const rank = (arr, k) => { const s = arr.slice().sort((a, b) => b[k] - a[k]); return Object.fromEntries(s.map((d, i) => [d.name, i + 1])); };
+  const rm = rank(rows, "measured"), rt = rank(rows, "target");
+  return rows.map(d => ({...d, rankMeasured: rm[d.name], rankTarget: rt[d.name]}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: null, domain: ["Experiment's ranking", "Ranking on what we care about"], padding: 0.4},
+  y: {label: "Rank (1 = best)", reverse: true, domain: [0.5, 8.5]},
+  marks: [
+    Plot.link(charts, {x1: () => "Experiment's ranking", x2: () => "Ranking on what we care about", y1: "rankMeasured", y2: "rankTarget", stroke: d => Math.abs(d.rankMeasured - d.rankTarget) > 2 ? "#d6604d" : "#2166ac", strokeWidth: 2}),
+    Plot.text(charts, {x: () => "Experiment's ranking", y: "rankMeasured", text: "name", dx: -8, textAnchor: "end"}),
+    Plot.text(charts, {x: () => "Ranking on what we care about", y: "rankTarget", text: "name", dx: 8, textAnchor: "start"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Rank correlation between the experiment's ranking and the ranking on the intended construct: **${fmt(cor(charts.map(d => d.rankMeasured), charts.map(d => d.rankTarget)))}**. Red links mark chart types whose rank moves by more than two places. Even with no noise (ρ < 1), the proxy can't fully stand in for what we care about.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Perception experiments measure proxies. The intended construct is always a step removed.
+- Rankings of chart types by narrow tasks may not hold for real uses.
+- Treat visualization guidelines as evidence about specific tasks, not as universal laws.
+:::
+
+## Related entries
+
+- [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [The worst visual display of all time](worst-visual-display.qmd)
+- [Cheeseburger-snarfing diet gurus](cheeseburger-snarfing-diet-gurus.qmd)
+
+## Source
+
+- Andrew Gelman, [Hullman's theorem of graphical perception](https://statmodeling.stat.columbia.edu/2021/04/27/hullmans-theorem-of-graphical-perception/) (2021).

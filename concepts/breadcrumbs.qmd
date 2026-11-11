@@ -1,0 +1,85 @@
+---
+title: "Breadcrumbs"
+date: 2026-11-09
+description: "I need that trail."
+order: 78
+categories: [Research culture, Computing]
+source: "https://statmodeling.stat.columbia.edu/2019/04/04/the-long-run-effects-of-americas-first-paid-maternity-leave-policy-i-need-that-trail-of-breadcrumbs/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#78** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The long-run effects of America's first paid maternity leave policy: I need that trail of breadcrumbs](https://statmodeling.stat.columbia.edu/2019/04/04/the-long-run-effects-of-americas-first-paid-maternity-leave-policy-i-need-that-trail-of-breadcrumbs/).
+:::
+
+## What it is
+
+When a paper reports a final estimate, such as a regression coefficient from a complex model with many controls, Gelman wants to see the *trail* leading to it. That means the raw data, the simple comparisons, the intermediate steps and how each modeling choice moved the estimate. Without the breadcrumbs, a reader can't tell whether the result comes from the data or from a particular path through the analysis.
+
+## Why it matters
+
+Complex analyses involve dozens of decisions: sample restrictions, variable codings, controls, functional forms. A final number with no trail gives the reader nothing to check, even when the code is available. Showing the steps from raw comparison to final model makes the analysis understandable and lets readers see where the result is robust and where it hangs on one choice.
+
+## How it works
+
+A toy model of reproducibility. An analysis has $k$ decision points. A documented decision is followed exactly. An undocumented one is guessed by a re-analyst from several reasonable options, each of which shifts the estimate somewhat. The spread of re-analysts' results grows with the number of missing breadcrumbs. Even honest re-analysis can't recover the original number, and nobody can tell which step matters.
+
+## Simulated example
+
+An analysis has 10 decision points, each with a few reasonable options. Choose how many steps are documented and see how widely independent re-analyses scatter around the published estimate.
+
+```{ojs}
+import {rng, range, mean, sd, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof documented = Inputs.range([0, 10], {value: 3, step: 1, label: "Decision points documented (of 10)"})
+viewof seed = Inputs.range([1, 500], {value: 78, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+trail = {
+  const r = rng(seed);
+  const shifts = range(10).map(() => r.normals(4, 0, 0.08));      // each decision's options shift the estimate
+  const chosen = range(10).map(() => r.int(0, 3));                 // what the original authors did
+  const published = 0.25 + sum(range(10).map(j => shifts[j][chosen[j]]));
+  const reanalyses = range(300).map(() => 0.25 + sum(range(10).map(j => j < documented ? shifts[j][chosen[j]] : shifts[j][r.int(0, 3)])));
+  return {published, reanalyses};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Estimate obtained by independent re-analysts", grid: true},
+  y: {label: "Re-analyses"},
+  marks: [
+    Plot.rectY(trail.reanalyses, Plot.binX({y: "count"}, {x: d => d, fill: "#2166ac", thresholds: 30})),
+    Plot.ruleX([trail.published], {stroke: "#d6604d", strokeWidth: 3}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Published estimate: **${fmt(trail.published, 3)}** (red). With ${documented} of 10 steps documented, re-analyses scatter with sd **${fmt(sd(trail.reanalyses), 3)}**. ${documented === 10 ? "With a full trail, everyone reproduces the result exactly." : "Without the full trail, nobody can tell which undocumented step the result depends on."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Show the path from raw data to the final estimate, not just the endpoint.
+- Simple comparisons first, then each modeling step and how it moved the result.
+- Code is necessary but not enough. Readers need to see which steps matter.
+:::
+
+## Related entries
+
+- [Your closest collaborator](closest-collaborator.qmd)
+- [Scaffolding](scaffolding.qmd)
+- [The Analyst's Paradox](analysts-paradox.qmd)
+- [You have no obligation to share your data and code](no-obligation-to-share.qmd)
+
+## Source
+
+- Andrew Gelman, [I need that trail of breadcrumbs](https://statmodeling.stat.columbia.edu/2019/04/04/the-long-run-effects-of-americas-first-paid-maternity-leave-policy-i-need-that-trail-of-breadcrumbs/) (2019).

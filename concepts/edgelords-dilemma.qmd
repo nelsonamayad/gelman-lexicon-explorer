@@ -1,0 +1,96 @@
+---
+title: "The Edgelord's Dilemma"
+date: 2026-11-09
+description: "It's not so much fun being a contrarian when you're suddenly sharing a platform with prominent stupid and dangerous people around the world."
+order: 148
+categories: [Research culture, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#148** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209).
+:::
+
+## What it is
+
+Contrarianism can be intellectually healthy. Questioning consensus, poking at received wisdom and defending unpopular positions on the evidence is how errors get corrected. But a contrarian position also attracts company. When the people loudly holding the same view are bad-faith actors or cranks, the contrarian faces a dilemma: keep the position and be associated with them, or back off and lose the independence that made contrarianism worthwhile.
+
+## Why it matters
+
+The dilemma has a statistical side. The farther a position is from the mainstream, the higher the share of its holders who got there by bad reasoning or bad faith rather than careful analysis. That isn't because the position must be wrong. It's because careful reasoners are rarer out in the tails. Observers reasonably update on the company a position keeps, and a careful contrarian has to work against that inference.
+
+## How it works
+
+A toy model. Positions lie along a line. Careful thinkers are spread around the evidence-based consensus with moderate dispersion. Bad-faith actors cluster at the extremes. For a contrarian at position $x$, the share of nearby co-holders who are bad-faith actors is
+
+$$
+\frac{f_{\text{bad}}(x)}{f_{\text{careful}}(x) + f_{\text{bad}}(x)},
+$$
+
+which rises steeply with distance from consensus.
+
+## Simulated example
+
+Here 10,000 careful thinkers and a smaller group of bad-faith actors are spread along a line of positions. Choose your own position and see who you're standing with.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof myPos = Inputs.range([0, 4], {value: 2.2, step: 0.1, label: "Your distance from consensus (sd units)"})
+viewof badShare = Inputs.range([0.01, 0.2], {value: 0.05, step: 0.01, label: "Bad-faith actors as a share of everyone"})
+viewof seed = Inputs.range([1, 500], {value: 148, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+edge = {
+  const r = rng(seed);
+  const N = 10000, nBad = Math.round(N * badShare);
+  return [
+    ...range(N - nBad).map(() => ({who: "Careful thinkers", pos: r.normal(0, 1)})),
+    ...range(nBad).map(() => ({who: "Bad-faith actors", pos: (r() < 0.5 ? -1 : 1) * r.normal(3, 0.7)}))
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Position (0 = evidence-based consensus)", grid: true},
+  y: {label: "People"},
+  color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Bad-faith actors", "Careful thinkers"]},
+  marks: [
+    Plot.rectY(edge, Plot.binX({y: "count"}, {x: "pos", fill: "who", thresholds: 80})),
+    Plot.ruleX([myPos], {stroke: "currentColor", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const near = edge.filter(d => Math.abs(d.pos - myPos) < 0.25);
+  const bad = near.filter(d => d.who === "Bad-faith actors").length;
+  return html`<div class="sim-readout">${md`At ${myPos} sd from consensus, **${pct(bad / Math.max(1, near.length))}** of the people standing near you are bad-faith actors (${bad} of ${near.length}). ${bad / Math.max(1, near.length) > 0.5 ? "Out here they are most of your company. That's the edgelord's dilemma." : "Close to the mainstream they're a small minority. Move further out and they become most of your company. That's the edgelord's dilemma."}`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- The further a position is from consensus, the more of its holders arrived there by bad reasoning.
+- That's a fact about the company a position keeps, not proof that it's wrong.
+- Careful contrarians need to make their reasoning visible, because their company can't vouch for them.
+:::
+
+## Related entries
+
+- [The Chestertonian Principle](chestertonian-principle.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+- [Noem's Razor](noems-razor.qmd)
+
+## Source
+
+- Andrew Gelman, [blog comment](https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209) (2024).

@@ -1,0 +1,86 @@
+---
+title: "What were you doing before you had any data?"
+date: 2026-11-09
+description: "Rubin's second question."
+order: 56
+categories: [Bayesian inference, Modeling workflow]
+source: "http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#56** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/).
+:::
+
+## What it is
+
+Donald Rubin's second question asks what you knew and did *before* the data arrived. How were units selected and assigned to treatments? What did you already believe about plausible effect sizes? The answers make up the *design* and the *prior*, the parts of the analysis that don't come from the data at hand but strongly shape what the data can tell you.
+
+## Why it matters
+
+Analysts often act as if knowledge starts when the data file opens. But the assignment mechanism determines which comparisons are valid, and prior knowledge determines which estimates are plausible. A useful practical version of the question is the **prior predictive check**: before fitting, simulate data from your model and priors and ask whether they look like anything you would believe. "Uninformative" priors often turn out, on inspection, to imply absurd data.
+
+## How it works
+
+For a logistic regression with $K$ standardized predictors and independent $\mathrm{N}(0, s^2)$ priors on the coefficients, the linear predictor $\eta = \sum_k \beta_k x_k$ has prior sd of about $s\sqrt{K}$. With $s = 10$ and $K = 5$, that is roughly 22 on the log-odds scale, so the prior says nearly every predicted probability is essentially 0 or 1. Most people *before seeing any data* would find that ridiculous. The prior predictive check makes the absurdity visible, and a scale like $s = 1$ fixes it.
+
+## Simulated example
+
+Simulate from the prior of a logistic regression with standardized predictors. Look at the implied predicted probabilities and ask: is this what you believed before the data?
+
+```{ojs}
+import {rng, range, invLogit, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof s = Inputs.range([0.1, 20], {value: 10, step: 0.1, label: "Prior sd on each coefficient"})
+viewof K = Inputs.range([1, 20], {value: 5, step: 1, label: "Number of predictors"})
+viewof seed = Inputs.range([1, 500], {value: 56, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+priorPred = {
+  const r = rng(seed);
+  return range(4000).map(() => {
+    let eta = r.normal(0, 1);
+    for (let k = 0; k < K; k++) eta += r.normal(0, s) * r.normal(0, 1);
+    return {p: invLogit(eta)};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Prior predicted probability", domain: [0, 1]},
+  y: {label: "Draws", grid: true},
+  marks: [Plot.rectY(priorPred, Plot.binX({y: "count"}, {x: "p", fill: "#2166ac", thresholds: 40, domain: [0, 1]})), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const extreme = priorPred.filter(d => d.p < 0.01 || d.p > 0.99).length / priorPred.length;
+  return html`<div class="sim-readout">${md`Under this prior, **${pct(extreme)}** of predicted probabilities are below 1% or above 99%. ${extreme > 0.5 ? "Before seeing any data, would you really have said that? A prior that sounded \"uninformative\" turns out to make strong claims." : "This prior implies a reasonable spread of probabilities, consistent with what most people would believe before seeing data."} Try s = 1.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Ask what you knew before the data: the design, the assignment mechanism, plausible effect sizes.
+- Prior predictive checks show what your priors actually imply.
+- "Vague" priors on coefficients can imply extreme, unbelievable predictions.
+:::
+
+## Related entries
+
+- [What would you do if you had all the data?](if-you-had-all-the-data.qmd)
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [The Bayesian cringe](bayesian-cringe.qmd)
+- [In high-dimensional space](high-dimensional-space.qmd)
+
+## Source
+
+- Andrew Gelman, [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/) (2012).
+- Gabry, Simpson, Vehtari, Betancourt and Gelman, "Visualization in Bayesian workflow," *JRSS A* (2019).

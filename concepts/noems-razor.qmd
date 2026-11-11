@@ -1,0 +1,98 @@
+---
+title: "Noem's Razor"
+date: 2026-11-09
+description: "Never attribute to stupidity that which is adequately explained by malice."
+order: 153
+categories: [Reasoning & fallacies, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2026/01/19/noems-razor-never-attribute-to-stupidity-that-which-is-adequately-explained-by-malice/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#153** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Noem's Razor](https://statmodeling.stat.columbia.edu/2026/01/19/noems-razor-never-attribute-to-stupidity-that-which-is-adequately-explained-by-malice/).
+:::
+
+## What it is
+
+This inverts **Hanlon's razor**, "never attribute to malice that which is adequately explained by stupidity." Hanlon's razor is a good default: most errors are honest. But sometimes the pattern of "mistakes" is better explained by intent. When the errors all point the same way, and that way serves the person making them, charity stops being the best explanation. Noem's Razor says not to cling to the stupidity story when malice explains the evidence.
+
+In the source post, an economist called the bad outcomes of a government enforcement policy a "textbook amateur mistake" of incentive design. Gelman argues that the outcomes were better explained by what the policy's backers actually wanted, and paraphrases a famous saying: "It was worse than a blunder; it was a crime." His general lesson: "When there's a policy that seems like it doesn't make sense, think more carefully about the incentives."
+
+## Why it matters
+
+Charitable interpretation is a virtue until it becomes a blind spot. Treating every self-serving "error" as innocent, in data analyses, public statements or policy claims, lets deliberate distortion go unchallenged. Statistics provides a principled way to decide: honest mistakes should be roughly *random in direction*, while motivated distortion is *systematically one-sided*. The direction of the errors is evidence.
+
+## How it works
+
+Compare two hypotheses about a source that has made $n$ errors:
+
+- **Stupidity:** each error is equally likely to help or hurt the source's interests, $p = 0.5$.
+- **Malice:** errors favour the source with high probability, say $p = 0.9$.
+
+If $k$ of the $n$ errors favour the source, the likelihood ratio is $\left(\frac{0.9}{0.5}\right)^k \left(\frac{0.1}{0.5}\right)^{n-k}$. A run of one-sided errors quickly overwhelms even a strong prior toward charity.
+
+## Simulated example
+
+Start with a charitable prior, so malice is unlikely. Observe a run of errors, each of which either favours the source or doesn't. Watch the posterior probability of malice.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof prior = Inputs.range([0.01, 0.5], {value: 0.05, step: 0.01, label: "Prior probability of malice (charitable)"})
+viewof truth = Inputs.radio(["Honest mistakes", "Motivated distortion"], {value: "Motivated distortion", label: "What's really going on"})
+viewof seed = Inputs.range([1, 500], {value: 153, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+razor = {
+  const r = rng(seed);
+  const pFav = truth === "Honest mistakes" ? 0.5 : 0.9;
+  let lo = Math.log(prior / (1 - prior)), fav = 0;
+  const out = [{n: 0, p: prior, fav: 0}];
+  for (let n = 1; n <= 15; n++) {
+    const f = r() < pFav;
+    fav += f;
+    lo += f ? Math.log(0.9 / 0.5) : Math.log(0.1 / 0.5);
+    out.push({n, p: 1 / (1 + Math.exp(-lo)), fav, f});
+  }
+  return out;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Errors observed"},
+  y: {label: "Posterior probability of malice", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [
+    Plot.line(razor, {x: "n", y: "p", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(razor.slice(1), {x: "n", y: "p", r: 5, fill: d => d.f ? "#d6604d" : "#5aae61"}),
+    Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Of 15 errors, **${razor.at(-1).fav}** favoured the source (red dots). Starting from a charitable ${pct(prior)} prior, the posterior probability of malice is now **${pct(razor.at(-1).p, 1)}**. ${truth === "Honest mistakes" ? "With honest, randomly directed mistakes, charity holds up, as Hanlon's razor says." : "With one-sided errors, the evidence overwhelms charity. That's Noem's razor."}`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Honest mistakes are random in direction. Motivated ones aren't.
+- The direction of a series of errors is evidence about intent.
+- Charity is a good prior, not a fixed conclusion. Update it when the pattern demands.
+:::
+
+## Related entries
+
+- [The Error-Reversal Heuristic](error-reversal-heuristic.qmd)
+- [McBroom's Law](mcbrooms-law.qmd)
+- [Clarke's Law](clarkes-law.qmd)
+- [The Edgelord's Dilemma](edgelords-dilemma.qmd)
+
+## Source
+
+- Andrew Gelman, [Noem's Razor: never attribute to stupidity that which is adequately explained by malice](https://statmodeling.stat.columbia.edu/2026/01/19/noems-razor-never-attribute-to-stupidity-that-which-is-adequately-explained-by-malice/) (2026).

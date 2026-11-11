@@ -1,0 +1,24 @@
+---
+title: "Modeling workflow"
+date: 2026-11-11
+subtitle: "37 entries"
+description: "How to build, check, expand and trust statistical models in practice: fake-data simulation, scaffolding, model checking and knowing when to stop."
+sidebar: false
+toc: false
+listing:
+  contents: "../concepts/*.qmd"
+  type: grid
+  sort: "order"
+  sort-ui: [order, title]
+  filter-ui: true
+  categories: false
+  include:
+    categories: "Modeling workflow"
+  fields: [title, description]
+  grid-columns: 3
+  page-size: 60
+---
+
+How to build, check, expand and trust statistical models in practice: fake-data simulation, scaffolding, model checking and knowing when to stop.
+
+Entries are listed in the order they appear in Gelman's list. See [all topics](../index.qmd#topics) or [browse every entry](../index.qmd#all-entries).

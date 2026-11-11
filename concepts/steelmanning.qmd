@@ -1,0 +1,90 @@
+---
+title: "Steelmanning"
+date: 2026-11-09
+description: "Why I'm skeptical of it."
+order: 142
+categories: [Reasoning & fallacies, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#142** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The challenge of bending over backward to see things from the other person's point of view](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/).
+:::
+
+## What it is
+
+"Steelmanning" means addressing the best form of the other person's argument, even if it's not the one they presented, rather than "strawmanning" their weakest point. Gelman agrees that charity is a virtue and that good arguments should be positive-sum. But he has two reservations:
+
+1. **There's usually no clear ranking of arguments.** It's rarely obvious which of someone's arguments is the strongest, so focusing on "the best one" can be a form of *premature optimization*. That is why he prefers to present all his arguments, not just the most bulletproof.
+2. **There are often more than two positions.** If X is criticizing Y, then bending over backward to steelman X can mean accepting X's caricature of Y. *By steelmanning X, you strawman Y.* His example is a blogger who, in being charitable to promoters of a disputed covid treatment, ended up endorsing a strawman of the whole public-health establishment.
+
+## Why it matters
+
+Charity toward one party can produce unfairness toward another without anyone noticing, because the charitable person feels they are being even-handed. The safer practice, Gelman suggests, is to address arguments as they actually come up, all of them, rather than reconstructing a single "best" version and arguing with that.
+
+## How it works
+
+A toy model of the second point, our construction rather than Gelman's. Y's work has true quality $q_Y$. Critic X describes it with a negative exaggeration. An observer forms a view of Y as a mix of the direct evidence and X's account, with weight $w$ on X's account. The more the observer "bends over backward" for X, the larger $w$ and the further their view of Y moves from the truth. Charity to X is paid for by Y.
+
+## Simulated example
+
+There are 500 disputes, each with an X criticizing a Y. Choose how much the observer bends over backward to see X's side, and how much X exaggerates. Compare the observer's view of Y's work with its true quality.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof w = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "How much the observer adopts X's framing (w)"})
+viewof exag = Inputs.range([0, 2], {value: 1, step: 0.05, label: "How much X caricatures Y"})
+viewof seed = Inputs.range([1, 500], {value: 142, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+disputes = {
+  const r = rng(seed);
+  return range(500).map(() => {
+    const qY = r.normal(0, 1);
+    const direct = qY + r.normal(0, 0.5);           // the observer's own look at Y
+    const xAccount = qY - exag + r.normal(0, 0.5);  // X's description of Y
+    return {qY, view: (1 - w) * direct + w * xAccount};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  grid: true,
+  x: {label: "True quality of Y's work"},
+  y: {label: "Observer's view of Y's work"},
+  marks: [
+    Plot.line([[-3, -3], [3, 3]], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.dot(disputes, {x: "qY", y: "view", r: 2, fill: "#d6604d", fillOpacity: 0.5})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`On average the observer rates Y's work **${fmt(mean(disputes.map(d => d.view - d.qY)))}** below its true quality (dashed line = fair). Steelmanning X with weight ${w} turned X's caricature into the observer's own view of Y. Set w to 0 and the bias against Y disappears, along with the charity to X. Gelman's suggestion is to take each argument on its own terms instead.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Charity is a virtue, but steelmanning one side can mean strawmanning another.
+- There's rarely a clear "strongest argument," so present and address all of them.
+- When three parties are involved, check who is paying for your generosity.
+:::
+
+## Related entries
+
+- [Gresham's Law of bad science](greshams-law-bad-science.qmd)
+- [The Backseat Driver Principle](backseat-driver-principle.qmd)
+- [The Paradox of Influence](paradox-of-influence.qmd)
+- [The Chestertonian Principle](chestertonian-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [The challenge of bending over backward to see things from the other person's point of view](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/) (2022).

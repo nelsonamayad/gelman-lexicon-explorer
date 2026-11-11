@@ -1,0 +1,94 @@
+---
+title: "Premature collapsing of the wave function"
+date: 2026-11-09
+description: "Avoid it. But do collapse the wave function when the decision finally comes."
+order: 152
+categories: [Significance & noise, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2019/09/13/deterministic-thinking-dichotomania/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#152** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Deterministic thinking (dichotomania)](https://statmodeling.stat.columbia.edu/2019/09/13/deterministic-thinking-dichotomania/), and on [decision analysis](https://statmodeling.stat.columbia.edu/2005/07/12/decision_analys_1/).
+:::
+
+## What it is
+
+The quantum-mechanics metaphor: until it's observed, a system is in a superposition of states, and measurement "collapses" it to one. In statistics, *uncertainty* is the superposition. **Premature collapse** means turning uncertain evidence into a yes/no verdict, such as "significant, so the effect is real" or "not significant, so there's no effect," too early in the analysis. You should carry the full uncertainty forward, and collapse to a single action only *when a decision actually has to be made*, using the costs and benefits of that decision.
+
+## Why it matters
+
+Dichotomizing early throws away information. An effect estimated at 0.4 ± 0.3 becomes "no effect" and is then treated as exactly zero downstream, or an estimate of 2.1 ± 1 becomes "real" and is treated as exactly 2.1. Decisions based on these collapsed summaries are worse than decisions that use the whole distribution. At decision time, though, you do have to choose an action, and refusing to is also a choice.
+
+## How it works
+
+Suppose an intervention with uncertain effect $\theta$ costs $c$, and each unit of $\theta$ is worth 1. The optimal decision is to act if $\mathrm{E}[\theta \mid \text{data}] > c$, which uses the whole posterior. Premature collapse first replaces the evidence with "effect = estimate if p < 0.05, else 0," then decides. That rule skips good interventions whose evidence fell short of the threshold, and adopts others on the strength of exaggerated significant estimates.
+
+## Simulated example
+
+There are 5,000 candidate interventions with uncertain effects. Compare decisions made by collapsing early (significance first, then decide) with decisions made from the full posterior.
+
+```{ojs}
+import {rng, range, mean, normalPosterior, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof cost = Inputs.range([0, 1], {value: 0.2, step: 0.05, label: "Cost of implementing an intervention"})
+viewof se = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Standard error of each study"})
+viewof seed = Inputs.range([1, 500], {value: 152, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+collapse = {
+  const r = rng(seed);
+  const tau = 0.4;
+  let vCollapse = 0, vPosterior = 0, vOracle = 0;
+  for (let i = 0; i < 5000; i++) {
+    const theta = r.normal(0.1, tau), y = r.normal(theta, se);
+    const collapsed = Math.abs(y / se) > 1.96 ? y : 0;
+    const post = normalPosterior(0.1, tau, y, se).mean;
+    if (collapsed > cost) vCollapse += theta - cost;
+    if (post > cost) vPosterior += theta - cost;
+    if (theta > cost) vOracle += theta - cost;
+  }
+  return [
+    {rule: "Collapse early (significance, then decide)", value: vCollapse / 5000},
+    {rule: "Carry uncertainty to the decision", value: vPosterior / 5000},
+    {rule: "Oracle (knows the true effects)", value: vOracle / 5000}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 180,
+  marginLeft: 260,
+  x: {label: "Average net benefit per candidate intervention", grid: true},
+  y: {label: null},
+  marks: [Plot.barX(collapse, {y: "rule", x: "value", fill: (d, i) => ["#d6604d", "#2166ac", "#999"][i]}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Net benefit per intervention: collapsing early **${fmt(collapse[0].value, 3)}**, carrying uncertainty to the decision **${fmt(collapse[1].value, 3)}**, oracle ${fmt(collapse[2].value, 3)}. Keep the superposition until you have to act, then collapse it using the costs and benefits, not a 5% threshold.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Don't turn evidence into yes/no verdicts before you need to.
+- Carry the full uncertainty into the decision, and make the decision with explicit costs and benefits.
+- When the decision comes, do decide. Refusing to is a choice too.
+:::
+
+## Related entries
+
+- [Institutional decision making](institutional-decision-making.qmd)
+- [Salad Tongs](salad-tongs.qmd)
+- [End of novel. Beginning of job.](end-of-novel.qmd)
+- [Uncertainty Interval](uncertainty-interval.qmd)
+
+## Source
+
+- Andrew Gelman, [Deterministic thinking (dichotomania)](https://statmodeling.stat.columbia.edu/2019/09/13/deterministic-thinking-dichotomania/) (2019).
+- Andrew Gelman, [Decision analysis](https://statmodeling.stat.columbia.edu/2005/07/12/decision_analys_1/) (2005).

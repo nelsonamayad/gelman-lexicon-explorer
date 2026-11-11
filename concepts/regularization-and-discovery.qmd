@@ -1,0 +1,92 @@
+---
+title: "Between regularization and discovery"
+date: 2026-11-09
+description: "There is no tradeoff."
+order: 122
+categories: [Bayesian inference, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2017/10/18/no-tradeoff-regularization-discovery/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#122** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [There is no tradeoff between regularization and discovery](https://statmodeling.stat.columbia.edu/2017/10/18/no-tradeoff-regularization-discovery/).
+:::
+
+## What it is
+
+A common worry is that regularization, meaning shrinkage, priors or partial pooling, will "hide" real discoveries by pulling interesting estimates toward zero. Gelman says there is no such tradeoff. Regularization pulls *noisy* estimates in more than precise ones, so it removes discoveries that were mostly noise and keeps those with real support. Your list of discoveries gets *better*, not shorter in the wrong places.
+
+## Why it matters
+
+Fear of regularization keeps people using raw estimates, which are dominated by the most extreme noisy results: small subgroups, small samples, lucky draws. Those are exactly the "discoveries" that fail to replicate. Shrinkage doesn't suppress the truly large effects. It suppresses large-*looking* estimates that rest on little data, which is what you want.
+
+## How it works
+
+With estimates $y_j \sim \mathrm{N}(\theta_j, \text{se}_j^2)$ and partial pooling, the shrunken estimate is $\tilde\theta_j = \frac{\tau^2}{\tau^2 + \text{se}_j^2}\,y_j$. Estimates with large $\text{se}_j$ are pulled in hard, and precise ones barely move. Ranking by $\tilde\theta_j$ rather than $y_j$ demotes noisy extremes and promotes well-measured large effects. The top of the list contains more real discoveries.
+
+## Simulated example
+
+There are 300 effects, most small and a few large, estimated with very different precisions (sample sizes vary). Take the "top 20 discoveries" by raw estimate and by regularized estimate. How many are truly among the 20 largest effects?
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof spreadN = Inputs.range([0, 2], {value: 1.2, step: 0.1, label: "Variation in sample sizes (log scale)"})
+viewof seed = Inputs.range([1, 500], {value: 122, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+disc = {
+  const r = rng(seed);
+  const rows = range(300).map(j => {
+    const theta = r() < 0.08 ? r.normal(0, 1.5) : r.normal(0, 0.2);
+    const n = Math.round(30 * Math.exp(r.normal(0, spreadN))) + 2;
+    const se = 2 / Math.sqrt(n);
+    return {j, theta, se, y: r.normal(theta, se)};
+  });
+  const tau2 = Math.max(0.01, mean(rows.map(d => d.y * d.y - d.se * d.se)));
+  const all = rows.map(d => ({...d, shrunk: tau2 / (tau2 + d.se * d.se) * d.y}));
+  const top = k => new Set(all.slice().sort((a, b) => Math.abs(b[k]) - Math.abs(a[k])).slice(0, 20).map(d => d.j));
+  const truth = top("theta"), raw = top("y"), reg = top("shrunk");
+  return {all: all.map(d => ({...d, rawTop: raw.has(d.j), regTop: reg.has(d.j), trueTop: truth.has(d.j)})),
+    rawHits: [...raw].filter(j => truth.has(j)).length, regHits: [...reg].filter(j => truth.has(j)).length};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  grid: true,
+  x: {label: "Raw estimate"},
+  y: {label: "Regularized estimate"},
+  marks: [
+    Plot.dot(disc.all, {x: "y", y: "shrunk", r: d => 1.5 + 3 / d.se / 2, fill: d => d.trueTop ? "#2166ac" : "#ccc", stroke: d => d.rawTop && !d.regTop ? "#d6604d" : "none", strokeWidth: 2}),
+    Plot.ruleX([0]), Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Of the top 20 discoveries, **${disc.rawHits}** (raw) vs **${disc.regHits}** (regularized) are truly among the 20 largest effects (blue). Red-ringed points are noisy "discoveries" that the raw list included and regularization dropped. Dot size reflects precision. Regularization didn't cost discoveries. It improved them.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Regularization pulls in noisy estimates and leaves precise ones mostly alone.
+- Discovery lists based on regularized estimates are more reliable.
+- The only "discoveries" you lose are the ones that weren't real.
+:::
+
+## Related entries
+
+- [Multiple Comparisons](multiple-comparisons.qmd)
+- [Ockhamite Tendencies](ockhamite-tendencies.qmd)
+- [Looking for a needle in a pile of needles](needle-in-pile-of-needles.qmd)
+- [The Blessing of Dimensionality](blessing-of-dimensionality.qmd)
+
+## Source
+
+- Andrew Gelman, [There is no tradeoff between regularization and discovery](https://statmodeling.stat.columbia.edu/2017/10/18/no-tradeoff-regularization-discovery/) (2017).

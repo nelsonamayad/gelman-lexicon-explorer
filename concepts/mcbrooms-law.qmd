@@ -1,0 +1,93 @@
+---
+title: "McBroom's Law"
+date: 2026-11-09
+description: "Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods."
+order: 95
+categories: [Research culture, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#95** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/).
+:::
+
+## What it is
+
+The line is from Michigan state senator Ed McBroom. Gelman compares it to Daniel Davies's dictum that "good ideas do not need lots of lies told about them in order to gain public acceptance," and calls it "kind of a Bayesian thing, or a multilevel modeling thing." A source of information, whether a researcher, a journal, a news outlet or an institution, should lose credibility when it is shown to have promoted false claims. It should lose *more* when it refuses to acknowledge them. The first part is ordinary updating. The second says that how a source responds to its own errors is itself strong evidence about its reliability.
+
+## Why it matters
+
+Everyone makes mistakes, so a single error is weak evidence against a source. Refusal to correct is different. It shows that the source's other claims also won't be corrected when wrong, so its whole output is less trustworthy. Readers who keep trusting unaccountable sources at the old level are failing to use some of the most informative evidence they have.
+
+## How it works
+
+Model a source as *reliable* (makes occasional errors, usually corrects them) or *unreliable* (more errors, rarely corrects). Each false claim is evidence against reliability. Each acknowledged correction is evidence *for* it, because reliable sources correct and unreliable ones don't. Each error that goes uncorrected for a long time adds more evidence against. The posterior probability of reliability then falls further for a source that never takes accountability than for one that makes the same errors and corrects them.
+
+## Simulated example
+
+Two sources make the same false claims at the same times. One corrects them. The other never does. Watch a reader's posterior belief that each source is reliable.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nErrors = Inputs.range([1, 10], {value: 4, step: 1, label: "Number of falsehoods exposed"})
+viewof pCorrectReliable = Inputs.range([0.5, 1], {value: 0.8, step: 0.05, label: "Pr(reliable source corrects an error)"})
+viewof pCorrectUnreliable = Inputs.range([0.05, 0.5], {value: 0.3, step: 0.05, label: "Pr(unreliable source corrects an error)"})
+```
+
+```{ojs}
+mcbroom = {
+  // Per-period: error exposed with prob 0.1 if reliable, 0.3 if unreliable; then the source corrects or not.
+  const prior = Math.log(0.8 / 0.2);
+  const lrError = Math.log(0.1 / 0.3);
+  const lrCorrect = Math.log(pCorrectReliable / pCorrectUnreliable);
+  const lrNoCorrect = Math.log((1 - pCorrectReliable) / (1 - pCorrectUnreliable));
+  const out = [];
+  let a = prior, b = prior;
+  out.push({k: 0, who: "Takes accountability", p: 1 / (1 + Math.exp(-a))}, {k: 0, who: "Never takes accountability", p: 1 / (1 + Math.exp(-b))});
+  for (let k = 1; k <= nErrors; k++) {
+    a += lrError + lrCorrect; b += lrError + lrNoCorrect;
+    out.push({k, who: "Takes accountability", p: 1 / (1 + Math.exp(-a))}, {k, who: "Never takes accountability", p: 1 / (1 + Math.exp(-b))});
+  }
+  return out;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Falsehoods exposed"},
+  y: {label: "Reader's belief that the source is reliable", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(mcbroom, {x: "k", y: "p", stroke: "who", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = w => mcbroom.filter(d => d.who === w).at(-1).p;
+  return html`<div class="sim-readout">${md`After ${nErrors} exposed falsehood(s), belief in reliability: **${pct(end("Takes accountability"))}** for the source that corrects, **${pct(end("Never takes accountability"))}** for the one that doesn't. Same errors, very different evidence. The refusal to correct is the most informative part.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Exposed falsehoods should reduce a source's credibility.
+- Refusing to acknowledge errors should reduce it further. It is strong evidence about everything else the source says.
+- Corrections are a sign of reliability, not of weakness.
+:::
+
+## Related entries
+
+- [Mistakes](mistakes.qmd)
+- [The John Yoo Line](john-yoo-line.qmd)
+- [Making errors is inevitable](making-errors-inevitable.qmd)
+- [Noem's Razor](noems-razor.qmd)
+
+## Source
+
+- Andrew Gelman, [Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/) (2021).

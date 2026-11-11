@@ -1,0 +1,88 @@
+---
+title: "Arrow's Other Theorem (strong form)"
+date: 2026-11-09
+description: "Any result will be published five times."
+order: 34
+categories: [Research culture, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#34** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/).
+:::
+
+## What it is
+
+The strong form turns the [weak form's](arrows-other-theorem-weak.qmd) upper bound into a prediction: under academic incentives, every result *will* be published five times. Each finding gets the working paper, the conference version, the journal article, the review and the book chapter.
+
+## Why it matters
+
+Repeat publication is not just padding. It distorts evidence synthesis. A literature review or meta-analysis that counts each version as a separate study treats one dataset as five. The pooled standard error shrinks by a factor of $\sqrt{5}$, and the result looks far more certain than it is. If the original estimate was a lucky draw (see [the significance filter](statistical-significance-filter.qmd)), the error is amplified five times over.
+
+## How it works
+
+Suppose a true effect is $\theta = 0$ and $K$ independent studies each give $\hat\theta_k \sim \mathrm{N}(0, \text{se}^2)$. A correct inverse-variance meta-analysis has standard error $\text{se}/\sqrt{K}$. If each study appears $m$ times and is naively counted $m$ times, the pooled point estimate is unchanged, but the reported standard error falls to $\text{se}/\sqrt{mK}$. The z-statistic grows by $\sqrt{m}$, and false positives multiply.
+
+## Simulated example
+
+We run many meta-analyses of a literature with *no true effect*. Each underlying study is published $m$ times, and the meta-analyst counts every publication. Watch the false-positive rate as $m$ goes from 1 to 5.
+
+```{ojs}
+import {rng, range, mean, pValue, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof m = Inputs.range([1, 5], {value: 5, step: 1, label: "Times each result is published (m)"})
+viewof K = Inputs.range([2, 20], {value: 6, step: 1, label: "Independent studies (K)"})
+viewof seed = Inputs.range([1, 500], {value: 34, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+meta = {
+  const r = rng(seed);
+  return [1, 2, 3, 4, 5].map(mm => {
+    let fp = 0;
+    for (let rep = 0; rep < 2000; rep++) {
+      const ests = r.normals(K, 0, 1);
+      const pooled = mean(ests);
+      if (pValue(pooled, 1 / Math.sqrt(K * mm)) < 0.05) fp++;
+    }
+    return {m: mm, fpr: fp / 2000};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Publications per result (m)", domain: [1, 2, 3, 4, 5]},
+  y: {label: "False-positive rate of meta-analysis", grid: true, tickFormat: "%", domain: [0, 0.6]},
+  marks: [
+    Plot.barY(meta, {x: "m", y: "fpr", fill: d => d.m === m ? "#d6604d" : "#bbb"}),
+    Plot.ruleY([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With each of ${K} null studies published **${m}** times and counted naively, the meta-analysis declares a "significant" effect **${pct(meta[m - 1].fpr, 1)}** of the time, against a nominal 5% (dashed line). The strong form of Arrow's Other Theorem quietly multiplies the evidence.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Under strong incentives, each finding tends to be republished. Expect it.
+- Meta-analyses must de-duplicate. Counting versions as independent studies overstates certainty by $\sqrt{m}$.
+- Ask how many *independent datasets* support a claim, not how many papers.
+:::
+
+## Related entries
+
+- [Arrow's Other Theorem (weak form)](arrows-other-theorem-weak.qmd)
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+
+## Source
+
+- Andrew Gelman, [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/) (2011).

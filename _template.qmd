@@ -1,0 +1,102 @@
+---
+# ---------------------------------------------------------------------------
+# TEMPLATE FOR A LEXICON ENTRY
+# Copy to concepts/<slug>.qmd. Files starting with "_" are not rendered.
+#
+# title:       The entry's name exactly as it appears in Gelman's list.
+# description: Gelman's one-line definition, verbatim. It shows under the
+#              title and in the index listing.
+# order:       Position in the original list (1-based). The index sorts by it.
+# categories:  One or two from the fixed set below.
+# source:      URL that the entry links to in the original list.
+#
+# Categories (use only these):
+#   Bayesian inference · Significance & noise · Causal inference ·
+#   Modeling workflow · Statistical graphics · Surveys & MRP ·
+#   Research culture · Reasoning & fallacies · Philosophy of statistics ·
+#   Communication · Computing
+# ---------------------------------------------------------------------------
+title: "Entry Name"
+description: "Gelman's one-line definition, verbatim."
+order: 0
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/..."
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#0** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/...).
+:::
+
+## What it is
+
+<!-- Two short paragraphs: the idea in plain language, then the precise
+     statistical (or practical) statement behind the slogan. -->
+
+## Why it matters
+
+<!-- The concrete mistake people make without this idea, and who pays for it.
+     Name a realistic setting (a study, a survey, a dashboard, a model fit). -->
+
+## How it works
+
+<!-- The mechanism. Use a small formula or a numbered chain of reasoning where
+     it helps. For aphorisms about research culture, state the mechanism the
+     slogan points at and say plainly that the simulation is a toy model. -->
+
+## Simulated example
+
+<!-- One sentence on what the simulation sets up and what to try. Then OJS
+     cells, in this order:
+       1. import helpers from ../js/stats.js
+       2. viewof controls (Inputs.range / Inputs.radio / Inputs.checkbox),
+          always including a "Random seed" slider
+       3. the simulation itself (pure computation, no DOM)
+       4. one or two Plot.plot() figures
+       5. a md`` readout inside <div class="sim-readout"> that states the
+          result in words and updates with the controls
+     Make sure the default slider values and seed visibly show the entry's
+     point. Never name a cell `window`, `width` or another global, and don't
+     write recursive cells (OJS reports a circular definition). -->
+
+```{ojs}
+import {rng, mean, sd, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof seed = Inputs.range([1, 500], {value: 42, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+sim = {
+  const r = rng(seed);
+  return r.normals(200).map((y, i) => ({i, y}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  marks: [Plot.rectY(sim, Plot.binX({y: "count"}, {x: "y"})), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The sample mean is **${fmt(mean(sim.map(d => d.y)))}**.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Takeaway one.
+- Takeaway two.
+- Takeaway three.
+:::
+
+## Related entries
+
+- [Another entry](another-entry.qmd)
+
+## Source
+
+- Andrew Gelman, [source post title](https://statmodeling.stat.columbia.edu/...).

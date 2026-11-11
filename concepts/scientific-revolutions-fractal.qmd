@@ -1,0 +1,84 @@
+---
+title: "Scientific revolutions"
+date: 2026-11-09
+description: "They're fractal."
+order: 145
+categories: [Philosophy of statistics, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#145** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Self-similarity of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/).
+:::
+
+## What it is
+
+Thomas Kuhn described science as long periods of "normal science" broken by rare paradigm-shifting revolutions. Gelman suggests revolutions are **fractal**, meaning self-similar across scales. There are a few huge revolutions (Newton, Darwin, quantum mechanics), more medium-sized ones that reshape a subfield, and many small ones that change how a research group or a single project thinks. Zoom in on any part of science and you see the same pattern of mostly-normal work punctuated by upheavals.
+
+## Why it matters
+
+The fractal view softens the sharp Kuhnian split between "normal science" and "revolution." Your own work can have revolutions: a new model that changes how you see a dataset, or a new method that changes a subfield. They are the same kind of event as the big ones, only smaller. Statistically, it implies a heavy-tailed, power-law distribution of the sizes of conceptual changes, with no natural cutoff between "small" and "revolutionary."
+
+## How it works
+
+A fractal or self-similar size distribution follows a power law: $\Pr(\text{size} > s) \propto s^{-\alpha}$. On a log-log plot, the survival function is a straight line with slope $-\alpha$. The same line appears whether you look at the whole of science or zoom into a subfield. Only the scale changes, not the shape.
+
+## Simulated example
+
+Sizes of conceptual changes are drawn from a power law. Plot the survival curve on log-log axes for all changes, and then for a "zoomed-in" subfield that only sees changes below some size.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof alpha = Inputs.range([0.5, 2.5], {value: 1.2, step: 0.1, label: "Power-law exponent α"})
+viewof seed = Inputs.range([1, 500], {value: 145, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+rev = {
+  const r = rng(seed);
+  const sizes = range(5000).map(() => Math.pow(1 - r(), -1 / alpha)).sort((a, b) => b - a);
+  const ccdf = arr => arr.map((s, i) => ({s, p: (i + 1) / arr.length}));
+  const sub = sizes.filter(s => s < 20);
+  return [...ccdf(sizes).map(d => ({...d, view: "All of science"})), ...ccdf(sub.map(s => s * 5)).map(d => ({...d, view: "Zoomed into a subfield (rescaled)"}))];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {type: "log", label: "Size of the conceptual change (log scale)", grid: true},
+  y: {type: "log", label: "Share of changes at least this big (log scale)", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(rev, {x: "s", y: "p", stroke: "view", strokeWidth: 2})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const all = rev.filter(d => d.view === "All of science");
+  const big = all.filter(d => d.s > 100).length;
+  return html`<div class="sim-readout">${md`Both views fall along nearly straight lines on log-log axes, with the same pattern at every scale. Of 5,000 changes, **${big}** are more than 100 times the minimum size (the "Kuhnian revolutions"), and there is no gap separating them from the rest. Revolutions come in all sizes.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Conceptual change in science happens at all scales, with the same pattern at each.
+- There's no sharp line between "normal science" and "revolution."
+- Small revolutions in your own work are the same kind of thing as the famous ones.
+:::
+
+## Related entries
+
+- [The capacity to be upset](capacity-to-be-upset.qmd)
+- [Cantor's Corner](cantors-corner.qmd)
+- [Physics is like Brazil](physics-is-like-brazil.qmd)
+
+## Source
+
+- Andrew Gelman, [Self-similarity of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/) (2005).

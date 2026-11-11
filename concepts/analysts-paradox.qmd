@@ -1,0 +1,87 @@
+---
+title: "The Analyst's Paradox"
+date: 2026-11-09
+description: "A good analyst has special data analysis and interpretation skills. But it's considered a bad or surprising thing that if you give the same data to different analysts, they come to different conclusions."
+order: 127
+categories: [Research culture, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2024/01/27/pt/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#127** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2024/01/27/pt/).
+:::
+
+## What it is
+
+We value analysts for their *judgment*: knowing which variables matter, how to handle outliers, which model fits the problem. Yet when "many analysts" studies give the same dataset to dozens of teams and get dozens of different answers, people react with surprise or alarm. If analysis needed no judgment, it could be automated and everyone would agree. If it does need judgment, different analysts *will* reach different conclusions. You can't have one without the other.
+
+## Why it matters
+
+The paradox clarifies what many-analysts studies show. The spread across teams is not a scandal. It is a measure of how much a conclusion depends on reasonable analytic choices, and so a measure of the uncertainty a single analysis leaves out. A good response is to report that dependence, through multiverse analyses, specification curves or models that average over choices, rather than pretend one analyst's path was the only one.
+
+## How it works
+
+Each team chooses among reasonable options for covariates, outlier rules, model family and outcome coding. Each choice shifts the estimate somewhat. The across-team spread is roughly the square root of the sum of the variances these choices introduce. When analytic variability is comparable to sampling variability, which is common, any one team's confidence interval *understates* the real uncertainty.
+
+## Simulated example
+
+Twenty-nine teams analyze the *same* dataset. Each makes four reasonable choices. Compare the spread of their estimates with the width of a single team's confidence interval.
+
+```{ojs}
+import {rng, range, mean, sd, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof choiceImpact = Inputs.range([0, 0.3], {value: 0.12, step: 0.01, label: "How much each analytic choice moves the estimate"})
+viewof seed = Inputs.range([1, 500], {value: 127, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+teams = {
+  const r = rng(seed);
+  const shifts = range(4).map(() => r.normals(3, 0, choiceImpact));
+  const se = 0.1, base = 0.3;
+  return range(29).map(t => {
+    const est = base + sum(range(4).map(j => shifts[j][r.int(0, 2)])) + r.normal(0, 0.02);
+    return {team: t + 1, est, lo: est - 1.96 * se, hi: est + 1.96 * se};
+  }).sort((a, b) => a.est - b.est).map((d, i) => ({...d, rank: i + 1}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Team (sorted by estimate)"},
+  y: {label: "Estimate with the team's own 95% interval", grid: true},
+  marks: [
+    Plot.ruleX(teams, {x: "rank", y1: "lo", y2: "hi", stroke: "#2166ac", strokeOpacity: 0.5}),
+    Plot.dot(teams, {x: "rank", y: "est", fill: "#2166ac", r: 3.5}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Same data, 29 teams: estimates range from **${fmt(teams[0].est)}** to **${fmt(teams.at(-1).est)}** (sd across teams **${fmt(sd(teams.map(d => d.est)))}**), while each team's own standard error is 0.10. ${teams.filter(d => d.lo > 0).length} teams find a "significant" positive effect and ${teams.filter(d => d.lo <= 0).length} don't. That's the cost of judgment, and judgment is why we value analysts.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- If analysis needs skill, different skilled analysts will disagree.
+- Across-analyst spread is real uncertainty that single-analysis intervals leave out.
+- Report sensitivity to analytic choices instead of presenting one path as the truth.
+:::
+
+## Related entries
+
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Robustness checks](robustness-checks.qmd)
+- [Breadcrumbs](breadcrumbs.qmd)
+- [The Methodological Attribution Problem](methodological-attribution-problem.qmd)
+
+## Source
+
+- Andrew Gelman, [The analyst's paradox](https://statmodeling.stat.columbia.edu/2024/01/27/pt/) (2024).
+- Silberzahn et al., "Many analysts, one data set," *Advances in Methods and Practices in Psychological Science* (2018).

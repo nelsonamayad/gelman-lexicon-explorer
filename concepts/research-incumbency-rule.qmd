@@ -1,0 +1,93 @@
+---
+title: "Research Incumbency Rule"
+date: 2026-11-09
+description: "Once an article is published in some approved venue, it is taken as truth. Criticisms which would absolutely derail a submission in pre-publication review can be brushed aside if they are presented after publication."
+order: 89
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2016/09/21/what-has-happened-down-here-is-the-winds-have-changed/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#89** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What has happened down here is the winds have changed](https://statmodeling.stat.columbia.edu/2016/09/21/what-has-happened-down-here-is-the-winds-have-changed/).
+:::
+
+## What it is
+
+There is an asymmetry in the burden of proof. *Before* publication, a single serious flaw raised by a reviewer, such as a coding error or an unaccounted confounder, can sink a paper. *After* publication, the same flaw raised by a critic is treated as one opinion among many, and the published result keeps its standing as the default truth. The paper, like a political incumbent, has the advantage.
+
+## Why it matters
+
+The asymmetry makes the published record stickier than the evidence warrants. Errors that slipped through review, which is noisy (see [The problem with peer review](problem-with-peer-review.qmd)), become very hard to remove. Critics need much stronger evidence to dislodge a published claim than reviewers needed to block it. That makes post-publication criticism, the main way science corrects itself, both thankless and largely ineffective.
+
+## How it works
+
+A toy model. Each paper has a flaw of some severity $s$. Before publication, a reviewer notices it with some probability and rejects the paper if $s > t_{\text{pre}}$. After publication, a critic notices it and the paper is corrected only if $s > t_{\text{post}}$, where $t_{\text{post}} > t_{\text{pre}}$. Papers whose flaws fall between the two thresholds are the ones that would have been rejected but are never corrected.
+
+## Simulated example
+
+There are 5,000 papers with flaws of varying severity. Set the pre- and post-publication thresholds and see how many seriously flawed papers persist.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tPre = Inputs.range([0.5, 3], {value: 1.5, step: 0.1, label: "Severity that blocks publication (pre)"})
+viewof tPost = Inputs.range([0.5, 5], {value: 3, step: 0.1, label: "Severity needed to correct after publication (post)"})
+viewof pNotice = Inputs.range([0.1, 1], {value: 0.5, step: 0.05, label: "Chance a reviewer notices a flaw"})
+viewof seed = Inputs.range([1, 500], {value: 89, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+incumbency = {
+  const r = rng(seed);
+  return range(5000).map(() => {
+    const s = r.exponential(0.8);
+    const blocked = r() < pNotice && s > tPre;
+    const corrected = !blocked && s > tPost;
+    return {s, status: blocked ? "Rejected in review" : corrected ? "Corrected after publication" : (s > tPre ? "Published; serious flaw persists" : "Published; minor or no flaw")};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Severity of the paper's flaw", grid: true},
+  y: {label: "Papers"},
+  color: {legend: true, domain: ["Published; minor or no flaw", "Rejected in review", "Published; serious flaw persists", "Corrected after publication"], range: ["#ccc", "#2166ac", "#d6604d", "#5aae61"]},
+  marks: [
+    Plot.rectY(incumbency, Plot.binX({y: "count"}, {x: "s", fill: "status", thresholds: 50})),
+    Plot.ruleX([tPre], {stroke: "#2166ac", strokeDasharray: "4 3"}),
+    Plot.ruleX([tPost], {stroke: "#5aae61", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const c = k => incumbency.filter(d => d.status === k).length;
+  return html`<div class="sim-readout">${md`**${c("Published; serious flaw persists")}** papers have flaws serious enough that a reviewer would have rejected them, yet they stay in the literature (red). Only **${c("Corrected after publication")}** get corrected. Lower the post-publication bar to the pre-publication bar and the red region disappears.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Published results get an incumbency advantage that the evidence may not justify.
+- A flaw is just as serious after publication as before.
+- Apply the same standard to post-publication criticism as to pre-publication review.
+:::
+
+## Related entries
+
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+- [The Time-Reversal Heuristic](time-reversal-heuristic.qmd)
+- [Deference Trap](deference-trap.qmd)
+- [The Javert Paradox](javert-paradox.qmd)
+
+## Source
+
+- Andrew Gelman, [What has happened down here is the winds have changed](https://statmodeling.stat.columbia.edu/2016/09/21/what-has-happened-down-here-is-the-winds-have-changed/) (2016).

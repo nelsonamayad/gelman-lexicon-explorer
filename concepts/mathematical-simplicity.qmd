@@ -1,0 +1,115 @@
+---
+title: "Mathematical Simplicity"
+date: 2026-11-09
+description: "Not always the same as conceptual simplicity."
+order: 90
+categories: [Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2020/09/10/why-we-kept-the-trig-in-golf-mathematical-simplicity-is-not-always-the-same-as-conceptual-simplicity/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#90** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Why we kept the trig in golf](https://statmodeling.stat.columbia.edu/2020/09/10/why-we-kept-the-trig-in-golf-mathematical-simplicity-is-not-always-the-same-as-conceptual-simplicity/).
+:::
+
+## What it is
+
+Gelman's golf-putting example makes the point. The *mathematically* simple model for probability of success against distance is a logistic regression with two parameters and a standard link function. The *conceptually* simple model starts from geometry: the putt succeeds if the angle of the shot is within the angular size of the hole, and angle errors are normal. That model needs trigonometry, but it has one parameter with a physical meaning, and it fits better and extrapolates sensibly.
+
+## Why it matters
+
+Analysts often reach for the model that is easiest to write in standard software and call it "simple." But a model that follows the actual mechanism can be simpler to *understand*, with fewer arbitrary parameters, more interpretable estimates and better behaviour outside the data. Keeping the trig is choosing conceptual simplicity over mathematical convenience.
+
+## How it works
+
+With hole radius $R$, ball radius $r$ and angular error sd $\sigma$, a putt from distance $x$ succeeds if $|\text{angle}| < \arcsin\big((R - r)/x\big)$, so
+
+$$
+\Pr(\text{success} \mid x) = 2\,\Phi\!\left(\frac{\arcsin\big((R-r)/x\big)}{\sigma}\right) - 1.
+$$
+
+The model has one parameter, $\sigma$, a golfer's angular precision. The logistic model $\text{logit}^{-1}(a + bx)$ has two parameters with no physical meaning, and its shape is wrong at short and long distances.
+
+## Simulated example
+
+Putting data are simulated from the geometric model, with distances from 2 to 20 feet. Both models are fit, then extended to 40 feet.
+
+```{ojs}
+import {rng, range, invLogit, pnorm, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof sigmaDeg = Inputs.range([0.5, 3], {value: 1.5, step: 0.1, label: "True angular error σ (degrees)"})
+viewof nPer = Inputs.range([20, 1000], {value: 200, step: 20, label: "Putts per distance"})
+viewof seed = Inputs.range([1, 500], {value: 90, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+golf = {
+  const r = rng(seed);
+  const R = 4.25 / 2 / 12, rb = 1.68 / 2 / 12;
+  const geo = (x, s) => 2 * pnorm(Math.asin(Math.min(1, (R - rb) / x)) / s) - 1;
+  const sTrue = sigmaDeg * Math.PI / 180;
+  const data = range(19).map(i => { const x = 2 + i; return {x, n: nPer, y: r.binomial(nPer, geo(x, sTrue))}; });
+  // Geometry fit: grid search on sigma.
+  let bestS = 0.01, bestLL = -Infinity;
+  for (let s = 0.002; s < 0.08; s += 0.0002) {
+    const ll = sum(data.map(d => { const p = Math.min(1 - 1e-9, Math.max(1e-9, geo(d.x, s))); return d.y * Math.log(p) + (d.n - d.y) * Math.log(1 - p); }));
+    if (ll > bestLL) { bestLL = ll; bestS = s; }
+  }
+  // Logistic fit: Newton on aggregated binomial.
+  let a = 0, b = 0;
+  for (let it = 0; it < 50; it++) {
+    let ga = 0, gb = 0, haa = 0, hab = 0, hbb = 0;
+    for (const d of data) { const p = invLogit(a + b * d.x), w = d.n * p * (1 - p); ga += d.y - d.n * p; gb += (d.y - d.n * p) * d.x; haa -= w; hab -= w * d.x; hbb -= w * d.x * d.x; }
+    const det = haa * hbb - hab * hab; a -= (hbb * ga - hab * gb) / det; b -= (haa * gb - hab * ga) / det;
+  }
+  const curves = range(77).map(i => 2 + i * 0.5).flatMap(x => [
+    {x, model: "Geometry (1 parameter)", p: geo(x, bestS)},
+    {x, model: "Logistic (2 parameters)", p: invLogit(a + b * x)},
+    {x, model: "Truth", p: geo(x, sTrue)}
+  ]);
+  return {data, curves, bestS, a, b};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "Distance (feet)", grid: true},
+  y: {label: "Probability of success", domain: [0, 1], grid: true},
+  color: {legend: true, domain: ["Geometry (1 parameter)", "Logistic (2 parameters)", "Truth"], range: ["#2166ac", "#d6604d", "#999"]},
+  marks: [
+    Plot.rect([0], {x1: 20, x2: 40, y1: 0, y2: 1, fill: "#999", fillOpacity: 0.07}),
+    Plot.line(golf.curves, {x: "x", y: "p", stroke: "model", strokeWidth: 2, strokeDasharray: d => d.model === "Truth" ? "4 3" : null}),
+    Plot.dot(golf.data, {x: "x", y: d => d.y / d.n, fill: "currentColor", r: 3}),
+    Plot.text([0], {x: 30, y: 0.95, text: () => "extrapolation"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const at = (m, x) => golf.curves.find(d => d.model === m && d.x === x).p;
+  return html`<div class="sim-readout">${md`The geometry model estimates σ = **${fmt(golf.bestS * 180 / Math.PI, 2)}°** (truth ${sigmaDeg}°), a number with meaning. At 40 feet: truth **${fmt(at("Truth", 40), 3)}**, geometry **${fmt(at("Geometry (1 parameter)", 40), 3)}**, logistic **${fmt(at("Logistic (2 parameters)", 40), 3)}**. The trig model is harder to write and simpler to understand.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A standard functional form isn't necessarily the simplest model.
+- Models built from the mechanism have fewer, more meaningful parameters.
+- Mechanistic models often extrapolate far better than generic curves.
+:::
+
+## Related entries
+
+- [Ockhamite Tendencies](ockhamite-tendencies.qmd)
+- [The Australia principle](australia-principle.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+
+## Source
+
+- Andrew Gelman, [Why we kept the trig in golf](https://statmodeling.stat.columbia.edu/2020/09/10/why-we-kept-the-trig-in-golf-mathematical-simplicity-is-not-always-the-same-as-conceptual-simplicity/) (2020).
+- Andrew Gelman, [Model building and expansion for golf putting](https://mc-stan.org/users/documentation/case-studies/golf.html) (Stan case study, 2019).

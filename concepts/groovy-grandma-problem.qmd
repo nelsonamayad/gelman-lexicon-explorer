@@ -1,0 +1,99 @@
+---
+title: "The Groovy Grandma Problem"
+date: 2026-11-09
+description: "When your sample differs systematically from your population within adjustment cells."
+order: 149
+categories: [Surveys & MRP]
+source: "https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#149** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The groovy grandma problem in survey research](https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/).
+:::
+
+## What it is
+
+Survey adjustment, whether weighting or [MRP](mister-p.qmd), corrects for the sample having the wrong *mix* of cells, such as too few older people. It assumes that *within* each cell, the respondents resemble the population. The groovy grandma problem is when they don't. The older people who answer an online opt-in poll are not typical older people. They're the tech-savvy, socially engaged "groovy grandmas." Weighting up the older cell multiplies their atypical views instead of correcting them.
+
+## Why it matters
+
+The problem is invisible to standard diagnostics. Weighted demographics match the census perfectly, because that is what weighting does, yet the estimates stay biased. The problem is worst in exactly the cells that need the most weight: underrepresented groups are reached through unusual channels, so the few who respond are the least typical. More weighting can make things *worse*.
+
+## How it works
+
+Let opinion depend on age group and on a trait $G$ ("grooviness"). In the population, $G$ is rare among older people. Response depends on age *and* $G$: groovy older people respond far more than other older people. After weighting on age, the older cell's estimate reflects mainly groovy respondents, so it is biased by about the within-cell difference in opinion times the over-representation of $G$. Fixing it requires adjusting for $G$ or for a proxy, such as internet use or social engagement, or at least checking a [canary variable](canary-variable.qmd).
+
+## Simulated example
+
+An online poll weighted to the correct age distribution. Vary how strongly "grooviness" drives older people's response, and compare the age-weighted estimate with the truth.
+
+```{ojs}
+import {rng, range, mean, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof groovy = Inputs.range([0, 4], {value: 2.5, step: 0.1, label: "How much grooviness boosts response among older people"})
+viewof seed = Inputs.range([1, 500], {value: 149, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+grandma = {
+  const r = rng(seed);
+  const pop = range(60000).map(() => {
+    const old = r.bernoulli(0.4), g = r.bernoulli(old ? 0.15 : 0.5);
+    const support = r.bernoulli(0.35 + 0.3 * g - 0.1 * old);
+    const pResp = 1 / (1 + Math.exp(-(-3 + (old ? -1 + groovy * g : 0.5 * g))));
+    return {old, g, support, resp: r() < pResp};
+  });
+  const sample = pop.filter(d => d.resp);
+  const cellMean = o => mean(sample.filter(d => d.old === o).map(d => d.support));
+  return {
+    truth: mean(pop.map(d => d.support)),
+    raw: mean(sample.map(d => d.support)),
+    weighted: 0.4 * cellMean(1) + 0.6 * cellMean(0),
+    oldTruth: mean(pop.filter(d => d.old).map(d => d.support)),
+    oldSample: cellMean(1),
+    groovyShareOldSample: mean(sample.filter(d => d.old).map(d => d.g)),
+    n: sample.length
+  };
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 200,
+  x: {label: "Estimated support", domain: [0.2, 0.7], grid: true, tickFormat: "%"},
+  y: {label: null},
+  marks: [
+    Plot.dot([
+      {m: "Truth", v: grandma.truth}, {m: "Raw sample", v: grandma.raw}, {m: "Weighted to census age mix", v: grandma.weighted},
+      {m: "Older cell: truth", v: grandma.oldTruth}, {m: "Older cell: respondents", v: grandma.oldSample}
+    ], {y: "m", x: "v", r: 7, fill: d => d.m.includes("ruth") ? "currentColor" : "#d6604d"}),
+    Plot.ruleX([grandma.truth], {strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Among older *respondents*, **${fmt(100 * grandma.groovyShareOldSample, 0)}%** are groovy, compared with 15% of older people in the population. Weighting fixes the age mix but not that: the weighted estimate is **${fmt(100 * grandma.weighted, 1)}%** against a truth of **${fmt(100 * grandma.truth, 1)}%**. The older cell alone is off by ${fmt(100 * (grandma.oldSample - grandma.oldTruth), 1)} points. The demographics look perfect, and the estimate is still wrong.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Adjustment fixes the mix of cells, not who the respondents are within each cell.
+- Under-represented cells are where within-cell selection tends to be strongest.
+- Adjust for the traits that drive response, such as engagement or internet use, and check canary variables.
+:::
+
+## Related entries
+
+- [Mister P](mister-p.qmd)
+- [Canary variable](canary-variable.qmd)
+- [The Freshman Fallacy](freshman-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [The groovy grandma problem in survey research](https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/) (2025).

@@ -1,0 +1,100 @@
+---
+title: "Robustness checks"
+date: 2026-11-09
+description: "are a joke."
+order: 120
+categories: [Significance & noise, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2018/11/14/robustness-checks-joke/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#120** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Robustness checks are a joke](https://statmodeling.stat.columbia.edu/2018/11/14/robustness-checks-joke/).
+:::
+
+## What it is
+
+Papers routinely include a "robustness checks" table showing the main result surviving alternative specifications. Gelman's complaint is that these are usually a ritual. Authors choose which checks to report, they run checks until enough agree, and checks that undermine the result tend to be left out or explained away. A robustness table that always says "robust" carries no information.
+
+## Why it matters
+
+Robustness checks are supposed to probe whether a result depends on arbitrary choices. Selected to reassure, they do the opposite: they hide the dependence. Readers see five specifications agreeing and conclude the result is solid, when twenty other reasonable specifications might have disagreed. Honest robustness work reports the full range of reasonable specifications, as in a specification curve or multiverse analysis, including the ones that hurt.
+
+## How it works
+
+Suppose there are $K$ reasonable specifications, and the main estimate is significant in some of them. Authors report the main specification plus the $m$ checks that agree most. The reported table is robust *by selection*. Even under a null effect, if any specification is significant, there are usually several correlated neighbours that agree with it.
+
+## Simulated example
+
+The true effect is zero, and 30 reasonable specifications give correlated estimates. We simulate datasets until one produces a significant specification, because that's the dataset that becomes a paper. The authors lead with the most significant estimate and report the 5 checks closest to it. Compare the reported table with the full set of specifications.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof trueEff = Inputs.range([0, 0.5], {value: 0, step: 0.05, label: "True effect"})
+viewof corr = Inputs.range([0, 0.95], {value: 0.7, step: 0.05, label: "Correlation among specifications"})
+viewof seed = Inputs.range([1, 500], {value: 120, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+specs = {
+  const r = rng(seed);
+  const se = 0.15;
+  // Only datasets where some specification is significant turn into a paper.
+  let all, tries = 0;
+  do {
+    const common = r.normal(0, se);
+    all = range(30).map(k => {
+      const est = trueEff + Math.sqrt(corr) * common + Math.sqrt(1 - corr) * r.normal(0, se);
+      return {k, est, lo: est - 1.96 * se, hi: est + 1.96 * se, sig: Math.abs(est) > 1.96 * se};
+    });
+    tries++;
+  } while (!all.some(d => d.sig) && tries < 500);
+  all = all.sort((a, b) => a.est - b.est).map((d, i) => ({...d, rank: i, tries}));
+  const main = all.reduce((a, b) => Math.abs(b.est) > Math.abs(a.est) ? b : a);
+  const reported = all.slice().sort((a, b) => Math.abs(a.est - main.est) - Math.abs(b.est - main.est)).slice(0, 6).map(d => d.k);
+  return all.map(d => ({...d, reported: reported.includes(d.k)}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Specification (sorted by estimate)"},
+  y: {label: "Estimate ± 1.96 se", grid: true},
+  marks: [
+    Plot.ruleX(specs, {x: "rank", y1: "lo", y2: "hi", stroke: d => d.reported ? "#d6604d" : "#bbb", strokeWidth: d => d.reported ? 3 : 1.5}),
+    Plot.dot(specs, {x: "rank", y: "est", fill: d => d.reported ? "#d6604d" : "#999", r: 3}),
+    Plot.ruleY([0]),
+    Plot.ruleY([trueEff], {stroke: "#2166ac", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const rep = specs.filter(d => d.reported), all = specs;
+  return html`<div class="sim-readout">${md`It took **${all[0].tries}** dataset(s) to get one worth writing up. Reported table (red): **${rep.filter(d => d.sig).length} of 6** specifications significant, so "robust!" The full set of 30 reasonable specifications: **${all.filter(d => d.sig).length}** significant, with estimates from ${fmt(all[0].est)} to ${fmt(all.at(-1).est)}. True effect: ${trueEff}. The robustness table was chosen, not discovered.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Selected robustness checks show only what the authors chose to show.
+- Report all reasonable specifications, as in a specification curve or multiverse analysis.
+- A check that couldn't have failed isn't a check.
+:::
+
+## Related entries
+
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Statistical Chemotherapy](statistical-chemotherapy.qmd)
+- [A bunch of hoops to jump through](bunch-of-hoops.qmd)
+- [The Pandora Principle](pandora-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [Robustness checks are a joke](https://statmodeling.stat.columbia.edu/2018/11/14/robustness-checks-joke/) (2018).

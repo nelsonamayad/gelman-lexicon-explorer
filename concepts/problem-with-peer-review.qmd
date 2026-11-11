@@ -1,0 +1,93 @@
+---
+title: "The problem with peer review"
+date: 2026-11-09
+description: "The peers."
+order: 61
+categories: [Research culture]
+source: "http://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#61** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/).
+:::
+
+## What it is
+
+Peer review is review by peers: people trained in the same field, with the same methods, assumptions and blind spots as the authors. If a misconception is widespread in a field, such as treating significance as proof, ignoring forking paths or trusting tiny samples, the reviewers share it. They can catch idiosyncratic errors but not the shared ones. "The problem with peer review is the peers."
+
+## Why it matters
+
+People treat "peer-reviewed" as a stamp of correctness. But review is only as good as the reviewers' understanding, and systematic errors in a field are by definition the ones most reviewers don't see. That is why whole literatures, not just individual papers, can go wrong, and why post-publication review by outsiders (statisticians, other fields, skeptical readers) catches so much that pre-publication review missed.
+
+## How it works
+
+Suppose each reviewer independently catches an *idiosyncratic* error with probability $p$. Then $k$ reviewers catch it with probability $1-(1-p)^k$, which climbs quickly. For a *shared* misconception held by a fraction $m$ of the field, a reviewer can only catch it if they don't hold it, so the probability per reviewer is $p(1-m)$. When $m$ is high, adding reviewers barely helps: $1-(1-p(1-m))^k$ stays low.
+
+## Simulated example
+
+Simulate papers containing either idiosyncratic or field-wide errors, each reviewed by $k$ peers. Compare detection rates.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pCatch = Inputs.range([0.1, 0.9], {value: 0.5, step: 0.05, label: "Reviewer skill: Pr(catch an error they understand)"})
+viewof m = Inputs.range([0, 1], {value: 0.85, step: 0.05, label: "Share of the field sharing the misconception"})
+viewof seed = Inputs.range([1, 500], {value: 61, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+review = {
+  const r = rng(seed);
+  return [1, 2, 3, 4, 5, 6, 8, 10].flatMap(k => ["Idiosyncratic error", "Shared misconception"].map(type => {
+    let caught = 0;
+    for (let i = 0; i < 2000; i++) {
+      let hit = false;
+      for (let j = 0; j < k; j++) {
+        const blind = type === "Shared misconception" && r() < m;
+        if (!blind && r() < pCatch) hit = true;
+      }
+      if (hit) caught++;
+    }
+    return {k, type, rate: caught / 2000};
+  }));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Number of peer reviewers"},
+  y: {label: "Share of errors caught", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(review, {x: "k", y: "rate", stroke: "type", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const at = (k, t) => review.find(d => d.k === k && d.type === t).rate;
+  return html`<div class="sim-readout">${md`With 3 reviewers, idiosyncratic errors are caught **${pct(at(3, "Idiosyncratic error"))}** of the time and field-wide misconceptions **${pct(at(3, "Shared misconception"))}**. Even 10 reviewers catch the shared misconception only **${pct(at(10, "Shared misconception"))}** of the time. More peers don't fix a problem the peers all share.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Peer review catches individual mistakes and misses field-wide ones.
+- Adding reviewers from the same pool gives diminishing returns against shared blind spots.
+- Outside perspectives, from other disciplines or post-publication critics, find what peers can't.
+:::
+
+## Related entries
+
+- [The Pinch-Hitter Syndrome](pinch-hitter-syndrome.qmd)
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+- [Deference Trap](deference-trap.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+
+## Source
+
+- Andrew Gelman, [Peer review make no damn sense](http://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/) (2016).

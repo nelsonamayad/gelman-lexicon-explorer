@@ -1,0 +1,91 @@
+---
+title: "Assumptions and Rigor"
+date: 2026-11-09
+description: "You can't have one without the other."
+order: 86
+categories: [Philosophy of statistics, Causal inference]
+source: "https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#86** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/).
+:::
+
+## What it is
+
+"Rigorous" methods come with guarantees: unbiasedness, nominal coverage, consistency. Every one of those guarantees is conditional on assumptions. Rigor without assumptions is impossible, and assumptions without rigorous checking are just hopes. The two come together: a rigorous result is a precise statement of what follows *if* the assumptions hold.
+
+## Why it matters
+
+Methods get marketed as "assumption-free" or "rigorous" in contrast with "model-based" approaches, as if some designs needed no assumptions. Difference-in-differences needs parallel trends. Instrumental variables need exclusion. Randomization inference needs a correctly specified estimand and no interference. Treating the rigor as unconditional hides the assumptions, and that is exactly where things go wrong.
+
+## How it works
+
+Take **difference-in-differences**. The estimator is unbiased for the treatment effect *if* treated and control groups would have followed parallel trends without treatment. If the treated group's trend differs by $\delta$ per period, the estimator's bias is $\delta$ times the number of periods. Its standard error and confidence interval know nothing about this. Coverage falls as the assumption fails, while the stated interval stays just as "rigorous."
+
+## Simulated example
+
+A difference-in-differences study with a true effect of 1. Introduce a violation of parallel trends and watch the rigorous-looking interval lose its guarantee.
+
+```{ojs}
+import {rng, range, mean, variance, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof delta = Inputs.range([-1, 1], {value: 0.4, step: 0.05, label: "Violation of parallel trends δ"})
+viewof n = Inputs.range([20, 500], {value: 100, step: 10, label: "Units per group"})
+viewof seed = Inputs.range([1, 500], {value: 86, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+did = {
+  const r = rng(seed);
+  return range(300).map(k => {
+    const cPre = r.normals(n, 0, 1), cPost = r.normals(n, 0.5, 1);
+    const tPre = r.normals(n, 0.3, 1), tPost = r.normals(n, 0.3 + 0.5 + delta + 1, 1);
+    const est = (mean(tPost) - mean(tPre)) - (mean(cPost) - mean(cPre));
+    const se = Math.sqrt((variance(tPost) + variance(tPre) + variance(cPost) + variance(cPre)) / n);
+    return {k, est, lo: est - 1.96 * se, hi: est + 1.96 * se};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Replication (first 50)"},
+  y: {label: "DiD estimate with 95% interval", grid: true},
+  marks: [
+    Plot.ruleX(did.slice(0, 50), {x: "k", y1: "lo", y2: "hi", stroke: d => d.lo <= 1 && 1 <= d.hi ? "#2166ac" : "#d6604d"}),
+    Plot.dot(did.slice(0, 50), {x: "k", y: "est", r: 2, fill: "currentColor"}),
+    Plot.ruleY([1], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const cov = did.filter(d => d.lo <= 1 && 1 <= d.hi).length / did.length;
+  return html`<div class="sim-readout">${md`Coverage of the nominal 95% interval: **${pct(cov, 1)}**. Average estimate: **${fmt(mean(did.map(d => d.est)))}** against a true effect of 1. The intervals look exactly as rigorous whether or not parallel trends holds. The rigor was always conditional on the assumption.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Every rigorous guarantee is conditional on assumptions. State them.
+- "Assumption-free" methods have assumptions too. They're just less visible.
+- Check assumptions where possible, and report how conclusions change when they're relaxed.
+:::
+
+## Related entries
+
+- [When researchers say "guarantee"](guarantee-is-assumption.qmd)
+- [The Speed Racer Principle](speed-racer-principle.qmd)
+- [Strongest-link Fallacy](strongest-link-fallacy.qmd)
+- [The Pandora Principle](pandora-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [Assumptions and rigor](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/) (2019).

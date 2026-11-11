@@ -1,0 +1,88 @@
+---
+title: "Two sides, no vig"
+date: 2026-11-09
+description: "The problem with generative and inferential reasoning in social science"
+order: 137
+categories: [Reasoning & fallacies, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#137** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Two sides, no vig: the problem with generative and inferential reasoning in social science](https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/).
+:::
+
+## What it is
+
+The "vig" (vigorish) is the bookmaker's cut, the cost of placing a bet. A bet with "two sides, no vig" costs nothing, and you collect whichever way it goes. The entry is the title of a paper Gelman planned, and the post gives its abstract. Social science can reason in two directions. **Generative modeling** predicts behavior from assumed preferences. **Inferential reasoning** deduces preferences from observed behavior. Both are valuable, but "in choosing which mode to use, social scientists have the freedom to come to essentially opposite conclusions for any problem that comes in." His examples come from economics, political science and public health.
+
+## Why it matters
+
+If a researcher can pick the mode of reasoning after seeing which conclusion it delivers, any outcome can be presented as support for their view, and nothing is risked. A claim that would have been "confirmed" whichever way the data came out carries no evidence. Gelman's suggested remedy is a "more holistic integration of data and theory": committing to how theory and data fit together before seeing which way the answer goes.
+
+## How it works
+
+Evidence for a theory $T$ from an outcome $D$ is the likelihood ratio $\Pr(D \mid T) / \Pr(D \mid \text{not } T)$. A committed theory predicts $D = +$ with high probability, so seeing $+$ is evidence for it and seeing $-$ is evidence against it. A two-sided theory "predicts" whichever outcome happens, so $\Pr(D \mid T) \approx \Pr(D \mid \text{not } T)$, the likelihood ratio is about 1, and belief shouldn't move. Counting its "successes" as support is the error.
+
+## Simulated example
+
+Two theories face 30 studies of an effect that is actually zero. The committed theory predicts a positive effect. The two-sided theory explains either sign. A naive scorekeeper counts "confirmations," meaning noticeable results (|z| > 1) that the theory can explain, while a Bayesian tracks the evidence.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof trueEffect = Inputs.range([-0.5, 0.5], {value: 0, step: 0.05, label: "True effect"})
+viewof seed = Inputs.range([1, 500], {value: 137, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+vig = {
+  const r = rng(seed);
+  let commitConf = 0, twoConf = 0, commitLO = 0, twoLO = 0;
+  return range(30).map(k => {
+    const z = r.normal(trueEffect / 0.2, 1);
+    const sig = Math.abs(z) > 1, pos = z > 0;            // a "noticeable" result, |z| > 1
+    if (sig && pos) commitConf++;
+    if (sig) twoConf++;                                      // either sign "confirms" it
+    // Evidence: committed theory predicts positive with prob .8 vs .5 under the null of no theory.
+    if (sig) commitLO += pos ? Math.log(0.8 / 0.5) : Math.log(0.2 / 0.5);
+    // Two-sided theory: predicts the observed sign with the same probability as no theory.
+    twoLO += 0;
+    return {k: k + 1, commitConf, twoConf, commitP: 1 / (1 + Math.exp(-commitLO)), twoP: 0.5};
+  });
+}
+```
+
+```{ojs}
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({width: 320, height: 240, title: "Naive count of 'confirmations'", x: {label: "Studies"}, y: {label: "Confirmations", grid: true}, color: {legend: true, domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(vig, {x: "k", y: "commitConf", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoConf", stroke: () => "Two-sided theory", strokeWidth: 2})]})}
+${Plot.plot({width: 320, height: 240, title: "Actual evidence (posterior)", x: {label: "Studies"}, y: {label: "Pr(theory)", domain: [0, 1], grid: true}, color: {domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(vig, {x: "k", y: "commitP", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoP", stroke: () => "Two-sided theory", strokeWidth: 2, strokeDasharray: "4 3"})]})}
+</div>`
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`After 30 studies, the two-sided theory has **${vig.at(-1).twoConf}** "confirmations" and the committed theory **${vig.at(-1).commitConf}**. Yet the two-sided theory's evidence hasn't moved from 50%, since it bet on both sides and risked nothing. The committed theory, which paid the vig, is now at **${pct(vig.at(-1).commitP)}**. Only theories that can lose can win.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A theory that explains both an outcome and its opposite gains no evidence from either.
+- Counting "consistent" results rewards flexibility, not truth.
+- Generative reasoning makes theories commit: say in advance what the data should look like.
+:::
+
+## Related entries
+
+- [The One-Way Street Fallacy](one-way-street-fallacy.qmd)
+- [Story Time](story-time.qmd)
+- [More Vampirical Than Empirical](more-vampirical-than-empirical.qmd)
+- [The Fallacy of the One-Sided Bet](one-sided-bet.qmd)
+
+## Source
+
+- Andrew Gelman, [Two sides, no vig: the problem with generative and inferential reasoning in social science](https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/) (2021).

@@ -1,0 +1,95 @@
+---
+title: "The Paradox of Influence"
+date: 2026-11-09
+description: "Anticipated influence becomes valueless if you end up saying whatever it takes to keep it."
+order: 68
+categories: [Research culture, Communication]
+source: "http://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#68** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/).
+:::
+
+## What it is
+
+Experts often justify compromises by pointing to influence: "If I tone this down, I'll keep my seat at the table and can steer things later." The paradox is that influence is valuable only if you use it to say things the powerful wouldn't otherwise hear. If keeping your influence requires saying whatever they want, your influence is worth nothing. You're an echo with a title.
+
+## Why it matters
+
+Statisticians, scientists and advisors face this constantly. Consultants soften findings for clients. Researchers shape conclusions to please funders. Experts on government panels drift toward the consensus that keeps them invited. Every step looks reasonable, but the cumulative effect is that the advice stops carrying information. The decision-maker would have done the same thing without it.
+
+## How it works
+
+A toy model. Advice is a weighted mix of what the evidence says and what the decision-maker already wants: $A = (1 - w)\,S + w\,P$. The probability of being heeded rises with $w$, because pandering is rewarded. But the advice's *added value*, how much it moves decisions toward the truth beyond what the decision-maker would have done anyway, falls with $w$. Expected impact is the product of the two, and it collapses to zero as $w \to 1$.
+
+## Simulated example
+
+An advisor chooses how much to pander. Plot their chance of being heeded, the information content of their advice, and their actual impact on decisions.
+
+```{ojs}
+import {rng, range, mean, cor, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof myW = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "How much you pander (w)"})
+viewof seed = Inputs.range([1, 500], {value: 68, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+influence = {
+  const r = rng(seed);
+  const cases = range(3000).map(() => { const truth = r.normal(), pref = r.normal(); return {truth, pref, signal: truth + r.normal(0, 0.5)}; });
+  return range(21).map(k => {
+    const w = k / 20;
+    const heeded = 0.2 + 0.75 * w;
+    const advice = cases.map(c => (1 - w) * c.signal + w * c.pref);
+    // Added information: correlation of advice with truth after removing what the boss already prefers.
+    const resid = cases.map((c, i) => advice[i] - w * c.pref);
+    const info = w < 1 ? Math.max(0, cor(resid, cases.map(c => c.truth))) * (1 - w) : 0;
+    return {w, heeded, info, impact: heeded * info};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Pandering w", grid: true},
+  y: {label: "Value", grid: true, domain: [0, 1]},
+  color: {legend: true, domain: ["Pr(heeded)", "Information in advice", "Actual impact"], range: ["#999", "#2166ac", "#d6604d"]},
+  marks: [
+    Plot.line(influence, {x: "w", y: "heeded", stroke: () => "Pr(heeded)", strokeWidth: 2}),
+    Plot.line(influence, {x: "w", y: "info", stroke: () => "Information in advice", strokeWidth: 2}),
+    Plot.line(influence, {x: "w", y: "impact", stroke: () => "Actual impact", strokeWidth: 3}),
+    Plot.ruleX([myW], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const me = influence.reduce((a, b) => Math.abs(b.w - myW) < Math.abs(a.w - myW) ? b : a);
+  const best = influence.reduce((a, b) => a.impact > b.impact ? a : b);
+  return html`<div class="sim-readout">${md`At w = ${fmt(me.w)}, you are heeded **${fmt(100 * me.heeded, 0)}%** of the time but your actual impact is **${fmt(me.impact, 3)}**. Impact peaks at w ≈ ${fmt(best.w)} and falls to **zero** at full pandering. Influence kept by saying whatever it takes is influence you no longer have.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Influence matters only if you use it to say things that would not otherwise be said.
+- Softening advice to stay in the room drains it of information.
+- If you would say the same thing as the decision-maker's prior, you are not adding anything.
+:::
+
+## Related entries
+
+- [The John Yoo Line](john-yoo-line.qmd)
+- [Steelmanning](steelmanning.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+
+## Source
+
+- Andrew Gelman, [One more thought on Hoover historian Niall Ferguson](http://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/) (2013).

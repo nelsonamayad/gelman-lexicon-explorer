@@ -1,0 +1,119 @@
+---
+title: "Institutional decision making"
+date: 2026-11-09
+description: "The setting where formal decision analysis makes sense."
+order: 4
+categories: [Bayesian inference, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#4** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/).
+:::
+
+## What it is
+
+Formal decision analysis means writing down a utility function, putting probabilities on outcomes and choosing the action that maximizes expected utility. Gelman argues it fits best in **institutional** settings: a government agency, a hospital or a company that makes the same kind of decision many times and has to justify its rules to others.
+
+For one-off personal choices, utilities are vague and change as you think about them, and the formal machinery can feel artificial. An institution, by contrast, needs explicit, consistent and auditable rules, and it gets to average over many cases.
+
+## Why it matters
+
+Institutions often decide by habit or by blanket rules: test everyone, test no one, treat everyone above a fixed cutoff. When decisions repeat across thousands of cases, small improvements in the rule add up. Decision analysis turns a model's predictions into a policy and makes the tradeoffs explicit, such as the cost of a test against the value of what it finds. That openness is itself valuable when the public is paying.
+
+## How it works
+
+For each case $i$ and action $a$, compute the expected utility $\mathrm{E}[U(a, \theta_i) \mid \text{data}]$ under the posterior for the unknown $\theta_i$. Choose the action with the highest expected utility. A classic example, from Gelman's work with Phillip Price, is home radon. A model predicts each house's radon level from geology and house features. The decision rule tells a homeowner whether to remediate immediately, measure first, or do nothing, based on predicted level, uncertainty, costs, and the health benefit of a reduction.
+
+## Simulated example
+
+An agency oversees 2,000 homes. Each home has an uncertain true radon level. A model gives a prediction with known uncertainty. A test costs money but reveals the true level, and remediating a high home produces a benefit. Compare three blanket policies with the decision-analytic one: test only the homes where the expected value of information exceeds the test's cost.
+
+```{ojs}
+import {rng, range, mean, sum, pnorm, dnorm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof testCost = Inputs.range([0, 300], {value: 50, step: 10, label: "Cost of a test ($)"})
+viewof fixCost = Inputs.range([500, 3000], {value: 1500, step: 100, label: "Cost of remediation ($)"})
+viewof benefitPerUnit = Inputs.range([100, 2000], {value: 700, step: 50, label: "Health value per unit of radon removed ($)"})
+viewof seed = Inputs.range([1, 500], {value: 5, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+policies = {
+  const r = rng(seed);
+  const s = 0.6;                             // model's predictive sd (log scale)
+  const homes = range(2000).map(() => {
+    const pred = r.normal(0.4, 0.7);         // predicted log radon
+    const truth = r.normal(pred, s);
+    return {pred, level: Math.exp(truth)};
+  });
+  // Remediation brings level down to 1; value = benefit*(level-1) - fixCost when level > 1.
+  const gain = lvl => Math.max(0, benefitPerUnit * (lvl - 1) - fixCost);
+  const fixGain = lvl => benefitPerUnit * Math.max(0, lvl - 1) - fixCost;
+  const expectedFixGain = h => {
+    // E[benefit*(L-1)^+] - fixCost, by numeric integration over the predictive.
+    let acc = 0;
+    for (let z = -4; z <= 4; z += 0.05) acc += dnorm(z) * 0.05 * Math.max(0, Math.exp(h.pred + s * z) - 1);
+    return benefitPerUnit * acc - fixCost;
+  };
+  const expectedTestGain = h => {
+    let acc = 0;
+    for (let z = -4; z <= 4; z += 0.05) acc += dnorm(z) * 0.05 * gain(Math.exp(h.pred + s * z));
+    return acc - testCost;
+  };
+  const value = {
+    "Do nothing": 0,
+    "Remediate all": sum(homes.map(h => fixGain(h.level))),
+    "Test all": sum(homes.map(h => gain(h.level) - testCost)),
+    "Decision analysis": sum(homes.map(h => {
+      const eFix = expectedFixGain(h), eTest = expectedTestGain(h);
+      const best = Math.max(0, eFix, eTest);
+      return best === 0 ? 0 : best === eFix ? fixGain(h.level) : gain(h.level) - testCost;
+    }))
+  };
+  return Object.entries(value).map(([policy, v]) => ({policy, perHome: v / homes.length}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 130,
+  x: {label: "Net benefit per home ($)", grid: true},
+  y: {label: null},
+  marks: [
+    Plot.barX(policies, {y: "policy", x: "perHome", fill: d => d.policy === "Decision analysis" ? "#2166ac" : "#bbb", sort: {y: "x", reverse: true}}),
+    Plot.ruleX([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const best = policies.reduce((a, b) => a.perHome > b.perHome ? a : b);
+  const da = policies.find(d => d.policy === "Decision analysis");
+  return html`<div class="sim-readout">${md`Best policy here: **${best.policy}** (${fmt(best.perHome, 0)} dollars per home). The decision-analytic rule gives **${fmt(da.perHome, 0)}** dollars per home. Over 2,000 homes, the gap between rules is real money. Raise the test cost and watch which policy wins.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Formal decision analysis is most convincing where a decision is repeated many times and someone has to justify it.
+- An institution averages over many cases, so expected utility is close to what actually happens.
+- Writing the utility function down makes the tradeoffs visible and open to debate.
+:::
+
+## Related entries
+
+- [Premature collapsing of the wave function](premature-collapse.qmd)
+- [Uncertainty](uncertainty-greases-commerce.qmd)
+- [Defaults](defaults.qmd)
+
+## Source
+
+- Andrew Gelman, [Institutional decision making](https://statmodeling.stat.columbia.edu/2004/11/16/institutional_d/) (2004).
+- Lin, Gelman, Price and Krantz, "Analysis of local decisions using hierarchical modeling, applied to home radon measurement and remediation," *Statistical Science* (1999).

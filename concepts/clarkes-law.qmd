@@ -1,0 +1,90 @@
+---
+title: "Clarke's Law"
+date: 2026-11-09
+description: "Any sufficiently crappy research is indistinguishable from fraud."
+order: 59
+categories: [Research culture]
+source: "http://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#59** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Clarke's law of research](http://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/).
+:::
+
+## What it is
+
+A riff on Arthur C. Clarke's "any sufficiently advanced technology is indistinguishable from magic." When research is sloppy enough, with errors in data entry, impossible summary statistics, unreproducible analyses and missing records, an outside reader cannot tell it apart from fabrication. Whether the authors *intended* to deceive matters morally. It doesn't matter for whether the results can be trusted.
+
+## Why it matters
+
+Debates about problematic papers often get stuck on intent: "it was an honest mistake, not fraud." Clarke's law moves attention to the evidence. If the numbers are internally inconsistent, the conclusions are unsupported either way. It also explains why forensic tools built to catch fraud flag so much sloppy work: from the data's point of view, the two look alike.
+
+## How it works
+
+The **GRIM test** (Brown and Heathers) is a simple forensic check. If $n$ people answer an integer-valued question, the mean must be a multiple of $1/n$. A reported mean of 3.48 with $n = 17$ is impossible, because no integer sum divided by 17 rounds to 3.48. Honest, careful reporting always passes. Fabricated means fail at a high rate. *Sloppy* reporting, with transcription errors and rounding mistakes, also fails, at a rate that rises with the sloppiness until it matches fraud.
+
+## Simulated example
+
+Studies report means of 1–7 Likert items with small samples. Compare the GRIM-inconsistency rate for honest, sloppy and fabricated reporting.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof errorRate = Inputs.range([0, 1], {value: 0.4, step: 0.05, label: "Sloppiness: Pr(a reported mean has an error)"})
+viewof seed = Inputs.range([1, 500], {value: 59, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+grimOK = (mean, n) => {
+  const k = Math.round(mean * n);
+  return [k - 1, k, k + 1].some(s => (Math.round(s / n * 100) / 100).toFixed(2) === mean.toFixed(2));
+}
+grim = {
+  const r = rng(seed);
+  const report = type => range(2000).map(() => {
+    const n = r.int(10, 40);
+    let sum = 0; for (let i = 0; i < n; i++) sum += r.int(1, 7);
+    let m = Math.round(sum / n * 100) / 100;
+    if (type === "Sloppy" && r() < errorRate) m = Math.round((m + (r() < 0.5 ? -1 : 1) * r.int(1, 9) / 100) * 100) / 100;
+    if (type === "Fabricated") m = Math.round(r.uniform(2, 6) * 100) / 100;
+    return {type, ok: grimOK(m, n)};
+  });
+  return ["Honest", "Sloppy", "Fabricated"].map(t => { const rep = report(t); return {type: t, fail: rep.filter(d => !d.ok).length / rep.length}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 90,
+  x: {label: "Share of reported means that are GRIM-inconsistent", domain: [0, 1], tickFormat: "%", grid: true},
+  y: {label: null},
+  marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#f4a582" : "#d6604d"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`GRIM failure rates: honest **${pct(grim[0].fail)}**, sloppy **${pct(grim[1].fail)}**, fabricated **${pct(grim[2].fail)}**. Turn the sloppiness up and the sloppy bar approaches the fraud bar. From the outside, sufficiently crappy research and fraud look the same.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Whether a result is reliable doesn't depend on intent. Sloppy and fraudulent work are both untrustworthy.
+- Simple consistency checks (GRIM, SPRITE, recomputing test statistics) catch both.
+- Defend results with clean, shareable data, not with assurances of good intentions.
+:::
+
+## Related entries
+
+- [You have no obligation to share your data and code](no-obligation-to-share.qmd)
+- [Honesty and transparency](honesty-and-transparency.qmd)
+- [Noem's Razor](noems-razor.qmd)
+
+## Source
+
+- Andrew Gelman, [Clarke's law of research](http://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/) (2016).
+- Brown and Heathers, "The GRIM test," *Social Psychological and Personality Science* (2017).

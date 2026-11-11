@@ -1,0 +1,99 @@
+---
+title: "Taking a Model Too Seriously"
+date: 2026-11-09
+description: "Really just another way of not taking it seriously at all."
+order: 26
+categories: [Modeling workflow, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#26** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/).
+:::
+
+## What it is
+
+Taking a model *seriously* means working out its implications and checking them against data, including implications you didn't build it for. Taking it *too* seriously means treating it as literally true: extrapolating it anywhere and believing its outputs without checking. The paradox is that the second attitude ends up ignoring the model's content. If you really believed the model, you would want to see whether its predictions hold.
+
+## Why it matters
+
+Models are tools with limited domains. A linear trend fitted to ten years of data, taken literally, predicts absurd values decades ahead. A model that assumes independence gives absurdly narrow intervals when the data are clustered. People who "trust the model" in this way often skip predictive checks entirely, and that is how they avoid learning what the model gets wrong. Gelman's approach is the opposite: take the model seriously enough to *falsify it*.
+
+## How it works
+
+- **Too seriously:** fit $y = a + b x$ on $x \in [0, 5]$, report $\hat y(15)$ with its narrow model-based interval, and don't look further.
+- **Seriously:** the model implies the residuals should be structureless and future data should look like posterior predictive draws. Check those implications. Curvature in the residuals means the model's own logic says not to extrapolate.
+
+## Simulated example
+
+The truth curves gently, but data are observed only on $x \in [0, 5]$, where a straight line fits well. Extrapolate the straight line to larger $x$ and compare with what actually happens. The residual plot is the model check that taking the model seriously demands.
+
+```{ojs}
+import {rng, range, lm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof curve = Inputs.range([0, 0.3], {value: 0.12, step: 0.01, label: "Curvature in the truth"})
+viewof xFar = Inputs.range([5, 20], {value: 15, step: 1, label: "Extrapolate to x ="})
+viewof seed = Inputs.range([1, 500], {value: 26, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+mdl = {
+  const r = rng(seed);
+  const truth = x => 1 + 0.8 * x - curve * x * x;
+  const data = range(60).map(() => { const x = r.uniform(0, 5); return {x, y: truth(x) + r.normal(0, 0.6)}; });
+  const f = lm(data.map(d => d.x), data.map(d => d.y));
+  const grid = range(81).map(i => i * xFar / 80).map(x => ({x, truth: truth(x), fit: f.predict(x)}));
+  const resid = data.map(d => ({x: d.x, resid: d.y - f.predict(d.x)}));
+  return {data, f, grid, resid, truthFar: truth(xFar), fitFar: f.predict(xFar),
+    seFar: f.sigma * Math.sqrt(1 / 60 + (xFar - 2.5) ** 2 / (60 * 25 / 12))};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "x", grid: true},
+  marks: [
+    Plot.rect([0], {x1: 0, x2: 5, y1: -60, y2: 30, fill: "#2166ac", fillOpacity: 0.05}),
+    Plot.dot(mdl.data, {x: "x", y: "y", r: 2, fill: "#2166ac"}),
+    Plot.line(mdl.grid, {x: "x", y: "fit", stroke: "#d6604d", strokeWidth: 2, strokeDasharray: "6 3"}),
+    Plot.line(mdl.grid, {x: "x", y: "truth", stroke: "currentColor"})
+  ],
+  y: {domain: [Math.min(-2, mdl.truthFar - 1), Math.max(6, mdl.fitFar + 1)], grid: true, label: "y"}
+})
+```
+
+```{ojs}
+Plot.plot({
+  height: 160,
+  x: {label: "x (observed range)", grid: true},
+  y: {label: "Residual", grid: true},
+  marks: [Plot.dot(mdl.resid, {x: "x", y: "resid", r: 2}), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The straight line predicts y(${xFar}) = **${fmt(mdl.fitFar, 1)}** ± ${fmt(1.96 * mdl.seFar, 1)} (its own 95% interval). The truth is **${fmt(mdl.truthFar, 1)}**. Taken literally, the model is confidently wrong. Taken seriously, its residuals already curve in the observed range, which is a warning not to extrapolate.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Believing a model literally is a way of not engaging with it.
+- Taking a model seriously means deriving its implications and checking them against data.
+- A model's stated uncertainty assumes the model is true. That assumption is what you need to check.
+:::
+
+## Related entries
+
+- [A chicken](a-chicken.qmd)
+- [The Pinocchio Principle](pinocchio-principle.qmd)
+- [Seeds of its own destruction](seeds-of-its-own-destruction.qmd)
+- [Cantor's Corner](cantors-corner.qmd)
+
+## Source
+
+- Andrew Gelman, [Just one of the many ways...](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/) (2009).

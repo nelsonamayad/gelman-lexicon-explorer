@@ -1,0 +1,91 @@
+---
+title: "Meritocracy won't happen"
+date: 2026-11-09
+description: "The problem's with the \"ocracy.\""
+order: 128
+categories: [Research culture, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2005/03/03/meritocracy_the/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#128** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Meritocracy...](https://statmodeling.stat.columbia.edu/2005/03/03/meritocracy_the/)
+:::
+
+## What it is
+
+The entry comes from an argument by James Flynn, the discoverer of the Flynn effect, which Gelman found convincing. "Merit" sounds fine. The trouble is the "-ocracy," meaning *rule by* the meritorious. As Gelman summarizes Flynn: "to the extent that people with merit get higher status, one would expect they would use that status to help their friends, children, etc, giving them a leg up beyond what would be expected based on their merit alone." Flynn's conclusion is that a class-stratified meritocracy is impossible, and the dynamic is easy to see in a simulation. Once people are selected into positions of power by measured merit, they gain advantages that let them and their children score well on the next round of measurement: resources, connections, coaching, and the power to set the criteria. Over time the system selects for incumbency and inheritance more than for merit, while still calling itself a meritocracy.
+
+## Why it matters
+
+Merit is always *measured*, and measurements are noisy and can be gamed. Selecting the top scorers partly selects lucky and advantaged people. If that selection then adds to their advantages, which is the "-ocracy" part, the link between position and true merit weakens with each generation. This is a statistical argument about selection, noise and feedback, not just a political one.
+
+## How it works
+
+A toy model. In each generation, everyone has true merit $M$, drawn independently each generation, and a measured score $S = M + A + \epsilon$, where $A$ is inherited advantage and $\epsilon$ is noise. The top 10% by score become the elite. Elite status gives the next generation advantage $A = \gamma$. Over generations, the correlation between elite status and true merit falls as $\gamma$ grows, and elite membership becomes hereditary.
+
+## Simulated example
+
+Follow 10 generations of a society that selects its elite on measured score. Vary how much elite status advantages the next generation.
+
+```{ojs}
+import {rng, range, mean, cor, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof gamma = Inputs.range([0, 3], {value: 2.5, step: 0.1, label: "Advantage passed on by elite status (γ)"})
+viewof noise = Inputs.range([0, 2], {value: 0.7, step: 0.05, label: "Measurement noise in the merit score"})
+viewof seed = Inputs.range([1, 500], {value: 128, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+merit = {
+  const r = rng(seed);
+  const N = 3000;
+  let elite = new Array(N).fill(false);
+  return range(10).map(g => {
+    const M = r.normals(N), S = M.map((m, i) => m + (elite[i] ? gamma : 0) + r.normal(0, noise));
+    const cut = S.slice().sort((a, b) => b - a)[Math.floor(N * 0.1)];
+    const newElite = S.map(s => s > cut);
+    const inherited = elite.some(Boolean) ? newElite.filter((e, i) => e && elite[i]).length / newElite.filter(Boolean).length : 0.1;
+    const row = {gen: g + 1, meritCor: cor(newElite.map(Number), M), inherited, meanMeritElite: mean(M.filter((_, i) => newElite[i]))};
+    elite = newElite;
+    return row;
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Generation"},
+  y: {label: "Value", grid: true, domain: [0, 1]},
+  color: {legend: true, domain: ["Share of elite whose parents were elite", "Correlation of elite status with true merit"], range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.line(merit, {x: "gen", y: "inherited", stroke: () => "Share of elite whose parents were elite", strokeWidth: 2, marker: "circle"}),
+    Plot.line(merit, {x: "gen", y: "meritCor", stroke: () => "Correlation of elite status with true merit", strokeWidth: 2, marker: "circle"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`By generation 10, **${pct(merit.at(-1).inherited)}** of the elite had elite parents (10% would mean no inheritance), and the correlation between elite status and true merit is **${fmt(merit.at(-1).meritCor)}** (generation 1: ${fmt(merit[0].meritCor)}). The merit was real. The "-ocracy" turned it into inheritance.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Selection on noisy measures of merit partly selects for luck and advantage.
+- When selection gives power that feeds back into future measurement, it entrenches incumbents.
+- Measurement, noise and feedback, not just good intentions, decide whether "merit" means anything.
+:::
+
+## Related entries
+
+- [The (Lance) Armstrong Principle](armstrong-principle.qmd)
+- [The Pinch-Hitter Syndrome](pinch-hitter-syndrome.qmd)
+- [The Status-Reversal Heuristic](status-reversal-heuristic.qmd)
+
+## Source
+
+- Andrew Gelman, [Meritocracy...](https://statmodeling.stat.columbia.edu/2005/03/03/meritocracy_the/) (2005).

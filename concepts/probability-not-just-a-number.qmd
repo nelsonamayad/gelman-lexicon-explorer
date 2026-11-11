@@ -1,0 +1,96 @@
+---
+title: "A probability isn't just a number"
+date: 2026-11-09
+description: "It's part of a network of conditional statements."
+order: 114
+categories: [Bayesian inference, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2022/12/23/a-probability-isnt-just-a-number-its-part-of-a-network-of-conditional-statements/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#114** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [A probability isn't just a number; it's part of a network of conditional statements](https://statmodeling.stat.columbia.edu/2022/12/23/a-probability-isnt-just-a-number-its-part-of-a-network-of-conditional-statements/).
+:::
+
+## What it is
+
+"Candidate X has a 70% chance of winning" sounds like a single fact. But a probabilistic forecast implies a whole web of related statements: the probability of winning given that she loses state A, the probability of winning both A and B, how the forecast should change if a poll shifts. Gelman's point is that you should judge a probability by checking whether that whole network of conditional statements makes sense, not only the headline number.
+
+## Why it matters
+
+Two forecasts can agree on every headline probability and disagree completely on the conditionals. Gelman used this point in critiquing election models whose state-level correlations implied absurd scenarios, such as a candidate who loses one state becoming *more* likely to win a neighbouring one. Checking only the marginal numbers misses those flaws. The conditional statements are where a model shows its assumptions.
+
+## How it works
+
+For two states with win probabilities $P(A)$ and $P(B)$, the marginals alone don't determine the joint. The correlation between the two outcomes sets
+
+$$
+P(B \mid A) \quad \text{and} \quad P(B \mid \text{not } A),
+$$
+
+which can be very different for the same marginals. A model with sensible marginals but implausible conditionals is a bad model.
+
+## Simulated example
+
+Two neighbouring states each have the same marginal win probability. Change the correlation between their outcomes and see how the conditional probabilities, which voters and analysts will actually ask about, move.
+
+```{ojs}
+import {rng, range, qnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pA = Inputs.range([0.1, 0.9], {value: 0.7, step: 0.05, label: "P(win state A) = P(win state B)"})
+viewof rho = Inputs.range([-0.9, 0.99], {value: 0.7, step: 0.01, label: "Correlation between the states' outcomes"})
+viewof seed = Inputs.range([1, 500], {value: 114, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+net = {
+  const r = rng(seed);
+  const cut = qnorm(1 - pA);
+  let a = 0, b = 0, ab = 0, nb_na = 0, na = 0;
+  const N = 40000;
+  for (let i = 0; i < N; i++) {
+    const z1 = r.normal(), z2 = rho * z1 + Math.sqrt(1 - rho * rho) * r.normal();
+    const A = z1 > cut, B = z2 > cut;
+    a += A; b += B; ab += A && B; if (!A) { na++; nb_na += B; }
+  }
+  return [
+    {stmt: "P(A)", p: a / N}, {stmt: "P(B)", p: b / N},
+    {stmt: "P(A and B)", p: ab / N},
+    {stmt: "P(B | won A)", p: ab / a}, {stmt: "P(B | lost A)", p: nb_na / na}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 110,
+  x: {label: "Probability", domain: [0, 1], tickFormat: "%", grid: true},
+  y: {label: null, domain: net.map(d => d.stmt)},
+  marks: [Plot.barX(net, {y: "stmt", x: "p", fill: (d, i) => i < 2 ? "#999" : "#2166ac"}), Plot.text(net, {y: "stmt", x: "p", text: d => pct(d.p), dx: 4, textAnchor: "start"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The headline numbers (grey) don't change. With correlation ${fmt(rho)}, losing A drops the chance of winning B to **${pct(net[4].p)}**, while winning A raises it to **${pct(net[3].p)}**. Two models with identical marginals can imply very different worlds. Check the network, not just the number.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A probability forecast implies many conditional statements. Check them.
+- Marginals alone don't determine joint or conditional probabilities.
+- Implausible conditional implications reveal model flaws that headline numbers hide.
+:::
+
+## Related entries
+
+- [Probability](probability.qmd)
+- [Uncertainty](uncertainty-greases-commerce.qmd)
+- [A chicken](a-chicken.qmd)
+
+## Source
+
+- Andrew Gelman, [A probability isn't just a number; it's part of a network of conditional statements](https://statmodeling.stat.columbia.edu/2022/12/23/a-probability-isnt-just-a-number-its-part-of-a-network-of-conditional-statements/) (2022).

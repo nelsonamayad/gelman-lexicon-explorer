@@ -1,0 +1,85 @@
+---
+title: "Anthropic principle"
+date: 2026-11-09
+description: "The phenomena we can successfully study in statistics will not be too small or too large."
+order: 119
+categories: [Philosophy of statistics, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2018/05/23/anthropic-principle-statistics/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#119** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The anthropic principle in statistics](https://statmodeling.stat.columbia.edu/2018/05/23/anthropic-principle-statistics/).
+:::
+
+## What it is
+
+In cosmology, the anthropic principle says we observe a universe compatible with our existence because otherwise we wouldn't be here to observe it. Gelman's statistical version says that the effects statisticians actually study, and need statistics for, fall in a band. Effects that are *too small* can't be detected with feasible data. Effects that are *too large* are obvious without statistics. Statistical work happens in between.
+
+## Why it matters
+
+The principle explains some recurring patterns. Published effects cluster near the edge of detectability. Statistical methods matter most in fields with moderate signal-to-noise. And claims of *huge* effects found by subtle statistical analysis deserve suspicion, because a truly huge effect would have been noticed without the analysis. If a study claims an effect large enough that it should be obvious, but it took fancy statistics to find, something doesn't add up.
+
+## How it works
+
+Let true effect sizes in a domain range over many orders of magnitude. Detection with feasible sample sizes requires $|\theta| \gtrsim c_1 \cdot \sigma/\sqrt{n_{\max}}$. Effects above $c_2 \cdot \sigma$ are visible to the naked eye and need no inference. The "anthropic window" between those bounds is where statistics can contribute. It is also where the studied effects come from.
+
+## Simulated example
+
+Effects in a domain span many orders of magnitude. Set the largest feasible sample size and the naked-eye threshold, and see which effects end up being "statistical."
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nMax = Inputs.range([1, 6], {value: 3, step: 0.25, label: "log10 of the largest feasible sample size"})
+viewof obvious = Inputs.range([0.5, 5], {value: 2, step: 0.1, label: "Naked-eye threshold (effect in sd units)"})
+viewof seed = Inputs.range([1, 500], {value: 119, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+universe = {
+  const r = rng(seed);
+  const detect = 2.8 / Math.sqrt(10 ** nMax);         // ~80% power threshold
+  return range(4000).map(() => {
+    const eff = 10 ** r.uniform(-4, 1);
+    return {eff, zone: eff < detect ? "Too small to detect" : eff > obvious ? "Obvious without statistics" : "Statistics territory"};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {type: "log", label: "True effect size (sd units, log scale)"},
+  y: {label: "Phenomena"},
+  color: {legend: true, domain: ["Too small to detect", "Statistics territory", "Obvious without statistics"], range: ["#bbb", "#2166ac", "#d6604d"]},
+  marks: [Plot.rectY(universe, Plot.binX({y: "count"}, {x: "eff", fill: "zone", thresholds: 50})), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const share = z => universe.filter(d => d.zone === z).length / universe.length;
+  return html`<div class="sim-readout">${md`**${pct(share("Statistics territory"))}** of phenomena fall in the window where statistics is both possible and necessary. **${pct(share("Too small to detect"))}** are invisible with feasible data, and **${pct(share("Obvious without statistics"))}** need no inference. A claim of a huge effect that only fancy statistics could detect falls outside the window, so be suspicious.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Statistics works in a window between "undetectable" and "obvious."
+- Studied effects cluster near the edge of detectability, so expect noise and exaggeration there.
+- Huge effects that were hard to detect are a contradiction worth investigating.
+:::
+
+## Related entries
+
+- [That narrow beach](narrow-beach.qmd)
+- [The Piranha Principle](piranha-principle.qmd)
+- [Kangaroo](kangaroo.qmd)
+
+## Source
+
+- Andrew Gelman, [The anthropic principle in statistics](https://statmodeling.stat.columbia.edu/2018/05/23/anthropic-principle-statistics/) (2018).

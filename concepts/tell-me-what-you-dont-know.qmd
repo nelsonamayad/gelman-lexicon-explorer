@@ -1,0 +1,90 @@
+---
+title: "Tell Me What You Don't Know"
+date: 2026-11-09
+description: "That's what I want to ask you."
+order: 49
+categories: [Communication, Bayesian inference]
+source: "http://statmodeling.stat.columbia.edu/2015/01/25/tell-dont-know/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#49** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tell me what you don't know](http://statmodeling.stat.columbia.edu/2015/01/25/tell-dont-know/).
+:::
+
+## What it is
+
+When you consult an expert, the usual question is "What do you know?" Gelman suggests asking the opposite: "What *don't* you know?" He divides anyone's understanding of a topic into three parts: what you know, what you don't know, and what you don't know you don't know. Asking about the first only shows the boundary between the first two. Asking about the second also brings out a lot of the first, shows that boundary, and gives a sense of where the third part begins. The answer shows the edges of the expert's knowledge: the assumptions they're unsure of, the cases where their model breaks down, the data they wish they had. That is often more useful than another confident summary.
+
+## Why it matters
+
+Experts, like everyone, tend to be overconfident. Their intervals are too narrow and their forecasts too precise. Asking about known unknowns makes them confront sources of uncertainty they would otherwise leave out. In statistical practice, the same move means listing the model's untested assumptions, the unmodeled sources of variation and the questions the data can't answer. Uncertainty reported this way is more honest and better calibrated.
+
+## How it works
+
+A toy model of elicitation. An expert's stated 90% interval is $\hat\theta \pm 1.645\,k\,\sigma$, where $\sigma$ is the true uncertainty and $k < 1$ reflects overconfidence. Asking "what don't you know?" prompts them to list omitted sources of error, which raises $k$ toward 1. Interval coverage rises from about $2\Phi(1.645k) - 1$ toward the nominal 90%.
+
+## Simulated example
+
+There are 200 forecasting questions. Experts are overconfident by a factor you choose. Compare coverage of their initial intervals with coverage after they are asked what they don't know.
+
+```{ojs}
+import {rng, range, pnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof k = Inputs.range([0.2, 1], {value: 0.5, step: 0.05, label: "Overconfidence factor k (1 = calibrated)"})
+viewof prompt = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "How much the question helps"})
+viewof seed = Inputs.range([1, 500], {value: 49, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+elicit = {
+  const r = rng(seed);
+  const kAfter = k + prompt * (1 - k);
+  return range(200).map(q => {
+    const sigma = Math.exp(r.normal(0, 0.5)), truth = r.normal(0, sigma);
+    return {q, truth, before: 1.645 * k * sigma, after: 1.645 * kAfter * sigma,
+      coverBefore: Math.abs(truth) < 1.645 * k * sigma, coverAfter: Math.abs(truth) < 1.645 * kAfter * sigma};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Question (first 60 shown)"},
+  y: {label: "Truth minus expert's estimate", grid: true},
+  marks: [
+    Plot.ruleX(elicit.slice(0, 60), {x: "q", y1: d => -d.after, y2: d => d.after, stroke: "#2166ac", strokeOpacity: 0.35, strokeWidth: 5}),
+    Plot.ruleX(elicit.slice(0, 60), {x: "q", y1: d => -d.before, y2: d => d.before, stroke: "#d6604d", strokeWidth: 2}),
+    Plot.dot(elicit.slice(0, 60), {x: "q", y: "truth", fill: "currentColor", r: 2.5}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const c = key => elicit.filter(d => d[key]).length / elicit.length;
+  return html`<div class="sim-readout">${md`Coverage of stated 90% intervals: initial (red) **${pct(c("coverBefore"))}**, after "tell me what you don't know" (wide blue) **${pct(c("coverAfter"))}**. The second question turns overconfident point estimates into usable uncertainty.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Ask experts about the limits of their knowledge, not just its content.
+- Overconfidence is the default. Prompts to list unknowns widen intervals toward calibration.
+- In your own analyses, write down what the model doesn't capture.
+:::
+
+## Related entries
+
+- [Uncertainty Interval](uncertainty-interval.qmd)
+- [The Backseat Driver Principle](backseat-driver-principle.qmd)
+- [The Taxonomy of Confusion](taxonomy-of-confusion.qmd)
+
+## Source
+
+- Andrew Gelman, [Tell me what you don't know](http://statmodeling.stat.columbia.edu/2015/01/25/tell-dont-know/) (2015).

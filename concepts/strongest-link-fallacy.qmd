@@ -1,0 +1,89 @@
+---
+title: "Strongest-link Fallacy"
+date: 2026-11-09
+description: "The idea that a chain of reasoning is as strong as its strongest link."
+order: 84
+categories: [Causal inference, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2018/01/08/benefits-limitations-randomized-controlled-trials-agree-deaton-cartwright/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#84** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Benefits and limitations of randomized controlled trials](https://statmodeling.stat.columbia.edu/2018/01/08/benefits-limitations-randomized-controlled-trials-agree-deaton-cartwright/).
+:::
+
+## What it is
+
+A chain is as strong as its *weakest* link. The strongest-link fallacy reasons as if it were as strong as its *strongest* one. In empirical research, a study is often praised for one excellent feature, typically randomization, while the other links in its argument are weak: the measurement, the sample, the generalization to the population of interest, the theory linking the measured outcome to the claim. Gelman raises this in discussing Deaton and Cartwright's critique of RCTs.
+
+## Why it matters
+
+"It was a randomized trial" can end a conversation, even when the trial had a tiny sample, an unvalidated outcome, a population unlike the target, or a treatment unlike the policy being discussed. Each of those links can break the conclusion independently. Putting the evidence's credibility on its strongest link overstates how well supported the conclusion is.
+
+## How it works
+
+If a conclusion requires links $L_1, \dots, L_K$ to all hold, and each holds with probability $p_k$ (roughly independently), then
+
+$$
+\Pr(\text{conclusion holds}) \approx \prod_{k=1}^K p_k \le \min_k p_k.
+$$
+
+The strongest link, $\max_k p_k$, appears nowhere in the formula except as one factor.
+
+## Simulated example
+
+Set the reliability of each link in a typical policy claim based on an RCT. Compare the reliability implied by the strongest link with the reliability of the whole chain.
+
+```{ojs}
+import {fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pRand = Inputs.range([0.5, 1], {value: 0.98, step: 0.01, label: "Randomization was done properly"})
+viewof pMeas = Inputs.range([0.3, 1], {value: 0.75, step: 0.01, label: "Outcome measures what we care about"})
+viewof pPower = Inputs.range([0.3, 1], {value: 0.6, step: 0.01, label: "Estimate isn't noise (adequate power)"})
+viewof pTransport = Inputs.range([0.3, 1], {value: 0.65, step: 0.01, label: "Result generalizes to the policy population"})
+```
+
+```{ojs}
+links = [
+  {link: "Randomization", p: pRand},
+  {link: "Measurement", p: pMeas},
+  {link: "Power / noise", p: pPower},
+  {link: "Generalization", p: pTransport},
+  {link: "Whole chain", p: pRand * pMeas * pPower * pTransport}
+]
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 110,
+  x: {label: "Probability the link holds", domain: [0, 1], tickFormat: "%", grid: true},
+  y: {label: null, domain: links.map(d => d.link)},
+  marks: [Plot.barX(links, {y: "link", x: "p", fill: d => d.link === "Whole chain" ? "#d6604d" : "#2166ac"}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Strongest link: **${pct(Math.max(pRand, pMeas, pPower, pTransport))}**. Weakest link: **${pct(Math.min(pRand, pMeas, pPower, pTransport))}**. The whole chain holds with probability **${pct(links[4].p)}**. Praising the randomization says little about the conclusion.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A conclusion is only as credible as all its links together, which is less than its weakest link.
+- One excellent design feature doesn't make up for weak measurement, low power or poor generalization.
+- Evaluate every link in the argument, especially the ones the authors don't talk about.
+:::
+
+## Related entries
+
+- [The Causal Identification Kool-Aid](causal-identification-kool-aid.qmd)
+- [The Freshman Fallacy](freshman-fallacy.qmd)
+- [Assumptions and Rigor](assumptions-and-rigor.qmd)
+- [Evidence and Truth](evidence-and-truth.qmd)
+
+## Source
+
+- Andrew Gelman, [Benefits and limitations of randomized controlled trials: I agree with Deaton and Cartwright](https://statmodeling.stat.columbia.edu/2018/01/08/benefits-limitations-randomized-controlled-trials-agree-deaton-cartwright/) (2018).

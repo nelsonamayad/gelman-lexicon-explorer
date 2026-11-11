@@ -1,0 +1,100 @@
+---
+title: "Defaults"
+date: 2026-11-09
+description: "What statistics is the science of."
+order: 37
+categories: [Philosophy of statistics, Modeling workflow]
+source: "http://statmodeling.stat.columbia.edu/2012/11/statistics-is-the-science-of-defaults/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#37** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics is the science of defaults](http://statmodeling.stat.columbia.edu/2012/11/statistics-is-the-science-of-defaults/).
+:::
+
+## What it is
+
+Gelman's claim is that statistics is "the science of defaults." Most applications of a statistical method are carried out by people who will not hand-tune every choice. So the real product of statistical research is a set of *default procedures*: default priors, default model specifications, default diagnostics, default graphs. These need to work reasonably well across the whole range of problems people will apply them to.
+
+## Why it matters
+
+A method that is optimal only when carefully tuned by its inventor will, in practice, be run with whatever the software ships with. The quality of the default therefore determines the quality of thousands of analyses. That is why the choice of default prior in software like Stan or rstanarm, or the default interval width, deserves serious study. Defaults are also policy: they set norms that users rarely question.
+
+## How it works
+
+Evaluate a default by its **average performance over the population of problems** it will meet, not by its performance on any one problem. For shrinkage estimators: if users meet effects of different typical sizes $\tau$ and studies of different precision, the risk of a default prior scale $s$ is
+
+$$
+R(s) = \mathrm{E}_{\text{problems}}\Big[\mathrm{E}\big[(\tilde\theta_s - \theta)^2\big]\Big].
+$$
+
+A good default makes $R(s)$ small across a wide range of problems, even if it is not optimal for any single one.
+
+## Simulated example
+
+Simulate 3,000 users, each with a different problem: the effect size scale and the noise level vary. Every user applies a normal prior with the *same* default scale $s$. Plot the average error against $s$. A flat prior ($s \to \infty$) is the "no-default default."
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof spread = Inputs.range([0.1, 3], {value: 1, step: 0.1, label: "Typical effect size across users"})
+viewof seed = Inputs.range([1, 500], {value: 37, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+risk = {
+  const r = rng(seed);
+  const users = range(3000).map(() => {
+    const tau = spread * Math.exp(r.normal(0, 0.7));
+    const se = Math.exp(r.normal(-0.3, 0.6));
+    const theta = r.normal(0, tau);
+    return {theta, se, y: r.normal(theta, se)};
+  });
+  const scales = [0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.5, 2, 3, 5, 10, 100];
+  return scales.map(s => ({
+    s,
+    err: Math.sqrt(mean(users.map(u => {
+      const w = s * s / (s * s + u.se * u.se);
+      return (w * u.y - u.theta) ** 2;
+    })))
+  }));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {type: "log", label: "Default prior scale s (log scale; 100 ≈ flat prior)", grid: true},
+  y: {label: "RMSE averaged over all users' problems", grid: true},
+  marks: [Plot.line(risk, {x: "s", y: "err", stroke: "#2166ac", strokeWidth: 2}), Plot.dot(risk, {x: "s", y: "err", fill: "#2166ac"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const best = risk.reduce((a, b) => a.err < b.err ? a : b);
+  const flat = risk.at(-1);
+  return html`<div class="sim-readout">${md`The best default scale for this population of problems is about **${best.s}** (RMSE ${fmt(best.err, 3)}). The flat "no default" has RMSE **${fmt(flat.err, 3)}**. A reasonable default helps thousands of users who will never tune it. A mis-scaled default (try s = 0.1) hurts them all.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Most statistical analyses run on defaults, so defaults deserve scientific study.
+- Judge a default by its average performance over the problems people actually bring to it.
+- "No default" (flat priors, no regularization) is itself a default, and often a poor one.
+:::
+
+## Related entries
+
+- [Default, the greatest trick it ever pulled](default-greatest-trick.qmd)
+- [Defaults, once set](defaults-once-set.qmd)
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [Conservatism](conservatism.qmd)
+
+## Source
+
+- Andrew Gelman, [Statistics is the science of defaults](http://statmodeling.stat.columbia.edu/2012/11/statistics-is-the-science-of-defaults/) (2012).

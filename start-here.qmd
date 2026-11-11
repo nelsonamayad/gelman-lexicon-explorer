@@ -1,0 +1,38 @@
+---
+title: "Start here"
+date: 2026-11-11
+subtitle: "A twelve-stop tour through the lexicon"
+sidebar: false
+---
+
+The lexicon has 153 entries, in no particular order. If you're not sure where to begin, this tour visits the twelve ideas that the rest of the lexicon most often builds on. Each stop takes a few minutes, and each simulation is worth playing with before you move on.
+
+## Part 1: Why so many findings don't hold up
+
+1. **[The Statistical Significance Filter](concepts/statistical-significance-filter.qmd).** Significant estimates from noisy studies are overestimates. This is the idea behind half the lexicon.
+2. **[Kangaroo](concepts/kangaroo.qmd).** What happens when the noise is so large that a study can't learn anything at all.
+3. **[The Garden of Forking Paths](concepts/garden-of-forking-paths.qmd).** How honest researchers, running one analysis each, still end up with too many false positives.
+4. **[16](concepts/sixteen.qmd).** Why "the effect was stronger in women" usually means very little.
+
+## Part 2: What to do instead
+
+5. **[Multiple Comparisons](concepts/multiple-comparisons.qmd).** Partial pooling as the fix for noise-chasing.
+6. **[Mister P](concepts/mister-p.qmd).** The same idea applied to surveys: getting good estimates from bad samples.
+7. **[Weakly Informative Priors](concepts/weakly-informative-priors.qmd).** Using the scale of the problem to keep estimates sensible.
+8. **[The Secret Weapon](concepts/secret-weapon.qmd).** The simplest useful display in statistics: fit the same model many times and plot all the results.
+
+## Part 3: How to work
+
+9. **[A chicken](concepts/a-chicken.qmd).** Check a model by making it generate fake data and comparing with the real data.
+10. **[The Folk Theorem of Statistical Computing](concepts/folk-theorem.qmd).** When the computation breaks, look at the model.
+
+## Part 4: How to read research
+
+11. **[The Time-Reversal Heuristic](concepts/time-reversal-heuristic.qmd).** A one-line test for how much to trust an original study after a failed replication.
+12. **[The Piranha Principle](concepts/piranha-principle.qmd).** Why a literature full of large effects can't all be right.
+
+## Where next
+
+- Pick a [topic](index.qmd#topics) that matches your interests.
+- Use the sidebar on any entry page to step through all 153 entries in Gelman's order. The links at the bottom of each page go to the previous and next entries.
+- Or try a [random entry](random.qmd).

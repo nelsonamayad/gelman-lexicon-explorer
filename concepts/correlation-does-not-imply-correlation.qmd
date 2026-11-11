@@ -1,0 +1,91 @@
+---
+title: "Correlation"
+date: 2026-11-09
+description: "It does not even imply correlation."
+order: 70
+categories: [Significance & noise, Reasoning & fallacies]
+source: "http://statmodeling.stat.columbia.edu/2014/08/04/correlation-even-imply-correlation/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#70** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Correlation does not even imply correlation](http://statmodeling.stat.columbia.edu/2014/08/04/correlation-even-imply-correlation/).
+:::
+
+## What it is
+
+Everyone knows that correlation does not imply causation. Gelman's sharper point is that a correlation *in your sample* does not even imply a correlation *in the population*. A noisy small sample, a data-dependent choice of which variables to correlate, or a sample selected on some combination of the variables can all produce a correlation that isn't there in the world.
+
+## Why it matters
+
+Analysts jump from "we found r = 0.4" straight to arguing about causal direction, skipping the step of asking whether the correlation is real. With small samples, many candidate variable pairs, or selected samples (who gets into the hospital, who applies to the program, who answers the survey), sample correlations can be pure artifacts. Arguing about the causal story of an artifact wastes everyone's time.
+
+## How it works
+
+Three ways to get a correlation that isn't there:
+
+1. **Noise.** With $n$ observations and true correlation 0, the sample correlation has sd of about $1/\sqrt{n}$. With $n = 20$, $|r| > 0.44$ happens 5% of the time.
+2. **Forking paths.** Among $k$ candidate pairs, the largest sample correlation is much bigger than a typical one.
+3. **Selection (Berkson's paradox).** If units are included only when $x + y$ is high, then $x$ and $y$ become *negatively* correlated in the sample even if they are independent in the population.
+
+## Simulated example
+
+$X$ and $Y$ are **independent** in the population. Choose a sample size and a selection rule, and look at the correlations you'd report.
+
+```{ojs}
+import {rng, range, cor, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([10, 500], {value: 25, step: 5, label: "Sample size"})
+viewof selection = Inputs.toggle({label: "Only observe units with X + Y above a cutoff (Berkson)", value: false})
+viewof k = Inputs.range([1, 50], {value: 20, step: 1, label: "Number of variable pairs examined"})
+viewof seed = Inputs.range([1, 500], {value: 70, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+corrs = {
+  const r = rng(seed);
+  const draw = () => {
+    const pts = [];
+    while (pts.length < n) { const x = r.normal(), y = r.normal(); if (!selection || x + y > 1) pts.push({x, y}); }
+    return pts;
+  };
+  const samples = range(k).map(() => draw());
+  const rs = samples.map(s => cor(s.map(d => d.x), s.map(d => d.y)));
+  const best = rs.reduce((bi, v, i) => Math.abs(v) > Math.abs(rs[bi]) ? i : bi, 0);
+  return {rs, best, pts: samples[best], rBest: rs[best]};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  grid: true,
+  x: {label: "X"},
+  y: {label: "Y"},
+  marks: [Plot.dot(corrs.pts, {x: "x", y: "y", fill: "#2166ac", r: 3}), Plot.linearRegressionY(corrs.pts, {x: "x", y: "y", stroke: "#d6604d"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The true population correlation is **0**. Of ${k} pairs examined, the most striking sample correlation is **r = ${fmt(corrs.rBest)}** (plotted). ${selection ? "Selection on X + Y alone builds in a negative correlation: Berkson's paradox." : ""} Before asking what causes this correlation, ask whether it exists.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- A sample correlation can come from noise, from choosing which pairs to look at, or from selection.
+- Selected samples can show strong correlations between variables that are independent in the population.
+- Check that the correlation is real before debating its causal interpretation.
+:::
+
+## Related entries
+
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Second-Order Availability Bias](second-order-availability-bias.qmd)
+- [Random in](random-in-random-out.qmd)
+
+## Source
+
+- Andrew Gelman, [Correlation does not even imply correlation](http://statmodeling.stat.columbia.edu/2014/08/04/correlation-even-imply-correlation/) (2014).

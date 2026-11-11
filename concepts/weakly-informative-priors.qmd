@@ -1,0 +1,125 @@
+---
+title: "Weakly Informative Priors"
+date: 2026-11-09
+description: "What you should be doing when you think you want to use noninformative priors."
+order: 7
+categories: [Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#7** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/).
+:::
+
+## What it is
+
+A weakly informative prior deliberately carries *less* information than you actually have, but enough to rule out values that are absurd. It is not "uninformative": it encodes the scale of the problem. A typical example is a $\mathrm{Normal}(0, 2.5)$ or $\mathrm{Cauchy}(0, 2.5)$ prior on a logistic regression coefficient for a standardized predictor. That says an effect of 50 on the log-odds scale is essentially impossible, but takes no strong position on whether the effect is 0.2 or 1.5.
+
+## Why it matters
+
+"Noninformative" flat priors look objective, but they assign as much prior mass to absurd values as to plausible ones. With sparse data or separation, that produces infinite or wildly unstable estimates. It also produces improper posteriors in hierarchical models and samplers that won't converge. A weakly informative prior regularizes estimates where the data are weak and gets out of the way where the data are strong.
+
+## How it works
+
+With a normal prior $\beta \sim \mathrm{N}(0, s^2)$, the posterior mode maximizes
+
+$$
+\log p(y \mid \beta) - \frac{\beta^2}{2 s^2}.
+$$
+
+When the likelihood is flat in some direction, as under *complete separation* in logistic regression where the MLE is $\pm\infty$, the penalty term keeps the estimate finite. When the likelihood is sharply peaked, the penalty barely moves it. The scale $s$ should reflect what a large but plausible effect looks like in your units.
+
+## Simulated example
+
+We repeat a small logistic-regression study 200 times. In each, the slope is estimated by maximum likelihood (flat prior) and by posterior mode under a $\mathrm{N}(0, s)$ prior. With small samples, some datasets are perfectly separated and the MLE runs off toward infinity.
+
+```{ojs}
+import {rng, range, mean, invLogit, fmt, pct, median} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([10, 200], {value: 20, step: 5, label: "Observations per study"})
+viewof trueBeta = Inputs.range([0, 3], {value: 1.5, step: 0.1, label: "True slope β"})
+viewof priorSd = Inputs.range([0.5, 10], {value: 2.5, step: 0.5, label: "Prior sd s"})
+viewof seed = Inputs.range([1, 500], {value: 13, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+fitLogit = (x, y, sSlope) => {
+  // Newton–Raphson for the posterior mode of (alpha, beta); intercept prior sd 10.
+  let a = 0, b = 0;
+  const pa = 1 / 100, pb = sSlope ? 1 / (sSlope * sSlope) : 0;
+  for (let it = 0; it < 60; it++) {
+    let ga = -pa * a, gb = -pb * b, haa = -pa, hab = 0, hbb = -pb;
+    for (let i = 0; i < x.length; i++) {
+      const p = invLogit(a + b * x[i]), w = p * (1 - p);
+      ga += y[i] - p; gb += (y[i] - p) * x[i];
+      haa -= w; hab -= w * x[i]; hbb -= w * x[i] * x[i];
+    }
+    const det = haa * hbb - hab * hab;
+    if (!Number.isFinite(det) || Math.abs(det) < 1e-12) { b += Math.sign(gb) * 5; continue; }
+    a -= (hbb * ga - hab * gb) / det;
+    b -= (haa * gb - hab * ga) / det;
+    if (Math.abs(b) > 1e3) break;
+  }
+  return Math.max(-50, Math.min(50, b));
+}
+```
+
+```{ojs}
+studies = {
+  const r = rng(seed);
+  return range(200).flatMap(k => {
+    const x = r.normals(n), y = x.map(v => r.bernoulli(invLogit(-0.3 + trueBeta * v)));
+    return [
+      {k, method: "Flat prior (MLE)", est: fitLogit(x, y, 0)},
+      {k, method: `Weakly informative N(0, ${priorSd})`, est: fitLogit(x, y, priorSd)}
+    ];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  facet: {data: studies, y: "method", marginRight: 150},
+  x: {label: "Estimated slope (capped at ±50)", type: "symlog", domain: [-50, 50]},
+  y: {label: "Studies", grid: true},
+  marks: [
+    Plot.rectY(studies, Plot.binX({y: "count"}, {x: "est", fill: "method", thresholds: 60})),
+    Plot.ruleX([trueBeta], {stroke: "currentColor", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ],
+  color: {range: ["#d6604d", "#2166ac"]}
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const flat = studies.filter(d => d.method.startsWith("Flat")).map(d => d.est);
+  const wip = studies.filter(d => !d.method.startsWith("Flat")).map(d => d.est);
+  const rmse = v => Math.sqrt(mean(v.map(e => (e - trueBeta) ** 2)));
+  return html`<div class="sim-readout">${md`With **${n}** observations per study, **${pct(flat.filter(e => Math.abs(e) > 20).length / flat.length)}** of MLEs blew up past ±20 (separation). Root-mean-square error: flat prior **${fmt(rmse(flat))}**, weakly informative prior **${fmt(rmse(wip))}**. Median estimates: ${fmt(median(flat))} vs ${fmt(median(wip))} (truth ${fmt(trueBeta)}). Increase *n* and the two converge, because the prior stops mattering once the data are strong.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- No prior is truly noninformative. Flat priors assign belief to absurd values.
+- Weakly informative priors encode the *scale* of the problem and give stable estimates for little cost.
+- They matter most when data are sparse and hardly at all when data are plentiful.
+:::
+
+## Related entries
+
+- [The Folk Theorem of Statistical Computing](folk-theorem.qmd)
+- [The Bayesian cringe](bayesian-cringe.qmd)
+- [Camel that is the likelihood](camel-likelihood.qmd)
+- [Between regularization and discovery](regularization-and-discovery.qmd)
+
+## Source
+
+- Andrew Gelman, [How to set up a weakly informative prior](https://statmodeling.stat.columbia.edu/2008/07/how_to_set_tuni/) (2008).
+- Gelman, Jakulin, Pittau and Su, "A weakly informative default prior distribution for logistic and other regression models," *Annals of Applied Statistics* (2008).

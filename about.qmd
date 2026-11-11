@@ -1,0 +1,41 @@
+---
+title: "About the Lexicon Explorer"
+date: 2026-11-09
+author:
+  - name: Nelson Amaya D
+    url: https://github.com/nelsonamayad
+  - name: Claude Opus 5.5
+sidebar: false
+toc: false
+---
+
+The **Andrew Gelman Statistical Lexicon Explorer** is a study aid built around Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/), created by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5.
+
+## Where the entries come from
+
+Since May 2009, Gelman has kept a running list of names for "important methods and concepts related to statistics that are not as well known as they should be" on his blog, *Statistical Modeling, Causal Inference, and Social Science*. This site follows the version of the list archived in March 2026, which has 153 entries. On every page, the title and the short definition under it are Gelman's own words, and each page links to the blog post or paper the entry points to.
+
+## What is added here
+
+The explanations and simulations were written for this site and are not Gelman's. Where an archived copy of the source post was available, the explanation was checked against it and quotes from it. Many entries are aphorisms about research culture, for example the Javert Paradox and Arrow's Other Theorem. For these, the simulation is a deliberately simple toy model of the mechanism behind the joke, and the page says so. Always read the linked source post for Gelman's own argument.
+
+## How to browse
+
+- **[Start here](start-here.qmd)** is a twelve-stop tour of the ideas the rest of the lexicon builds on.
+- **[Browse by topic](index.qmd#topics)** groups the entries into eleven topics, such as significance and noise, Bayesian inference and research culture.
+- **[Every entry](index.qmd#all-entries)** is a searchable, sortable table in Gelman's order.
+- On any entry page, the **sidebar** and the **previous/next** links step through all 153 entries in order.
+- **[Random entry](random.qmd)** takes you somewhere unexpected.
+
+## How the simulations work
+
+Every simulation runs in your browser with [Observable JS](https://quarto.org/docs/interactive/ojs/). There is no server, R or Python. All pages share the helper functions in `js/stats.js`: a seeded random number generator, common distributions and regression routines. That means a given random seed always reproduces the same draws. Click **Show simulation code** under any cell to see how it was computed.
+
+## Building the site
+
+The site is built with [Quarto](https://quarto.org) and styled from a single `_brand.yml` file, which provides the colors, fonts, logo and light/dark themes.
+
+```bash
+quarto preview   # live-reloading local server
+quarto render    # build the static site into _site/
+```

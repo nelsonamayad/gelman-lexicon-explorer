@@ -1,0 +1,77 @@
+# Brand definition for the Andrew Gelman Statistical Lexicon Explorer.
+# Spec: https://posit-dev.github.io/brand-yml/
+# Colors with light/dark values give the site an automatic dark-mode toggle.
+# The palette matches the colors used in the OJS simulations
+# (blue #2166ac, red #d6604d, green #5aae61, gold #e6ab02).
+
+meta:
+  name:
+    short: Lexicon Explorer
+    full: Andrew Gelman Statistical Lexicon Explorer
+  link:
+    home: https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/
+    github: https://github.com/nelsonamayad
+
+logo:
+  images:
+    mark:
+      path: assets/logo.svg
+      alt: "Lexicon Explorer logo: a bell curve over a histogram"
+  small: mark
+  medium: mark
+
+color:
+  palette:
+    navy: "#1d4e89"
+    blue: "#2166ac"
+    sky: "#9ecae1"
+    red: "#d6604d"
+    salmon: "#f4a582"
+    green: "#5aae61"
+    gold: "#e6ab02"
+    paper: "#fbfaf7"
+    ink: "#1f2328"
+    night: "#14171c"
+    fog: "#e3e6ea"
+  foreground:
+    light: ink
+    dark: fog
+  background:
+    light: paper
+    dark: night
+  primary:
+    light: blue
+    dark: "#6baed6"
+  secondary:
+    light: "#5c6670"
+    dark: "#a7b0ba"
+  success: green
+  warning: gold
+  danger: red
+  info: sky
+  link:
+    light: blue
+    dark: "#8cc4e8"
+
+typography:
+  fonts:
+    - family: Source Sans 3
+      source: google
+      weight: [400, 600, 700]
+      style: [normal, italic]
+    - family: Source Serif 4
+      source: google
+      weight: [600, 700]
+    - family: JetBrains Mono
+      source: google
+      weight: [400, 600]
+  base:
+    family: Source Sans 3
+    size: 17px
+    line-height: 1.6
+  headings:
+    family: Source Serif 4
+    weight: 700
+  monospace:
+    family: JetBrains Mono
+    size: 0.9em

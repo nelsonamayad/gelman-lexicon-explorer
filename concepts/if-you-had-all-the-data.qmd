@@ -1,0 +1,95 @@
+---
+title: "What would you do if you had all the data?"
+date: 2026-11-09
+description: "Rubin's first question."
+order: 55
+categories: [Causal inference, Modeling workflow]
+source: "http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#55** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/).
+:::
+
+## What it is
+
+Donald Rubin's first question to anyone with a statistical problem: *if you had all the data, with no missing values, the whole population and every potential outcome, what would you compute?* The answer defines the **estimand**, the quantity you are trying to learn. Only after that is clear do the questions of sampling, missing data and modeling make sense.
+
+## Why it matters
+
+Many analyses skip this step and go straight to a method: "run a regression of y on treatment." Without a clear estimand you can't tell whether the method answers the right question, or whether two analysts disagree about the data or about what they're estimating. In causal inference, "all the data" includes potential outcomes that can *never* be observed together, and the question makes clear that the average treatment effect, the effect on the treated and the median effect are different targets.
+
+## How it works
+
+In the potential-outcomes framework, each unit $i$ has $Y_i(0)$ and $Y_i(1)$. With *all* the data, you could compute any of:
+
+- the average treatment effect, $\frac{1}{N}\sum_i [Y_i(1) - Y_i(0)]$;
+- the effect on the treated, the same average taken over treated units;
+- the share who benefit, $\frac{1}{N}\sum_i \mathbb{1}[Y_i(1) > Y_i(0)]$.
+
+Each is a well-defined function of the complete data, and they can differ a lot. Your actual data are a missing-data version of this complete table. Inference is about predicting the missing half.
+
+## Simulated example
+
+Here is a population with *both* potential outcomes, visible only in simulation. Pick an estimand and compare its all-data value with what a randomized experiment that sees only half of each pair can estimate.
+
+```{ojs}
+import {rng, range, mean, median, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof heterogeneity = Inputs.range([0, 2], {value: 1.2, step: 0.1, label: "Variation in individual effects"})
+viewof selfSelect = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Do people who benefit more choose treatment?"})
+viewof seed = Inputs.range([1, 500], {value: 55, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+units = {
+  const r = rng(seed);
+  return range(3000).map(i => {
+    const y0 = r.normal(0, 1), effect = 0.3 + heterogeneity * r.normal(0, 1);
+    const chooses = r() < 0.5 + selfSelect * Math.tanh(effect) / 2;
+    return {i, y0, y1: y0 + effect, effect, chooses, randomized: r() < 0.5};
+  });
+}
+estimands = [
+  {name: "Average effect (everyone)", value: mean(units.map(d => d.effect))},
+  {name: "Effect on those who choose treatment", value: mean(units.filter(d => d.chooses).map(d => d.effect))},
+  {name: "Median individual effect", value: median(units.map(d => d.effect))},
+  {name: "Share who benefit", value: units.filter(d => d.effect > 0).length / units.length}
+]
+rct = mean(units.filter(d => d.randomized).map(d => d.y1)) - mean(units.filter(d => !d.randomized).map(d => d.y0))
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 250,
+  x: {label: "Value computed from ALL the data (both potential outcomes)", grid: true},
+  y: {label: null},
+  marks: [Plot.barX(estimands, {y: "name", x: "value", fill: "#2166ac"}), Plot.ruleX([0]), Plot.ruleX([rct], {stroke: "#d6604d", strokeWidth: 2, strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With all the data, four reasonable "effects" take values from **${fmt(Math.min(...estimands.slice(0, 3).map(d => d.value)))}** to **${fmt(Math.max(...estimands.slice(0, 3).map(d => d.value)))}** (plus a share benefiting of ${pct(estimands[3].value)}). A randomized experiment (red dashed) estimates **${fmt(rct)}**, which targets the *first* one. Decide what you'd compute with all the data, then check that your design estimates that.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Define the estimand as a function of the complete data before choosing a method.
+- Different estimands (ATE, ATT, median, share benefiting) can be very different numbers.
+- Treat inference as predicting the missing parts of the complete data.
+:::
+
+## Related entries
+
+- [What were you doing before you had any data?](before-you-had-any-data.qmd)
+- [WWJD](wwjd.qmd)
+- [The Freshman Fallacy](freshman-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/) (2012).

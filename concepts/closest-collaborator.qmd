@@ -1,0 +1,92 @@
+---
+title: "Your closest collaborator"
+date: 2026-11-09
+description: "You, six months ago—and she doesn't respond to emails. (from Karl Broman via Erin Jonaitis)"
+order: 104
+categories: [Computing, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2014/12/31/closest-collaborator-cant-talk/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#104** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Your closest collaborator . . . and she can't talk](https://statmodeling.stat.columbia.edu/2014/12/31/closest-collaborator-cant-talk/).
+:::
+
+## What it is
+
+A saying from Karl Broman, passed along by Erin Jonaitis. The person you'll most often need to explain your analysis to is *yourself*, months later. Past-you knew why that observation was dropped, what that variable recode meant and which version of the data file was final. Present-you has forgotten, and past-you won't answer questions. Documentation, scripts and version control are messages to that collaborator.
+
+## Why it matters
+
+Reproducibility is usually framed as being for *others*: reviewers, replicators, the public. Its first beneficiary is the analyst. Projects get revised, reviewers ask for changes, and errors need tracing, often long after the analysis was done. Undocumented decisions then have to be rediscovered or guessed, and guesses introduce new errors.
+
+## How it works
+
+A toy forgetting model. An analysis involves $D$ decisions. A documented decision can always be recovered. For an undocumented one, the chance you still remember it after $t$ months decays roughly like $e^{-t/\tau}$. The expected number of decisions you can reconstruct is
+
+$$
+D\big[f + (1 - f)\,e^{-t/\tau}\big],
+$$
+
+where $f$ is the fraction documented. Every decision you can't reconstruct has to be guessed or redone.
+
+## Simulated example
+
+An analysis has 40 decisions. Choose how many you document, and see how much of your own analysis you can recover months later.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof docFrac = Inputs.range([0, 1], {value: 0.3, step: 0.05, label: "Fraction of decisions documented"})
+viewof tau = Inputs.range([1, 24], {value: 4, step: 1, label: "Memory half-life (months)"})
+viewof seed = Inputs.range([1, 500], {value: 104, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+memory = {
+  const r = rng(seed);
+  const D = 40, lam = Math.log(2) / tau;
+  return range(25).map(t => {
+    let recovered = 0;
+    for (let d = 0; d < D; d++) recovered += (d < docFrac * D) || r() < Math.exp(-lam * t) ? 1 : 0;
+    return {t, recovered, expected: D * (docFrac + (1 - docFrac) * Math.exp(-lam * t))};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Months since the analysis"},
+  y: {label: "Decisions you can reconstruct (of 40)", domain: [0, 40], grid: true},
+  marks: [
+    Plot.line(memory, {x: "t", y: "expected", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(memory, {x: "t", y: "recovered", fill: "#2166ac", r: 3}),
+    Plot.ruleY([docFrac * 40], {stroke: "#d6604d", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`After 6 months you can reconstruct about **${fmt(memory[6].expected, 0)}** of 40 decisions. After two years, about **${fmt(memory[24].expected, 0)}**. The red line is the floor that documentation guarantees. Past-you won't answer emails, so leave notes.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- The first audience for reproducibility is your future self.
+- Document decisions at the time you make them. Memory decays faster than you expect.
+- Scripts, comments and version control are messages to a collaborator who can't be reached.
+:::
+
+## Related entries
+
+- [Breadcrumbs](breadcrumbs.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+- [Until it runs twice](until-it-runs-twice.qmd)
+
+## Source
+
+- Andrew Gelman, [Your closest collaborator . . . and she can't talk](https://statmodeling.stat.columbia.edu/2014/12/31/closest-collaborator-cant-talk/) (2014).

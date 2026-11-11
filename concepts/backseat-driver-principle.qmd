@@ -1,0 +1,96 @@
+---
+title: "The Backseat Driver Principle"
+date: 2026-11-09
+description: "Even if the advice or criticism is annoying, it makes sense to listen."
+order: 10
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#10** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/).
+:::
+
+## What it is
+
+Gelman's framing: "The driver overestimates his control over the situation ... The backseat driver ('Whoa—you're taking that curve too fast!') underestimates the driver's control. As a driver, I listen to the passengers because they provide a useful corrective." More generally: "I'll take anybody's advice seriously." A backseat driver is irritating, but sometimes they spot the pedestrian you missed. The principle is that the *annoyingness* of criticism tells you little about whether it is *correct*. A referee who is rude, a commenter who nitpicks or a colleague who keeps asking "did you check X?" may still be pointing at a real problem, and the cost of checking is usually small next to the cost of driving into a ditch.
+
+## Why it matters
+
+Researchers, like drivers, tend to discount criticism by its tone or source. That is a filter on the *wrong variable*. In data analysis, an outside reader sees things you don't: an outlier, a coding error, a confounder, a misleading graph. Dismissing critiques you find irritating systematically keeps errors in your work.
+
+## How it works
+
+Think of each critique as a noisy signal. Suppose a fraction $q$ of critiques point to real problems, checking one costs $c$, and an unfixed real problem costs $L$. Checking every critique is worth it whenever $qL > c$. Even if 80% of the backseat driver's comments are wrong ($q = 0.2$), checking pays off when an error is more than five times as costly as a check. Tone doesn't appear in the calculation, unless it is actually correlated with $q$.
+
+## Simulated example
+
+A toy model of a project with hidden errors. Over 40 rounds, critics raise comments. Some point to real errors, many don't, and the true ones are not reliably the polite ones. One analyst checks only polite comments. Another checks every comment. Track the errors left at the end.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof precision = Inputs.range([0.05, 0.8], {value: 0.25, step: 0.05, label: "Share of critiques that are correct"})
+viewof rudeCorrect = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Pr(correct critique is rude)"})
+viewof seed = Inputs.range([1, 500], {value: 10, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+driving = {
+  const r = rng(seed);
+  const run = policy => {
+    let errors = 12;
+    const path = [{round: 0, errors, policy}];
+    for (let t = 1; t <= 40; t++) {
+      for (let k = 0; k < 1; k++) {               // one critique per round
+        const correct = errors > 0 && r() < precision;
+        const rude = correct ? r() < rudeCorrect : r() < 0.5;
+        const check = policy === "Listen to everyone" || !rude;
+        if (correct && check) errors--;
+      }
+      path.push({round: t, errors, policy});
+    }
+    return path;
+  };
+  return [...run("Listen to everyone"), ...run("Ignore rude critics")];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Round of feedback"},
+  y: {label: "Errors remaining", grid: true, domain: [0, 12]},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(driving, {x: "round", y: "errors", stroke: "policy", strokeWidth: 2, curve: "step-after"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = p => driving.filter(d => d.policy === p).at(-1).errors;
+  return html`<div class="sim-readout">${md`After 40 rounds: the analyst who listens to everyone has **${end("Listen to everyone")}** of 12 errors left, and the one who ignores rude critics has **${end("Ignore rude critics")}**. Unless rudeness actually signals being wrong (lower the second slider toward 0), tone-based filtering just leaves errors in place.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- How annoying a criticism is and whether it is correct are different things. Don't filter on the first.
+- When errors are costly and checks are cheap, check even low-probability critiques.
+- Outside readers see what you can't. That's what the backseat is for.
+:::
+
+## Related entries
+
+- [The Javert Paradox](javert-paradox.qmd)
+- [Tell Me What You Don't Know](tell-me-what-you-dont-know.qmd)
+- [Mistakes](mistakes.qmd)
+- [Steelmanning](steelmanning.qmd)
+
+## Source
+
+- Andrew Gelman, [The backseat driver principle](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/) (2007).

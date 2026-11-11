@@ -1,0 +1,89 @@
+---
+title: "The capacity to be upset"
+date: 2026-11-09
+description: "An important characteristic of a good scientist, to recognize anomalies for what they are, and to track them down and figure out what in our understanding is lacking."
+order: 146
+categories: [Modeling workflow, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#146** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The role of doubt in conceiving research](https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/).
+:::
+
+## What it is
+
+Good scientists get *upset* by anomalies: a data point that shouldn't be there, a result that contradicts the model, a number that doesn't add up. They don't explain it away as noise or move on. They take the discomfort as a signal that their understanding is incomplete, and they track down the cause. That capacity to be bothered is what turns surprises into discoveries.
+
+## Why it matters
+
+Most anomalies are noise, so there's a temptation to ignore all of them. But some aren't, and those are where new understanding comes from: a data error, a broken model, a new phenomenon. A researcher who is never upset never finds them. One who is upset by everything never finishes. The skill is calibrated upset-ness: noticing deviations bigger than the noise can explain, and following them up.
+
+## How it works
+
+Think of it as anomaly detection with a threshold. Flag a residual when it exceeds $k$ standard deviations of what the model expects. A high $k$ (hard to upset) misses real anomalies. A low $k$ (easily upset) chases noise. The researcher with a well-calibrated $k$, who also *investigates* what they flag, catches the real problems at a manageable cost in false alarms.
+
+## Simulated example
+
+A stream of 300 measurements fits a model well, except that a real anomaly, a shift caused by an undetected problem, starts partway through. Set how easily the researcher gets upset.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof k = Inputs.range([1, 5], {value: 2, step: 0.1, label: "How hard to upset (flag residuals beyond k sd)"})
+viewof shift = Inputs.range([0, 3], {value: 1.2, step: 0.1, label: "Size of the real anomaly (sd units)"})
+viewof seed = Inputs.range([1, 500], {value: 146, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+upset = {
+  const r = rng(seed);
+  return range(300).map(t => {
+    const real = t >= 200 && t < 240;
+    const resid = r.normal(real ? shift : 0, 1);
+    return {t, resid, real, flagged: Math.abs(resid) > k};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Measurement"},
+  y: {label: "Residual from the model (sd units)", grid: true},
+  marks: [
+    Plot.rect([0], {x1: 200, x2: 240, y1: -5, y2: 6, fill: "#e6ab02", fillOpacity: 0.12}),
+    Plot.dot(upset, {x: "t", y: "resid", r: d => d.flagged ? 4 : 2, fill: d => d.flagged ? "#d6604d" : "#999"}),
+    Plot.ruleY([k, -k], {stroke: "#d6604d", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const hit = upset.filter(d => d.real && d.flagged).length, falseA = upset.filter(d => !d.real && d.flagged).length;
+  return html`<div class="sim-readout">${md`The shaded zone is the real anomaly. The researcher flags **${hit}** of its 40 points, along with **${falseA}** false alarms elsewhere. ${hit === 0 ? "Never upset, so the problem goes unnoticed." : falseA > 30 ? "Upset by everything, so the real signal is buried in false alarms." : "Upset in the right places, so there's something worth tracking down."}`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Treat anomalies as information about what you don't understand.
+- Calibrate how easily you get upset: not by every wiggle, and not by nothing.
+- Follow up. Being upset is only useful if it leads to an investigation.
+:::
+
+## Related entries
+
+- [Cantor's Corner](cantors-corner.qmd)
+- [God is in Every Leaf of Every Tree](god-is-in-every-leaf.qmd)
+- [Canary variable](canary-variable.qmd)
+- [Scientific revolutions](scientific-revolutions-fractal.qmd)
+
+## Source
+
+- Andrew Gelman, [The role of doubt in conceiving research](https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/) (2023).

@@ -1,0 +1,87 @@
+---
+title: "The combination of originality, ambition, and lack of scruple"
+date: 2026-11-09
+description: "Can take you far in social science."
+order: 151
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#151** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More on that claim that scientific citations are worth $100,000 each](https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/).
+:::
+
+## What it is
+
+Originality and ambition are virtues. Combined with a willingness to overclaim, cut corners or ignore inconvenient evidence, they make a powerful formula for academic success, because the reward system mostly measures attention, such as citations, press and grants, and not accuracy. Gelman's observation is that this combination "can take you far," and that the people at the top of attention-based rankings are therefore not a random sample of careful researchers.
+
+## Why it matters
+
+If rewards follow claimed impact, and claimed impact can be inflated, selection on rewards is partly selection on willingness to inflate. That has consequences for whom we hold up as role models, whose work gets replicated less critically, and what incentives early-career researchers learn. It is the same structure as the [Armstrong principle](armstrong-principle.qmd), seen from the winners' side.
+
+## How it works
+
+A toy model. Each researcher has originality $O$, ambition $A$ and scruple $S$. Their *claimed* effect sizes are their true findings plus an exaggeration that grows with $A$ and shrinks with $S$. Citations scale with $O$ times the claimed size. Rank researchers by citations, and look at how scrupulous the top of the ranking is compared with everyone else.
+
+## Simulated example
+
+There are 5,000 researchers. Vary how much citations reward exaggerated claims, and look at the scruple of the top 2% by citations.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof reward = Inputs.range([0, 2], {value: 1, step: 0.05, label: "How much citations reward exaggeration"})
+viewof seed = Inputs.range([1, 500], {value: 151, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+careers = {
+  const r = rng(seed);
+  const people = range(5000).map(() => {
+    const O = r.normal(), A = r.normal(), S = r.normal();
+    const exaggeration = Math.max(0, A - S);
+    const cites = O + reward * exaggeration + r.normal(0, 0.5);
+    return {O, A, S, cites};
+  }).sort((a, b) => b.cites - a.cites);
+  return people.map((p, i) => ({...p, group: i < 100 ? "Top 2% by citations" : "Everyone else"}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Scruple (standardized)", grid: true},
+  y: {label: "Share of group", tickFormat: "%"},
+  color: {legend: true, range: ["#999", "#d6604d"], domain: ["Everyone else", "Top 2% by citations"]},
+  marks: [Plot.rectY(careers, Plot.binX({y: "proportion-facet"}, {x: "S", fill: "group", fillOpacity: 0.55, thresholds: 30, mixBlendMode: "multiply"}))],
+  facet: undefined
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = (grp, k) => mean(careers.filter(d => d.group === grp).map(d => d[k]));
+  return html`<div class="sim-readout">${md`Average scruple: top 2% **${fmt(g("Top 2% by citations", "S"))}**, everyone else **${fmt(g("Everyone else", "S"))}**. Average originality: top **${fmt(g("Top 2% by citations", "O"))}**, everyone else ${fmt(g("Everyone else", "O"))}. The top really is more original, and also less scrupulous. Set the reward for exaggeration to 0 and the scruple gap disappears.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Selection on attention partly selects for willingness to exaggerate.
+- Top-ranked researchers aren't a random sample of careful ones.
+- Reward systems that measure accuracy rather than attention would change who rises.
+:::
+
+## Related entries
+
+- [The (Lance) Armstrong Principle](armstrong-principle.qmd)
+- [Meritocracy won't happen](meritocracy.qmd)
+- [Brilliance](brilliance.qmd)
+
+## Source
+
+- Andrew Gelman, [More on that claim that scientific citations are worth $100,000 each](https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/) (2021).

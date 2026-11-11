@@ -1,0 +1,105 @@
+---
+title: "The Blessing of Dimensionality"
+date: 2026-11-09
+description: "It's good to have more data, even if you label this additional information as \"dimensions\" rather than \"data points.\""
+order: 20
+categories: [Modeling workflow, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2004/10/the_blessing_of/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#20** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/10/the_blessing_of/).
+:::
+
+## What it is
+
+Machine learning talks about the "curse of dimensionality": the more variables you have, the harder estimation becomes. Gelman turns this around. More measured variables are *more information*. If your method gets worse when you hand it more information, the fault lies with the method, not with the information. With a model that regularizes sensibly, such as a hierarchical model, a prior or a penalty, adding dimensions should help, or at worst do no harm.
+
+## Why it matters
+
+Analysts often throw away variables to "avoid overfitting," or refuse to include group indicators because there are "too many parameters." That discards real information. The curse belongs to *unregularized* methods like least squares with many predictors. Shrinkage turns the curse into a blessing: each extra weak predictor adds a bit of signal, and the prior or penalty keeps the noise in check.
+
+## How it works
+
+With $p$ predictors and $n$ observations, least squares has variance that grows roughly like $p/(n - p)$ and breaks down as $p \to n$. Ridge regression, or equivalently a normal prior on the coefficients, adds the penalty $\lambda \lVert\beta\rVert^2$:
+
+$$
+\hat\beta_{\text{ridge}} = (X^\top X + \lambda I)^{-1} X^\top y.
+$$
+
+When many predictors each carry a little signal, the penalized fit keeps improving as $p$ grows, which is the blessing. Without the penalty, out-of-sample accuracy falls apart.
+
+## Simulated example
+
+There are $n = 100$ training observations and a test set. We add predictors one batch at a time. Each predictor has a small true coefficient. Compare test-set $R^2$ for least squares and for ridge regression as the number of dimensions grows.
+
+```{ojs}
+import {rng, range, mean, sum, ridge, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof signal = Inputs.range([0.05, 0.4], {value: 0.15, step: 0.01, label: "Size of each true coefficient"})
+viewof lambda = Inputs.range([1, 200], {value: 40, step: 1, label: "Ridge penalty λ"})
+viewof seed = Inputs.range([1, 500], {value: 20, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+dims = {
+  const r = rng(seed);
+  const P = 90, n = 100, nTest = 500;
+  const beta = range(P).map(() => signal * (r() < 0.5 ? -1 : 1));
+  const make = m => range(m).map(() => {
+    const x = r.normals(P);
+    return {x, y: sum(x.map((v, j) => v * beta[j])) + r.normal(0, 1)};
+  });
+  const train = make(n), test = make(nTest);
+  const r2 = (fit, p) => {
+    const ty = test.map(d => d.y), my = mean(ty);
+    const sse = sum(test.map(d => (d.y - fit.predict(d.x.slice(0, p))) ** 2));
+    return Math.max(-0.5, 1 - sse / sum(ty.map(v => (v - my) ** 2)));
+  };
+  return [5, 10, 20, 30, 40, 50, 60, 70, 80, 90].flatMap(p => {
+    const X = train.map(d => d.x.slice(0, p)), y = train.map(d => d.y);
+    return [
+      {p, method: "Least squares", r2: r2(ridge(X, y, 0), p)},
+      {p, method: "Ridge (regularized)", r2: r2(ridge(X, y, lambda), p)}
+    ];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Number of predictors (dimensions)"},
+  y: {label: "Out-of-sample R²", grid: true, domain: [-0.5, 1]},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(dims, {x: "p", y: "r2", stroke: "method", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const at = (p, m) => dims.find(d => d.p === p && d.method === m).r2;
+  return html`<div class="sim-readout">${md`With 90 predictors and 100 observations, least squares reaches out-of-sample R² of **${fmt(at(90, "Least squares"))}** (floored at −0.5), while ridge reaches **${fmt(at(90, "Ridge (regularized)"))}**. With 5 predictors, both are around **${fmt(at(5, "Ridge (regularized)"))}**. The extra dimensions are a blessing, if you use them with regularization.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- More variables are more information. Discarding them should be a last resort.
+- The "curse" belongs to unregularized estimators. Priors, penalties and hierarchical models turn it into a blessing.
+- If adding information makes your estimates worse, fix the method.
+:::
+
+## Related entries
+
+- [Between regularization and discovery](regularization-and-discovery.qmd)
+- [Ockhamite Tendencies](ockhamite-tendencies.qmd)
+- [In high-dimensional space](high-dimensional-space.qmd)
+
+## Source
+
+- Andrew Gelman, [The blessing of dimensionality](https://statmodeling.stat.columbia.edu/2004/10/the_blessing_of/) (2004).

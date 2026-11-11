@@ -1,0 +1,95 @@
+---
+title: "That narrow beach"
+date: 2026-11-09
+description: "Where statistics lives, this zone of phase transition between the continent of clear effects and the sea of confusion."
+order: 135
+categories: [Philosophy of statistics, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#135** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics in the sweet spot](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/).
+:::
+
+## What it is
+
+Picture a continent of **clear effects**, where the signal is so strong you don't need statistics (smoking and lung cancer at the population level, gravity), and a sea of **confusion**, where the signal is so weak that no analysis can extract it. Between them is a narrow beach, a phase transition where careful statistical analysis makes the difference between learning and not learning. That's where statistics lives.
+
+## Why it matters
+
+The image explains both the power and the limits of statistics. Good methods, such as partial pooling, careful measurement and sound design, move what can be learned a little way into the sea, which is valuable. But no method turns noise into signal. Researchers who wade out into the sea and claim discoveries are fooling themselves, and those who apply heavy machinery on the continent are wasting effort.
+
+## How it works
+
+Compare two analysts deciding whether an effect is positive. One eyeballs the data. The other uses a proper statistical analysis. As the signal-to-noise ratio (SNR) rises, both approach 100% accuracy. As it falls, both drop toward 50%, a coin flip. The *gap* between them, the value added by statistics, is largest in a narrow band of intermediate SNR. That band is the beach.
+
+## Simulated example
+
+Many decisions at various signal-to-noise ratios. Compare the eyeball analyst with the statistical analyst, and find the beach.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([5, 200], {value: 30, step: 5, label: "Observations per decision"})
+viewof seed = Inputs.range([1, 500], {value: 135, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+beach = {
+  const r = rng(seed);
+  return range(25).map(k => {
+    const snr = 10 ** (-2 + k * 0.125);
+    let eye = 0, stat = 0;
+    for (let i = 0; i < 600; i++) {
+      const sign = r() < 0.5 ? 1 : -1, y = r.normals(n, sign * snr, 1);
+      // Eyeball: look at a handful of points (the first 3) and go with their median sign.
+      const glance = y.slice(0, 3).sort((a, b) => a - b)[1];
+      eye += Math.sign(glance) === sign;
+      stat += Math.sign(mean(y)) === sign;
+    }
+    return {snr, eye: eye / 600, stat: stat / 600, gap: (stat - eye) / 600};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {type: "log", label: "Signal-to-noise ratio (effect / sd per observation)"},
+  y: {label: "Accuracy deciding the sign", domain: [0.4, 1], tickFormat: "%", grid: true},
+  color: {legend: true, domain: ["Eyeballing", "Statistical analysis", "Value added (the beach)"], range: ["#999", "#2166ac", "#e6ab02"]},
+  marks: [
+    Plot.areaY(beach, {x: "snr", y1: "eye", y2: "stat", fill: () => "Value added (the beach)", fillOpacity: 0.35}),
+    Plot.line(beach, {x: "snr", y: "eye", stroke: () => "Eyeballing", strokeWidth: 2}),
+    Plot.line(beach, {x: "snr", y: "stat", stroke: () => "Statistical analysis", strokeWidth: 2})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const best = beach.reduce((a, b) => b.gap > a.gap ? b : a);
+  return html`<div class="sim-readout">${md`Statistics adds the most at signal-to-noise ≈ **${fmt(best.snr, 2)}**, where it improves accuracy by **${fmt(100 * best.gap, 0)} points**. Far to the right (the continent), eyeballing already works. Far to the left (the sea), nothing does. With more observations per decision, the beach moves left, but it stays a beach.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Statistics matters most in a narrow band between obvious and hopeless.
+- Better methods move the beach a bit. They don't drain the sea.
+- Claims of discoveries from deep in the sea of noise deserve skepticism.
+:::
+
+## Related entries
+
+- [Anthropic principle](anthropic-principle.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [The most important aspect of a statistical method](what-data-it-uses.qmd)
+
+## Source
+
+- Andrew Gelman, [Statistics in the sweet spot between signals that are so clear you don't need statistics and signals that are so weak that statistical analysis can't help](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/) (2023).

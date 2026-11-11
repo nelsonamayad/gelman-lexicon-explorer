@@ -1,0 +1,82 @@
+---
+title: "Arrow's Other Theorem (weak form)"
+date: 2026-11-09
+description: "Any result can be published no more than five times."
+order: 33
+categories: [Research culture]
+source: "https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#33** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/).
+:::
+
+## What it is
+
+A joke named after Kenneth Arrow, whose famous impossibility theorem is about voting. The weak form sets an *upper bound*: a single research result can be repackaged and published at most five times. Typical vehicles are a working paper, a conference paper, a journal article, a review chapter and a book. The [strong form](arrows-other-theorem-strong.qmd) says the bound is always reached.
+
+## Why it matters
+
+Behind the joke is a real phenomenon: one finding spread across several outlets. Each version may add something, but readers counting publications, or reviewers counting supporting studies, see more evidence than exists. The *number of papers* on a topic tells you less than it seems to about the *number of independent findings*.
+
+## How it works
+
+A toy model: each result starts with one publication. At each step, the authors repackage it again with probability $p$, until they stop or hit the cap of five. The number of publications per result is a truncated geometric distribution, with mean
+
+$$
+\mathrm{E}[\text{pubs}] = \sum_{k=0}^{4} p^k = \frac{1 - p^5}{1 - p}.
+$$
+
+The redundancy ratio of the literature, publications divided by distinct results, ranges from 1 (when $p = 0$) to 5 (when $p = 1$).
+
+## Simulated example
+
+Here 500 distinct results enter the literature. Set the probability that a result gets repackaged one more time.
+
+```{ojs}
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof p = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Pr(repackage once more)"})
+viewof seed = Inputs.range([1, 500], {value: 33, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pubs = {
+  const r = rng(seed);
+  return range(500).map(i => { let k = 1; while (k < 5 && r() < p) k++; return {i, k}; });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Publications per result", domain: [1, 2, 3, 4, 5]},
+  y: {label: "Results", grid: true},
+  marks: [Plot.barY(pubs, Plot.groupX({y: "count"}, {x: "k", fill: "#2166ac"})), Plot.ruleY([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`500 distinct results produced **${pubs.reduce((s, d) => s + d.k, 0)}** publications, a redundancy ratio of **${fmt(mean(pubs.map(d => d.k)))}**. Theory: ${fmt((1 - p ** 5) / (1 - p + 1e-12))}. No result exceeds five, which is the weak form. The count of papers overstates the count of findings.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- One finding can appear many times in the literature under different covers.
+- Count independent findings, not papers.
+- The weak form is an upper bound. See the strong form for the claim that the bound is always reached.
+:::
+
+## Related entries
+
+- [Arrow's Other Theorem (strong form)](arrows-other-theorem-strong.qmd)
+- [The wedding, never about the marriage](wedding-not-marriage.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+
+## Source
+
+- Andrew Gelman, [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/) (2011).

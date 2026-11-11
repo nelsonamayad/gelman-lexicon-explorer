@@ -1,0 +1,102 @@
+---
+title: "Bayesians"
+date: 2026-11-09
+description: "They are frequentists."
+order: 24
+categories: [Bayesian inference, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#24** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayesians are frequentists](https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/).
+:::
+
+## What it is
+
+The supposed battle between Bayesians and frequentists hides a convergence. A Bayesian posterior probability is a *frequency* statement, averaged over a reference set of problems: all the situations where the prior and the data model hold. If the prior describes the distribution of true parameters across the problems you work on, then 90% posterior intervals contain the truth 90% of the time *across those problems*. Bayesians care about calibration, which is a frequentist property. They just choose a different reference set.
+
+## Why it matters
+
+This perspective gives practical guidance. To check a Bayesian method, simulate from the prior and the model and see whether its intervals are calibrated. That is a frequency evaluation. It also clarifies disagreements. A frequentist interval is calibrated *for every fixed θ*, while a Bayesian interval is calibrated *on average over the prior*. Neither is "subjective" or "objective." They answer differently defined frequency questions.
+
+## How it works
+
+Let $\theta \sim p(\theta)$ and $y \mid \theta \sim p(y \mid \theta)$. The posterior interval $I(y)$ with probability $0.9$ satisfies
+
+$$
+\Pr\big(\theta \in I(y)\big) = 0.9,
+$$
+
+where the probability is over the *joint* distribution of $(\theta, y)$. Conditional on a particular $\theta$, coverage can be above or below 0.9. It is higher near the prior mean, because shrinkage helps there, and lower far from it. Averaged over $\theta$ drawn from the prior, it is exactly 0.9.
+
+## Simulated example
+
+The prior is $\theta \sim \mathrm{N}(0, 1)$ and the data give $y \sim \mathrm{N}(\theta, \text{se})$. For a grid of fixed true values, we compute the coverage of the Bayesian 90% interval. Then we average over θ drawn from the prior.
+
+```{ojs}
+import {rng, range, normalPosterior, mean, fmt, pct, dnorm} from "../js/stats.js"
+```
+
+```{ojs}
+viewof se = Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Data standard error"})
+viewof seed = Inputs.range([1, 500], {value: 24, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+coverage = {
+  const r = rng(seed);
+  const cov = theta => {
+    let hit = 0;
+    for (let k = 0; k < 800; k++) {
+      const y = r.normal(theta, se), post = normalPosterior(0, 1, y, se);
+      if (Math.abs(post.mean - theta) < 1.645 * post.sd) hit++;
+    }
+    return hit / 800;
+  };
+  const grid = range(31).map(i => -3 + i * 0.2).map(theta => ({theta, cov: cov(theta), prior: dnorm(theta)}));
+  let hit = 0;
+  for (let k = 0; k < 5000; k++) {
+    const theta = r.normal(0, 1), y = r.normal(theta, se), post = normalPosterior(0, 1, y, se);
+    if (Math.abs(post.mean - theta) < 1.645 * post.sd) hit++;
+  }
+  return {grid, averaged: hit / 5000};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Fixed true θ", grid: true},
+  y: {label: "Coverage of Bayesian 90% interval", domain: [0, 1], grid: true},
+  marks: [
+    Plot.areaY(coverage.grid, {x: "theta", y: d => d.prior, fill: "#2166ac", fillOpacity: 0.12}),
+    Plot.line(coverage.grid, {x: "theta", y: "cov", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.ruleY([0.9], {stroke: "#d6604d", strokeDasharray: "4 3"}),
+    Plot.text([0], {x: 2.9, y: 0.93, text: () => "nominal 90%", textAnchor: "end", fill: "#d6604d"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`For any *fixed* θ, coverage is not 90%. It is higher near the prior mean and lower in the tails (blue line). Averaged over θ drawn from the prior (shaded), coverage is **${pct(coverage.averaged, 1)}**: the Bayesian interval is a calibrated frequency statement over its reference set.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Bayesian probabilities are calibrated frequencies over the reference set defined by the prior.
+- Frequentist and Bayesian coverage answer different "over what?" questions, and both are frequency claims.
+- Check Bayesian methods by simulation from the prior: if the intervals are calibrated there, the machinery works.
+:::
+
+## Related entries
+
+- [Bayesian](bayesian.qmd)
+- [Probability](probability.qmd)
+- [The Self-Cleaning Oven](self-cleaning-oven.qmd)
+- [Uncertainty Interval](uncertainty-interval.qmd)
+
+## Source
+
+- Andrew Gelman, [Bayesians are frequentists](https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/) (2018).

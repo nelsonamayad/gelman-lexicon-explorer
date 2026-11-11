@@ -1,0 +1,95 @@
+---
+title: "The Pandora Principle"
+date: 2026-11-09
+description: "Once you've considered a possible interaction or bias or confounder, you can't un-think it."
+order: 67
+categories: [Modeling workflow, Causal inference]
+source: "http://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#67** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Pandora principle in statistics, and its malign converse, the ostrich](http://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/).
+:::
+
+## What it is
+
+Once a possible confounder, interaction or bias has been raised, you can't honestly pretend you never thought of it. The box is open. You have to deal with it: adjust for it, model it or at least account for the uncertainty it creates. Gelman calls the malign converse the **ostrich**: avoiding thinking about a problem so you don't have to address it.
+
+## Why it matters
+
+This has an uncomfortable consequence. Careful analysts, who think of more possible problems, end up with wider uncertainty than careless ones who never asked. That can look like a penalty for diligence. But the careless analyst's narrow interval was never justified. It came from not looking. Once you know a confounder might matter, reporting the unadjusted estimate with its unadjusted interval is ostrich behaviour.
+
+## How it works
+
+Suppose the treatment effect estimate is $\hat\tau_A$ without adjusting for a possible confounder $U$, and $\hat\tau_B$ with it. Before $U$ was considered, the analyst reported $\hat\tau_A \pm 2\,\text{se}_A$. After considering $U$, an honest summary has to include the uncertainty about *which model is right*. A simple version is a mixture of the two models' sampling distributions, whose spread includes $(\hat\tau_A - \hat\tau_B)^2$. That box can't be closed again.
+
+## Simulated example
+
+A covariate $U$ affects both treatment uptake and the outcome. Compare the ostrich's report (ignore $U$), the adjusted estimate, and an honest interval that reflects uncertainty about whether $U$ matters.
+
+```{ojs}
+import {rng, range, ols, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof confound = Inputs.range([0, 1.5], {value: 0.6, step: 0.05, label: "Strength of confounding by U"})
+viewof pMatters = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Your belief that U matters"})
+viewof seed = Inputs.range([1, 500], {value: 67, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pandora = {
+  const r = rng(seed);
+  const rows = range(500).map(() => {
+    const u = r.normal(), z = r() < 1 / (1 + Math.exp(-confound * 1.5 * u)) ? 1 : 0;
+    return {u, z, y: 0.3 * z + confound * u + r.normal()};
+  });
+  const A = ols(rows.map(d => [d.z]), rows.map(d => d.y)), B = ols(rows.map(d => [d.z, d.u]), rows.map(d => d.y));
+  const mA = A.coef[1], sA = A.se[1], mB = B.coef[1], sB = B.se[1];
+  const mix = (1 - pMatters) * mA + pMatters * mB;
+  const varMix = (1 - pMatters) * (sA ** 2 + mA ** 2) + pMatters * (sB ** 2 + mB ** 2) - mix ** 2;
+  return [
+    {who: "Ostrich (never thought of U)", est: mA, lo: mA - 1.96 * sA, hi: mA + 1.96 * sA},
+    {who: "Adjusted for U", est: mB, lo: mB - 1.96 * sB, hi: mB + 1.96 * sB},
+    {who: "Honest (unsure whether U matters)", est: mix, lo: mix - 1.96 * Math.sqrt(varMix), hi: mix + 1.96 * Math.sqrt(varMix)}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 230,
+  x: {label: "Treatment effect estimate (95% interval)", grid: true},
+  y: {label: null},
+  marks: [
+    Plot.ruleY(pandora, {y: "who", x1: "lo", x2: "hi", strokeWidth: 3, stroke: (d, i) => ["#d6604d", "#2166ac", "#5aae61"][i]}),
+    Plot.dot(pandora, {y: "who", x: "est", r: 5, fill: "currentColor"}),
+    Plot.ruleX([0.3], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The true effect is 0.30 (dashed). The ostrich reports **${fmt(pandora[0].est)}** [${fmt(pandora[0].lo)}, ${fmt(pandora[0].hi)}], which is narrow and wrong. Once U has been thought of, the honest interval is **[${fmt(pandora[2].lo)}, ${fmt(pandora[2].hi)}]**. Wider, but it is what you actually know.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Once a potential bias has been raised, address it. Don't un-think it.
+- Diligence can widen uncertainty. That's honesty, not a penalty.
+- The ostrich's narrow intervals come from not looking.
+:::
+
+## Related entries
+
+- [Robustness checks](robustness-checks.qmd)
+- [The "All Else Equal" Fallacy](all-else-equal-fallacy.qmd)
+- [Assumptions and Rigor](assumptions-and-rigor.qmd)
+- [The capacity to be upset](capacity-to-be-upset.qmd)
+
+## Source
+
+- Andrew Gelman, [The Pandora principle in statistics, and its malign converse, the ostrich](http://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/) (2017).

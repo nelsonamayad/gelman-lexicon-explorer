@@ -1,0 +1,97 @@
+---
+title: "God is in Every Leaf of Every Tree"
+date: 2026-11-09
+description: "No problem is too small or too trivial if we really do something about it."
+order: 27
+categories: [Modeling workflow, Research culture]
+source: "https://statmodeling.stat.columbia.edu/2005/10/god_is_in_every/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#27** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/10/god_is_in_every/).
+:::
+
+## What it is
+
+The phrase is borrowed from Richard Feynman: "No problem is too small or too trivial if we can really do something about it." In statistics, careful work on a seemingly small applied problem, such as a single dataset, a coding quirk or one strange data point, often turns up general principles. The details are not beneath the statistician. They are where the understanding comes from.
+
+## Why it matters
+
+There is a status hierarchy in which "big" methodological questions outrank "mere" applications. Gelman's experience is that the reverse is often true: new methods come out of struggling with real, messy, specific problems. On the defensive side, small details such as a missing-data code, a units mismatch or a duplicated row can overturn a conclusion. Paying attention to the leaves is how you avoid publishing nonsense about the tree.
+
+## How it works
+
+A concrete case: survey data where "don't know" or "missing" was coded as 99. It's a tiny detail, but if it goes unnoticed it contaminates every downstream number. The effect on the mean is roughly
+
+$$
+\Delta\bar{y} \approx f\,(99 - \bar{y}_{\text{valid}}),
+$$
+
+where $f$ is the fraction miscoded. Even a few percent of rows can move the mean by several units, and in a regression they can flip a slope.
+
+## Simulated example
+
+A 1–10 rating scale in which missing answers are coded as 99. Raise the share of missing responses and see what the "trivial" coding detail does to the mean and to a regression slope.
+
+```{ojs}
+import {rng, range, mean, lm, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof missRate = Inputs.range([0, 0.15], {value: 0.04, step: 0.005, label: "Share of responses missing"})
+viewof missingRelated = Inputs.toggle({label: "Missingness more common among older respondents", value: true})
+viewof seed = Inputs.range([1, 500], {value: 27, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+leaf = {
+  const r = rng(seed);
+  return range(1000).map(() => {
+    const age = r.uniform(18, 80);
+    const rating = Math.min(10, Math.max(1, Math.round(6 - 0.03 * (age - 50) + r.normal(0, 1.8))));
+    const pMiss = missingRelated ? missRate * 2 * (age - 18) / 62 : missRate;
+    const missing = r() < pMiss;
+    return {age, rating, recorded: missing ? 99 : rating, missing};
+  });
+}
+cmp = {
+  const valid = leaf.filter(d => !d.missing);
+  return {
+    meanNaive: mean(leaf.map(d => d.recorded)), meanClean: mean(valid.map(d => d.rating)),
+    slopeNaive: lm(leaf.map(d => d.age), leaf.map(d => d.recorded)).b,
+    slopeClean: lm(valid.map(d => d.age), valid.map(d => d.rating)).b
+  };
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Age", grid: true},
+  y: {label: "Recorded rating", type: "symlog", grid: true},
+  marks: [Plot.dot(leaf, {x: "age", y: "recorded", r: 1.8, fill: d => d.missing ? "#d6604d" : "#2166ac", fillOpacity: 0.6})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Mean rating: treating 99 as a number gives **${fmt(cmp.meanNaive)}**, and dropping the missing code gives **${fmt(cmp.meanClean)}**. Slope of rating on age: **${fmt(cmp.slopeNaive, 3)}** vs **${fmt(cmp.slopeClean, 3)}**. ${Math.sign(cmp.slopeNaive) !== Math.sign(cmp.slopeClean) ? "The sign of the slope flips." : ""} A tiny coding detail changed the substantive conclusion.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Small problems deserve full attention. General insights often come from specific puzzles.
+- Data details such as codes, units and duplicates can dominate the substantive result.
+- Look at the raw data. The leaf you skip may be the one that matters.
+:::
+
+## Related entries
+
+- [The capacity to be upset](capacity-to-be-upset.qmd)
+- [Breadcrumbs](breadcrumbs.qmd)
+- [Mistakes](mistakes.qmd)
+
+## Source
+
+- Andrew Gelman, [God is in every leaf of every tree](https://statmodeling.stat.columbia.edu/2005/10/god_is_in_every/) (2005).

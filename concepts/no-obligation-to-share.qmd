@@ -1,0 +1,89 @@
+---
+title: "You have no obligation to share your data and code"
+date: 2026-11-09
+description: "And I have no obligation to believe anything you write."
+order: 150
+categories: [Research culture, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2023/09/10/the-authors-of-research-papers-have-no-obligation-to-share-their-data-and-code-and-i-have-no-obligation-to-believe-anything-they-write/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#150** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The authors of research papers have no obligation to share their data and code, and I have no obligation to believe anything they write](https://statmodeling.stat.columbia.edu/2023/09/10/the-authors-of-research-papers-have-no-obligation-to-share-their-data-and-code-and-i-have-no-obligation-to-believe-anything-they-write/).
+:::
+
+## What it is
+
+Gelman doesn't argue that authors must be forced to share. There are sometimes legitimate reasons not to, such as privacy or proprietary data. His point is about what follows for readers. A claim whose data and code can't be checked deserves less belief. Sharing is how authors earn credibility, and refusing to share has an evidential cost that readers are entitled to apply.
+
+## Why it matters
+
+Analyses contain errors at some base rate (see [Mistakes](mistakes.qmd)). Shared data and code let errors be found, so a shared result that has survived checking is more credible. An unshared result keeps its full prior chance of error. And if authors who *know* their analysis is shaky are less likely to share, then not sharing is itself evidence. Readers who give unshared results the same trust as checked ones are ignoring both effects.
+
+## How it works
+
+A toy model. Each published result is wrong with prior probability $e$. Shared results get checked, and errors are found with probability $d$. Authors of erroneous analyses share less often, at rate $s_{\text{wrong}} < s_{\text{right}}$. By Bayes' rule, a reader's probability that a result is correct is highest for "shared and checked, no error found" and lowest for "not shared," which comes out *below* the base rate whenever $s_{\text{wrong}} < s_{\text{right}}$.
+
+## Simulated example
+
+There are 5,000 published results. Vary the base error rate and how much less likely authors of flawed analyses are to share. Compare the reader's credence by sharing status.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof e = Inputs.range([0.05, 0.5], {value: 0.25, step: 0.01, label: "Base rate of serious errors"})
+viewof sRight = Inputs.range([0.1, 1], {value: 0.7, step: 0.05, label: "Pr(share) if the analysis is sound"})
+viewof sWrong = Inputs.range([0, 1], {value: 0.35, step: 0.05, label: "Pr(share) if the analysis is flawed"})
+viewof seed = Inputs.range([1, 500], {value: 150, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+share = {
+  const r = rng(seed);
+  const d = 0.7;
+  const rows = range(5000).map(() => {
+    const wrong = r() < e, shared = r() < (wrong ? sWrong : sRight);
+    const caught = shared && wrong && r() < d;
+    return {wrong, status: !shared ? "Not shared" : caught ? "Shared: error found" : "Shared: checks out"};
+  });
+  return ["Shared: checks out", "Not shared", "Shared: error found"].map(st => {
+    const g = rows.filter(x => x.status === st);
+    return {status: st, n: g.length, correct: g.length ? mean(g.map(x => +!x.wrong)) : NaN};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 150,
+  x: {label: "Probability the result is correct", domain: [0, 1], tickFormat: "%", grid: true},
+  y: {label: null},
+  marks: [Plot.barX(share, {y: "status", x: "correct", fill: d => d.status === "Not shared" ? "#d6604d" : d.status.includes("checks") ? "#2166ac" : "#999"}), Plot.ruleX([1 - e], {stroke: "currentColor", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Base rate of correct results: **${pct(1 - e)}** (dashed line). Shared and checked: **${pct(share[0].correct)}**. Not shared: **${pct(share[1].correct)}**. You have no obligation to share, and readers have every reason to believe unshared claims less.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Sharing data and code is how a result earns credibility.
+- When flawed analyses are shared less often, not sharing is itself evidence against a result.
+- Readers can adjust their belief according to whether a result can be checked.
+:::
+
+## Related entries
+
+- [Breadcrumbs](breadcrumbs.qmd)
+- [Clarke's Law](clarkes-law.qmd)
+- [McBroom's Law](mcbrooms-law.qmd)
+- [Honesty and transparency](honesty-and-transparency.qmd)
+
+## Source
+
+- Andrew Gelman, [The authors of research papers have no obligation to share their data and code, and I have no obligation to believe anything they write](https://statmodeling.stat.columbia.edu/2023/09/10/the-authors-of-research-papers-have-no-obligation-to-share-their-data-and-code-and-i-have-no-obligation-to-believe-anything-they-write/) (2023).

@@ -1,0 +1,94 @@
+---
+title: "More Vampirical Than Empirical"
+date: 2026-11-09
+description: "Those hypotheses that are unable to be killed by mere evidence. (from Jeremy Freese)"
+order: 47
+categories: [Research culture, Bayesian inference]
+source: "http://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#47** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Jeremy Freese adds a new item to the lexicon](http://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/).
+:::
+
+## What it is
+
+Sociologist Jeremy Freese's term for hypotheses that won't die. Failed replications come in, and the hypothesis survives through ad hoc rescues: "the replication used a different population," "there must be a hidden moderator," "the original effect is real but context-dependent." Like a vampire, the hypothesis can't be killed by evidence. It just goes on feeding.
+
+## Why it matters
+
+A hypothesis that survives *every* possible outcome makes no predictions and teaches nothing. Vampirical hypotheses take up journal space, funding and attention, and they discourage replication work, because negative results are explained away instead of counted. Seeing the pattern helps reviewers and readers ask the right question: *what result would make you give this up?*
+
+## How it works
+
+Compare two updaters facing $k$ failed replications.
+
+- **Empirical updater.** Each failure has likelihood ratio $\text{LR} < 1$ against the hypothesis. The posterior log-odds fall by $\log \text{LR}$ per failure and drop steadily.
+- **Vampirical updater.** Before each update, they explain the failure away with a "hidden moderator" story with probability $m$. An explained-away failure counts for nothing. Even modest values of $m$ slow learning enormously, and as $m \to 1$ the hypothesis becomes immortal.
+
+## Simulated example
+
+Both updaters start at 80% belief in a hypothesis that is in fact false. Twenty replication attempts follow, mostly failures. Watch the two beliefs diverge.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof m = Inputs.range([0, 1], {value: 0.85, step: 0.05, label: "Pr(a failure is explained away)"})
+viewof lr = Inputs.range([0.2, 0.9], {value: 0.4, step: 0.05, label: "Likelihood ratio of each failure"})
+viewof seed = Inputs.range([1, 500], {value: 47, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+vamp = {
+  const r = rng(seed);
+  let emp = Math.log(4), vam = Math.log(4);
+  const out = [{k: 0, who: "Empirical", p: 0.8}, {k: 0, who: "Vampirical", p: 0.8}];
+  for (let k = 1; k <= 20; k++) {
+    const success = r() < 0.08;                 // occasional false positive
+    const l = success ? Math.log(1 / lr) : Math.log(lr);
+    emp += l;
+    vam += success ? l : (r() < m ? 0 : l);
+    out.push({k, who: "Empirical", p: 1 / (1 + Math.exp(-emp))}, {k, who: "Vampirical", p: 1 / (1 + Math.exp(-vam))});
+  }
+  return out;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Replication attempts"},
+  y: {label: "Belief in the hypothesis", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(vamp, {x: "k", y: "p", stroke: "who", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = w => vamp.filter(d => d.who === w).at(-1).p;
+  return html`<div class="sim-readout">${md`After 20 attempts, the empirical updater's belief is **${pct(end("Empirical"), 1)}** and the vampirical updater's is **${pct(end("Vampirical"), 1)}**. Every "hidden moderator" story throws away a piece of evidence. Push the slider to 1 and the hypothesis is immortal.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A hypothesis that can explain away every failure doesn't predict anything.
+- Ask in advance: what evidence would change your mind?
+- Ad hoc moderators are hypotheses too. Test them, don't just invoke them.
+:::
+
+## Related entries
+
+- [The Time-Reversal Heuristic](time-reversal-heuristic.qmd)
+- [The Horse](the-horse.qmd)
+- [Eureka bias](eureka-bias.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+
+## Source
+
+- Andrew Gelman, [Jeremy Freese adds a new item to the lexicon](http://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/) (2014).

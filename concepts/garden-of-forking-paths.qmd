@@ -1,0 +1,109 @@
+---
+title: "The Garden of Forking Paths"
+date: 2026-11-09
+description: "Multiple comparisons can be a problem, even when there is no \"fishing expedition\" or \"p-hacking\" and the research hypothesis was posited ahead of time."
+order: 44
+categories: [Significance & noise]
+source: "http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#44** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The garden of forking paths (PDF)](http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf).
+:::
+
+## What it is
+
+The name comes from a Borges story. A researcher can run only *one* analysis, honestly and with a hypothesis stated in advance, and still have a multiple-comparisons problem. The reason is that the details of that analysis depend on the data. Which outcome measure, which subgroup, which exclusions and which covariates are all decided after seeing the data, often in good faith. Had the data come out differently, a different but equally reasonable analysis would have been run. The p-value assumes a single fixed analysis, so it is wrong.
+
+## Why it matters
+
+Gelman and Loken's point is that p-hacking doesn't require deliberate fishing. Researchers who never "tried many things" still walk a path whose branches were chosen by the data. This explains why so many results from honest researchers fail to replicate. The issue is not bad intent. It is that the nominal 5% false-positive rate assumes a garden with one path.
+
+## How it works
+
+Suppose there are $k$ reasonable analysis paths, and the path actually taken depends on which one "looks right" given the data. Under the null, the chance that the chosen path gives $p < 0.05$ approaches
+
+$$
+\Pr(\min_j p_j < 0.05) \le 1 - (0.95)^k
+$$
+
+for roughly independent paths, and somewhat less when paths are correlated. The researcher computes only one p-value, but its *sampling distribution* is the distribution of a data-dependent choice.
+
+## Simulated example
+
+Under a true null, a study has two outcome measures, an optional outlier exclusion, and the choice of analyzing everyone or one sex. That gives up to eight paths. We model the data-dependent choice as following the most promising path. Toggle the forks to see the effective false-positive rate.
+
+```{ojs}
+import {rng, range, mean, variance, pValue, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof forks = Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"})
+viewof n = Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"})
+viewof seed = Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+garden = {
+  const r = rng(seed);
+  const useOutcome2 = forks.includes("Two outcome measures");
+  const useTrim = forks.includes("Optional outlier exclusion");
+  const useSex = forks.includes("Subgroup by sex");
+  const test = (t, c) => pValue(mean(t) - mean(c), Math.sqrt(variance(t) / t.length + variance(c) / c.length));
+  const trim = a => a.filter(v => Math.abs(v) < 2);
+  let hits = 0, pathCounts = 0;
+  const reps = 1000;
+  for (let k = 0; k < reps; k++) {
+    const mk = () => range(n).map(() => { const y1 = r.normal(), y2 = 0.5 * y1 + Math.sqrt(0.75) * r.normal(); return {y1, y2, sex: r.bernoulli(0.5)}; });
+    const T = mk(), C = mk();
+    const ps = [];
+    for (const outcome of useOutcome2 ? ["y1", "y2"] : ["y1"])
+      for (const tr of useTrim ? [false, true] : [false])
+        for (const grp of useSex ? ["all", 0, 1] : ["all"]) {
+          let t = T.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
+          let c = C.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
+          if (tr) { t = trim(t); c = trim(c); }
+          ps.push(test(t, c));
+        }
+    pathCounts = ps.length;
+    if (Math.min(...ps) < 0.05) hits++;
+  }
+  return {rate: hits / reps, paths: pathCounts};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 140,
+  marginLeft: 150,
+  x: {label: "False-positive rate (true effect is zero)", domain: [0, 0.5], tickFormat: "%", grid: true},
+  y: {label: null},
+  marks: [
+    Plot.barX([{k: "Nominal (one fixed path)", v: 0.05}, {k: `Data-dependent (${garden.paths} paths)`, v: garden.rate}], {y: "k", x: "v", fill: (d, i) => i ? "#d6604d" : "#999"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With **${garden.paths}** reasonable paths and a data-dependent choice among them, the chance of a "significant" finding under the null is **${pct(garden.rate, 1)}**, not 5%. Each simulated researcher ran only one analysis. Fishing is not needed, only forks.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Data-dependent analysis choices inflate false-positive rates even without deliberate p-hacking.
+- A pre-stated hypothesis does not remove the forks. Pre-specifying the *analysis* does, as far as it goes.
+- Better still: analyze all reasonable paths together, for example with a multilevel model, rather than choosing one.
+:::
+
+## Related entries
+
+- [Multiple Comparisons](multiple-comparisons.qmd)
+- [Preregistration](preregistration.qmd)
+- [Story Time](story-time.qmd)
+- [Robustness checks](robustness-checks.qmd)
+
+## Source
+
+- Gelman and Loken, ["The garden of forking paths: Why multiple comparisons can be a problem, even when there is no 'fishing expedition' or 'p-hacking' and the research hypothesis was posited ahead of time"](http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf) (2013).

@@ -1,0 +1,79 @@
+---
+title: "If zero is in the neighborhood"
+date: 2026-11-09
+description: "Invite it in."
+order: 100
+categories: [Statistical graphics]
+source: "https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#100** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Graphing advice: if zero is in the neighborhood, invite it in](https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/).
+:::
+
+## What it is
+
+This is graphing advice about the y-axis. There is an old rule that "every axis must start at zero" and an opposite habit of letting software zoom in on the data range. Gelman takes a middle path. If zero is *close* to the range of the data, extend the axis to include it, because then the reader can see proportions and absolute levels. If zero is far away, as with temperatures in Kelvin or adult heights in centimetres, don't force it in.
+
+## Why it matters
+
+Auto-scaled axes that stop just below the data make small changes look dramatic: a rise from 52% to 55% fills the whole panel. Including zero when it's close keeps that change in proportion. Including zero when it is far from the data just flattens everything into a line along the top. The neighbourhood rule keeps the benefits of both conventions.
+
+## How it works
+
+A simple version of the rule: let the data range be $[a, b]$ with $a > 0$. If $a < 1.5\,(b - a)$, so that the distance from zero to the data is comparable to the data's own spread, extend the axis to zero. If zero is much farther away, keep the zoomed axis but label it clearly.
+
+## Simulated example
+
+A time series whose level you can shift up or down. The left panel uses the software's default auto-scaled axis. The right panel follows the neighbourhood rule.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof level = Inputs.range([2, 200], {value: 5, step: 1, label: "Typical level of the series"})
+viewof seed = Inputs.range([1, 500], {value: 100, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+series = {
+  const r = rng(seed);
+  let v = level;
+  return range(24).map(t => { v += r.normal(0.15, 0.6); return {t, v}; });
+}
+rule = {
+  const lo = Math.min(...series.map(d => d.v)), hi = Math.max(...series.map(d => d.v));
+  return {lo, hi, invite: lo <= 0 || lo < 1.5 * (hi - lo)};
+}
+```
+
+```{ojs}
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({width: 320, height: 240, title: "Software default", y: {grid: true, label: "Value"}, x: {label: "Month"}, marks: [Plot.line(series, {x: "t", y: "v", stroke: "#d6604d", strokeWidth: 2})]})}
+${Plot.plot({width: 320, height: 240, title: "Neighbourhood rule", y: {grid: true, label: "Value", domain: rule.invite ? [0, rule.hi * 1.05] : undefined}, x: {label: "Month"}, marks: [Plot.line(series, {x: "t", y: "v", stroke: "#2166ac", strokeWidth: 2}), Plot.ruleY(rule.invite ? [0] : [])]})}
+</div>`
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The data range from **${fmt(rule.lo, 1)}** to **${fmt(rule.hi, 1)}**. ${rule.invite ? "Zero is in the neighbourhood, so it gets invited in. The right panel shows the change in proportion to the level." : "Zero is far from the data. Including it would flatten the series into a line, so the rule keeps the zoomed axis."} Slide the level up to 200 and the rule stops inviting zero.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Include zero on the axis when it's close to the data. It shows proportion.
+- Don't force zero in when it's far away. It hides variation.
+- Choose axes on purpose. Software defaults aren't decisions.
+:::
+
+## Related entries
+
+- [Alabama First](alabama-first.qmd)
+- [The Year Jesus was born](year-jesus-was-born.qmd)
+- [Seeds of its own destruction](seeds-of-its-own-destruction.qmd)
+
+## Source
+
+- Andrew Gelman, [Graphing advice: if zero is in the neighborhood, invite it in](https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/) (2021).

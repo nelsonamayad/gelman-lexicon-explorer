@@ -1,0 +1,104 @@
+---
+title: "The Causal Identification Kool-Aid"
+date: 2026-11-09
+description: "The attitude by which any statistically significant difference is considered to represent some true population effect, as long as it is associated with a randomized treatment assignment, instrumental variable analysis, or regression discontinuity."
+order: 83
+categories: [Causal inference, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#83** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 2019 project: how false beliefs in statistical differences still live in social science and journalism today](https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/).
+:::
+
+## What it is
+
+Methods like randomized experiments, instrumental variables and regression discontinuity (RDD) solve one problem, **bias** from confounding. They do nothing about **noise**, and nothing about the flexibility of the analysis. The Kool-Aid is the belief that because a design is "identified," any significant estimate it produces must be real. An RDD with a noisy outcome and several reasonable ways to fit it can produce significant "effects" from pure noise as easily as any other analysis.
+
+## Why it matters
+
+Identification strategies carry great prestige in economics and political science, and that prestige can switch off skepticism. Gelman and Imbens showed that RDD analyses using high-order global polynomials, a once-common practice, give noisy estimates that are sensitive to the polynomial degree. Add the freedom to choose among bandwidths and polynomial orders, and spurious discontinuities become routine. "Identified" doesn't mean "well estimated."
+
+## How it works
+
+In an RDD, the effect is the jump in $\mathrm{E}(y \mid x)$ at a cutoff. Each reasonable specification, such as local linear fits with different bandwidths or global polynomials of different orders, has a roughly 5% false-positive rate on its own when there is no jump. But the specifications give *different* estimates on the same data. An analyst who reports whichever specification "works" walks the [garden of forking paths](garden-of-forking-paths.qmd), and the significant estimates that result are large exaggerations of a true effect of zero.
+
+## Simulated example
+
+The true discontinuity is **zero**: the outcome is a smooth curve plus noise. Each simulated analyst tries six standard RDD specifications. Compare the false-positive rate of each specification alone with the rate when any one of them can be reported.
+
+```{ojs}
+import {rng, range, mean, ols, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([100, 1000], {value: 200, step: 50, label: "Observations"})
+viewof noiseSd = Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Outcome noise (sd)"})
+viewof seed = Inputs.range([1, 500], {value: 83, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+rdd = {
+  const r = rng(seed);
+  const specs = [
+    {name: "Local linear, h = 0.25", h: 0.25, order: 1}, {name: "Local linear, h = 0.5", h: 0.5, order: 1},
+    {name: "Global linear", h: 1, order: 1}, {name: "Global quadratic", h: 1, order: 2},
+    {name: "Global cubic", h: 1, order: 3}, {name: "Global quartic", h: 1, order: 4}
+  ];
+  const hits = specs.map(() => 0), sigSizes = [];
+  let any = 0;
+  for (let rep = 0; rep < 300; rep++) {
+    const pts = range(n).map(() => { const x = r.uniform(-1, 1); return {x, d: x >= 0 ? 1 : 0, y: 0.5 * x * x + 0.3 * x + r.normal(0, noiseSd)}; });
+    let reported = null;
+    specs.forEach((s, i) => {
+      const sub = pts.filter(p => Math.abs(p.x) <= s.h);
+      const X = sub.map(p => { const row = [p.d]; for (let k = 1; k <= s.order; k++) row.push(p.x ** k, p.d * p.x ** k); return row; });
+      const f = ols(X, sub.map(p => p.y));
+      if (Math.abs(f.coef[1] / f.se[1]) > 1.96) { hits[i]++; if (reported === null) reported = f.coef[1]; }
+    });
+    if (reported !== null) { any++; sigSizes.push(Math.abs(reported)); }
+  }
+  return {
+    rows: [...specs.map((s, i) => ({spec: s.name, fpr: hits[i] / 300})), {spec: "Any of the six (forking paths)", fpr: any / 300}],
+    sigSize: sigSizes.length ? mean(sigSizes) : NaN
+  };
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 250,
+  marginLeft: 200,
+  x: {label: "False-positive rate (true jump = 0)", tickFormat: "%", grid: true},
+  y: {label: null, domain: rdd.rows.map(d => d.spec)},
+  marks: [
+    Plot.barX(rdd.rows, {y: "spec", x: "fpr", fill: d => d.spec.startsWith("Any") ? "#d6604d" : "#2166ac"}),
+    Plot.ruleX([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Each specification on its own gives about 5% false positives. An analyst free to report any of the six finds a "significant discontinuity" **${pct(rdd.rows.at(-1).fpr)}** of the time, and those reported jumps average **${fmt(rdd.sigSize)}** in absolute size when the truth is zero. The identification strategy did its job on bias. It did nothing about noise or forking paths.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Identification addresses bias, not variance. Noisy identified estimates are still noisy.
+- Flexible specification choices such as bandwidth and polynomial order create forking paths inside "clean" designs.
+- Apply the same skepticism to significant results from RCTs, IVs and RDDs as to any others.
+:::
+
+## Related entries
+
+- [Strongest-link Fallacy](strongest-link-fallacy.qmd)
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [Robustness checks](robustness-checks.qmd)
+
+## Source
+
+- Andrew Gelman, [The 2019 project](https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/) (2021).
+- Gelman and Imbens, "Why high-order polynomials should not be used in regression discontinuity designs," *Journal of Business & Economic Statistics* (2019).

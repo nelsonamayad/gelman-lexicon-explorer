@@ -1,0 +1,86 @@
+---
+title: "The Javert Paradox"
+date: 2026-11-09
+description: "Suppose you find a problem with published work. If you just point it out once or twice, the authors of the work are likely to do nothing. But if you really pursue the problem, then you look like a Javert."
+order: 71
+categories: [Research culture]
+source: "https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#71** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It's hard to criticize science without looking like an obsessive (Slate)](https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html).
+:::
+
+## What it is
+
+Javert is the inspector in *Les Misérables* who pursues Jean Valjean for decades over a stolen loaf of bread. Scientific critics face a version of this. Point out an error once, politely, and the authors ignore it. Keep pushing, with blog posts, letters, replications and follow-ups, until it is actually addressed, and you're seen as obsessive and vindictive. No level of effort is both *effective* and *respectable*.
+
+## Why it matters
+
+The paradox discourages error correction. Most potential critics stop after one polite note, the error stands, and the few who persist pay a reputational cost that deters others. It also distorts how criticism is judged: observers focus on the critic's persistence rather than on whether the critique is right.
+
+## How it works
+
+A toy model. Let $e$ be the critic's persistence: the number of times they raise the issue, follow up or escalate. The probability that the problem gets corrected rises slowly with $e$, because authors tend to ignore criticism until it becomes unavoidable. The perceived obsessiveness rises roughly in proportion to $e$. If the community's tolerance threshold is reached before the correction probability becomes meaningful, there is no "good" level of persistence. That is the paradox.
+
+## Simulated example
+
+Vary how responsive authors are and how tolerant the community is. Look for a persistence level that is both effective and not "Javert-like."
+
+```{ojs}
+import {range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof responsiveness = Inputs.range([0.01, 0.5], {value: 0.06, step: 0.01, label: "Author responsiveness to each push"})
+viewof tolerance = Inputs.range([1, 15], {value: 4, step: 0.5, label: "Community tolerance before 'obsessive'"})
+```
+
+```{ojs}
+javert = range(21).map(e => ({
+  e,
+  corrected: 1 - Math.exp(-responsiveness * e * e / 4),
+  obsessive: 1 / (1 + Math.exp(-(e - tolerance)))
+}))
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Persistence (number of pushes)"},
+  y: {label: "Probability", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, domain: ["Error gets corrected", "Critic seen as Javert"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.line(javert, {x: "e", y: "corrected", stroke: () => "Error gets corrected", strokeWidth: 2}),
+    Plot.line(javert, {x: "e", y: "obsessive", stroke: () => "Critic seen as Javert", strokeWidth: 2}),
+    Plot.areaY(javert, {x: "e", y1: 0, y2: d => Math.min(d.corrected, 1 - d.obsessive), fill: "#5aae61", fillOpacity: 0.2})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const sweet = javert.filter(d => d.corrected > 0.5 && d.obsessive < 0.5);
+  return html`<div class="sim-readout">${md`${sweet.length ? `There *is* a sweet spot here: ${sweet[0].e}–${sweet.at(-1).e} pushes give a >50% chance of correction without looking obsessive.` : "There is **no** persistence level that gives a >50% chance of correction without the critic being seen as a Javert. That's the paradox."} The green area shows how much room is left for respectable, effective criticism. Make authors more responsive and it grows.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Errors that are pointed out once tend to be ignored. Pursuing them gets the critic labelled obsessive.
+- Judge criticism by its content, not by how persistent the critic is.
+- Institutions such as journals can resolve the paradox by responding to the *first* well-founded critique.
+:::
+
+## Related entries
+
+- [The Backseat Driver Principle](backseat-driver-principle.qmd)
+- [The Horse](the-horse.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+- [Research Incumbency Rule](research-incumbency-rule.qmd)
+
+## Source
+
+- Andrew Gelman, [It's hard to criticize science without looking like an obsessive](https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html), *Slate* (2018).

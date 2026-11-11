@@ -1,0 +1,93 @@
+---
+title: "Preregistration"
+date: 2026-11-09
+description: "It's a floor, not a ceiling."
+order: 133
+categories: [Research culture, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#133** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What's the difference between Derek Jeter and preregistration?](https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/)
+:::
+
+## What it is
+
+Preregistration means specifying your analysis before seeing the data. It sets a **floor**: the preregistered analysis must be done and reported, whatever it shows. It is not a **ceiling**. You can, and often should, go beyond it with better models, additional covariates, multilevel structure and exploratory analyses, as long as you clearly label which is which.
+
+## Why it matters
+
+Some researchers treat preregistration as a cage, a set of analyses beyond which nothing may be done. That throws away information. Preregistered plans are written before seeing the data and are usually simple. Better analyses, such as adjusting for a pre-test or partially pooling across sites, often only become clearly appropriate once the data are in. Preregistration guards against the [garden of forking paths](garden-of-forking-paths.qmd) by guaranteeing the floor. It shouldn't prevent you from using the data well.
+
+## How it works
+
+Report the preregistered analysis in full. Then add the improved analyses, labelled as such. Readers can see whether the conclusions agree. If they do, good. If they don't, readers learn something about how sensitive the result is. Either way, nothing is hidden and nothing is wasted.
+
+## Simulated example
+
+A preregistered plan uses a simple difference in means. After seeing the data, the analyst also runs an analysis adjusted for a strongly predictive baseline covariate, labelled as exploratory. Compare their precision over 500 replications.
+
+```{ojs}
+import {rng, range, mean, sd, ols, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof rho = Inputs.range([0, 0.9], {value: 0.7, step: 0.05, label: "Correlation of baseline covariate with outcome"})
+viewof n = Inputs.range([20, 300], {value: 60, step: 10, label: "Participants per arm"})
+viewof seed = Inputs.range([1, 500], {value: 133, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+prereg = {
+  const r = rng(seed);
+  const effect = 0.3;
+  return range(500).map(k => {
+    const rows = range(2 * n).map(i => { const z = i < n ? 1 : 0, x = r.normal(); return {z, x, y: effect * z + rho * x + Math.sqrt(1 - rho * rho) * r.normal()}; });
+    const t = rows.filter(d => d.z).map(d => d.y), c = rows.filter(d => !d.z).map(d => d.y);
+    const floorEst = mean(t) - mean(c), floorSe = Math.sqrt(sd(t) ** 2 / n + sd(c) ** 2 / n);
+    const adj = ols(rows.map(d => [d.z, d.x]), rows.map(d => d.y));
+    return {k, floorEst, floorSe, adjEst: adj.coef[1], adjSe: adj.se[1], effect};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  x: {label: "Estimate of the treatment effect (true = 0.3)", grid: true},
+  y: {label: "Replications"},
+  color: {legend: true, domain: ["Preregistered (the floor)", "Plus labelled exploratory analysis"], range: ["#999", "#2166ac"]},
+  marks: [
+    Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "floorEst", fill: () => "Preregistered (the floor)", fillOpacity: 0.5, thresholds: 40})),
+    Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "adjEst", fill: () => "Plus labelled exploratory analysis", fillOpacity: 0.6, thresholds: 40})),
+    Plot.ruleX([0.3], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const cov = (e, s) => prereg.filter(d => Math.abs(d[e] - d.effect) < 1.96 * d[s]).length / prereg.length;
+  return html`<div class="sim-readout">${md`Average standard error: preregistered **${fmt(mean(prereg.map(d => d.floorSe)), 3)}**, adjusted **${fmt(mean(prereg.map(d => d.adjSe)), 3)}**. Coverage: ${pct(cov("floorEst", "floorSe"))} vs ${pct(cov("adjEst", "adjSe"))}. Both are honest. Treating the preregistration as a ceiling would have thrown away the extra precision.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Preregistration guarantees a minimum analysis. It doesn't forbid better ones.
+- Report the preregistered analysis in full, then add improvements labelled as exploratory.
+- Compare the two. Agreement is reassuring and disagreement is informative.
+:::
+
+## Related entries
+
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Honesty and transparency](honesty-and-transparency.qmd)
+- [The most important aspect of a statistical method](what-data-it-uses.qmd)
+
+## Source
+
+- Andrew Gelman, [What's the difference between Derek Jeter and preregistration?](https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/) (2022).

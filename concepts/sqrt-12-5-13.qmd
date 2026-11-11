@@ -1,0 +1,90 @@
+---
+title: "sqrt(12^2 + 5^2)"
+date: 2026-11-09
+description: "13."
+order: 101
+categories: [Significance & noise, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#101** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/).
+:::
+
+## What it is
+
+Independent sources of variation add *in quadrature*: their standard deviations combine as the square root of the sum of squares. With 12 and 5, the total is $\sqrt{144 + 25} = 13$, barely more than the larger one alone. Gelman calls the formula "so, so important": "when you have two sources of variation, only the larger one matters (unless the variances are very close to each other). It comes up all the time in multilevel modeling." For example, when within-group variation is much larger than between-group variation, the group-level component barely changes the total, and the reverse is also true.
+
+## Why it matters
+
+Effort often goes to whichever error source is easiest to measure or most familiar, such as more decimal places or a slightly better instrument, while the dominant source, such as sampling variation, non-response or model misspecification, is left alone. Because of quadrature, eliminating the small source *entirely* reduces the total from 13 to 12. Halving the big source reduces it to about 7.8.
+
+## How it works
+
+For independent errors with standard deviations $\sigma_1$ and $\sigma_2$,
+
+$$
+\sigma_{\text{total}} = \sqrt{\sigma_1^2 + \sigma_2^2}.
+$$
+
+The marginal benefit of reducing $\sigma_k$ is $\partial \sigma_{\text{total}} / \partial \sigma_k = \sigma_k / \sigma_{\text{total}}$, which is proportional to the source's size. Small sources contribute almost nothing at the margin.
+
+## Simulated example
+
+Two independent error sources. Compare the total error after halving each one, both from the formula and by Monte Carlo.
+
+```{ojs}
+import {rng, range, sd, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof s1 = Inputs.range([0, 20], {value: 12, step: 0.5, label: "Error source 1 (sd)"})
+viewof s2 = Inputs.range([0, 20], {value: 5, step: 0.5, label: "Error source 2 (sd)"})
+viewof seed = Inputs.range([1, 500], {value: 101, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+quad = {
+  const r = rng(seed);
+  const mc = (a, b) => sd(range(20000).map(() => r.normal(0, a) + r.normal(0, b)));
+  return [
+    {scenario: "As is", formula: Math.hypot(s1, s2), sim: mc(s1, s2)},
+    {scenario: "Halve source 1", formula: Math.hypot(s1 / 2, s2), sim: mc(s1 / 2, s2)},
+    {scenario: "Halve source 2", formula: Math.hypot(s1, s2 / 2), sim: mc(s1, s2 / 2)},
+    {scenario: "Eliminate source 2", formula: Math.hypot(s1, 0), sim: mc(s1, 0)}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 200,
+  marginLeft: 140,
+  x: {label: "Total error (sd)", grid: true},
+  y: {label: null, domain: quad.map(d => d.scenario)},
+  marks: [Plot.barX(quad, {y: "scenario", x: "formula", fill: "#2166ac"}), Plot.dot(quad, {y: "scenario", x: "sim", fill: "#d6604d", r: 5}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`√(${s1}² + ${s2}²) = **${fmt(quad[0].formula, 2)}**. Halving source 1 gives **${fmt(quad[1].formula, 2)}**. Halving source 2 gives **${fmt(quad[2].formula, 2)}**, and eliminating source 2 altogether gives **${fmt(quad[3].formula, 2)}**. Red dots are Monte Carlo checks. Work on the biggest source of error.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Independent errors add in quadrature, so the largest source dominates.
+- Reducing a small source of error barely helps. Find and attack the big one.
+- In surveys and experiments, that's usually sampling error, non-response or model error, not instrument precision.
+:::
+
+## Related entries
+
+- [Kangaroo](kangaroo.qmd)
+- [The most important aspect of a statistical method](what-data-it-uses.qmd)
+- [Honesty and transparency](honesty-and-transparency.qmd)
+
+## Source
+
+- Andrew Gelman, [The most important formula in statistics?](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/) (2008).

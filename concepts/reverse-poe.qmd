@@ -1,0 +1,88 @@
+---
+title: "Reverse Poe"
+date: 2026-11-09
+description: "It's evidently sincere, yet its contents are parodic."
+order: 63
+categories: [Research culture, Communication]
+source: "http://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#63** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/).
+:::
+
+## What it is
+
+**Poe's Law** says that without clear markers of intent, a parody of an extreme view can't be told apart from a sincere statement of it. The **Reverse Poe** is the opposite case: something that is plainly sincere, such as a published paper, a press release or an official report, whose content reads like parody. Examples include a study that claims an absurdly large effect from a trivial manipulation, or a regression with ridiculous implications presented with a straight face.
+
+## Why it matters
+
+When sincere scientific claims become indistinguishable from satire, it's a sign that the field's quality control has broken down. Reviewers and readers have stopped asking "does this make any sense?" Reverse Poes are useful warning signals. If your first reaction to a finding is "this must be a joke," take that seriously as a prior, even when the paper comes with all the trappings of seriousness.
+
+## How it works
+
+A toy picture. Give each text an "absurdity score." Parodies and sincere work each have a distribution of scores. Readers use a threshold, so anything above it is "probably a joke." When sincere work includes a heavy right tail of absurd claims, much of it lands above the threshold. Those are the Reverse Poes. The more the two distributions overlap, the harder it is to tell satire from science.
+
+## Simulated example
+
+There are 2,000 sincere papers and 300 parodies. Move the sincere distribution's tail to reflect weaker quality control and see how many sincere papers a reader would mistake for jokes.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tail = Inputs.range([0, 0.4], {value: 0.08, step: 0.01, label: "Share of sincere papers with absurd claims"})
+viewof threshold = Inputs.range([1, 5], {value: 3, step: 0.1, label: "Reader's 'must be a joke' threshold"})
+viewof seed = Inputs.range([1, 500], {value: 63, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+texts = {
+  const r = rng(seed);
+  const sincere = range(2000).map(() => ({kind: "Sincere", score: r() < tail ? r.normal(4, 0.8) : r.normal(1, 0.8)}));
+  const parody = range(300).map(() => ({kind: "Parody", score: r.normal(4.2, 0.8)}));
+  return [...sincere, ...parody];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Absurdity score", grid: true},
+  y: {label: "Texts"},
+  color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Parody", "Sincere"]},
+  marks: [
+    Plot.rectY(texts, Plot.binX({y: "count"}, {x: "score", fill: "kind", fillOpacity: 0.6, thresholds: 50, mixBlendMode: "multiply"})),
+    Plot.ruleX([threshold], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const above = texts.filter(d => d.score > threshold);
+  const rp = above.filter(d => d.kind === "Sincere").length;
+  return html`<div class="sim-readout">${md`Above the "must be a joke" line there are **${above.length}** texts, and **${rp}** of them (${pct(rp / Math.max(1, above.length))}) are **sincere**: Reverse Poes. As quality control weakens and the absurd tail grows, readers lose the ability to tell science from satire.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- When a sincere claim reads like a parody, take the reaction seriously.
+- Reverse Poes indicate failed quality control, not just one bad paper.
+- "Does this make any sense at all?" is a legitimate scientific question.
+:::
+
+## Related entries
+
+- [Clarke's Law](clarkes-law.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+- [The Piranha Principle](piranha-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [It comes down to reality and it's fine with me cause I've let it slide](http://statmodeling.stat.columbia.edu/2016/06/23/it-comes-down-to-reality-and-its-fine-with-me-cause-ive-let-it-slide/) (2016).

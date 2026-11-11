@@ -1,0 +1,94 @@
+---
+title: "The Pinocchio Principle"
+date: 2026-11-09
+description: "A model that is created solely for computational reasons can take on a life of its own."
+order: 31
+categories: [Computing, Bayesian inference]
+source: "http://www.stat.columbia.edu/~gelman/research/published/parameterization.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#31** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Parameterization and Bayesian modeling (PDF)](http://www.stat.columbia.edu/~gelman/research/published/parameterization.pdf).
+:::
+
+## What it is
+
+Pinocchio was carved as a puppet and became a real boy. Statisticians sometimes add a parameter or restructure a model *purely to make computation easier*, such as speeding up a Gibbs sampler or making an integral tractable. Later they discover the computational device has a meaningful interpretation and leads to new, better models. The scaffolding comes to life.
+
+## Why it matters
+
+Gelman's example is **parameter expansion** in hierarchical models. To fix a Gibbs sampler that gets stuck when the group-level variance $\tau$ is near zero, you write $\theta_j = \mu + \alpha\,\eta_j$ with a redundant multiplier $\alpha$. The sampler mixes far better. In addition, the implied prior on $\tau = |\alpha|\,\sigma_\eta$ is a **folded non-central t** family, which includes the half-Cauchy. That family became a recommended default prior for hierarchical variance parameters. A computational trick produced a modeling idea.
+
+## How it works
+
+With $\alpha \sim \mathrm{N}(0, A^2)$ and $\sigma_\eta^2 \sim \text{Inv-}\chi^2(\nu)$ independent, the product $\tau = |\alpha|\,\sigma_\eta$ has a half-$t_\nu$ distribution with scale $A$. For $\nu = 1$ this is the half-Cauchy. Here $\alpha$ was introduced only to break the dependence between $\tau$ and the $\theta_j$ in the sampler, but the prior it induces is useful in its own right.
+
+## Simulated example
+
+Draw the "computational" parameters $\alpha$ and $\sigma_\eta$ from their conditionally conjugate distributions and look at the implied prior on $\tau$. Compare it with the half-t density the theory predicts.
+
+```{ojs}
+import {rng, range, fmt, quantile} from "../js/stats.js"
+```
+
+```{ojs}
+viewof A = Inputs.range([0.5, 10], {value: 2.5, step: 0.5, label: "Scale of α (A)"})
+viewof nu = Inputs.range([1, 30], {value: 1, step: 1, label: "Degrees of freedom ν"})
+viewof seed = Inputs.range([1, 500], {value: 31, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+lgamma = z => {
+  const g = 7, c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313, -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  // Lanczos approximation; only called here with z >= 0.5.
+  z -= 1; let x = c[0]; for (let i = 1; i < g + 2; i++) x += c[i] / (z + i);
+  const t = z + g + 0.5; return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+halfT = (x, nu, A) => 2 * Math.exp(lgamma((nu + 1) / 2) - lgamma(nu / 2)) / (A * Math.sqrt(nu * Math.PI)) * (1 + (x / A) ** 2 / nu) ** (-(nu + 1) / 2)
+```
+
+```{ojs}
+taus = {
+  const r = rng(seed);
+  return range(20000).map(() => Math.abs(r.normal(0, A)) * Math.sqrt(nu / r.chisq(nu)));
+}
+cap = quantile(taus, 0.95)
+density = range(200).map(i => { const x = (i + 0.5) * cap / 200; return {x, d: halfT(x, nu, A)}; })
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Implied prior on τ = |α| σ_η (showing up to the 95th percentile)", domain: [0, cap]},
+  y: {label: "Density", grid: true},
+  marks: [
+    Plot.rectY(taus.filter(t => t < cap), Plot.binX({y: (bin, {x1, x2}) => bin.length / taus.length / (x2 - x1)}, {x: d => d, fill: "#2166ac", fillOpacity: 0.4, thresholds: 60})),
+    Plot.line(density, {x: "x", y: "d", stroke: "#d6604d", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`The histogram shows simulated draws of τ from the parameter-expansion "trick". The red line is the half-t density with ν = ${nu} and scale A = ${A}. They match. With ν = 1, the trick yields a **half-Cauchy** prior, now a standard default for hierarchical scale parameters. Median implied τ: **${fmt(quantile(taus, 0.5))}**.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Devices introduced for computation can carry real modeling content.
+- Parameter expansion, meant to speed up Gibbs sampling, gave rise to the half-t family of priors for variance parameters.
+- When a trick works unusually well, ask what model it implies.
+:::
+
+## Related entries
+
+- [The Folk Theorem of Statistical Computing](folk-theorem.qmd)
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+
+## Source
+
+- Andrew Gelman, "Parameterization and Bayesian modeling," *Journal of the American Statistical Association* (2004). [PDF](http://www.stat.columbia.edu/~gelman/research/published/parameterization.pdf).
+- Andrew Gelman, "Prior distributions for variance parameters in hierarchical models," *Bayesian Analysis* (2006).

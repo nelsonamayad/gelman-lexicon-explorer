@@ -1,0 +1,93 @@
+---
+title: "Uncertainty Interval"
+date: 2026-11-09
+description: "Say this instead of confidence or credible interval."
+order: 54
+categories: [Communication, Bayesian inference]
+source: "http://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#54** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Let's say uncertainty intervals](http://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/).
+:::
+
+## What it is
+
+Gelman proposes calling intervals "uncertainty intervals" rather than "confidence intervals" (the frequentist term) or "credible intervals" (the Bayesian term). The word "confidence" suggests the interval makes you confident. "Credible" suggests you should believe it. Neither is guaranteed. The interval's actual job is to *express uncertainty*, and the name should say so.
+
+## Why it matters
+
+Labels shape interpretation. "95% confidence" sounds like a guarantee, so people ignore the assumptions behind it: the model is right, the sample is random, there are no forking paths. Arguing over "confidence" versus "credible" also exaggerates the differences between frameworks, when in most applied problems the two intervals are almost numerically identical. "Uncertainty interval" is neutral and honest.
+
+## How it works
+
+For an estimate with standard error $\text{se}$ and a weak prior, the frequentist interval $\hat\theta \pm 1.96\,\text{se}$ and the Bayesian posterior interval are almost the same. They diverge only when the prior is informative relative to the data. In either case, the interval reflects only the uncertainty the *model* knows about. Model misspecification, such as ignoring clustering, can make both too narrow, which is another reason not to call them "confidence."
+
+## Simulated example
+
+Thirty replications of a study. For each, we compute a classical interval and a Bayesian interval under a weakly informative prior, both nominally 95%. Optionally, the data have unmodeled clustering, which both intervals ignore.
+
+```{ojs}
+import {rng, range, mean, sd, normalPosterior, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof priorSd = Inputs.range([0.1, 10], {value: 5, step: 0.1, label: "Prior sd (Bayesian interval)"})
+viewof clustered = Inputs.toggle({label: "Data have unmodeled clustering", value: false})
+viewof seed = Inputs.range([1, 500], {value: 54, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+intervals = {
+  const r = rng(seed);
+  const truth = 1;
+  return range(400).map(k => {
+    const y = clustered
+      ? range(10).flatMap(() => { const c = r.normal(0, 0.8); return r.normals(10, truth + c, 1); })
+      : r.normals(100, truth, 1);
+    const est = mean(y), se = sd(y) / Math.sqrt(y.length);
+    const post = normalPosterior(0, priorSd, est, se);
+    return {k, est, lo: est - 1.96 * se, hi: est + 1.96 * se, bLo: post.mean - 1.96 * post.sd, bHi: post.mean + 1.96 * post.sd, truth};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Replication (first 30)"},
+  y: {label: "Interval", grid: true},
+  color: {legend: true, domain: ["Classical", "Bayesian"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.ruleX(intervals.slice(0, 30), {x: d => d.k - 0.15, y1: "lo", y2: "hi", stroke: () => "Classical", strokeWidth: 2}),
+    Plot.ruleX(intervals.slice(0, 30), {x: d => d.k + 0.15, y1: "bLo", y2: "bHi", stroke: () => "Bayesian", strokeWidth: 2}),
+    Plot.ruleY([1], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const cov = (lo, hi) => intervals.filter(d => d[lo] <= d.truth && d.truth <= d[hi]).length / intervals.length;
+  return html`<div class="sim-readout">${md`Coverage over 400 replications: classical **${pct(cov("lo", "hi"), 1)}**, Bayesian **${pct(cov("bLo", "bHi"), 1)}**. With a weak prior they are almost identical, so "confidence" versus "credible" is mostly a naming fight. ${clustered ? "With unmodeled clustering, *both* are far too narrow, and neither deserves the word \"confidence\"." : "Turn on clustering to see both fail together."}`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Call intervals what they are: expressions of uncertainty.
+- Classical and Bayesian intervals usually agree closely. The name shouldn't suggest a bigger difference.
+- An interval is only as trustworthy as the model behind it. It doesn't guarantee anything.
+:::
+
+## Related entries
+
+- [Bayesians](bayesians-are-frequentists.qmd)
+- [When researchers say "guarantee"](guarantee-is-assumption.qmd)
+- [Tell Me What You Don't Know](tell-me-what-you-dont-know.qmd)
+
+## Source
+
+- Andrew Gelman, [Let's say uncertainty intervals](http://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/) (2010).

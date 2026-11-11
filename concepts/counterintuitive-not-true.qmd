@@ -1,0 +1,95 @@
+---
+title: "Just because something is counterintuitive"
+date: 2026-11-09
+description: "Doesn't mean it's true."
+order: 76
+categories: [Reasoning & fallacies, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#76** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Just because something is counterintuitive doesn't mean it's true](https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/).
+:::
+
+## What it is
+
+Popular science loves the counterintuitive: "everything you thought you knew about X is wrong." Surprise gets attention, but being surprising is not evidence of being true. If anything it points the other way. A finding is counterintuitive because it contradicts what we had good reason to believe. It therefore starts with a *lower* prior probability and needs *stronger* evidence to be believed.
+
+## Why it matters
+
+Journals, journalists and TED talks reward surprise. If surprising findings face the same evidence bar as unsurprising ones, such as a single p < 0.05, then the surprising findings that get through are much more likely to be false. The "counterintuitive" label works as a credibility *boost* in public discussion when it should work as a warning.
+
+## How it works
+
+By Bayes' rule, the probability that a significant finding is true is
+
+$$
+\Pr(\text{true} \mid \text{sig}) = \frac{\pi \cdot \text{power}}{\pi \cdot \text{power} + (1-\pi)\cdot\alpha},
+$$
+
+where $\pi$ is the prior probability that the hypothesis is true. Counterintuitive hypotheses have small $\pi$. With $\pi = 0.05$, power 0.5 and $\alpha = 0.05$, a significant result is true only about a third of the time. For a plausible hypothesis with $\pi = 0.5$, it is true more than 90% of the time.
+
+## Simulated example
+
+Simulate many studies of hypotheses ranging from obvious to wildly counterintuitive. All face the same p < 0.05 bar. Among the significant results, how often is the finding real?
+
+```{ojs}
+import {rng, range, qnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof power = Inputs.range([0.1, 0.95], {value: 0.5, step: 0.05, label: "Power of each study"})
+viewof seed = Inputs.range([1, 500], {value: 76, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+surprise = {
+  const r = rng(seed);
+  const shift = qnorm(0.975) + qnorm(power);
+  return [0.02, 0.05, 0.1, 0.2, 0.3, 0.5, 0.7, 0.9].map(pi => {
+    let sig = 0, sigTrue = 0;
+    for (let i = 0; i < 20000; i++) {
+      const real = r() < pi, z = r.normal(real ? shift : 0, 1);
+      if (Math.abs(z) > 1.96) { sig++; if (real) sigTrue++; }
+    }
+    return {pi, ppv: sigTrue / sig, theory: pi * power / (pi * power + (1 - pi) * 0.05)};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Prior plausibility π  (← counterintuitive · obvious →)", type: "log", grid: true},
+  y: {label: "Pr(finding is true | significant)", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [
+    Plot.line(surprise, {x: "pi", y: "theory", stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line(surprise, {x: "pi", y: "ppv", stroke: "#2166ac", strokeWidth: 2}),
+    Plot.dot(surprise, {x: "pi", y: "ppv", fill: "#2166ac"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With power ${pct(power)}, a significant counterintuitive finding (π = 0.02) is true **${pct(surprise[0].ppv)}** of the time, and a significant obvious one (π = 0.9) **${pct(surprise.at(-1).ppv)}** of the time. The more surprising the claim, the more evidence it needs.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Surprising claims start with a lower prior, so they need stronger evidence.
+- An equal significance bar for all claims lets through mostly false surprises.
+- Treat "counterintuitive" as a reason to look harder, not as a selling point.
+:::
+
+## Related entries
+
+- [The Paradox of Philosophizing](paradox-of-philosophizing.qmd)
+- [The Piranha Principle](piranha-principle.qmd)
+- [Reverse Poe](reverse-poe.qmd)
+- [Disbelief](disbelief.qmd)
+
+## Source
+
+- Andrew Gelman, [Just because something is counterintuitive doesn't mean it's true](https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/) (2007).

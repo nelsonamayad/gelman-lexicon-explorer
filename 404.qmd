@@ -1,0 +1,13 @@
+---
+title: "Page not found"
+date: 2026-11-11
+sidebar: false
+toc: false
+---
+
+That page doesn't exist. It may have been renamed when the site was reorganized.
+
+- [Browse all 153 entries](/index.html#all-entries)
+- [Browse by topic](/index.html#topics)
+- [Start here](/start-here.html)
+- [Try a random entry](/random.html)

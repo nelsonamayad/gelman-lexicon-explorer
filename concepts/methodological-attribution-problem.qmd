@@ -1,0 +1,93 @@
+---
+title: "The Methodological Attribution Problem"
+date: 2026-11-09
+description: "The many useful contributions of a good statistical consultant, or collaborator, will often be overly attributed to the statistician's methods or philosophy."
+order: 40
+categories: [Research culture, Causal inference]
+source: "http://www.stat.columbia.edu/~gelman/research/published/gelman_discussion_of_efron.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#40** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [discussion of Efron (PDF)](http://www.stat.columbia.edu/~gelman/research/published/gelman_discussion_of_efron.pdf).
+:::
+
+## What it is
+
+When a skilled statistician produces a good analysis, observers credit the method: "Bayesian methods work," "bootstrapping saved the day." Much of the value actually came from the statistician's judgment: careful data cleaning, asking the right question, sensible model checking, good graphs. Because skilled statisticians tend to favour particular methods, method and skill are confounded, and the method gets the credit.
+
+## Why it matters
+
+This produces bad inferences about methods. Novices adopt a technique expecting the results they saw from experts and are disappointed. Methodological debates turn into disputes over track records that are really records of *people*. Gelman raises this in discussing Brad Efron's work. The success of a statistician's applied work doesn't by itself show that their philosophy is right.
+
+## How it works
+
+It is a causal-inference problem with a confounder. Let analysis quality be $Q = \beta_{\text{method}} M + \beta_{\text{skill}} S + \epsilon$, where more skilled analysts are more likely to use method $M$. A naive comparison of outcomes by method estimates
+
+$$
+\mathrm{E}[Q \mid M=1] - \mathrm{E}[Q \mid M=0] = \beta_{\text{method}} + \beta_{\text{skill}}\big(\mathrm{E}[S \mid M=1] - \mathrm{E}[S \mid M=0]\big),
+$$
+
+which mixes the method's effect with the skill gap between the groups.
+
+## Simulated example
+
+Here 1,000 analysts vary in skill, and skilled ones prefer the "fancy" method. The method itself has only a small true benefit. Compare the naive credit given to the method with its true effect.
+
+```{ojs}
+import {rng, range, mean, ols, invLogit, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof methodEffect = Inputs.range([-0.5, 1], {value: 0.1, step: 0.05, label: "True effect of the method"})
+viewof selection = Inputs.range([0, 3], {value: 2, step: 0.1, label: "How strongly skill predicts using it"})
+viewof seed = Inputs.range([1, 500], {value: 40, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+analysts = {
+  const r = rng(seed);
+  return range(1000).map(() => {
+    const skill = r.normal(0, 1);
+    const m = r.bernoulli(invLogit(selection * skill));
+    return {skill, m, q: methodEffect * m + 1 * skill + r.normal(0, 0.5), group: m ? "Uses fancy method" : "Uses standard method"};
+  });
+}
+attr = {
+  const naive = mean(analysts.filter(d => d.m).map(d => d.q)) - mean(analysts.filter(d => !d.m).map(d => d.q));
+  const adj = ols(analysts.map(d => [d.m, d.skill]), analysts.map(d => d.q)).coef[1];
+  return {naive, adj};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Analyst skill", grid: true},
+  y: {label: "Quality of analysis", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.dot(analysts, {x: "skill", y: "q", fill: "group", r: 2, fillOpacity: 0.5})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Naive credit to the method (difference in average quality): **${fmt(attr.naive)}**. True method effect: **${fmt(methodEffect)}**. Adjusting for skill recovers **${fmt(attr.adj)}**. Most of the apparent advantage comes from the people using the method, not from the method itself.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Good results from good statisticians are evidence about the statisticians first, and only partly about their methods.
+- Comparisons of methods by track record are confounded by user skill.
+- To evaluate a method, use controlled comparisons: the same data, the same analyst or simulation studies.
+:::
+
+## Related entries
+
+- [Brilliance](brilliance.qmd)
+- [The most important aspect of a statistical method](what-data-it-uses.qmd)
+- [The Analyst's Paradox](analysts-paradox.qmd)
+
+## Source
+
+- Andrew Gelman, [Discussion of Efron](http://www.stat.columbia.edu/~gelman/research/published/gelman_discussion_of_efron.pdf).

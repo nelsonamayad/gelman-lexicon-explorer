@@ -1,0 +1,102 @@
+---
+title: "Conservatism"
+date: 2026-11-09
+description: "In statistics, the desire to use methods that have been used before."
+order: 9
+categories: [Research culture, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2007/06/bayes_radical_l/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#9** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayes: radical, liberal, or conservative?](https://statmodeling.stat.columbia.edu/2007/06/bayes_radical_l/)
+:::
+
+## What it is
+
+Statistical "conservatism" usually means wide intervals or few rejections. Gelman points to a different and very common sense: the preference for methods that *have been used before*. The familiar method feels safe because reviewers know it, software implements it, and nobody will be blamed for it.
+
+This is a sociological meaning of conservative, not a mathematical one. A familiar method is not necessarily cautious in its *results*. Unpooled estimates, for example, are the old default for estimating many group means, and they produce extreme, overconfident rankings.
+
+## Why it matters
+
+Conservatism has real virtues: a track record, known failure modes, comparability across studies. But "it's what everyone does" can lock in methods that are worse by any measure of accuracy. Gelman's 2007 post discusses how Bayesian methods have been called both radical and conservative. Whether a method is conservative depends on what you take as the baseline.
+
+## How it works
+
+Ask two separate questions about any method:
+
+1. *Is it familiar?* This is conservatism in the sociological sense.
+2. *Is it cautious?* Does it avoid overclaiming, give calibrated intervals and keep error rates low?
+
+The answers often diverge. Separate (no-pooling) estimates of many group means are familiar, but they are the *least* cautious estimates available. Every noisy extreme is taken at face value. Partial pooling is newer, but it is more conservative in the sense that matters.
+
+## Simulated example
+
+We estimate the means of 40 groups of varying size. The traditional approach estimates each group separately. The newer approach partially pools toward the overall mean. Which one is "conservative"?
+
+```{ojs}
+import {rng, range, mean, sum, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof tau = Inputs.range([0.05, 1.5], {value: 0.3, step: 0.05, label: "True between-group sd"})
+viewof avgN = Inputs.range([3, 100], {value: 10, step: 1, label: "Average group size"})
+viewof seed = Inputs.range([1, 500], {value: 19, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+groups = {
+  const r = rng(seed);
+  const raw = range(40).map(j => {
+    const theta = r.normal(0, tau), nj = Math.max(2, r.poisson(avgN));
+    const ybar = mean(r.normals(nj, theta, 1));
+    return {j, theta, nj, ybar, v: 1 / nj};
+  });
+  const mu = sum(raw.map(d => d.ybar / d.v)) / sum(raw.map(d => 1 / d.v));
+  const tau2 = Math.max(0.001, mean(raw.map(d => (d.ybar - mu) ** 2)) - mean(raw.map(d => d.v)));
+  return raw.map(d => ({...d, pooled: mu + tau2 / (tau2 + d.v) * (d.ybar - mu)}));
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "True group mean", grid: true},
+  y: {label: "Estimate", grid: true},
+  color: {legend: true, domain: ["Familiar: no pooling", "Newer: partial pooling"], range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.link(groups, {x1: "theta", y1: "ybar", x2: "theta", y2: "pooled", stroke: "#ccc"}),
+    Plot.dot(groups, {x: "theta", y: "ybar", fill: () => "Familiar: no pooling", r: 3}),
+    Plot.dot(groups, {x: "theta", y: "pooled", fill: () => "Newer: partial pooling", r: 3}),
+    Plot.line([[-2, -2], [2, 2]], {stroke: "#999", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const rm = k => Math.sqrt(mean(groups.map(d => (d[k] - d.theta) ** 2)));
+  const top = k => groups.slice().sort((a, b) => b[k] - a[k])[0];
+  return html`<div class="sim-readout">${md`Root-mean-square error: no pooling **${fmt(rm("ybar"), 3)}**, partial pooling **${fmt(rm("pooled"), 3)}**. The familiar method's "best" group has estimate **${fmt(top("ybar").ybar)}** but true mean **${fmt(top("ybar").theta)}**. Overclaiming like this is exactly what a *conservative* method should avoid.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- "Conservative" can mean *familiar* or *cautious*, and these are different properties.
+- The traditional default is not automatically the safe choice. Evaluate methods by their error rates, not by how familiar they are.
+- A track record is valuable. Weigh it against the cost of known flaws.
+:::
+
+## Related entries
+
+- [Defaults, once set](defaults-once-set.qmd)
+- [Defaults](defaults.qmd)
+- [Multiple Comparisons](multiple-comparisons.qmd)
+- [Between regularization and discovery](regularization-and-discovery.qmd)
+
+## Source
+
+- Andrew Gelman, [Bayes: radical, liberal, or conservative?](https://statmodeling.stat.columbia.edu/2007/06/bayes_radical_l/) (2007).

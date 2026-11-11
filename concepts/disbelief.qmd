@@ -1,0 +1,93 @@
+---
+title: "Disbelief"
+date: 2026-11-09
+description: "Remains an option."
+order: 103
+categories: [Reasoning & fallacies, Bayesian inference]
+source: "https://statmodeling.stat.columbia.edu/2014/09/03/disagree-alan-turing-daniel-kahneman-regarding-strength-statistical-evidence/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#103** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I disagree with Alan Turing and Daniel Kahneman regarding the strength of statistical evidence](https://statmodeling.stat.columbia.edu/2014/09/03/disagree-alan-turing-daniel-kahneman-regarding-strength-statistical-evidence/).
+:::
+
+## What it is
+
+Both Alan Turing (about telepathy experiments) and Daniel Kahneman (about social priming studies) argued that the published statistical evidence was so strong that readers had no choice but to accept the findings. Kahneman wrote that "disbelief is not an option." Gelman disagreed. Published evidence passes through filters: selection on significance, forking paths, publication bias. Once you account for them, the evidence is much weaker than it looks, and disbelief remains a perfectly reasonable option. In the priming case, later replications supported the skeptics.
+
+## Why it matters
+
+"The evidence is overwhelming" is a strong rhetorical move, but it assumes the published record is an unbiased sample of what researchers found. When it isn't, many significant results can come from a world with no effect at all. Taking the selection process into account is not stubbornness. It is correct inference.
+
+## How it works
+
+Suppose we see $k$ published significant studies. If studies are published *only* when significant, then the probability of seeing $k$ significant results is close to 1 under *both* "effect exists" and "no effect." What differs is how many unpublished null results were needed, which we can't see. The likelihood ratio from the published record is therefore far weaker than the naive calculation that treats each published result as an unselected draw.
+
+## Simulated example
+
+There is **no** true effect. Many labs run studies, and only significant ones get published. A naive reader updates on the published z-scores as if they were unselected. A selection-aware reader conditions on the fact that only significant results are published. Compare their beliefs.
+
+```{ojs}
+import {rng, range, dnorm, pnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nPub = Inputs.range([1, 15], {value: 8, step: 1, label: "Published significant studies"})
+viewof prior = Inputs.range([0.01, 0.5], {value: 0.1, step: 0.01, label: "Prior probability the effect is real"})
+viewof seed = Inputs.range([1, 500], {value: 103, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+disbelief = {
+  const r = rng(seed);
+  const delta = 2.5;                                  // z-shift if the effect were real
+  const pub = [];
+  while (pub.length < nPub) { const z = r.normal(0, 1); if (z > 1.96) pub.push(z); }   // truth: no effect
+  let naive = Math.log(prior / (1 - prior)), aware = naive;
+  const path = [{k: 0, reader: "Naive (no selection)", p: prior}, {k: 0, reader: "Selection-aware", p: prior}];
+  pub.forEach((z, i) => {
+    naive += Math.log(dnorm(z, delta) / dnorm(z, 0));
+    // Conditional on z > 1.96: density divided by Pr(z > 1.96) under each hypothesis.
+    aware += Math.log((dnorm(z, delta) / (1 - pnorm(1.96 - delta))) / (dnorm(z, 0) / (1 - pnorm(1.96))));
+    path.push({k: i + 1, reader: "Naive (no selection)", p: 1 / (1 + Math.exp(-naive))}, {k: i + 1, reader: "Selection-aware", p: 1 / (1 + Math.exp(-aware))});
+  });
+  return path;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Published significant studies read"},
+  y: {label: "Belief the effect is real", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(disbelief, {x: "k", y: "p", stroke: "reader", strokeWidth: 2, marker: "circle"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const end = w => disbelief.filter(d => d.reader === w).at(-1).p;
+  return html`<div class="sim-readout">${md`There is no true effect. After ${nPub} published significant studies, the naive reader is **${pct(end("Naive (no selection)"), 1)}** convinced. The selection-aware reader is at **${pct(end("Selection-aware"), 1)}**. Once you account for how results reach print, disbelief remains an option.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Published evidence is filtered. Account for selection before calling evidence "overwhelming."
+- Many significant results can come from a null world when only significant results get published.
+- Skepticism based on how evidence was produced is good inference, not stubbornness.
+:::
+
+## Related entries
+
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [Evidence and Truth](evidence-and-truth.qmd)
+- [The Chestertonian Principle](chestertonian-principle.qmd)
+
+## Source
+
+- Andrew Gelman, [I disagree with Alan Turing and Daniel Kahneman regarding the strength of statistical evidence](https://statmodeling.stat.columbia.edu/2014/09/03/disagree-alan-turing-daniel-kahneman-regarding-strength-statistical-evidence/) (2014).

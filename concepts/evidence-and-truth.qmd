@@ -1,0 +1,93 @@
+---
+title: "Evidence and Truth"
+date: 2026-11-09
+description: "They're different."
+order: 85
+categories: [Philosophy of statistics, Reasoning & fallacies]
+source: "https://statmodeling.stat.columbia.edu/2018/04/06/important-distinction-truth-evidence/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#85** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [An important distinction between truth and evidence](https://statmodeling.stat.columbia.edu/2018/04/06/important-distinction-truth-evidence/).
+:::
+
+## What it is
+
+"Is this claim true?" and "Does this study provide good evidence for this claim?" are different questions. A claim can be true while a study supporting it is worthless. A study can give apparently strong evidence for a claim that is false. Criticizing the evidence is not the same as denying the claim, and defending the claim doesn't rescue bad evidence.
+
+## Why it matters
+
+Debates about research often collapse the two. A critic says "this study is too noisy to tell us anything," and the authors reply as if the critic had said "the effect doesn't exist." Or people reason that "the conclusion is plausible, so the study must be fine." Keeping truth and evidence apart lets you say what is usually the honest position: "the claim might well be true, but this study doesn't show it."
+
+## How it works
+
+Think of claims as true or false, and evidence as a noisy signal of truth, like a z-statistic. The two distributions of evidence, for true claims and for false ones, overlap:
+
+- some **true** claims have weak evidence (low power);
+- some **false** claims have strong evidence (noise, forking paths).
+
+Truth is a property of the world. Evidence is a property of a study. The joint distribution, not either one alone, determines what you should believe.
+
+## Simulated example
+
+There are 3,000 claims. A fraction are true, and each comes with a study whose evidence strength depends on the truth plus noise. See how often strong evidence goes with a false claim, and how often a true claim has only weak evidence.
+
+```{ojs}
+import {rng, range, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof pi = Inputs.range([0.05, 0.9], {value: 0.3, step: 0.05, label: "Share of claims that are true"})
+viewof signal = Inputs.range([0.5, 4], {value: 1.5, step: 0.1, label: "Typical evidence strength for true claims"})
+viewof seed = Inputs.range([1, 500], {value: 85, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+claims = {
+  const r = rng(seed);
+  return range(3000).map(() => {
+    const truth = r() < pi;
+    return {truth: truth ? "True claim" : "False claim", z: r.normal(truth ? signal : 0, 1)};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Evidence strength (z-statistic of the supporting study)", grid: true},
+  y: {label: "Claims"},
+  color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["False claim", "True claim"]},
+  marks: [
+    Plot.rectY(claims, Plot.binX({y: "count"}, {x: "z", fill: "truth", fillOpacity: 0.6, thresholds: 60, mixBlendMode: "multiply"})),
+    Plot.ruleX([1.96], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const strong = claims.filter(d => d.z > 1.96), trueClaims = claims.filter(d => d.truth === "True claim");
+  return html`<div class="sim-readout">${md`Among claims with "strong" evidence (z > 1.96), **${pct(strong.filter(d => d.truth === "False claim").length / strong.length)}** are false. Among true claims, **${pct(trueClaims.filter(d => d.z <= 1.96).length / trueClaims.length)}** have only weak evidence. Evidence and truth are related, and they are not the same thing.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- A claim can be true while the evidence for it is bad, and the other way round.
+- Criticizing a study isn't denying its conclusion. Be clear about which you're doing.
+- "Plausible but not shown by this study" is a common and honest verdict.
+:::
+
+## Related entries
+
+- [Strongest-link Fallacy](strongest-link-fallacy.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+- [Disbelief](disbelief.qmd)
+
+## Source
+
+- Andrew Gelman, [An important distinction between truth and evidence](https://statmodeling.stat.columbia.edu/2018/04/06/important-distinction-truth-evidence/) (2018).

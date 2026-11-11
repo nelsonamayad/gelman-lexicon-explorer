@@ -1,0 +1,96 @@
+---
+title: "Looking for a needle in a pile of needles"
+date: 2026-11-09
+description: "They're not looking for a needle in a haystack, they're . . ."
+order: 88
+categories: [Causal inference, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#88** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [They're not looking for a needle in a haystack, they're looking for a needle in a pile of needles](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/).
+:::
+
+## What it is
+
+A needle in a haystack is hard to find, but once found it's obviously a needle. A needle in a *pile of needles* can't be picked out at all, because everything around it looks the same. Gelman used the phrase about an observational study claiming that U.S. cities with stronger public-health interventions during the 1918 flu had faster economic growth afterwards. Comparing cities, "the tide of the correlation is so much larger than the swells of the treatment effect." Cities differed in many ways that also predicted growth. When other researchers extended the data backwards, the intervention measures "explained" growth from *before* 1918 just as well as growth after it, which leaves a noisy zero.
+
+## Why it matters
+
+Observational comparisons across places, firms or people mix any treatment effect with every pre-existing difference that happens to correlate with treatment. If those differences are large and the effect is small, the estimate mostly reflects the differences. Adding controls and robustness checks doesn't fix this, and Gelman notes the authors had done both. The data simply can't single out the needle. He stresses that this isn't a slam on the authors, who used standard methods carefully. It's that the method can't solve this problem.
+
+## How it works
+
+Let city $c$ have a background growth tendency $g_c$ and treatment intensity $x_c$ that is correlated with $g_c$. Growth in a period is $y_c = g_c + \beta x_c + \epsilon_c$. Regressing $y$ on $x$ gives roughly $\beta + \text{cov}(x, g)/\text{var}(x)$. When the confounding term is much larger than $\beta$, the estimate is driven by it. A **placebo test**, regressing *pre*-treatment growth on the later treatment, picks up the same confounding term, which is the tell-tale sign the replicators found.
+
+## Simulated example
+
+There are 43 cities, as in the original study. Background growth differs by city and is correlated with how strongly each city intervened. Compare the "effect" estimated on post-1918 growth with the placebo estimate on pre-1918 growth, over 500 simulated datasets.
+
+```{ojs}
+import {rng, range, mean, lm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof beta = Inputs.range([0, 0.5], {value: 0.05, step: 0.01, label: "True effect of the intervention (β)"})
+viewof confound = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Correlation of intervention with background growth"})
+viewof seed = Inputs.range([1, 500], {value: 88, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+needles = {
+  const r = rng(seed);
+  return range(500).flatMap(k => {
+    const cities = range(43).map(() => {
+      const g = r.normal(), x = confound * g + Math.sqrt(1 - confound * confound) * r.normal();
+      return {x, pre: g + r.normal(0, 0.5), post: g + beta * x + r.normal(0, 0.5)};
+    });
+    return [
+      {period: "Placebo: growth before 1918", est: lm(cities.map(c => c.x), cities.map(c => c.pre)).b},
+      {period: "Claimed effect: growth after 1918", est: lm(cities.map(c => c.x), cities.map(c => c.post)).b}
+    ];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Estimated 'effect' of the intervention on growth", grid: true},
+  y: {label: "Simulated datasets"},
+  color: {legend: true, range: ["#2166ac", "#999"], domain: ["Claimed effect: growth after 1918", "Placebo: growth before 1918"]},
+  marks: [
+    Plot.rectY(needles, Plot.binX({y: "count"}, {x: "est", fill: "period", fillOpacity: 0.55, thresholds: 50, mixBlendMode: "multiply"})),
+    Plot.ruleX([beta], {stroke: "#d6604d", strokeWidth: 2}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const m = p => mean(needles.filter(d => d.period.startsWith(p)).map(d => d.est));
+  return html`<div class="sim-readout">${md`True effect: **${fmt(beta)}** (red line). Average estimated effect after 1918: **${fmt(m("Claimed"))}**. Average placebo "effect" on growth *before* the intervention: **${fmt(m("Placebo"))}**. The two distributions nearly coincide. The data can't tell the needle from the pile around it. Set the correlation to 0 and the placebo collapses to zero, so the needle can be found.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- When confounding correlations dwarf the treatment effect, the estimate mostly measures the confounding.
+- Placebo tests on pre-treatment outcomes reveal the problem: the "treatment" predicts the past too.
+- More controls and robustness checks don't help if the method can't separate the needle from the pile.
+:::
+
+## Related entries
+
+- [The Causal Identification Kool-Aid](causal-identification-kool-aid.qmd)
+- [Robustness checks](robustness-checks.qmd)
+- [Correlation](correlation-does-not-imply-correlation.qmd)
+- [The "All Else Equal" Fallacy](all-else-equal-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [They're not looking for a needle in a haystack, they're looking for a needle in a pile of needles](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/) (2020).
+- Lilley, Lilley and Rinaldi, comment on Correia, Luck and Verner, "Pandemics depress the economy, public health interventions do not" (2020).

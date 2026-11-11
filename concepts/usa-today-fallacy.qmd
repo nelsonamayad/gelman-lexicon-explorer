@@ -1,0 +1,100 @@
+---
+title: "The USA Today Fallacy"
+date: 2026-11-09
+description: "Counting all states (or countries) equally, forgetting that many more people live in larger jurisdictions, and so you're ignoring millions and millions of Californians if you give their state the same space you give Montana and Delaware."
+order: 15
+categories: [Statistical graphics, Surveys & MRP]
+source: "https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#15** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/).
+:::
+
+## What it is
+
+A summary or graph that treats every state, country or district as one unit commits the USA Today fallacy when the question is really about *people*. "Thirty states saw an increase" says nothing about how many Americans saw one. On a map, Montana takes up much more ink than New Jersey, though New Jersey has about eight times as many residents.
+
+## Why it matters
+
+Averages over jurisdictions and averages over people answer different questions, and they can differ a lot when the outcome is correlated with population size. Urban–rural differences make this common: large states are more urban. A state-level average can tell the opposite story from the population average. Choropleth maps make it worse by giving visual weight according to land area.
+
+## How it works
+
+If $\theta_s$ is the value in state $s$ and $N_s$ its population,
+
+$$
+\bar\theta_{\text{states}} = \frac{1}{S}\sum_s \theta_s
+\quad\text{vs.}\quad
+\bar\theta_{\text{people}} = \frac{\sum_s N_s\,\theta_s}{\sum_s N_s}.
+$$
+
+The two agree only if $\theta_s$ is uncorrelated with $N_s$. Decide which one answers your question. If it's about people, weight by population, and size your graphical elements accordingly.
+
+## Simulated example
+
+The populations below are approximate 2020 census figures. The outcome is simulated so that it is correlated with state size, as many urban–rural outcomes are. Compare the unweighted state average with the population-weighted one.
+
+```{ojs}
+import {rng, sum, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof sizeCorr = Inputs.range([-10, 10], {value: 6, step: 0.5, label: "How much the outcome rises with log population"})
+viewof seed = Inputs.range([1, 500], {value: 15, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pops = ({"California":39.5,"Texas":29.1,"Florida":21.5,"New York":20.2,"Pennsylvania":13.0,"Illinois":12.8,"Ohio":11.8,"Georgia":10.7,"North Carolina":10.4,"Michigan":10.1,"New Jersey":9.3,"Virginia":8.6,"Washington":7.7,"Arizona":7.2,"Massachusetts":7.0,"Tennessee":6.9,"Indiana":6.8,"Maryland":6.2,"Missouri":6.2,"Wisconsin":5.9,"Colorado":5.8,"Minnesota":5.7,"South Carolina":5.1,"Alabama":5.0,"Louisiana":4.7,"Kentucky":4.5,"Oregon":4.2,"Oklahoma":4.0,"Connecticut":3.6,"Utah":3.3,"Iowa":3.2,"Nevada":3.1,"Arkansas":3.0,"Mississippi":3.0,"Kansas":2.9,"New Mexico":2.1,"Nebraska":2.0,"Idaho":1.8,"West Virginia":1.8,"Hawaii":1.5,"New Hampshire":1.4,"Maine":1.4,"Rhode Island":1.1,"Montana":1.1,"Delaware":1.0,"South Dakota":0.9,"North Dakota":0.8,"Alaska":0.7,"Vermont":0.6,"Wyoming":0.6})
+```
+
+```{ojs}
+usa = {
+  const r = rng(seed);
+  const entries = Object.entries(pops);
+  const lm = mean(entries.map(([, p]) => Math.log(p)));
+  return entries.map(([state, pop]) => ({state, pop, value: 50 + sizeCorr * (Math.log(pop) - lm) + r.normal(0, 4)}));
+}
+summary = ({
+  states: mean(usa.map(d => d.value)),
+  people: sum(usa.map(d => d.value * d.pop)) / sum(usa.map(d => d.pop))
+})
+```
+
+```{ojs}
+Plot.plot({
+  height: 320,
+  x: {label: "State population (millions, log scale)", type: "log", grid: true},
+  y: {label: "Outcome", grid: true},
+  r: {range: [2, 22]},
+  marks: [
+    Plot.dot(usa, {x: "pop", y: "value", r: "pop", fill: "#2166ac", fillOpacity: 0.35, stroke: "#2166ac", title: "state"}),
+    Plot.text(usa.filter(d => d.pop > 15 || d.pop < 0.8), {x: "pop", y: "value", text: "state", dy: -12, fontSize: 10}),
+    Plot.ruleY([summary.states], {stroke: "#d6604d", strokeDasharray: "5 3"}),
+    Plot.ruleY([summary.people], {stroke: "currentColor"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Average across the 50 states (dashed red): **${fmt(summary.states, 1)}**. Average across *people* (solid black): **${fmt(summary.people, 1)}**. The four largest states hold about a third of the population, and an unweighted state average gives them 4 votes out of 50.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Decide whether your unit of analysis is the jurisdiction or the person.
+- When outcomes correlate with size, state-weighted and population-weighted summaries can disagree a lot.
+- On maps, land area is not population. Consider cartograms or population-sized symbols.
+:::
+
+## Related entries
+
+- [Alabama First](alabama-first.qmd)
+- [Mister P](mister-p.qmd)
+- [The Superplot](superplot.qmd)
+
+## Source
+
+- Andrew Gelman, [Overrepresentation of small states](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/) (2004).

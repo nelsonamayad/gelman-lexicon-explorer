@@ -1,0 +1,95 @@
+---
+title: "The Foxhole Fallacy"
+date: 2026-11-09
+description: "There are no X's in foxholes (where X = people who disagree with me on some issue of faith)."
+order: 30
+categories: [Reasoning & fallacies, Philosophy of statistics]
+source: "https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#30** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [No Bayesians in foxholes](https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/).
+:::
+
+## What it is
+
+"There are no atheists in foxholes" claims that under real pressure, everyone comes around to belief. The foxhole fallacy is the general form of the argument: "when it *really* matters, everybody does it my way." In statistics you hear "there are no Bayesians in foxholes," or the reverse, "when the stakes are high, everyone wants a prior." Gelman's post points out how often this rhetorical move appears and how little evidence usually stands behind it.
+
+## Why it matters
+
+The claim is unfalsifiable as usually stated. Anyone who doesn't convert under pressure wasn't in a "real" foxhole. It also rests on anecdote, and on anecdotes filtered by the arguer's own side. People remember the dramatic conversion *toward* their view and forget the quiet cases going the other way. It replaces evidence about what works under pressure with a story about who is serious.
+
+## How it works
+
+A toy model of the evidence behind a foxhole claim. Under pressure, some practitioners switch methods, in both directions, at similar rates. The arguer observes switches through a biased memory: switches toward their view are noticed with high probability and switches away with low probability. Their "evidence" shows a one-way stampede even when the true net flow is zero.
+
+## Simulated example
+
+There are 1,000 practitioners in high-pressure situations. Set the true switching rates in each direction and how selective the arguer's memory is.
+
+```{ojs}
+import {rng, range, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof toMine = Inputs.range([0, 0.2], {value: 0.05, step: 0.01, label: "True rate of switching TO my method"})
+viewof fromMine = Inputs.range([0, 0.2], {value: 0.05, step: 0.01, label: "True rate of switching AWAY"})
+viewof memoryBias = Inputs.range([0, 1], {value: 0.8, step: 0.05, label: "Memory selectivity"})
+viewof seed = Inputs.range([1, 500], {value: 30, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+foxhole = {
+  const r = rng(seed);
+  let toT = 0, fromT = 0, toR = 0, fromR = 0;
+  for (let i = 0; i < 1000; i++) {
+    const usesMine = i < 500;
+    if (!usesMine && r() < toMine) { toT++; if (r() < 0.5 + memoryBias / 2) toR++; }
+    if (usesMine && r() < fromMine) { fromT++; if (r() < 0.5 - memoryBias / 2) fromR++; }
+  }
+  return [
+    {what: "Actually happened", dir: "Switched to my side", n: toT},
+    {what: "Actually happened", dir: "Switched away", n: fromT},
+    {what: "What I remember", dir: "Switched to my side", n: toR},
+    {what: "What I remember", dir: "Switched away", n: fromR}
+  ];
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 220,
+  marginLeft: 120,
+  fy: {label: null},
+  x: {label: "Number of practitioners", grid: true},
+  y: {label: null},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.barX(foxhole, {fy: "what", y: "dir", x: "n", fill: "dir"}), Plot.ruleX([0])]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = (w, d) => foxhole.find(x => x.what === w && x.dir === d).n;
+  return html`<div class="sim-readout">${md`True net flow toward my side: **${g("Actually happened", "Switched to my side") - g("Actually happened", "Switched away")}**. Remembered net flow: **${g("What I remember", "Switched to my side") - g("What I remember", "Switched away")}**. A selective memory turns two-way traffic into "there are no X's in foxholes."`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- "Everyone agrees with me when it really counts" is a rhetorical move, not evidence.
+- Anecdotes about conversions are filtered by who is telling them.
+- To judge methods under pressure, look at outcomes, not testimonials.
+:::
+
+## Related entries
+
+- [Bayesian](bayesian.qmd)
+- [The Pluralist's Dilemma](pluralists-dilemma.qmd)
+- [Second-Order Availability Bias](second-order-availability-bias.qmd)
+
+## Source
+
+- Andrew Gelman, [No Bayesians in foxholes](https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/) (2006).

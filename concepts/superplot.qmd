@@ -1,0 +1,109 @@
+---
+title: "The Superplot"
+date: 2026-11-09
+description: "Line plot of estimates in an interaction, with circles showing group sizes and a line showing the regression of the aggregate averages."
+order: 3
+categories: [Statistical graphics]
+source: "https://statmodeling.stat.columbia.edu/2005/11/income_matters/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#3** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/11/income_matters/).
+:::
+
+## What it is
+
+The superplot is a single graph that shows, together:
+
+- **within-group relationships**, as one line per group, for example how the probability of voting Republican rises with income *within* a state;
+- **group sizes**, as circles whose area shows how many people sit at each point;
+- **the between-group relationship**, as a separate line through the group averages.
+
+It became famous through Gelman's *Red State, Blue State* analysis. Within every state, richer voters lean Republican. Across states, richer states lean Democratic.
+
+## Why it matters
+
+Within-group and between-group relationships can point in opposite directions. This is the ecological fallacy and its cousin, Simpson's paradox. If you show only the aggregate line, you will conclude that wealth makes people vote Democratic. If you show only the individual-level regression, you will miss that geography matters. The superplot puts both levels on one canvas, and the circles show which points actually represent many people.
+
+## How it works
+
+Fit a model with a group-by-predictor interaction, for example a varying-intercept regression of vote on income with an intercept for each state group. For each group, draw its fitted line across the predictor's range. At each predictor value, place a circle whose area is proportional to the number of people in that group at that value. Finally, draw the regression of group-level average outcomes on group-level average predictors. That line can have the opposite slope.
+
+## Simulated example
+
+Three kinds of states (poor, middle-income, rich) have different income distributions. Within each, higher income raises the probability of voting Republican. Move the slider to change how strongly state wealth pushes the whole state toward the Democrats.
+
+```{ojs}
+import {rng, range, mean, lm, invLogit, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof stateShift = Inputs.range([0, 1.5], {value: 0.9, step: 0.05, label: "State-wealth effect (toward Dem)"})
+viewof within = Inputs.range([0, 0.8], {value: 0.35, step: 0.05, label: "Within-state income slope"})
+viewof seed = Inputs.range([1, 500], {value: 3, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+superSim = {
+  const r = rng(seed);
+  const groups = [
+    {g: "Poor states", center: 2.2, alpha: 0},
+    {g: "Middle states", center: 3, alpha: -stateShift / 2},
+    {g: "Rich states", center: 3.8, alpha: -stateShift}
+  ];
+  const people = groups.flatMap(G => range(3000).map(() => {
+    const inc = Math.min(5, Math.max(1, Math.round(r.normal(G.center, 1))));
+    const p = invLogit(G.alpha + within * (inc - 3));
+    return {g: G.g, inc, vote: r.bernoulli(p)};
+  }));
+  const cells = groups.flatMap(G => [1, 2, 3, 4, 5].map(inc => {
+    const c = people.filter(d => d.g === G.g && d.inc === inc);
+    return {g: G.g, inc, n: c.length, fit: invLogit(G.alpha + within * (inc - 3))};
+  }));
+  const agg = groups.map(G => {
+    const c = people.filter(d => d.g === G.g);
+    return {g: G.g, inc: mean(c.map(d => d.inc)), vote: mean(c.map(d => d.vote))};
+  });
+  return {cells, agg, between: lm(agg.map(d => d.inc), agg.map(d => d.vote))};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 360,
+  x: {label: "Income category (1 = poorest, 5 = richest)", ticks: 5},
+  y: {label: "Pr(vote Republican)", domain: [0, 1], grid: true},
+  r: {range: [0, 16]},
+  color: {legend: true, domain: ["Poor states", "Middle states", "Rich states"], range: ["#d6604d", "#7f7f7f", "#2166ac"]},
+  marks: [
+    Plot.line(superSim.cells, {x: "inc", y: "fit", stroke: "g", strokeWidth: 2}),
+    Plot.dot(superSim.cells, {x: "inc", y: "fit", r: "n", stroke: "g", fill: "g", fillOpacity: 0.15}),
+    Plot.line(superSim.agg, {x: "inc", y: "vote", stroke: "currentColor", strokeWidth: 3, strokeDasharray: "6 4"}),
+    Plot.dot(superSim.agg, {x: "inc", y: "vote", fill: "currentColor", r: 5})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Every coloured line slopes **${within > 0 ? "up" : "flat"}**: within each state, richer people are more Republican. The dashed black line through the state averages has slope **${fmt(superSim.between.b, 3)}** per income category${superSim.between.b < 0 ? ". It slopes *down*: richer states are more Democratic" : ""}. Circle area is the number of people at each income level in each kind of state.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Show within-group and between-group relationships together. They can disagree.
+- Circles sized by group counts show where the population actually is, so readers don't over-weight sparse cells.
+- The superplot is a remedy for the ecological fallacy drawn as a graph.
+:::
+
+## Related entries
+
+- [The Secret Weapon](secret-weapon.qmd)
+- [Second-Order Availability Bias](second-order-availability-bias.qmd)
+- [The USA Today Fallacy](usa-today-fallacy.qmd)
+
+## Source
+
+- Andrew Gelman, [Income matters](https://statmodeling.stat.columbia.edu/2005/11/income_matters/) (2005).
+- Gelman, Park, Shor, Bafumi and Cortina, *Red State, Blue State, Rich State, Poor State* (2008).

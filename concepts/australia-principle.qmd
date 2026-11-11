@@ -1,0 +1,107 @@
+---
+title: "The Australia principle"
+date: 2026-11-09
+description: "Build the parts of the model you need, as you need them."
+order: 75
+categories: [Bayesian inference, Modeling workflow]
+source: "https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#75** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Prior distributions and the Australia principle](https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/).
+:::
+
+## What it is
+
+The name comes from a philosophical joke. Australia doesn't really exist. "They" just build the parts you need when you visit: a mock-up of the airport, the Sydney Opera House in the background, some kangaroos. Gelman applies this to **prior distributions**. Where the likelihood is strong relative to the question you're asking, you don't need to worry much about the prior, and something vague will do. Where the likelihood is weak, you need to build more of the prior yourself, because "you need to supply the relevant scenery yourself, as it's not coming from the likelihood."
+
+## Why it matters
+
+Two consequences follow, as Gelman puts it: the prior can often only be understood in the context of the likelihood, and the prior you need depends on the question being asked. His example is a random-sample survey of 3,000 people. For a public-opinion proportion, N = 3,000 gives about ±1 percentage point and any vague prior is fine. For comparing the sex ratio of babies born to "beautiful" and "ugly" parents, where plausible differences are a fraction of a percentage point, N = 3,000 tells you essentially nothing, and you need a strong prior to get a reasonable posterior.
+
+## How it works
+
+With a normal approximation, the posterior mean is a precision-weighted average of the prior mean and the estimate:
+
+$$
+\hat\theta_{\text{post}} = \frac{\hat\theta/\text{se}^2 + \mu_0/\sigma_0^2}{1/\text{se}^2 + 1/\sigma_0^2}.
+$$
+
+What matters is the size of the standard error *relative to the effects you care about*. When $\text{se}$ is small compared with plausible effects, the prior barely matters. When $\text{se}$ is large compared with plausible effects, the prior does most of the work, so it had better be built carefully.
+
+## Simulated example
+
+The same survey of 3,000 people answers two questions. The first is a public-opinion proportion, where effects of interest are several percentage points. The second is a sex-ratio difference, where the true effect is at most a few tenths of a point. Compare the posteriors under a vague prior and an informative one.
+
+```{ojs}
+import {rng, range, normalPosterior, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof n = Inputs.range([500, 100000], {value: 3000, step: 500, label: "Survey sample size"})
+viewof seed = Inputs.range([1, 500], {value: 75, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+australia = {
+  const r = rng(seed);
+  // Q1: opinion proportion (truth 0.52), effect scale ~ 0.05.
+  const se1 = 0.5 / Math.sqrt(n), est1 = 0.52 + r.normal(0, se1);
+  // Q2: difference in Pr(girl) between two groups of n/2 (truth 0.002), effect scale ~ 0.003.
+  const se2 = Math.sqrt(2 * 0.25 / (n / 2)), est2 = 0.002 + r.normal(0, se2);
+  const rows = [];
+  const add = (q, est, se, priorMean, vagueSd, infoSd, truth) => {
+    for (const [label, sd] of [["Vague prior", vagueSd], ["Informative prior", infoSd]]) {
+      const p = normalPosterior(priorMean, sd, est, se);
+      rows.push({q, prior: label, mean: p.mean, lo: p.mean - 1.96 * p.sd, hi: p.mean + 1.96 * p.sd, truth, est, se});
+    }
+  };
+  add("Q1: public-opinion proportion", est1, se1, 0.5, 1, 0.05, 0.52);
+  add("Q2: sex-ratio difference", est2, se2, 0, 1, 0.003, 0.002);
+  return rows;
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 260,
+  marginLeft: 120,
+  facet: {data: australia, y: "q", marginRight: 10, label: null},
+  fy: {label: null},
+  x: {label: "Posterior estimate with 95% interval (each panel on its own scale)"},
+  y: {label: null},
+  marks: [
+    Plot.ruleY(australia, {fy: "q", y: "prior", x1: "lo", x2: "hi", stroke: d => d.prior === "Vague prior" ? "#d6604d" : "#2166ac", strokeWidth: 3}),
+    Plot.dot(australia, {fy: "q", y: "prior", x: "mean", fill: "currentColor", r: 4}),
+    Plot.ruleX(australia, {fy: "q", x: "truth", stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const g = (q, p) => australia.find(d => d.q.startsWith(q) && d.prior === p);
+  return html`<div class="sim-readout">${md`**Q1 (opinion):** the vague and informative priors give essentially the same answer (${fmt(100 * g("Q1", "Vague prior").mean, 1)}% vs ${fmt(100 * g("Q1", "Informative prior").mean, 1)}%), because the likelihood supplies the scenery. **Q2 (sex ratio):** the standard error is **${fmt(100 * g("Q2", "Vague prior").se, 2)} points** against a true effect of 0.2 points. The vague-prior interval runs from ${fmt(100 * g("Q2", "Vague prior").lo, 1)} to ${fmt(100 * g("Q2", "Vague prior").hi, 1)} points, which is useless, so the prior has to be built. Same data, different question, different prior needed.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Build the prior where the likelihood is weak, and don't fuss over it where the likelihood is strong.
+- The prior you need depends on the question, not just the data.
+- The prior can often only be understood in the context of the likelihood.
+:::
+
+## Related entries
+
+- [Weakly Informative Priors](weakly-informative-priors.qmd)
+- [Kangaroo](kangaroo.qmd)
+- [Camel that is the likelihood](camel-likelihood.qmd)
+- [The Bayesian cringe](bayesian-cringe.qmd)
+
+## Source
+
+- Andrew Gelman, [Prior distributions and the Australia principle](https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/) (2018).
+- Gelman, Simpson and Betancourt, "The prior can often only be understood in the context of the likelihood," *Entropy* (2017).

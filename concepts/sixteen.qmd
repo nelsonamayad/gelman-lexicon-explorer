@@ -1,0 +1,101 @@
+---
+title: "16"
+date: 2026-11-09
+description: "You need this much more of a sample size to estimate an interaction that is half the size of a main effect."
+order: 80
+categories: [Significance & noise, Causal inference]
+source: "https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#80** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [You need 16 times the sample size to estimate an interaction than to estimate a main effect](https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect/).
+:::
+
+## What it is
+
+Interactions are much harder to estimate than main effects. In a balanced design, the standard error of an interaction is **twice** the standard error of the main effect. Realistic interactions are also usually *smaller* than main effects, say half the size. Together these mean you need $2^2 \times 2^2 = 16$ times the sample size to estimate the interaction with the same precision relative to its size.
+
+## Why it matters
+
+Studies are powered for main effects and then mined for interactions: "the treatment worked especially for women," "the effect was stronger among older participants." If the study had 80% power for the main effect, its power for a half-size interaction is tiny. Interaction "findings" from such studies are mostly the [significance filter](statistical-significance-filter.qmd) at work: exaggerated, unstable and often wrong in sign.
+
+## How it works
+
+In a 2×2 design with $n$ people per cell and outcome sd $\sigma$:
+
+- the main effect (average over the other factor) is a difference of two means, each based on $2n$ people, so $\text{se}_{\text{main}} = \sigma\sqrt{2/(2n)} \cdot \sqrt{2}/\sqrt{2} = \sigma/\sqrt{n}$;
+- the interaction is a *difference of differences* of four cell means, so $\text{se}_{\text{int}} = \sigma\sqrt{4/n} = 2\sigma/\sqrt{n}$.
+
+If the interaction is half the main effect, its z-score is $(\theta/2)/(2\sigma/\sqrt{n}) = \tfrac14$ of the main effect's. Matching precision requires $n$ to be $4^2 = 16$ times larger.
+
+## Simulated example
+
+A 2×2 experiment with main effect θ and an interaction of θ/2. For a range of sample sizes, estimate the power to detect each.
+
+```{ojs}
+import {rng, range, mean, qnorm, pnorm, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof theta = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"})
+viewof intRatio = Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"})
+viewof seed = Inputs.range([1, 500], {value: 80, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+power16 = {
+  const r = rng(seed);
+  const ns = [10, 20, 40, 80, 160, 320, 640, 1280];
+  const gamma = intRatio * theta;
+  return ns.flatMap(n => {
+    let hitM = 0, hitI = 0;
+    for (let rep = 0; rep < 400; rep++) {
+      // Cells: (treat a, group b), effect coded ±1/2.
+      const cell = (a, b) => mean(r.normals(n, theta * (a - 0.5) * 2 / 2 + gamma * (a - 0.5) * (b - 0.5) * 4 / 2, 1));
+      const m00 = cell(0, 0), m10 = cell(1, 0), m01 = cell(0, 1), m11 = cell(1, 1);
+      const main = ((m10 - m00) + (m11 - m01)) / 2, inter = (m11 - m01) - (m10 - m00);
+      if (Math.abs(main / (1 / Math.sqrt(n))) > 1.96) hitM++;
+      if (Math.abs(inter / (2 / Math.sqrt(n))) > 1.96) hitI++;
+    }
+    return [{n, what: "Main effect", power: hitM / 400}, {n, what: "Interaction", power: hitI / 400}];
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {type: "log", label: "People per cell (log scale)", grid: true},
+  y: {label: "Power", domain: [0, 1], tickFormat: "%", grid: true},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.line(power16, {x: "n", y: "power", stroke: "what", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.8], {stroke: "#999", strokeDasharray: "4 3"})]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const nMain = (qnorm(0.975) + qnorm(0.8)) ** 2 / theta ** 2;
+  const nInt = (qnorm(0.975) + qnorm(0.8)) ** 2 * 4 / (intRatio * theta) ** 2;
+  return html`<div class="sim-readout">${md`For 80% power: about **${fmt(nMain, 0)}** per cell for the main effect and **${fmt(nInt, 0)}** per cell for the interaction, a ratio of **${fmt(nInt / nMain, 1)}×**. With the interaction at half the main effect, that's the famous 16.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Interaction estimates have twice the standard error of main effects in balanced designs.
+- Realistic interactions are smaller than main effects, so power drops by a factor of about 16 in sample size.
+- Treat interaction "findings" from studies powered for main effects with great suspicion.
+:::
+
+## Related entries
+
+- [The Statistical Significance Filter](statistical-significance-filter.qmd)
+- [The 80% Power Lie](80-percent-power-lie.qmd)
+- [The Freshman Fallacy](freshman-fallacy.qmd)
+- [Story Time](story-time.qmd)
+
+## Source
+
+- Andrew Gelman, [You need 16 times the sample size to estimate an interaction than to estimate a main effect](https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect/) (2018).

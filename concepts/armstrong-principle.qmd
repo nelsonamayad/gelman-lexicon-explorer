@@ -1,0 +1,90 @@
+---
+title: "The (Lance) Armstrong Principle"
+date: 2026-11-09
+description: "If you push people to promise more than they can deliver, they're motivated to cheat."
+order: 64
+categories: [Research culture]
+source: "http://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#64** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Lance Armstrong principle](http://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/).
+:::
+
+## What it is
+
+Named after the cyclist whose doping became an open secret. When people are required to deliver results beyond what is honestly achievable, they are pushed toward cutting corners. Examples include grant proposals that must promise transformative effects, journals that demand clean significant results, and careers that depend on breakthroughs. The cheating isn't always outright fraud. It is often p-hacking, selective reporting or overclaiming, which are softer forms of the same pressure.
+
+## Why it matters
+
+Institutions that demand overpromising get exaggeration and misconduct as predictable side effects. Blaming individual "bad apples" misses the structural cause. If the realistic effect of an intervention is small, a funding system that rewards only large promised effects selects for researchers who either overpromise and then cheat, or overpromise and then fail.
+
+## How it works
+
+A toy model. Each researcher's honest result is $Y \sim \mathrm{N}(\mu, \sigma)$. They are required to deliver at least $T$, the promise. If $Y < T$, they cheat with a probability that rises with the shortfall: $\Pr(\text{cheat}) = 1 - e^{-\kappa (T - Y)}$. Cheaters report $T$ or a bit above. As $T$ rises above $\mu$, the share of reports that are cheats climbs, and the reported literature shows effects that cluster just above the promise.
+
+## Simulated example
+
+There are 2,000 researchers whose honest effects average 0.2. Raise the promised effect and the pressure, and see what the reported literature looks like.
+
+```{ojs}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+```
+
+```{ojs}
+viewof promise = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Promised effect T"})
+viewof kappa = Inputs.range([0, 10], {value: 3, step: 0.5, label: "Pressure to deliver κ"})
+viewof seed = Inputs.range([1, 500], {value: 64, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+reports = {
+  const r = rng(seed);
+  return range(2000).map(() => {
+    const honest = r.normal(0.2, 0.25);
+    const cheat = honest < promise && r() < 1 - Math.exp(-kappa * (promise - honest));
+    return {honest, reported: cheat ? promise + Math.abs(r.normal(0, 0.05)) : honest, cheat};
+  });
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  x: {label: "Reported effect", grid: true},
+  y: {label: "Researchers"},
+  marks: [
+    Plot.rectY(reports, Plot.binX({y: "count"}, {x: "reported", fill: d => d.cheat ? "#d6604d" : "#2166ac", thresholds: 60})),
+    Plot.ruleX([promise], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleX([0.2], {stroke: "#2166ac"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const c = reports.filter(d => d.cheat).length / reports.length;
+  return html`<div class="sim-readout">${md`Promised effect **${fmt(promise)}** against an honest average of 0.20. **${pct(c)}** of researchers cheat (red). The reported literature averages **${fmt(mean(reports.map(d => d.reported)))}**, with a spike just above the promise. Lower the promise toward reality and the cheating goes away.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Demanding more than is achievable creates incentives to cheat.
+- Exaggeration and misconduct are often structural, not just individual failings.
+- Reward accurate reporting of realistic effects, not promises.
+:::
+
+## Related entries
+
+- [The combination of originality, ambition, and lack of scruple](originality-ambition-scruple.qmd)
+- [The 80% Power Lie](80-percent-power-lie.qmd)
+- [Meritocracy won't happen](meritocracy.qmd)
+- [Passive Corruption](passive-corruption.qmd)
+
+## Source
+
+- Andrew Gelman, [The Lance Armstrong principle](http://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/) (2017).

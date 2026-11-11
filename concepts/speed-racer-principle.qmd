@@ -1,0 +1,92 @@
+---
+title: "The Speed Racer Principle"
+date: 2026-11-09
+description: "Sometimes the most interesting aspect of a scientific or cultural product is not its overt content but rather its unexamined assumptions."
+order: 53
+categories: [Philosophy of statistics, Modeling workflow]
+source: "http://statmodeling.stat.columbia.edu/2013/02/09/thomas-hobbes-would-be-spinning-in-his-grave/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#53** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Thomas Hobbes would be spinning in his grave](http://statmodeling.stat.columbia.edu/2013/02/09/thomas-hobbes-would-be-spinning-in-his-grave/).
+:::
+
+## What it is
+
+Gelman rewatched the 1960s *Speed Racer* cartoons as an adult and found that the best parts were not the plots. They were the long drives, with Japanese industrial scenes in the background. "Similarly, sometimes the most interesting aspect of a book or article is not its overt content but rather its unexamined assumptions." His example was a newspaper column on happiness research. The same is true of scientific work. The headline claim often matters less than the unexamined assumptions it rests on: the choice of scale, what counts as a unit, which variables are "controls," what the comparison group is.
+
+## Why it matters
+
+Unexamined assumptions are where conclusions are most fragile and readers are least alert. A paper may debate its estimator at length while silently assuming that effects are additive on the raw scale. That assumption alone can create or erase the main finding. Reading for assumptions, not just for claims, is a core skill for evaluating research.
+
+## How it works
+
+A classic example is **interaction and scale**. Two groups grow at the same *percentage* rate. On the raw scale, their gap widens over time, which shows up as an interaction. On the log scale, the lines are parallel and there is no interaction. Whether "the treatment works better for group A" is a finding or an artifact depends on an assumption about scale that is rarely stated or defended.
+
+## Simulated example
+
+Two groups, one starting higher, both growing by the same percentage per period. Fit the "interaction" model on the raw scale and on the log scale. The headline finding comes from the unexamined assumption.
+
+```{ojs}
+import {rng, range, ols, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof growth = Inputs.range([0, 0.3], {value: 0.15, step: 0.01, label: "Common growth rate per period"})
+viewof ratio = Inputs.range([1, 4], {value: 2.5, step: 0.1, label: "Group A starts this many times higher"})
+viewof scale = Inputs.radio(["Raw scale", "Log scale"], {value: "Raw scale", label: "Analysis scale"})
+viewof seed = Inputs.range([1, 500], {value: 53, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+racer = {
+  const r = rng(seed);
+  return range(400).map(() => {
+    const t = r.int(0, 6), a = r.bernoulli(0.5);
+    const y = 10 * (a ? ratio : 1) * Math.exp(growth * t + r.normal(0, 0.1));
+    return {t, a, group: a ? "Group A" : "Group B", y, ly: Math.log(y)};
+  });
+}
+inter = {
+  const yv = racer.map(d => scale === "Raw scale" ? d.y : d.ly);
+  const f = ols(racer.map(d => [d.t, d.a, d.t * d.a]), yv);
+  return {coef: f.coef[3], se: f.se[3]};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  x: {label: "Time period"},
+  y: {label: scale === "Raw scale" ? "Outcome" : "log(Outcome)", grid: true, type: scale === "Raw scale" ? "linear" : "log"},
+  color: {legend: true, range: ["#d6604d", "#2166ac"]},
+  marks: [
+    Plot.dot(racer, {x: d => d.t + (d.a ? 0.1 : -0.1), y: "y", fill: "group", r: 1.5, fillOpacity: 0.4}),
+    Plot.line(racer, Plot.groupX({y: "mean"}, {x: "t", y: "y", stroke: "group", strokeWidth: 2}))
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`On the **${scale.toLowerCase()}**, the time × group interaction is **${fmt(inter.coef, 3)}** (se ${fmt(inter.se, 3)}). ${Math.abs(inter.coef / inter.se) > 2 ? "\"Group A benefits more from time!\" is a striking finding." : "No interaction: the groups change in parallel."} Switch scales: the same data, and the headline depends entirely on an assumption nobody discussed.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Read research for its assumptions, not just its claims.
+- Choices of scale, comparison group and "control" variables are often the real drivers of a result.
+- Make your own assumptions explicit, and check whether the conclusion survives reasonable alternatives.
+:::
+
+## Related entries
+
+- [Default, the greatest trick it ever pulled](default-greatest-trick.qmd)
+- [The "All Else Equal" Fallacy](all-else-equal-fallacy.qmd)
+- [When researchers say "guarantee"](guarantee-is-assumption.qmd)
+- [Assumptions and Rigor](assumptions-and-rigor.qmd)
+
+## Source
+
+- Andrew Gelman, [Thomas Hobbes would be spinning in his grave](http://statmodeling.stat.columbia.edu/2013/02/09/thomas-hobbes-would-be-spinning-in-his-grave/) (2013).

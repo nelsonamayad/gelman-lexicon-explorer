@@ -1,0 +1,90 @@
+---
+title: "Cheeseburger-snarfing diet gurus"
+date: 2026-11-09
+description: "When we teach, we don't practice what we preach."
+order: 91
+categories: [Research culture, Causal inference]
+source: "http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics2.pdf"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#91** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ethics and statistics column (PDF)](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics2.pdf).
+:::
+
+## What it is
+
+Picture a diet guru eating cheeseburgers between lectures. Statisticians teach students to randomize, measure carefully, use control groups and be skeptical of anecdotes. Then they evaluate their own teaching with end-of-semester satisfaction surveys, gut feelings and before-and-after impressions with no comparison group. When it comes to teaching, we don't practice what we preach.
+
+## Why it matters
+
+Teaching innovations get adopted on the strength of enthusiasm and student ratings, which mostly measure how much students *liked* the class, not how much they *learned*. Instructors who introduce a new method are often enthusiastic, and enthusiasm raises ratings whatever the method's effect. The result is a body of educational "best practice" built on exactly the kind of evidence statisticians tell everyone else to distrust.
+
+## How it works
+
+A toy model. A teaching innovation has a small true effect on learning. Its novelty and the instructor's enthusiasm have a large effect on student satisfaction. The guru's evaluation compares satisfaction before and after. A proper evaluation randomizes sections and measures learning on a common pre/post test. The two can disagree about whether the innovation works, and about how well.
+
+## Simulated example
+
+Compare how a teaching innovation looks under the guru's evaluation and under the evaluation statisticians would demand of anyone else.
+
+```{ojs}
+import {rng, range, mean, sd, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof learnEffect = Inputs.range([-0.3, 0.5], {value: 0.05, step: 0.05, label: "True effect on learning (sd units)"})
+viewof enthusiasm = Inputs.range([0, 1.5], {value: 0.8, step: 0.05, label: "Novelty/enthusiasm boost to ratings"})
+viewof seed = Inputs.range([1, 500], {value: 91, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+teaching = {
+  const r = rng(seed);
+  const sections = range(20).map(k => {
+    const treated = k % 2 === 0, inst = r.normal(0, 0.3);
+    const students = range(40).map(() => {
+      const pre = r.normal(), post = pre * 0.6 + inst + (treated ? learnEffect : 0) + r.normal(0, 0.8);
+      const rating = 3.5 + inst + (treated ? enthusiasm : 0) * 0.5 + r.normal(0, 0.6);
+      return {pre, post, rating};
+    });
+    return {treated, gain: mean(students.map(s => s.post - 0.6 * s.pre)), rating: mean(students.map(s => s.rating))};
+  });
+  const diff = k => mean(sections.filter(s => s.treated).map(s => s[k])) - mean(sections.filter(s => !s.treated).map(s => s[k]));
+  const se = k => Math.sqrt(sd(sections.filter(s => s.treated).map(s => s[k])) ** 2 / 10 + sd(sections.filter(s => !s.treated).map(s => s[k])) ** 2 / 10);
+  return {sections, ratingDiff: diff("rating"), ratingSe: se("rating"), learnDiff: diff("gain"), learnSe: se("gain")};
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 280,
+  grid: true,
+  x: {label: "Section's average learning gain (adjusted for pre-test)"},
+  y: {label: "Section's average satisfaction rating"},
+  color: {legend: true, domain: ["New method", "Old method"], range: ["#d6604d", "#2166ac"]},
+  marks: [Plot.dot(teaching.sections, {x: "gain", y: "rating", fill: d => d.treated ? "New method" : "Old method", r: 6})]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`Guru's evidence: ratings up by **${fmt(teaching.ratingDiff)}** points (se ${fmt(teaching.ratingSe)}), so "students love it!" Proper randomized evaluation of learning: **${fmt(teaching.learnDiff)}** sd (se ${fmt(teaching.learnSe)}). The true effect on learning is ${fmt(learnEffect)}. Ratings measure the cheeseburger, not the diet.`}</div>`
+```
+
+## Key takeaways
+
+::: takeaways
+- Apply to our own teaching the standards of evidence we teach.
+- Satisfaction ratings measure enjoyment and enthusiasm, not learning.
+- Randomize sections and measure learning directly when evaluating teaching changes.
+:::
+
+## Related entries
+
+- [Basketball, or knitting](basketball-or-knitting.qmd)
+- [A bunch of hoops to jump through](bunch-of-hoops.qmd)
+- [Hullman's Theorem](hullmans-theorem.qmd)
+
+## Source
+
+- Andrew Gelman, [Ethics and statistics column, *Chance*](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics2.pdf).

@@ -1,0 +1,87 @@
+---
+title: "Story Time"
+date: 2026-11-09
+description: "When the numbers are put to bed, the stories come out."
+order: 29
+categories: [Communication, Significance & noise]
+source: "https://statmodeling.stat.columbia.edu/2010/10/story_time/"
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#29** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2010/10/story_time/).
+:::
+
+## What it is
+
+"Story time" is the moment in a paper or talk when the careful quantitative analysis ends and the speculation begins. The results section was hedged and full of standard errors. The discussion section explains *why* the pattern happened, which subgroups drive it and what it means for policy, often with no data behind any of it. The stories get the same authority as the numbers, though they haven't earned it.
+
+## Why it matters
+
+Readers remember stories, not standard errors. When a paper's narrative goes beyond its evidence, the narrative is what spreads into press coverage and policy. The danger is greatest when the story is built on noise. Any random pattern in subgroups can be given a plausible explanation after the fact, and the story then makes the noise feel real.
+
+## How it works
+
+Suppose an intervention has *no effect at all* and you look at ten subgroups. By chance, one subgroup will show the largest "effect." Story time supplies an explanation: "the program worked especially well for older women because..." The explanation is plausible, it is untested, and with a different random seed a different subgroup would have been on top, with an equally plausible story.
+
+## Simulated example
+
+This intervention has zero true effect in every subgroup. Each draw produces a "standout" subgroup ripe for storytelling. Click through seeds and watch the protagonist change.
+
+```{ojs}
+import {rng, range, mean, twoGroup, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof nPer = Inputs.range([20, 400], {value: 60, step: 10, label: "People per arm per subgroup"})
+viewof seed = Inputs.range([1, 500], {value: 29, step: 1, label: "Random seed (new study)"})
+```
+
+```{ojs}
+subgroups = ["Young men", "Young women", "Older men", "Older women", "Urban", "Rural", "Low income", "High income", "College", "No college"]
+story = {
+  const r = rng(seed);
+  return subgroups.map(g => ({g, ...twoGroup(r, nPer, 0, 1)}))
+    .sort((a, b) => b.est - a.est);
+}
+```
+
+```{ojs}
+Plot.plot({
+  height: 300,
+  marginLeft: 100,
+  x: {label: "Estimated effect (95% interval). True effect is 0 everywhere.", grid: true},
+  y: {label: null, domain: story.map(d => d.g)},
+  marks: [
+    Plot.ruleY(story, {y: "g", x1: d => d.est - 1.96 * d.se, x2: d => d.est + 1.96 * d.se, stroke: (d, i) => i === 0 ? "#d6604d" : "#999"}),
+    Plot.dot(story, {y: "g", x: "est", fill: (d, i) => i === 0 ? "#d6604d" : "#2166ac", r: 4}),
+    Plot.ruleX([0], {stroke: "currentColor"})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const top = story[0];
+  return html`<div class="sim-readout">${md`Tonight's story: *"The program was especially effective for **${top.g.toLowerCase()}**"* (estimate ${fmt(top.est)}, p = ${fmt(top.p, 3)}). There is nothing to explain, since every true effect is zero. Change the seed and a different subgroup becomes the hero.`}</div>`;
+}
+```
+
+## Key takeaways
+
+::: takeaways
+- Notice where the numbers stop and the stories start, as writer and as reader.
+- After-the-fact explanations of subgroup patterns are cheap. Noise always provides something to explain.
+- Label speculation as speculation, and don't let the discussion section claim more than the results section showed.
+:::
+
+## Related entries
+
+- [The Garden of Forking Paths](garden-of-forking-paths.qmd)
+- [Two sides, no vig](two-sides-no-vig.qmd)
+- [That toothpaste feeling](toothpaste-feeling.qmd)
+- [Context](context.qmd)
+
+## Source
+
+- Andrew Gelman, [Story time](https://statmodeling.stat.columbia.edu/2010/10/story_time/) (2010).
