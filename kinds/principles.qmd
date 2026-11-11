@@ -2,7 +2,7 @@
 title: "Principles and heuristics"
 date: 2026-11-11
 subtitle: "50 entries"
-description: "A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds."
+description: "A rule of thumb, or a fact about how statistics works, with a simulation that illustrates it, often a toy model of our own."
 sidebar: false
 listing:
   - id: t-noise-and-evidence
@@ -82,7 +82,7 @@ Entries are listed in the order they appear in Gelman's list. See [all themes](.
 ::: {#t-noise-and-evidence}
 :::
 
-## Building and checking models (17)
+## Building and checking models (16)
 
 [See the whole theme](../themes/building-and-checking-models.qmd).
 
@@ -96,7 +96,7 @@ Entries are listed in the order they appear in Gelman's list. See [all themes](.
 ::: {#t-causes-samples-populations}
 :::
 
-## Showing and telling (3)
+## Showing and telling (4)
 
 [See the whole theme](../themes/showing-and-telling.qmd).
 

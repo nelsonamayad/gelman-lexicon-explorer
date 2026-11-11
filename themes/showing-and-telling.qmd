@@ -1,7 +1,7 @@
 ---
 title: "Showing and telling"
 date: 2026-11-11
-subtitle: "18 entries"
+subtitle: "19 entries"
 description: "Graphs, tables and writing: displays that let readers compare, numbers worth printing, and words that help."
 sidebar: false
 listing:
@@ -60,9 +60,9 @@ Something you can do: a model, a display, a check.
 ::: {#k-methods}
 :::
 
-## Principles and heuristics (3)
+## Principles and heuristics (4)
 
-A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds.
+A rule of thumb, or a fact about how statistics works, with a simulation that illustrates it, often a toy model of our own.
 
 ::: {#k-principles}
 :::

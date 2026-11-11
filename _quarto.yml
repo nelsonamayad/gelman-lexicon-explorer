@@ -7,13 +7,21 @@ project:
   resources:
     - js/stats.js
     - assets/
+  # Removes the ES6 polyfill script Quarto adds next to MathJax.
+  post-render: scripts/post_render.py
 
 website:
   title: "Andrew Gelman Statistical Lexicon Explorer"
-  description: "All 153 entries in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation."
-  # Set this to the Netlify URL (or custom domain) once the site exists;
-  # it is used for the sitemap and social-media preview cards.
-  # site-url: https://YOUR-SITE.netlify.app
+  description: "All 155 entries in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation."
+  # Public URL, used for the sitemap and social-media preview cards. The site
+  # is published to Netlify (.github/workflows/publish.yml). If Netlify gives
+  # the site a different name, or you add a custom domain, change it here.
+  site-url: https://gelman-lexicon-explorer.netlify.app
+  # "Edit this page" and "Report an issue" links on every page, so readers can
+  # send corrections.
+  repo-url: https://github.com/nelsonamayad/gelman-lexicon-explorer
+  repo-branch: main
+  repo-actions: [edit, issue]
   favicon: assets/logo.svg
   search:
     location: navbar
@@ -21,8 +29,21 @@ website:
   page-navigation: true
   back-to-top-navigation: true
   bread-crumbs: true
+  # Social-media preview image (1200 x 630) for every page.
+  image: assets/social-card.png
+  image-alt: "Andrew Gelman Statistical Lexicon Explorer: all 155 entries, each with an interactive simulation."
   open-graph: true
-  twitter-card: true
+  twitter-card:
+    card-style: summary_large_image
+  # Google Analytics is added by _analytics.html (included below) and loads
+  # only after the visitor accepts analytics cookies in this banner; the
+  # footer gets a "Cookie preferences" link. See about.qmd#privacy.
+  cookie-consent:
+    type: express
+    style: simple
+    palette: light
+    policy-url: about.html#privacy
+    prefs-text: "Cookie preferences"
   navbar:
     logo: assets/logo.svg
     logo-alt: "Lexicon Explorer logo"
@@ -49,22 +70,28 @@ website:
         text: Start here
       - href: random.qmd
         text: Random entry
+      - href: r/index.qmd
+        text: Try it in R
       - href: about.qmd
         text: About
     right:
       - icon: github
-        href: https://github.com/nelsonamayad
-        aria-label: Nelson Amaya D on GitHub
+        href: https://github.com/nelsonamayad/gelman-lexicon-explorer
+        aria-label: Source code on GitHub
       - icon: box-arrow-up-right
         href: https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/
         aria-label: Gelman's original lexicon
   # The sidebar (entries grouped by theme) is generated into _sidebar.yml by
   # scripts/build_groups.py and merged in through metadata-files below.
   page-footer:
-    left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Explanations and simulations by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5, an independent study aid."
+    left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Explanations and simulations by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5. An independent study aid, not affiliated with or endorsed by Andrew Gelman."
     right:
       - text: About
         href: about.qmd
+      - text: License
+        href: about.qmd#license
+      - text: Privacy
+        href: about.qmd#privacy
       - icon: shuffle
         href: random.qmd
         aria-label: Random entry
@@ -84,6 +111,14 @@ date-format: long
 format:
   html:
     css: styles.css
+    # A canonical link on every page (pages are reachable with and without .html).
+    canonical-url: true
+    # Pin MathJax to an exact version instead of the floating mathjax@4.
+    html-math-method:
+      method: mathjax
+      url: "https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js"
+    include-in-header: _analytics.html
+    include-after-body: _a11y.html
     toc: true
     toc-title: "On this page"
     code-fold: true

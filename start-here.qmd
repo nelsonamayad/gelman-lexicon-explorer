@@ -5,7 +5,7 @@ subtitle: "A twelve-stop tour through the lexicon"
 sidebar: false
 ---
 
-The lexicon has 153 entries, in no particular order. If you're not sure where to begin, this tour visits the twelve ideas that the rest of the lexicon most often builds on. Each stop takes a few minutes, and each simulation is worth playing with before you move on.
+The lexicon has 155 entries, in no particular order. If you're not sure where to begin, this tour visits the twelve ideas that the rest of the lexicon most often builds on. Each stop takes a few minutes, and each simulation is worth playing with before you move on.
 
 ## Part 1: Why so many findings don't hold up
 
@@ -19,7 +19,7 @@ The lexicon has 153 entries, in no particular order. If you're not sure where to
 5. **[Multiple Comparisons](concepts/multiple-comparisons.qmd).** Partial pooling as the fix for noise-chasing.
 6. **[Mister P](concepts/mister-p.qmd).** The same idea applied to surveys: getting good estimates from bad samples.
 7. **[Weakly Informative Priors](concepts/weakly-informative-priors.qmd).** Using the scale of the problem to keep estimates sensible.
-8. **[The Secret Weapon](concepts/secret-weapon.qmd).** The simplest useful display in statistics: fit the same model many times and plot all the results.
+8. **[The Secret Weapon](concepts/secret-weapon.qmd).** A simple and very useful display: fit the same model many times and plot all the results. Gelman calls it secret because it "seems to be done much less often than it could be."
 
 ## Part 3: How to work
 
@@ -35,5 +35,5 @@ The lexicon has 153 entries, in no particular order. If you're not sure where to
 
 - Pick a [theme](index.qmd#themes) that matches your interests, such as noise and evidence, models, or how science behaves.
 - Or browse by [kind](index.qmd#kinds): all the fallacies, all the methods, all the laws and aphorisms.
-- On any entry page, the sidebar groups all 153 entries by theme. The links at the bottom of each page step to the previous and next entry in that theme.
+- On any entry page, the sidebar groups all 155 entries by theme. The links at the bottom of each page step to the previous and next entry in that theme.
 - Or try a [random entry](random.qmd).

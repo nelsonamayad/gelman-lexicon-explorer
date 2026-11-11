@@ -6,26 +6,31 @@ order: 36
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
 categories: ["Thinking about statistics", "Law or aphorism"]
-source: "http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/"
+source: "https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
+Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-Many practitioners say they "don't do philosophy" and just analyze the data. But every analysis carries philosophical commitments: what counts as evidence, what a probability means, when to declare a discovery. Refusing to discuss these commitments doesn't remove them. It leaves them unexamined, chosen by default or by whoever is willing to argue. "If philosophy is outlawed, only outlaws will do philosophy."
+Gelman's post responds to an article on the philosophy of statistics by the economist John DiNardo, which argues against Bayesian ideas that Gelman says "have already been discredited, within Bayesian statistics." The book *Bayesian Data Analysis* had skipped the defensiveness and jumped "straight to the models and the applications", which worked, "but it has led the likes of John DiNardo and Chris Burdzy ... to not notice the philosophical content that is there. And this is the paradox of philosophizing." Leaving the philosophy out kept the message that "Bayesian data analysis is about what works", but then critics don't see it: "as the saying goes, if philosophy is outlawed, only outlaws will do philosophy. DiNardo is responding to the outlaws."
+
+More generally, many practitioners say they "don't do philosophy" and just analyze the data. But every analysis carries philosophical commitments: what counts as evidence, what a probability means, when to declare a discovery. Refusing to discuss these commitments doesn't remove them. It leaves them unexamined, chosen by default or by whoever is willing to argue. "If philosophy is outlawed, only outlaws will do philosophy."
 
 ## Why it matters
 
-Implicit philosophies carry real consequences. "Report effects with p < 0.05" sounds neutral, but it implies a particular trade-off between false positives and false negatives. What that rule means in practice depends heavily on how often true effects occur in the field, which is the kind of prior the "no philosophy" analyst says they don't use. Making the philosophy explicit lets you see and debate those consequences.
+Implicit philosophies carry real consequences. *Report effects with p < 0.05* sounds neutral, but it implies a particular trade-off between false positives and false negatives. What that rule means in practice depends heavily on how often true effects occur in the field, which is the kind of prior the "no philosophy" analyst says they don't use. Making the philosophy explicit lets you see and debate those consequences.
 
 ## How it works
 
-Take the rule "declare a discovery when p < α" in a field where a fraction $\pi$ of tested hypotheses are true and studies have power $1-\beta$. The share of declared discoveries that are false is
+Take the rule *declare a discovery when p < α* in a field where a fraction $\pi$ of tested hypotheses are true and studies have power $1-\beta$. The share of declared discoveries that are false is
 
 $$
 \text{FDR} = \frac{\alpha(1-\pi)}{\alpha(1-\pi) + (1-\beta)\pi}.
@@ -33,11 +38,14 @@ $$
 
 The analyst who refused to state a prior has still chosen a rule whose meaning depends on $\pi$. That is an implicit philosophy, an "outlaw" one.
 
+This true-or-false accounting is a simplification, and not the framing Gelman prefers. He has argued that effects in social science are rarely exactly zero, and that it is more useful to ask how often an estimate gets the sign wrong or exaggerates the magnitude (type S and type M errors; see [the significance filter](statistical-significance-filter.qmd)). The point of the example survives either way: a rule chosen without stated assumptions still depends on them.
+
 ## Simulated example
 
 Simulate 5,000 studies in a field, apply the "philosophy-free" p < 0.05 rule, and see what fraction of discoveries are false. Vary the base rate and the power.
 
 ```{ojs}
+//| echo: false
 import {rng, range, pnorm, qnorm, fmt, pct} from "../js/stats.js"
 ```
 
@@ -65,6 +73,8 @@ counts = {
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "The Paradox of Philosophizing: simulation chart",
+  ariaDescription: "Horizontal axis: Declared discoveries. The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 200,
   marginLeft: 120,
   x: {label: "Declared discoveries", grid: true},
@@ -81,6 +91,48 @@ Plot.plot({
   return html`<div class="sim-readout">${md`Of **${counts.sig}** discoveries, **${counts.falseDisc}** (${pct(counts.falseDisc / Math.max(1, counts.sig))}) are false. Theory: ${pct(theory)}. The "philosophy-free" rule means something completely different when π = 0.5 than when π = 0.02. Ignoring that is itself a philosophical position.`}</div>`;
 }
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, pnorm, qnorm, fmt, pct} from "../js/stats.js"
+
+viewof pi = Inputs.range([0.01, 0.9], {value: 0.1, step: 0.01, label: "Share of tested hypotheses that are true (π)"})
+viewof power = Inputs.range([0.1, 0.95], {value: 0.4, step: 0.05, label: "Power of each study"})
+viewof seed = Inputs.range([1, 500], {value: 36, step: 1, label: "Random seed"})
+
+field = {
+  const r = rng(seed);
+  const shift = qnorm(0.975) + qnorm(power);   // effect in se units giving that power
+  return range(5000).map(() => {
+    const real = r() < pi;
+    const z = r.normal(real ? shift : 0, 1);
+    return {real, sig: Math.abs(z) > 1.96};
+  });
+}
+counts = {
+  const sig = field.filter(d => d.sig);
+  return {sig: sig.length, falseDisc: sig.filter(d => !d.real).length};
+}
+
+Plot.plot({
+  ariaLabel: "The Paradox of Philosophizing: simulation chart",
+  ariaDescription: "Horizontal axis: Declared discoveries. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 200,
+  marginLeft: 120,
+  x: {label: "Declared discoveries", grid: true},
+  y: {label: null},
+  color: {legend: true, domain: ["True effect", "No effect"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.barX(field.filter(d => d.sig), Plot.groupY({x: "count"}, {y: () => "p < 0.05", fill: d => d.real ? "True effect" : "No effect"}))]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
@@ -99,4 +151,4 @@ Plot.plot({
 
 ## Source
 
-- Andrew Gelman, [Hey dude, ya don't...](http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/) (2010).
+- Andrew Gelman, [Hey dude, ya don't...](https://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/) (2010).

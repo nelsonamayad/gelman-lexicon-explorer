@@ -103,6 +103,33 @@ code, pre, kbd, samp {
   color: var(--bs-secondary-color);
 }
 
+/* On phones, show each row of the full table as a stacked card instead of a
+   four-column table that would need sideways scrolling. */
+@media (max-width: 576px) {
+  .quarto-listing-table thead {
+    display: none;
+  }
+  .quarto-listing-table,
+  .quarto-listing-table tbody,
+  .quarto-listing-table tr,
+  .quarto-listing-table td {
+    display: block;
+    width: 100%;
+  }
+  .quarto-listing-table tr {
+    padding: 0.6rem 0;
+    border-bottom: 1px solid var(--bs-border-color);
+  }
+  .quarto-listing-table td {
+    border: 0;
+    padding: 0.1rem 0;
+    max-width: none;
+  }
+  .quarto-listing-table td.listing-order::before {
+    content: "#";
+  }
+}
+
 /* Grid cards on topic pages. */
 .quarto-grid-item .listing-description {
   font-size: 0.92rem;

@@ -1,0 +1,162 @@
+---
+title: "The paradox of storytelling"
+date: 2026-11-11
+description: "Learning from anomalies seems to contradict usual principles of science and statistics where we seek representative or unbiased samples."
+order: 154
+theme: "Showing and telling"
+kind: "Principle or heuristic"
+categories: ["Showing and telling", "Principle or heuristic"]
+source: "https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/"
+verified: true
+source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list."
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#154** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Storytelling and Scientific Understanding](https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+
+Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list.
+:::
+
+## What it is
+
+The entry comes from the abstract of "Storytelling and Scientific Understanding", talks that Gelman and Thomas Basbøll gave at Johns Hopkins. They argue that "storytelling is central to science, not just as a tool for broadcasting scientific findings to the outside world, but also as a way that we as scientists understand and evaluate theories." For that purpose, "a story should be anomalous and immutable; that is, it should be surprising, representing some aspect of reality that is not well explained by existing models of the world, and have details that stand up to scrutiny."
+
+That leads to the paradox: "learning from anomalies seems to contradict usual principles of science and statistics where we seek representative or unbiased samples." Their resolution is to place "learning-within-stories into a hypothetico-deductive (Popperian) framework, in which storytelling is a form of exploration of the implications of a hypothesis."
+
+## Why it matters
+
+Statistics teaches us to distrust the unusual case: a vivid anecdote is not a representative sample, and selecting cases because they are surprising biases any average you compute from them. Yet scientists keep learning from striking cases, and Gelman and Basbøll argue that this is legitimate when the story is used for the right job. An average describes how things usually go. An anomaly that holds up under scrutiny shows *where a theory breaks*, which an average can hide completely. The two kinds of evidence answer different questions.
+
+## How it works
+
+Our reading of the two conditions, in statistical terms:
+
+1. **Anomalous.** The case is far from what the current model predicts, so it carries information about where the model fails. A representative sample, by design, contains mostly cases where the model works.
+2. **Immutable.** The details hold up when checked. The most surprising reports are disproportionately errors, misreadings or embellishments, so a story teaches something only after its details have been verified.
+3. **Hypothetico-deductive use.** The story doesn't estimate how common something is. It tests a hypothesis: if the theory were right, this couldn't have happened.
+
+## Simulated example
+
+A toy model, our own. A theory predicts an outcome for 10,000 cases. In a small share of cases the theory genuinely fails, by 3 standard deviations. Every report has ordinary measurement noise, and a few have gross errors. One researcher takes a representative sample of 200 cases and averages them. Another collects the 30 most surprising reported cases, the stories, and checks their details by measuring them again.
+
+```{ojs}
+//| echo: false
+import {rng, range, mean, sd, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof q = Inputs.range([0.002, 0.05], {value: 0.01, step: 0.002, label: "Share of cases where the theory fails"})
+viewof errRate = Inputs.range([0, 0.03], {value: 0.005, step: 0.0025, label: "Share of reports with gross errors"})
+viewof seed = Inputs.range([1, 500], {value: 154, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+stories = {
+  const r = rng(seed);
+  const cases = range(10000).map(() => {
+    const real = r() < q;                       // the theory fails for this case
+    const truth = real ? 3 : 0;                 // deviation from the prediction, in sd units
+    const gross = r() < errRate;                // a detail that won't stand up to scrutiny
+    return {real, gross, truth, report: truth + r.normal(0, 1) + (gross ? r.normal(0, 4) : 0)};
+  });
+  const sample = range(200).map(() => cases[Math.floor(r() * cases.length)].report);
+  const top = cases.slice().sort((a, b) => Math.abs(b.report) - Math.abs(a.report)).slice(0, 30)
+    .map((c, i) => {
+      const recheck = c.truth + r.normal(0, 1);  // measure again: no gross error this time
+      return {...c, rank: i + 1, holdsUp: Math.abs(recheck) > 2, kind: c.real ? "Real anomaly" : "Not a real anomaly"};
+    });
+  return {avg: mean(sample), se: sd(sample) / Math.sqrt(200), top};
+}
+```
+
+```{ojs}
+Plot.plot({
+  ariaLabel: "The paradox of storytelling: simulation chart",
+  ariaDescription: "Horizontal axis: rank of the 30 most surprising reported cases. Vertical axis: reported deviation from the theory, in standard deviations. Color shows whether each case is a real anomaly; filled dots held up when their details were checked and crosses did not. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "The 30 most surprising stories (rank)"},
+  y: {label: "Reported deviation from the theory (sd)", grid: true},
+  color: {legend: true, domain: ["Real anomaly", "Not a real anomaly"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.dot(stories.top.filter(d => d.holdsUp), {x: "rank", y: "report", fill: "kind", r: 5}),
+    Plot.dot(stories.top.filter(d => !d.holdsUp), {x: "rank", y: "report", stroke: "kind", symbol: "times", r: 5}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+{
+  const t = stories.top, real = t.filter(d => d.real).length, kept = t.filter(d => d.holdsUp);
+  return html`<div class="sim-readout">${md`The representative sample puts the average deviation from the theory at **${fmt(stories.avg, 2)}** (standard error ${fmt(stories.se, 2)}): on average, the theory looks fine. Of the 30 most surprising stories, **${real}** are real anomalies and **${30 - real}** are not. Checking the details keeps **${kept.filter(d => d.real).length}** of the real ones and **${kept.filter(d => !d.real).length}** of the others. The anomalies show where the theory fails, which the average can't, but only after the stories that don't hold up have been weeded out.`}</div>`;
+}
+```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, sd, fmt} from "../js/stats.js"
+
+viewof q = Inputs.range([0.002, 0.05], {value: 0.01, step: 0.002, label: "Share of cases where the theory fails"})
+viewof errRate = Inputs.range([0, 0.03], {value: 0.005, step: 0.0025, label: "Share of reports with gross errors"})
+viewof seed = Inputs.range([1, 500], {value: 154, step: 1, label: "Random seed"})
+
+stories = {
+  const r = rng(seed);
+  const cases = range(10000).map(() => {
+    const real = r() < q;                       // the theory fails for this case
+    const truth = real ? 3 : 0;                 // deviation from the prediction, in sd units
+    const gross = r() < errRate;                // a detail that won't stand up to scrutiny
+    return {real, gross, truth, report: truth + r.normal(0, 1) + (gross ? r.normal(0, 4) : 0)};
+  });
+  const sample = range(200).map(() => cases[Math.floor(r() * cases.length)].report);
+  const top = cases.slice().sort((a, b) => Math.abs(b.report) - Math.abs(a.report)).slice(0, 30)
+    .map((c, i) => {
+      const recheck = c.truth + r.normal(0, 1);  // measure again: no gross error this time
+      return {...c, rank: i + 1, holdsUp: Math.abs(recheck) > 2, kind: c.real ? "Real anomaly" : "Not a real anomaly"};
+    });
+  return {avg: mean(sample), se: sd(sample) / Math.sqrt(200), top};
+}
+
+Plot.plot({
+  ariaLabel: "The paradox of storytelling: simulation chart",
+  ariaDescription: "Horizontal axis: rank of the 30 most surprising reported cases. Vertical axis: reported deviation from the theory, in standard deviations. Color shows whether each case is a real anomaly; filled dots held up when their details were checked and crosses did not. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "The 30 most surprising stories (rank)"},
+  y: {label: "Reported deviation from the theory (sd)", grid: true},
+  color: {legend: true, domain: ["Real anomaly", "Not a real anomaly"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.dot(stories.top.filter(d => d.holdsUp), {x: "rank", y: "report", fill: "kind", r: 5}),
+    Plot.dot(stories.top.filter(d => !d.holdsUp), {x: "rank", y: "report", stroke: "kind", symbol: "times", r: 5}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
+
+## Key takeaways
+
+::: takeaways
+- Gelman and Basbøll argue that stories help scientists understand and evaluate theories, not just communicate results.
+- A useful story is anomalous (surprising given current models) and immutable (its details stand up to scrutiny).
+- That seems to contradict the statistical habit of seeking representative samples. The resolution: a story tests a hypothesis, it doesn't estimate an average.
+:::
+
+## Related entries
+
+- [Story Time](story-time.qmd)
+- [Context](context.qmd)
+- [Just because something is counterintuitive](counterintuitive-not-true.qmd)
+
+## Source
+
+- Andrew Gelman and Thomas Basbøll, [Storytelling and Scientific Understanding](https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/) (2024), abstract of their talks at Johns Hopkins.

@@ -78,7 +78,7 @@ website:
             - concepts/schoolyard-evolutionary-biology.qmd
             - concepts/canary-variable.qmd
             - concepts/groovy-grandma-problem.qmd
-        - section: "Showing and telling (18)"
+        - section: "Showing and telling (19)"
           href: themes/showing-and-telling.qmd
           contents:
             - concepts/superplot.qmd
@@ -99,7 +99,8 @@ website:
             - concepts/seeds-of-its-own-destruction.qmd
             - concepts/click-through-solution.qmd
             - concepts/marginal.qmd
-        - section: "How science behaves (39)"
+            - concepts/paradox-of-storytelling.qmd
+        - section: "How science behaves (40)"
           href: themes/how-science-behaves.qmd
           contents:
             - concepts/pinch-hitter-syndrome.qmd
@@ -141,6 +142,7 @@ website:
             - concepts/edgelords-dilemma.qmd
             - concepts/no-obligation-to-share.qmd
             - concepts/originality-ambition-scruple.qmd
+            - concepts/transitive-property-of-money.qmd
         - section: "Thinking about statistics (33)"
           href: themes/thinking-about-statistics.qmd
           contents:

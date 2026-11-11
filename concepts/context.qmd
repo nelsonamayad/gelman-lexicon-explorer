@@ -7,56 +7,69 @@ theme: "Showing and telling"
 kind: "Principle or heuristic"
 categories: ["Showing and telling", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#111** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-A number or a story taken by itself means little. "Crime rose 8% this year" could be alarming or routine depending on how much the rate usually moves from year to year. "The treatment improved scores by 3 points" depends on the scale, the spread and what other interventions achieve. A statistic exists in context: its history, its natural variability and its comparison points.
+The entry is about judging a statement by where it is said and who says it. Gelman's post starts from a column by Michael Shermer, "a journalist and self-described skeptic", about an event that "shook [his] skepticism to its core": an old radio that didn't work, briefly started working again, then stopped. Gelman doesn't want to mock Shermer. He wants to talk about "the somewhat unstable way in which we use different sources of discourse in different aspects of life, and the awkwardness that can arise when we use the wrong words at the wrong time." Shermer used romantic discourse "in a space where people were expecting science discourse or journalism discourse."
+
+The general point: "our norm is to evaluate statements in their context. When a comedian says something on a sitcom, we evaluate it based on how funny it is (and maybe on how offensive it might be), when a self-declared skeptic writes a column, we evaluate things in that way, etc. A story doesn't exist on its own, it exists in context." Gelman ends by noting that "it's natural to interpret the Shermer story in terms of some frame or another. The frame 'prominent skeptic is stunned by a coincidence' is just one way to interpret this story."
 
 ## Why it matters
 
-Journalism and research communication often report changes without the baseline needed to interpret them. Readers can't tell a meaningful shift from ordinary fluctuation, so every uptick becomes a trend and every downturn a crisis. Giving context, such as the typical year-to-year change, the long-run range or a comparable effect, turns a factoid into information.
+The same words can be a joke, a confession, a claim of evidence or a sales pitch, and readers judge them by the frame they assume. Problems start when the frame is mismatched. A personal story placed where readers expect evidence gets judged as evidence. An offhand remark in a talk gets cited as a finding. A result in a press release gets read as if it had passed the scrutiny of a paper. Saying which kind of statement you are making, and noticing which kind you are reading, avoids judging a story by the wrong standard.
 
 ## How it works
 
-Judge a change $\Delta$ relative to the distribution of changes you would expect anyway. With historical year-to-year changes $\Delta_1, \dots, \Delta_T$, the percentile of the new $\Delta$ among them, or $\Delta / \mathrm{sd}(\Delta_t)$, tells you whether it is unusual. The same $\Delta$ is huge in a stable series and trivial in a volatile one.
+Gelman's post has no formula. Here is our own reading of it, as a checklist for any statement you meet:
+
+1. **Who is speaking, and in what role?** A comedian, a columnist, a scientist writing a paper, a scientist talking to a reporter.
+2. **What kind of discourse is it?** Entertainment, personal experience, journalism, scientific evidence.
+3. **Which standard follows from that?** Funny or not, honest or not, well reported or not, well supported or not.
+4. **Is there a mismatch?** If a statement borrows the authority of one frame while working by the rules of another, judge it by what it actually is.
 
 ## Simulated example
 
-Every headline reports the same "+8% this year." Choose how volatile the underlying series is and see what that 8% actually means.
+This toy model is our own. It takes one frame Gelman mentions, "prominent skeptic is stunned by a coincidence", and asks the question that frame invites: how often does a coincidence like this happen to *somebody*? Each reader of a skeptic's column has a small chance each year that a dead device briefly comes back to life, and a few days a year that carry special meaning, such as a wedding or an anniversary.
 
 ```{ojs}
-import {rng, range, sd, fmt, pct} from "../js/stats.js"
+//| echo: false
+import {rng, range, mean, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof volatility = Inputs.range([1, 20], {value: 3, step: 0.5, label: "Typical year-to-year change (%)"})
-viewof headline = Inputs.range([0, 30], {value: 8, step: 0.5, label: "This year's reported change (%)"})
+viewof readers = Inputs.range([10, 1000], {value: 100, step: 10, label: "Readers (thousands)"})
+viewof oneIn = Inputs.range([100, 10000], {value: 1000, step: 100, label: "Chance a dead device revives in a year: 1 in"})
+viewof special = Inputs.range([1, 20], {value: 3, step: 1, label: "Days a year that carry special meaning"})
 viewof seed = Inputs.range([1, 500], {value: 111, step: 1, label: "Random seed"})
 ```
 
 ```{ojs}
-history = {
+coincidences = {
   const r = rng(seed);
-  return range(40).map(t => ({year: 1985 + t, change: r.normal(0, volatility)}));
+  const lambda = readers * 1000 * (1 / oneIn) * (special / 365);
+  return {lambda, years: range(50).map(t => ({year: 1975 + t, n: r.poisson(lambda)}))};
 }
 ```
 
 ```{ojs}
 Plot.plot({
-  height: 280,
+  ariaLabel: "Context: simulation chart",
+  ariaDescription: "Horizontal axis: Year. Vertical axis: number of readers who saw a dead device revive on a special day. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 260,
   x: {label: "Year", tickFormat: "d"},
-  y: {label: "Year-to-year change (%)", grid: true},
+  y: {label: "Readers with an uncanny revival", grid: true},
   marks: [
-    Plot.ruleX(history, {x: "year", y: "change", stroke: "#999", strokeWidth: 4}),
-    Plot.ruleX([{year: 2025, change: headline}], {x: "year", y: "change", stroke: "#d6604d", strokeWidth: 6}),
-    Plot.text([{year: 2025, change: headline}], {x: "year", y: "change", text: () => "this year", dy: -10, fill: "#d6604d"}),
+    Plot.ruleX(coincidences.years, {x: "year", y: "n", stroke: "#2166ac", strokeWidth: 4}),
     Plot.ruleY([0])
   ]
 })
@@ -65,17 +78,53 @@ Plot.plot({
 ```{ojs}
 //| echo: false
 {
-  const larger = history.filter(d => Math.abs(d.change) >= headline).length;
-  return html`<div class="sim-readout">${md`In the past 40 years, **${larger}** years had a change at least as large as this year's ${headline}%. This year is **${fmt(headline / sd(history.map(d => d.change)), 1)} sd** from zero. ${larger > 6 ? "In context, it's routine." : "In context, it really is unusual."} Same headline, different stories.`}</div>`;
+  const withOne = coincidences.years.filter(d => d.n > 0).length;
+  return html`<div class="sim-readout">${md`Among **${(readers * 1000).toLocaleString("en-US")}** readers, about **${fmt(coincidences.lambda, 1)}** such coincidences are expected each year. In **${withOne}** of 50 simulated years, at least one reader saw a dead device come back to life on a day that mattered to them. ${coincidences.lambda >= 0.5 ? `To the person it happens to, it is uncanny. Read in the coincidence frame, it is something that happens to somebody ${withOne >= 40 ? "almost every year" : withOne >= 20 ? "every year or two" : "every few years"}.` : "With these settings it is rare even across the whole readership, and the coincidence frame alone doesn't explain it away."} The frame decides which question gets asked.`}</div>`;
 }
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, fmt} from "../js/stats.js"
+
+viewof readers = Inputs.range([10, 1000], {value: 100, step: 10, label: "Readers (thousands)"})
+viewof oneIn = Inputs.range([100, 10000], {value: 1000, step: 100, label: "Chance a dead device revives in a year: 1 in"})
+viewof special = Inputs.range([1, 20], {value: 3, step: 1, label: "Days a year that carry special meaning"})
+viewof seed = Inputs.range([1, 500], {value: 111, step: 1, label: "Random seed"})
+
+coincidences = {
+  const r = rng(seed);
+  const lambda = readers * 1000 * (1 / oneIn) * (special / 365);
+  return {lambda, years: range(50).map(t => ({year: 1975 + t, n: r.poisson(lambda)}))};
+}
+
+Plot.plot({
+  ariaLabel: "Context: simulation chart",
+  ariaDescription: "Horizontal axis: Year. Vertical axis: number of readers who saw a dead device revive on a special day. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 260,
+  x: {label: "Year", tickFormat: "d"},
+  y: {label: "Readers with an uncanny revival", grid: true},
+  marks: [
+    Plot.ruleX(coincidences.years, {x: "year", y: "n", stroke: "#2166ac", strokeWidth: 4}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
 ::: takeaways
-- A statistic means something only against its context: history, variability and comparisons.
-- Report how unusual a change is, not just its size.
-- When you see a bare number, ask what it should be compared with.
+- We judge statements in their context: a joke by whether it is funny, a column by the standards of journalism, a paper by its evidence.
+- Trouble comes from mismatches, when a story borrows the authority of one kind of discourse and works by the rules of another.
+- Any story can be read through more than one frame. Say which frame you are using, because it decides which question you ask.
 :::
 
 ## Related entries
@@ -83,6 +132,9 @@ Plot.plot({
 - [Story Time](story-time.qmd)
 - [The Chris Rock Effect](chris-rock-effect.qmd)
 - [Salad Tongs](salad-tongs.qmd)
+- [Second-Order Availability Bias](second-order-availability-bias.qmd)
+- [Objects of the class](objects-of-the-class.qmd)
+- [The paradox of storytelling](paradox-of-storytelling.qmd)
 
 ## Source
 

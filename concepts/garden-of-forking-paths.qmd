@@ -6,13 +6,16 @@ order: 44
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
 categories: ["Noise and evidence", "Principle or heuristic"]
-source: "http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf"
+source: "https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#44** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The garden of forking paths (PDF)](http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf).
+Entry **#44** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The garden of forking paths (PDF)](https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf).
 
 Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
@@ -25,19 +28,20 @@ Gelman and Loken's point is that p-hacking doesn't require deliberate fishing. R
 
 ## How it works
 
-Suppose there are $k$ reasonable analysis paths, and the path actually taken depends on which one "looks right" given the data. Under the null, the chance that the chosen path gives $p < 0.05$ approaches
+If a researcher ran all $k$ reasonable analyses and reported the best one, that would be fishing. For $k$ independent paths under the null, the chance that at least one gives $p < 0.05$ is
 
 $$
-\Pr(\min_j p_j < 0.05) \le 1 - (0.95)^k
+\Pr(\min_j p_j < 0.05) = 1 - (0.95)^k,
 $$
 
-for roughly independent paths, and somewhat less when paths are correlated. The researcher computes only one p-value, but its *sampling distribution* is the distribution of a data-dependent choice.
+and less when the paths are correlated. Gelman and Loken's point is different. A researcher who computes only *one* p-value can still be partway along that road, because the choice of which analysis to run responds to the data: the outcome that shows the clearer pattern, the subgroup where the effect seems to be, the outliers that seem to be hiding it. Each choice is made by looking at the data, not at p-values, and each pushes the single reported test toward significance. The false-positive rate ends up between the nominal 5% and the fishing rate, depending on how closely the choices follow the noise.
 
 ## Simulated example
 
-Under a true null, a study has two outcome measures, an optional outlier exclusion, and the choice of analyzing everyone or one sex. That gives up to eight paths. We model the data-dependent choice as following the most promising path. Toggle the forks to see the effective false-positive rate.
+Under a true null (the treatment does nothing), a study has two outcome measures, participants of both sexes, and the usual scattering of outliers. Three researchers analyze each of 1,000 such studies, and each reports a single test. The **preregistered** researcher always tests the first outcome on everyone. The **forking-paths** researcher makes three reasonable-looking choices after looking at plots of the data, and never computes a p-value for an alternative: use the outcome whose treatment–control difference looks larger; if the difference in one sex is more than twice that in the other, report that sex; and drop outliers (beyond 2.5 sd) if the difference looks larger without them. The **fishing** researcher tests every combination and reports the smallest p-value. Toggle the forks to see the effect of each.
 
 ```{ojs}
+//| echo: false
 import {rng, range, mean, variance, pValue, fmt, pct} from "../js/stats.js"
 ```
 
@@ -53,45 +57,145 @@ garden = {
   const useOutcome2 = forks.includes("Two outcome measures");
   const useTrim = forks.includes("Optional outlier exclusion");
   const useSex = forks.includes("Subgroup by sex");
-  const test = (t, c) => pValue(mean(t) - mean(c), Math.sqrt(variance(t) / t.length + variance(c) / c.length));
-  const trim = a => a.filter(v => Math.abs(v) < 2);
-  let hits = 0, pathCounts = 0;
+  const diff = (t, c) => mean(t) - mean(c);
+  const test = (t, c) => pValue(diff(t, c), Math.sqrt(variance(t) / t.length + variance(c) / c.length));
+  const trim = a => { const m = mean(a), s = Math.sqrt(variance(a)); return a.filter(v => Math.abs(v - m) < 2.5 * s); };
+  const pick = (D, grp, outcome) => D.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
   const reps = 1000;
+  let pre = 0, forked = 0, fished = 0, paths = 0;
   for (let k = 0; k < reps; k++) {
-    const mk = () => range(n).map(() => { const y1 = r.normal(), y2 = 0.5 * y1 + Math.sqrt(0.75) * r.normal(); return {y1, y2, sex: r.bernoulli(0.5)}; });
+    // Outcomes with heavy-ish tails, so that outliers occur; the true effect is zero.
+    const mk = () => range(n).map(() => { const y1 = r.t(5), y2 = 0.5 * y1 + Math.sqrt(0.75) * r.t(5); return {y1, y2, sex: r.bernoulli(0.5)}; });
     const T = mk(), C = mk();
+    // 1. Preregistered: one fixed analysis.
+    if (test(pick(T, "all", "y1"), pick(C, "all", "y1")) < 0.05) pre++;
+    // 2. Forking paths: one analysis, chosen by looking at the data (no p-values).
+    let outcome = "y1";
+    if (useOutcome2 && Math.abs(diff(pick(T, "all", "y2"), pick(C, "all", "y2"))) > Math.abs(diff(pick(T, "all", "y1"), pick(C, "all", "y1")))) outcome = "y2";
+    let grp = "all";
+    if (useSex) {
+      const d0 = Math.abs(diff(pick(T, 0, outcome), pick(C, 0, outcome))), d1 = Math.abs(diff(pick(T, 1, outcome), pick(C, 1, outcome)));
+      if (d1 > 2 * d0) grp = 1; else if (d0 > 2 * d1) grp = 0;
+    }
+    let t = pick(T, grp, outcome), c = pick(C, grp, outcome);
+    if (useTrim && Math.abs(diff(trim(t), trim(c))) > Math.abs(diff(t, c))) { t = trim(t); c = trim(c); }
+    if (test(t, c) < 0.05) forked++;
+    // 3. Fishing: every path tested, the smallest p-value reported.
     const ps = [];
-    for (const outcome of useOutcome2 ? ["y1", "y2"] : ["y1"])
+    for (const o of useOutcome2 ? ["y1", "y2"] : ["y1"])
       for (const tr of useTrim ? [false, true] : [false])
-        for (const grp of useSex ? ["all", 0, 1] : ["all"]) {
-          let t = T.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
-          let c = C.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
-          if (tr) { t = trim(t); c = trim(c); }
-          ps.push(test(t, c));
+        for (const g of useSex ? ["all", 0, 1] : ["all"]) {
+          let a = pick(T, g, o), b = pick(C, g, o);
+          if (tr) { a = trim(a); b = trim(b); }
+          ps.push(test(a, b));
         }
-    pathCounts = ps.length;
-    if (Math.min(...ps) < 0.05) hits++;
+    paths = ps.length;
+    if (Math.min(...ps) < 0.05) fished++;
   }
-  return {rate: hits / reps, paths: pathCounts};
+  return {pre: pre / reps, forked: forked / reps, fished: fished / reps, paths};
 }
 ```
 
 ```{ojs}
 Plot.plot({
-  height: 140,
-  marginLeft: 150,
+  ariaLabel: "The Garden of Forking Paths: simulation chart",
+  ariaDescription: "Horizontal axis: false-positive rate when the true effect is zero. Three bars: a preregistered analysis, a single analysis chosen by looking at the data, and fishing through every path. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 160,
+  marginLeft: 230,
   x: {label: "False-positive rate (true effect is zero)", domain: [0, 0.5], tickFormat: "%", grid: true},
   y: {label: null},
   marks: [
-    Plot.barX([{k: "Nominal (one fixed path)", v: 0.05}, {k: `Data-dependent (${garden.paths} paths)`, v: garden.rate}], {y: "k", x: "v", fill: (d, i) => i ? "#d6604d" : "#999"})
+    Plot.barX([
+      {k: "Preregistered (one fixed test)", v: garden.pre},
+      {k: "Forking paths (one test, data-chosen)", v: garden.forked},
+      {k: `Fishing (best of ${garden.paths} tests)`, v: garden.fished}
+    ], {y: "k", x: "v", fill: (d, i) => ["#999", "#d6604d", "#67001f"][i]}),
+    Plot.ruleX([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
   ]
 })
 ```
 
 ```{ojs}
 //| echo: false
-html`<div class="sim-readout">${md`With **${garden.paths}** reasonable paths and a data-dependent choice among them, the chance of a "significant" finding under the null is **${pct(garden.rate, 1)}**, not 5%. Each simulated researcher ran only one analysis. Fishing is not needed, only forks.`}</div>`
+html`<div class="sim-readout">${md`Under the null, the preregistered test is "significant" **${pct(garden.pre, 1)}** of the time, close to the nominal 5%. The forking-paths researcher also reports exactly one test, chosen by looking at the data rather than at p-values, and gets **${pct(garden.forked, 1)}**. Testing all ${garden.paths} paths and reporting the best, which is fishing, gives **${pct(garden.fished, 1)}**. ${garden.forked > 0.07 ? "No fishing was needed to more than double the nominal rate, only choices that followed the data." : "With these forks the data-dependent choices add little; turn more of them on."}`}</div>`
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, variance, pValue, fmt, pct} from "../js/stats.js"
+
+viewof forks = Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"})
+viewof n = Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"})
+viewof seed = Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"})
+
+garden = {
+  const r = rng(seed);
+  const useOutcome2 = forks.includes("Two outcome measures");
+  const useTrim = forks.includes("Optional outlier exclusion");
+  const useSex = forks.includes("Subgroup by sex");
+  const diff = (t, c) => mean(t) - mean(c);
+  const test = (t, c) => pValue(diff(t, c), Math.sqrt(variance(t) / t.length + variance(c) / c.length));
+  const trim = a => { const m = mean(a), s = Math.sqrt(variance(a)); return a.filter(v => Math.abs(v - m) < 2.5 * s); };
+  const pick = (D, grp, outcome) => D.filter(d => grp === "all" || d.sex === grp).map(d => d[outcome]);
+  const reps = 1000;
+  let pre = 0, forked = 0, fished = 0, paths = 0;
+  for (let k = 0; k < reps; k++) {
+    // Outcomes with heavy-ish tails, so that outliers occur; the true effect is zero.
+    const mk = () => range(n).map(() => { const y1 = r.t(5), y2 = 0.5 * y1 + Math.sqrt(0.75) * r.t(5); return {y1, y2, sex: r.bernoulli(0.5)}; });
+    const T = mk(), C = mk();
+    // 1. Preregistered: one fixed analysis.
+    if (test(pick(T, "all", "y1"), pick(C, "all", "y1")) < 0.05) pre++;
+    // 2. Forking paths: one analysis, chosen by looking at the data (no p-values).
+    let outcome = "y1";
+    if (useOutcome2 && Math.abs(diff(pick(T, "all", "y2"), pick(C, "all", "y2"))) > Math.abs(diff(pick(T, "all", "y1"), pick(C, "all", "y1")))) outcome = "y2";
+    let grp = "all";
+    if (useSex) {
+      const d0 = Math.abs(diff(pick(T, 0, outcome), pick(C, 0, outcome))), d1 = Math.abs(diff(pick(T, 1, outcome), pick(C, 1, outcome)));
+      if (d1 > 2 * d0) grp = 1; else if (d0 > 2 * d1) grp = 0;
+    }
+    let t = pick(T, grp, outcome), c = pick(C, grp, outcome);
+    if (useTrim && Math.abs(diff(trim(t), trim(c))) > Math.abs(diff(t, c))) { t = trim(t); c = trim(c); }
+    if (test(t, c) < 0.05) forked++;
+    // 3. Fishing: every path tested, the smallest p-value reported.
+    const ps = [];
+    for (const o of useOutcome2 ? ["y1", "y2"] : ["y1"])
+      for (const tr of useTrim ? [false, true] : [false])
+        for (const g of useSex ? ["all", 0, 1] : ["all"]) {
+          let a = pick(T, g, o), b = pick(C, g, o);
+          if (tr) { a = trim(a); b = trim(b); }
+          ps.push(test(a, b));
+        }
+    paths = ps.length;
+    if (Math.min(...ps) < 0.05) fished++;
+  }
+  return {pre: pre / reps, forked: forked / reps, fished: fished / reps, paths};
+}
+
+Plot.plot({
+  ariaLabel: "The Garden of Forking Paths: simulation chart",
+  ariaDescription: "Horizontal axis: false-positive rate when the true effect is zero. Three bars: a preregistered analysis, a single analysis chosen by looking at the data, and fishing through every path. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 160,
+  marginLeft: 230,
+  x: {label: "False-positive rate (true effect is zero)", domain: [0, 0.5], tickFormat: "%", grid: true},
+  y: {label: null},
+  marks: [
+    Plot.barX([
+      {k: "Preregistered (one fixed test)", v: garden.pre},
+      {k: "Forking paths (one test, data-chosen)", v: garden.forked},
+      {k: `Fishing (best of ${garden.paths} tests)`, v: garden.fished}
+    ], {y: "k", x: "v", fill: (d, i) => ["#999", "#d6604d", "#67001f"][i]}),
+    Plot.ruleX([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
@@ -107,7 +211,13 @@ html`<div class="sim-readout">${md`With **${garden.paths}** reasonable paths and
 - [Preregistration](preregistration.qmd)
 - [Story Time](story-time.qmd)
 - [Robustness checks](robustness-checks.qmd)
+- [Statistical Chemotherapy](statistical-chemotherapy.qmd)
+- [Correlation](correlation-does-not-imply-correlation.qmd)
+- [The Causal Identification Kool-Aid](causal-identification-kool-aid.qmd)
+- [Freedom](freedom-not-user-friendly.qmd)
+- [Theoretical statistics](theoretical-statistics.qmd)
+- [The Analyst's Paradox](analysts-paradox.qmd)
 
 ## Source
 
-- Gelman and Loken, ["The garden of forking paths: Why multiple comparisons can be a problem, even when there is no 'fishing expedition' or 'p-hacking' and the research hypothesis was posited ahead of time"](http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf) (2013).
+- Gelman and Loken, ["The garden of forking paths: Why multiple comparisons can be a problem, even when there is no 'fishing expedition' or 'p-hacking' and the research hypothesis was posited ahead of time"](https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf) (2013).

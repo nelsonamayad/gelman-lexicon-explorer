@@ -116,7 +116,13 @@ export const cor = (x, y) => {
   return sxy / Math.sqrt(sxx * syy);
 };
 export const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
-export const fmt = (v, d = 2) => (Number.isFinite(v) ? v.toFixed(d) : String(v));
+// Format a number with d decimals. Never prints "-0.00", and shows "–" when
+// the value is undefined (NaN or infinite), for example a mean of no values.
+export const fmt = (v, d = 2) => {
+  if (!Number.isFinite(v)) return "–";
+  const s = v.toFixed(d);
+  return /^-0\.?0*$/.test(s) ? s.slice(1) : s;
+};
 export const pct = (v, d = 0) => (100 * v).toFixed(d) + "%";
 
 // ---------- Distributions ----------
@@ -154,8 +160,48 @@ export function qnorm(p) {
     (((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1);
 }
 
-// Two-sided p-value for a z statistic.
-export const pValue = (est, se) => 2 * (1 - pnorm(Math.abs(est / se)));
+// Log gamma (Lanczos approximation, g = 7).
+function lgamma(x) {
+  const c = [0.99999999999980993, 676.5203681218851, -1259.1392167224028, 771.32342877765313,
+    -176.61502916214059, 12.507343278686905, -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
+  if (x < 0.5) return Math.log(Math.PI / Math.abs(Math.sin(Math.PI * x))) - lgamma(1 - x);
+  x -= 1;
+  let a = c[0];
+  const t = x + 7.5;
+  for (let i = 1; i < 9; i++) a += c[i] / (x + i);
+  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
+}
+
+// Regularized incomplete beta I_x(a, b), by continued fraction (Numerical Recipes).
+function ibeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const front = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) + a * Math.log(x) + b * Math.log(1 - x));
+  if (x > (a + 1) / (a + b + 2)) return 1 - ibeta(1 - x, b, a);
+  let f = 1, c = 1, d = 1 - (a + b) * x / (a + 1);
+  d = Math.abs(d) < 1e-300 ? 1e300 : 1 / d;
+  f = d;
+  for (let m = 1; m <= 300; m++) {
+    for (const num of [m * (b - m) * x / ((a + 2 * m - 1) * (a + 2 * m)), -(a + m) * (a + b + m) * x / ((a + 2 * m) * (a + 2 * m + 1))]) {
+      d = 1 + num * d; d = Math.abs(d) < 1e-300 ? 1e300 : 1 / d;
+      c = 1 + num / c; if (Math.abs(c) < 1e-300) c = 1e-300;
+      f *= d * c;
+    }
+    if (Math.abs(d * c - 1) < 1e-12) break;
+  }
+  return front * f / a;
+}
+
+// Student t CDF with df degrees of freedom.
+export function pt(t, df) {
+  const tail = 0.5 * ibeta(df / (df + t * t), df / 2, 0.5);
+  return t >= 0 ? 1 - tail : tail;
+}
+
+// Two-sided p-value for est / se: against the normal distribution, or against
+// a t distribution when df is given (use it for small samples).
+export const pValue = (est, se, df) =>
+  df ? 2 * (1 - pt(Math.abs(est / se), df)) : 2 * (1 - pnorm(Math.abs(est / se)));
 export const logit = (p) => Math.log(p / (1 - p));
 export const invLogit = (x) => 1 / (1 + Math.exp(-x));
 
@@ -246,10 +292,14 @@ function invert(M) {
 // ---------- Common experiment ----------
 
 // A two-group experiment with n per arm, true effect `effect` and outcome sd
-// `sigma`. Returns the difference in means, its standard error and p-value.
+// `sigma`. Returns the difference in means, its standard error and the
+// p-value of Welch's t test (t reference distribution, so small samples keep
+// their nominal false-positive rate).
 export function twoGroup(r, n, effect, sigma = 1) {
   const t = r.normals(n, effect, sigma), c = r.normals(n, 0, sigma);
   const est = mean(t) - mean(c);
-  const se = Math.sqrt(variance(t) / n + variance(c) / n);
-  return { est, se, p: pValue(est, se), z: est / se };
+  const vt = variance(t) / n, vc = variance(c) / n;
+  const se = Math.sqrt(vt + vc);
+  const df = (vt + vc) ** 2 / (vt ** 2 / (n - 1) + vc ** 2 / (n - 1));
+  return { est, se, df, p: pValue(est, se, df), z: est / se };
 }

@@ -7,17 +7,23 @@ theme: "Thinking about statistics"
 kind: "Law or aphorism"
 categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/"
+verified: true
+source-note: "Gelman's examples concern theoretical foundations; the simulation takes the word in a narrower technical sense, as labeled."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#138** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The house is stronger than the foundations](https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+
+Source check: ✓ The explanation was checked against the source. Gelman's examples concern theoretical foundations; the simulation takes the word in a narrower technical sense, as labeled.
 :::
 
 ## What it is
 
 Statistics' philosophical foundations are still debated: what probability means, how to justify priors, whether p-values make sense. Yet the *practice* built on them works remarkably well. Regression, hierarchical models and sampling methods give useful answers in thousands of applications. The house stands even though the foundations are contested. In Gelman's image, the house is stronger than the foundations.
+
+He uses the expression about foundational work he considers misdirected: a "huge literature on simulation from the distribution of a discrete contingency table with known margins", whose point is "to compute a p-value with respect to a completely uninteresting model in which margins are fixed", and the years of effort on bootstrap confidence intervals, "inferences that are supposed to have specified coverage conditional on any value of the unknown parameters." "I think it's great when people come up with effective methods," he writes. What irritates him is "when people tie themselves into knots trying to solve problems that in my opinion aren't real."
 
 ## Why it matters
 
@@ -25,13 +31,14 @@ Practitioners sometimes take foundational disputes to mean the methods are unrel
 
 ## How it works
 
-A concrete case. Least squares regression is often "founded" on the assumption of normally distributed errors. But the coefficient estimates are unbiased, and with moderate samples the usual intervals are nearly calibrated, for a wide range of *non-normal* error distributions. The foundation is shaky, since errors are rarely normal, and the house still stands. Gauss–Markov conditions and the central limit theorem carry most of the weight.
+Gelman's examples are about theoretical foundations. Our toy model takes "foundations" in a narrower, technical sense: the textbook assumptions behind a method. Least squares regression is often "founded" on the assumption of normally distributed errors. But the coefficient estimates are unbiased, and with moderate samples the usual intervals are nearly calibrated, for a wide range of *non-normal* error distributions. The foundation is shaky, since errors are rarely normal, and the house still stands. Gauss–Markov conditions and the central limit theorem carry most of the weight.
 
 ## Simulated example
 
 Fit a regression with errors drawn from increasingly non-normal distributions and check whether the 95% intervals still cover the true slope.
 
 ```{ojs}
+//| echo: false
 import {rng, range, lm, fmt, pct} from "../js/stats.js"
 ```
 
@@ -56,8 +63,12 @@ house = {
 
 ```{ojs}
 html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
-${Plot.plot({width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
-${Plot.plot({width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
+${Plot.plot({
+  ariaLabel: "The house: The 'foundation': error distribution",
+  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
+${Plot.plot({
+  ariaLabel: "The house: The 'house': slope estimates",
+  ariaDescription: "Horizontal axis: Estimated slope (truth 0.5). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
 </div>`
 ```
 
@@ -65,9 +76,46 @@ ${Plot.plot({width: 320, height: 220, title: "The 'house': slope estimates", x: 
 //| echo: false
 {
   const cov = house.reps.filter(d => d.cover).length / house.reps.length;
-  return html`<div class="sim-readout">${md`With **${errDist.toLowerCase()}** errors and n = ${n}, the "normal-errors" 95% interval covers the true slope **${pct(cov, 1)}** of the time, and the estimates are centred on the truth. The foundation (normality) is false, and the house stands anyway. Shrink n to 10 to find where it starts to creak.`}</div>`;
+  return html`<div class="sim-readout">${md`With **${errDist.toLowerCase()}** errors and n = ${n}, the "normal-errors" 95% interval covers the true slope **${pct(cov, 1)}** of the time, and the estimates are centered on the truth. The foundation (normality) is false, and the house stands anyway. Shrink n to 10 to find where it starts to creak.`}</div>`;
 }
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, lm, fmt, pct} from "../js/stats.js"
+
+viewof errDist = Inputs.radio(["Normal (the foundation)", "Skewed (exponential)", "Heavy-tailed (t, 3 df)", "Bimodal"], {value: "Skewed (exponential)", label: "Error distribution"})
+viewof n = Inputs.range([10, 300], {value: 50, step: 10, label: "Sample size"})
+viewof seed = Inputs.range([1, 500], {value: 138, step: 1, label: "Random seed"})
+
+house = {
+  const r = rng(seed);
+  const err = () => errDist.startsWith("Normal") ? r.normal() : errDist.startsWith("Skewed") ? r.exponential(1) - 1 : errDist.startsWith("Heavy") ? r.t(3) / Math.sqrt(3) : (r() < 0.5 ? -1 : 1) + r.normal(0, 0.3);
+  const reps = range(1500).map(() => {
+    const x = r.normals(n), y = x.map(v => 1 + 0.5 * v + err());
+    const f = lm(x, y);
+    return {b: f.b, cover: Math.abs(f.b - 0.5) < 1.96 * f.seB};
+  });
+  return {reps, residSample: range(800).map(() => err())};
+}
+
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({
+  ariaLabel: "The house: The 'foundation': error distribution",
+  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
+${Plot.plot({
+  ariaLabel: "The house: The 'house': slope estimates",
+  ariaDescription: "Horizontal axis: Estimated slope (truth 0.5). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
+</div>`
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 

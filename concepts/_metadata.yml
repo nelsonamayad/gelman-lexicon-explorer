@@ -1,0 +1,12 @@
+# Settings shared by every entry page.
+
+# Each entry shows its simulation code once, in the "Show simulation code"
+# block that scripts/build_groups.py generates after the simulation, so the
+# individual cells don't echo their code.
+execute:
+  echo: false
+
+author:
+  - name: Nelson Amaya D
+    url: https://github.com/nelsonamayad
+  - name: Claude Opus 5.5

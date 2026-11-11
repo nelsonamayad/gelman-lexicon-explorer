@@ -1,6 +1,7 @@
 ---
 title: "Andrew Gelman Statistical Lexicon Explorer"
 date: 2026-11-09
+description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
 subtitle: "Every entry in Andrew Gelman's Handy Statistical Lexicon, explained with an interactive simulation to help you understand it a bit better"
 author:
   - name: Nelson Amaya D.
@@ -16,7 +17,6 @@ listing:
   sort: "order"
   sort-ui: [order, title]
   filter-ui: true
-  categories: true
   page-size: 200
   fields: [order, title, description, categories]
   field-display-names:
@@ -27,9 +27,9 @@ listing:
 ---
 
 ::: {.hero}
-Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for "important methods and concepts related to statistics that are not as well known as they should be." This site gives each of the **153 entries** its own page, with an explanation and an interactive simulation that runs in your browser.
+Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for "important methods and concepts related to statistics that are not as well known as they should be." This site gives each of the **155 entries** on the list (as of November 2026) its own page, with an explanation and an interactive simulation that runs in your browser. Entries are numbered in the order Gelman lists them. His list itself isn't numbered, so the numbers are ours.
 
-I love this page and have learned a lot from reading it through the years. With the help of coding agents, I built this homage to the author and the lexicon itself, enjoy it.
+I love Gelman's lexicon page and have learned a lot from reading it through the years. With the help of coding agents, I built this homage to the author and to the lexicon itself. Enjoy it.
 
 [Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
 :::

@@ -71,9 +71,9 @@ Something you can do: a model, a display, a check.
 ::: {#k-methods}
 :::
 
-## Principles and heuristics (17)
+## Principles and heuristics (16)
 
-A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds.
+A rule of thumb, or a fact about how statistics works, with a simulation that illustrates it, often a toy model of our own.
 
 ::: {#k-principles}
 :::
@@ -92,7 +92,7 @@ A pithy saying, often a joke about research culture, with a toy model of the mec
 ::: {#k-laws-and-aphorisms}
 :::
 
-## Advice (3)
+## Advice (4)
 
 Practical guidance for graphics, writing and analysis.
 

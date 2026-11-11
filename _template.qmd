@@ -17,6 +17,12 @@
 # categories:  Leave as [theme, kind]; scripts/build_groups.py keeps it in sync
 #              and adds the "Filed under" line to the source callout.
 # source:      URL that the entry links to in the original list.
+# verified:    true once "What it is" has been checked against the source
+#              (archived post, paper or article); false until then.
+# source-note: Optional one-sentence note on how (or why not) the source was
+#              checked, e.g. "No archived copy of the source post could be found."
+#              build_groups.py turns verified/source-note into the "Source
+#              check" line in the callout.
 #
 # After creating or reclassifying an entry, run: python scripts/build_groups.py
 # ---------------------------------------------------------------------------
@@ -28,6 +34,7 @@ theme: "Building and checking models"
 kind: "Principle or heuristic"
 categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/..."
+verified: false
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
@@ -56,16 +63,24 @@ Entry **#0** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling
      cells, in this order:
        1. import helpers from ../js/stats.js
        2. viewof controls (Inputs.range / Inputs.radio / Inputs.checkbox),
-          always including a "Random seed" slider
+          including a "Random seed" slider whenever the simulation uses
+          random draws (rng(seed)); deterministic models omit it, since a
+          seed control that changes nothing would mislead
        3. the simulation itself (pure computation, no DOM)
-       4. one or two Plot.plot() figures
+       4. one or two Plot.plot() figures, each starting with ariaLabel and
+          ariaDescription (required for screen readers)
        5. a md`` readout inside <div class="sim-readout"> that states the
           result in words and updates with the controls
      Make sure the default slider values and seed visibly show the entry's
-     point. Never name a cell `window`, `width` or another global, and don't
-     write recursive cells (OJS reports a circular definition). -->
+     point. Deterministic calculators should say so in the sentence above
+     the cells. Never name a cell `window`, `width` or another global, and
+     don't write recursive cells (OJS reports a circular definition).
+     Cells don't show their code (concepts/_metadata.yml sets echo: false).
+     scripts/build_groups.py adds a single "Show simulation code" block after
+     the cells; don't write or edit it by hand. -->
 
 ```{ojs}
+//| echo: false
 import {rng, mean, sd, fmt} from "../js/stats.js"
 ```
 
@@ -82,6 +97,8 @@ sim = {
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "Entry Name: simulation chart",
+  ariaDescription: "Horizontal axis: y. Vertical axis: count. The summary below the chart states the result in words.",
   height: 260,
   marks: [Plot.rectY(sim, Plot.binX({y: "count"}, {x: "y"})), Plot.ruleY([0])]
 })

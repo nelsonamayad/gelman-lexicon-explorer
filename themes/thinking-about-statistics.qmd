@@ -44,7 +44,7 @@ Entries are listed in the order they appear in Gelman's list. See [all themes](.
 
 ## Principles and heuristics (12)
 
-A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds.
+A rule of thumb, or a fact about how statistics works, with a simulation that illustrates it, often a toy model of our own.
 
 ::: {#k-principles}
 :::

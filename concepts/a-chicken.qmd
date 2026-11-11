@@ -7,89 +7,156 @@ theme: "Building and checking models"
 kind: "Method or technique"
 categories: ["Building and checking models", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2016/05/09/bill-james-does-model-checking/"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#118** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bill James does model checking](https://statmodeling.stat.columbia.edu/2016/05/09/bill-james-does-model-checking/).
 
 Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-Samuel Butler's quip is that "a hen is only an egg's way of making another egg." Gelman applies it to statistical models, through a post on how baseball writer Bill James checks models. A fitted model is the data's way of making *more data*. A good model, run forward, produces replicated datasets that look like the real one. Comparing the replications with the actual data, the **posterior predictive check**, is the heart of model checking and Bayesian workflow.
+The entry adapts Samuel Butler's quip that a hen is only an egg's way of making another egg. Gelman's post quotes the baseball writer Bill James on *Total Baseball*, Pete Palmer's statistical encyclopedia, which rated the second baseman Glenn Hubbard above Pete Rose, Brooks Robinson and Sandy Koufax, "a conclusion which is every bit as preposterous as it seems to be at first blush." James traced the error to "the failure to adjust Hubbard's fielding statistics for the ground-ball tendency of his pitching staff." Hubbard's teams gave up unusually many ground balls, so he had many chances to make plays, and the model credited him with skill he didn't have.
+
+Gelman's reaction: "Posterior checking!" Then the analogy: "A chicken is an egg's way of making another egg. To make the analogy explicit: the 'egg' is the model and data, and the chicken is the inferences from the model. The chicken is implicit in the egg, but it needs some growing. The inferences are implicit in the model and the data, but it takes some computing."
 
 ## Why it matters
 
-Parameter estimates and fit statistics can look fine for a model that is badly wrong. Simulating fake data from the fitted model and setting it beside the real data shows what the model *believes the world looks like*. If the replications lack features the real data have, such as bimodality, heavy tails, excess zeros or a trend, the model is missing something, whatever its p-values or R² say.
+A model that produces many inferences can be checked against them. *Total Baseball* "included so much data and made so many inferences that people such as James could come in and see which of these statements made no sense—and what this revealed about the problems with Palmer's model." Gelman links this to Lakatos: "once you have the external counterexample—an implication that doesn't make sense—you go find the internal flaw," often an assumption so implicit "that you didn't even realize it was an assumption at all." The alternative is to take the model's output and use it, with no way of noticing when it has gone wrong.
 
 ## How it works
 
-1. Fit the model and get the posterior, or a point estimate, for its parameters.
-2. Simulate $y^{\text{rep}}$ from the model several times.
-3. Plot $y^{\text{rep}}$ against $y$. Systematic differences point to model failures.
-4. Expand the model to fix the failure and repeat. The chicken makes another egg, which hatches into a better chicken.
+1. Fit the model to the data. This is the egg.
+2. Compute its inferences, as many as you can: rankings, predictions, comparisons. This is the chicken.
+3. Look for inferences that make no sense, given what you know. Gelman notes that James's is a *posterior* check, "because his criticism of the Total Baseball model comes from the absurdity of one of its inferences, conditional on the data."
+4. Follow the absurd inference back to the assumption that produced it, fix the model, and repeat.
 
 ## Simulated example
 
-The data are bimodal, a mix of two groups. Fit either a single normal or a two-component mixture, then compare replicated datasets with the real one.
+A toy version of James's check, our own. Sixty second basemen play for 30 teams. Each team's pitchers give up more or fewer ground balls, and a fielder's assists depend on both his skill and how many ground balls come his way. One model rates fielders by raw assists, as *Total Baseball* effectively did. The other adjusts for the team's ground-ball tendency. Skill is unrelated to team, so a sensible rating shouldn't depend on it either. The check is whether the ratings imply that the best fielders all happen to play for ground-ball teams.
 
 ```{ojs}
-import {rng, range, mean, sd, dnorm, fmt} from "../js/stats.js"
+//| echo: false
+import {rng, range, mean, sd, lm, cor, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof model = Inputs.radio(["Single normal", "Two-component mixture"], {value: "Single normal", label: "Model"})
-viewof sep = Inputs.range([0, 6], {value: 3.5, step: 0.25, label: "Separation of the two groups in the truth"})
+viewof model = Inputs.radio(["Raw assists", "Adjusted for team ground balls"], {value: "Raw assists", label: "Model"})
+viewof gbEffect = Inputs.range([0, 1], {value: 0.8, step: 0.05, label: "How much team ground balls drive assists"})
 viewof seed = Inputs.range([1, 500], {value: 118, step: 1, label: "Random seed"})
 ```
 
 ```{ojs}
-egg = {
+fielders = {
   const r = rng(seed);
-  const y = range(400).map(() => r() < 0.4 ? r.normal(-sep / 2, 1) : r.normal(sep / 2, 1));
-  let fit;
-  if (model === "Single normal") fit = {draw: () => r.normal(mean(y), sd(y))};
-  else {
-    // A few EM iterations for a two-component normal mixture.
-    let w = 0.5, m1 = Math.min(...y) / 2, m2 = Math.max(...y) / 2, s1 = 1, s2 = 1;
-    for (let it = 0; it < 60; it++) {
-      const g = y.map(v => { const a = w * dnorm(v, m1, s1), b = (1 - w) * dnorm(v, m2, s2); return a / (a + b); });
-      const sg = g.reduce((s, v) => s + v, 0);
-      w = sg / y.length;
-      m1 = y.reduce((s, v, i) => s + g[i] * v, 0) / sg; m2 = y.reduce((s, v, i) => s + (1 - g[i]) * v, 0) / (y.length - sg);
-      s1 = Math.sqrt(y.reduce((s, v, i) => s + g[i] * (v - m1) ** 2, 0) / sg) || 1; s2 = Math.sqrt(y.reduce((s, v, i) => s + (1 - g[i]) * (v - m2) ** 2, 0) / (y.length - sg)) || 1;
-    }
-    fit = {draw: () => r() < w ? r.normal(m1, s1) : r.normal(m2, s2)};
-  }
-  const reps = range(8).flatMap(k => range(400).map(() => ({k, v: fit.draw()})));
-  return {y, reps};
+  const teams = range(30).map(() => r.normal(0, 1));          // ground-ball tendency (z-score)
+  const players = range(60).map(i => {
+    const gb = teams[Math.floor(i / 2)], skill = r.normal(0, 1);
+    return {gb, skill, assists: 300 + 15 * skill + 40 * gbEffect * gb + r.normal(0, 10)};
+  });
+  const fit = lm(players.map(d => d.gb), players.map(d => d.assists));
+  const raw = players.map(d => d.assists);
+  const adj = players.map(d => d.assists - fit.predict(d.gb));
+  const score = model === "Raw assists" ? raw : adj;
+  const z = score.map(v => (v - mean(score)) / sd(score));
+  const rated = players.map((d, i) => ({...d, rating: z[i]}));
+  const cut = rated.map(d => d.gb).sort((a, b) => b - a)[19];  // top third of players by team ground balls
+  const top10 = rated.slice().sort((a, b) => b.rating - a.rating).slice(0, 10);
+  return {
+    rated,
+    top10GB: top10.filter(d => d.gb >= cut).length,
+    corGB: cor(rated.map(d => d.rating), rated.map(d => d.gb)),
+    corSkill: cor(rated.map(d => d.rating), rated.map(d => d.skill))
+  };
 }
 ```
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "A chicken: simulation chart",
+  ariaDescription: "Horizontal axis: the team's ground-ball tendency. Vertical axis: the fielder's rating under the chosen model. The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 300,
-  x: {label: "y", domain: [-8, 8]},
-  y: {label: "Density", grid: true},
+  x: {label: "Team ground-ball tendency (sd units)", grid: true},
+  y: {label: "Fielder rating (sd units)", grid: true},
   marks: [
-    Plot.lineY(egg.reps, Plot.binX({y: "proportion"}, {x: "v", z: "k", stroke: "#2166ac", strokeOpacity: 0.35, thresholds: 40, domain: [-8, 8]})),
-    Plot.lineY(egg.y, Plot.binX({y: "proportion"}, {x: d => d, stroke: "currentColor", strokeWidth: 2.5, thresholds: 40, domain: [-8, 8]}))
+    Plot.dot(fielders.rated, {x: "gb", y: "rating", fill: "#2166ac", fillOpacity: 0.7, r: 4}),
+    Plot.linearRegressionY(fielders.rated, {x: "gb", y: "rating", stroke: "#d6604d"}),
+    Plot.ruleY([0])
   ]
 })
 ```
 
 ```{ojs}
 //| echo: false
-html`<div class="sim-readout">${md`Black: the real data. Blue: 8 datasets replicated from the fitted **${model.toLowerCase()}**. ${model === "Single normal" && sep > 2 ? "The replications are one bump and the data are two. The chicken lays the wrong kind of egg. Switch to the mixture." : "The replications look like the data. This model can make another egg like the one it came from."}`}</div>`
+{
+  const f = fielders, absurd = f.top10GB >= 6 || f.corGB > 0.5;
+  return html`<div class="sim-readout">${md`Under **${model.toLowerCase()}**, **${f.top10GB}** of the 10 top-rated fielders play for the third of teams with the most ground balls. If ratings were unrelated to team, about 3 or 4 would. The correlation between rating and team ground-ball tendency is **${fmt(f.corGB, 2)}**, and between rating and true skill **${fmt(f.corSkill, 2)}**. ${absurd ? "That implication makes no sense: skill doesn't depend on the team, so the best fielders shouldn't cluster on ground-ball teams. The absurd inference points to the missing adjustment, as Glenn Hubbard's rating did for James." : "No implication here looks absurd: the ratings don't depend on which team a fielder plays for."}`}</div>`;
+}
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, sd, lm, cor, fmt} from "../js/stats.js"
+
+viewof model = Inputs.radio(["Raw assists", "Adjusted for team ground balls"], {value: "Raw assists", label: "Model"})
+viewof gbEffect = Inputs.range([0, 1], {value: 0.8, step: 0.05, label: "How much team ground balls drive assists"})
+viewof seed = Inputs.range([1, 500], {value: 118, step: 1, label: "Random seed"})
+
+fielders = {
+  const r = rng(seed);
+  const teams = range(30).map(() => r.normal(0, 1));          // ground-ball tendency (z-score)
+  const players = range(60).map(i => {
+    const gb = teams[Math.floor(i / 2)], skill = r.normal(0, 1);
+    return {gb, skill, assists: 300 + 15 * skill + 40 * gbEffect * gb + r.normal(0, 10)};
+  });
+  const fit = lm(players.map(d => d.gb), players.map(d => d.assists));
+  const raw = players.map(d => d.assists);
+  const adj = players.map(d => d.assists - fit.predict(d.gb));
+  const score = model === "Raw assists" ? raw : adj;
+  const z = score.map(v => (v - mean(score)) / sd(score));
+  const rated = players.map((d, i) => ({...d, rating: z[i]}));
+  const cut = rated.map(d => d.gb).sort((a, b) => b - a)[19];  // top third of players by team ground balls
+  const top10 = rated.slice().sort((a, b) => b.rating - a.rating).slice(0, 10);
+  return {
+    rated,
+    top10GB: top10.filter(d => d.gb >= cut).length,
+    corGB: cor(rated.map(d => d.rating), rated.map(d => d.gb)),
+    corSkill: cor(rated.map(d => d.rating), rated.map(d => d.skill))
+  };
+}
+
+Plot.plot({
+  ariaLabel: "A chicken: simulation chart",
+  ariaDescription: "Horizontal axis: the team's ground-ball tendency. Vertical axis: the fielder's rating under the chosen model. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "Team ground-ball tendency (sd units)", grid: true},
+  y: {label: "Fielder rating (sd units)", grid: true},
+  marks: [
+    Plot.dot(fielders.rated, {x: "gb", y: "rating", fill: "#2166ac", fillOpacity: 0.7, r: 4}),
+    Plot.linearRegressionY(fielders.rated, {x: "gb", y: "rating", stroke: "#d6604d"}),
+    Plot.ruleY([0])
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
 ::: takeaways
-- A model is a way of generating data. Use it to make fake data and compare with the real data.
-- Posterior predictive checks show failures that summary statistics hide.
-- Model building is a cycle: fit, simulate, compare, expand.
+- The model and data are the egg. The inferences are the chicken, and it takes computing to grow them.
+- Look at the inferences, especially the surprising ones. An implication that makes no sense is evidence of a flaw in the model.
+- Follow the absurd inference back to the assumption that produced it, often one you hadn't noticed you were making.
 :::
 
 ## Related entries
@@ -98,6 +165,10 @@ html`<div class="sim-readout">${md`Black: the real data. Blue: 8 datasets replic
 - [Seeds of its own destruction](seeds-of-its-own-destruction.qmd)
 - [The Self-Cleaning Oven](self-cleaning-oven.qmd)
 - [P-values and U-values](p-values-and-u-values.qmd)
+- [Scaffolding](scaffolding.qmd)
+- [Taking a Model Too Seriously](taking-a-model-too-seriously.qmd)
+- [Camel that is the likelihood](camel-likelihood.qmd)
+- [A probability isn't just a number](probability-not-just-a-number.qmd)
 
 ## Source
 

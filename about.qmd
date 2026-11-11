@@ -9,15 +9,19 @@ sidebar: false
 toc: false
 ---
 
-The **Andrew Gelman Statistical Lexicon Explorer** is a study aid built around Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/), created by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5.
+The **Andrew Gelman Statistical Lexicon Explorer** is a study aid built around Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/), created by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5. It is an independent project. It is not affiliated with or endorsed by Andrew Gelman, and any mistakes in it are ours.
 
 ## Where the entries come from
 
-Since May 2009, Gelman has kept a running list of names for "important methods and concepts related to statistics that are not as well known as they should be" on his blog, *Statistical Modeling, Causal Inference, and Social Science*. This site follows the version of the list archived in March 2026, which has 153 entries. On every page, the title and the short definition under it are Gelman's own words, and each page links to the blog post or paper the entry points to.
+Since May 2009, Gelman has kept a running list of names for "important methods and concepts related to statistics that are not as well known as they should be" on his blog, *Statistical Modeling, Causal Inference, and Social Science*. This site covers the 155 entries on the list as of November 2026 (last checked 11 November 2026; Gelman last updated the list in August 2026). The first 153 follow the version of the list archived in March 2026. The two newest, [The paradox of storytelling](concepts/paradox-of-storytelling.qmd) and [The transitive property of money](concepts/transitive-property-of-money.qmd), were added later, and no archived copy of the updated list was available, so their one-line descriptions quote the linked posts instead. Gelman keeps adding entries, so newer ones may be missing here.
+
+On every page, the title and the short definition under it are Gelman's own words, with one exception: the title of #74, [The Piranha Principle](concepts/piranha-principle.qmd), corrects a typo in his list ("Pinciple"). Each page links to the blog post or paper the entry points to. The entry numbers are ours: they follow the order of Gelman's list, which isn't numbered.
 
 ## What is added here
 
-The explanations and simulations were written for this site and are not Gelman's. Where an archived copy of the source post was available, the explanation was checked against it and quotes from it. Many entries are aphorisms about research culture, for example the Javert Paradox and Arrow's Other Theorem. For these, the simulation is a deliberately simple toy model of the mechanism behind the joke, and the page says so. Always read the linked source post for Gelman's own argument.
+The explanations and simulations were written for this site and are not Gelman's. Each entry has a **Source check** line under its definition. A ✓ means the explanation was checked against the post or paper the entry links to, usually an archived copy, and quotes from it. Otherwise the line says the entry hasn't been checked yet, and why. Many entries are aphorisms about research culture, for example the Javert Paradox and Arrow's Other Theorem. For these, the simulation is a deliberately simple toy model of the mechanism behind the joke, and the page says so. Always read the linked source post for Gelman's own argument.
+
+Quotation marks on these pages are kept for words someone actually said or wrote: Gelman, the other people named on each page, and well-known lines such as proverbs and film taglines. Hypothetical lines that illustrate a point, such as what a researcher might say in defense of a study, are set in *italics* instead.
 
 ## How to browse
 
@@ -25,12 +29,32 @@ The explanations and simulations were written for this site and are not Gelman's
 - **[Browse by theme](index.qmd#themes)** puts every entry in one of six themes, from *Noise and evidence* to *How science behaves*.
 - **[Browse by kind](index.qmd#kinds)** groups the same entries by what sort of idea they are: methods, principles, fallacies, laws and aphorisms, or advice.
 - **[Every entry](index.qmd#all-entries)** is a searchable, sortable table in Gelman's order.
-- On any entry page, the **sidebar** lists all 153 entries grouped by theme, and the **previous/next** links step through a theme in Gelman's order. Each entry's *Filed under* line links to its theme and kind.
+- On any entry page, the **sidebar** lists all 155 entries grouped by theme, and the **previous/next** links step through a theme in Gelman's order. Each entry's *Filed under* line links to its theme and kind.
 - **[Random entry](random.qmd)** takes you somewhere unexpected.
 
 ## How the simulations work
 
-Every simulation runs in your browser with [Observable JS](https://quarto.org/docs/interactive/ojs/). There is no server, R or Python. All pages share the helper functions in `js/stats.js`: a seeded random number generator, common distributions and regression routines. That means a given random seed always reproduces the same draws. Click **Show simulation code** under any cell to see how it was computed.
+Every simulation runs in your browser with [Observable JS](https://quarto.org/docs/interactive/ojs/). There is no server: everything is computed in your browser. All pages share the helper functions in `js/stats.js`: a seeded random number generator, common distributions and regression routines. That means a given random seed always reproduces the same draws. Click **Show simulation code** under a simulation to see all of its code.
+
+A few entries also have their simulation written in R, on separate **[Try it in R](r/index.qmd)** pages. These run R itself in your browser with [webR](https://docs.r-wasm.org/webr/latest/), so you can edit the code and run it again. webR is a large download, so it loads only on those pages.
+
+## Corrections
+
+If a page gets something wrong, or claims more than Gelman's post supports, please say so. Every entry page has **Report an issue** and **Edit this page** links. They open the page's source in the project's [GitHub repository](https://github.com/nelsonamayad/gelman-lexicon-explorer), where you can describe the problem or propose a fix directly. Every proposed change is checked automatically before it can go live.
+
+## License
+
+- The code (the simulations, `js/stats.js` and the build scripts) is released under the [MIT License](https://github.com/nelsonamayad/gelman-lexicon-explorer/blob/main/LICENSE).
+- The explanations written for this site are released under [Creative Commons Attribution 4.0 (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/).
+- The entry names, the one-line definitions and the quotations are Andrew Gelman's, or those of the other authors named on each page. They are quoted for commentary and teaching, and they remain theirs.
+
+We have not asked Andrew Gelman or the other quoted authors for permission to reproduce their words. They are quoted, with links to the originals, for commentary and teaching. If you hold the rights to any quoted material and want it changed or removed, please [open an issue](https://github.com/nelsonamayad/gelman-lexicon-explorer/issues) and we will act on it.
+
+## Privacy
+
+The site uses Google Analytics to count visits and see which entries people read. It loads only if you accept analytics cookies in the banner shown on your first visit, and you can change your choice at any time with the **Cookie preferences** link in the footer. The site collects no other personal data and has no accounts or forms.
+
+Like any web page, these pages are fetched from third-party servers that see your IP address: the site's host (Netlify), Google Fonts, public code libraries (jsDelivr) and, on the [Try it in R](r/index.qmd) pages only, webR's own servers.
 
 ## Building the site
 

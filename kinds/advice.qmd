@@ -1,7 +1,7 @@
 ---
 title: "Advice"
 date: 2026-11-11
-subtitle: "14 entries"
+subtitle: "15 entries"
 description: "Practical guidance for graphics, writing and analysis."
 sidebar: false
 listing:
@@ -49,7 +49,7 @@ Entries are listed in the order they appear in Gelman's list. See [all themes](.
 ::: {#t-noise-and-evidence}
 :::
 
-## Building and checking models (3)
+## Building and checking models (4)
 
 [See the whole theme](../themes/building-and-checking-models.qmd).
 

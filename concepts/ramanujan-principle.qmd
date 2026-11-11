@@ -6,78 +6,152 @@ order: 35
 theme: "Showing and telling"
 kind: "Principle or heuristic"
 categories: ["Showing and telling", "Principle or heuristic"]
-source: "http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/"
+source: "https://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#35** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tables as graphs: the Ramanujan principle](http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/).
+Entry **#35** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tables as graphs: the Ramanujan principle](https://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/).
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-Srinivasa Ramanujan reportedly spotted deep patterns in tables of numbers. Most readers can't, but they still *look* at tables, and what they see is shape. A column of numbers is read like a crude bar chart: the lengths of the numbers, their leading digits and how they line up. Since tables will be read as graphs anyway, Gelman's advice is to design them as graphs. Round aggressively, align the digits, order rows meaningfully, and put the comparisons you want readers to make next to each other.
+Gelman's post: "Tables are commonly read as crude graphs: what you notice in a table of numbers is (a) the minus signs, and thus which values are positive and which are negative, and (b) the length of each number, that is, its order of magnitude." The name comes from the most famous example: "the mathematician Srinivasa Ramanujan supposedly conjectured the asymptotic form of the partition function based on a look at a table of the first several partition numbers: he was essentially looking at a graph on the logarithmic scale."
+
+Ramanujan is not an exception to the rule but its best illustration. Everyone reads tables this way, and he read one so well that he saw the formula behind it. Gelman discusses modern statistical examples in an article for *Significance* magazine.
 
 ## Why it matters
 
-Regression tables with six decimal places, unsorted rows and misaligned columns make the eye do work that a graph would do for free. Readers end up pattern-matching on noise: the digit lengths of $0.000123$ versus $0.0123$, or the position of a stray asterisk. Badly designed tables are badly designed graphs that nobody meant to draw.
+If readers take in a table through its signs and the lengths of its numbers, then those are the features a table should make easy to see. A regression table with six decimal places, unsorted rows and ragged alignment hides the signs and orders of magnitude among digits that carry no information. A table designed with this in mind (rounded, aligned, sorted, with signs easy to spot) works as the crude graph readers will make of it anyway. When a comparison matters more than that, draw the actual graph.
 
 ## How it works
 
-A number's printed width is approximately $\lfloor \log_{10}|x| \rfloor$ plus a constant, so a right-aligned column of integers *is* a log-scale bar chart. Decimal alignment makes magnitude visible. Rounding to two significant digits removes visual noise that conveys no information relative to the standard errors. Sorting by value turns the column into a ranked display.
+The number of digits in a positive integer $x$ is $\lfloor \log_{10} x \rfloor + 1$, so a right-aligned column of integers is a bar chart on the log scale. Ramanujan's table was of the partition numbers $p(n)$, the number of ways to write $n$ as a sum of positive integers: $p(4) = 5$, because $4 = 3+1 = 2+2 = 2+1+1 = 1+1+1+1$. Their lengths grow like $\sqrt{n}$, and the asymptotic formula that Hardy and Ramanujan proved is
+
+$$
+p(n) \sim \frac{1}{4n\sqrt{3}} \exp\!\left(\pi\sqrt{\frac{2n}{3}}\right).
+$$
 
 ## Simulated example
 
-A table of simulated estimates spanning several orders of magnitude. Toggle rounding, alignment and sorting, and compare the table's "crude graph" with an actual graph of the same numbers.
+There is nothing random here: the table below holds the exact partition numbers, computed with Euler's recurrence. Read it as Ramanujan might have, by the lengths of the numbers, then compare it with the graph on the log scale and the asymptotic formula.
 
 ```{ojs}
-import {rng, range, fmt} from "../js/stats.js"
+//| echo: false
+import {range, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof digits = Inputs.radio(["Raw (6 decimals)", "2 significant digits"], {value: "Raw (6 decimals)", label: "Rounding"})
-viewof sorted = Inputs.toggle({label: "Sort rows by value", value: false})
-viewof seed = Inputs.range([1, 500], {value: 35, step: 1, label: "Random seed"})
+viewof nMax = Inputs.range([20, 200], {value: 100, step: 10, label: "Largest n"})
+viewof showFormula = Inputs.toggle({label: "Show the Hardy–Ramanujan formula", value: true})
 ```
 
 ```{ojs}
-rows = {
-  const r = rng(seed);
-  const names = ["Alpha", "Bravo", "Charlie", "Delta", "Echo", "Foxtrot", "Golf", "Hotel", "India", "Juliet", "Kilo", "Lima"];
-  const d = names.map(name => ({name, value: Math.exp(r.normal(3, 2.2))}));
-  return sorted ? d.sort((a, b) => b.value - a.value) : d;
+partitions = {
+  // Euler's pentagonal-number recurrence, in exact integer arithmetic.
+  const p = [1n];
+  for (let n = 1; n <= 200; n++) {
+    let s = 0n;
+    for (let k = 1; k * (3 * k - 1) / 2 <= n; k++) {
+      const sign = k % 2 ? 1n : -1n, g1 = k * (3 * k - 1) / 2, g2 = k * (3 * k + 1) / 2;
+      s += sign * p[n - g1];
+      if (g2 <= n) s += sign * p[n - g2];
+    }
+    p.push(s);
+  }
+  return p;
 }
-show = v => digits.startsWith("Raw") ? v.toFixed(6) : Number(v.toPrecision(2)).toLocaleString("en-US", {maximumFractionDigits: 3})
+asymptotic = n => Math.exp(Math.PI * Math.sqrt(2 * n / 3)) / (4 * n * Math.sqrt(3))
+curve = range(nMax).map(i => i + 1).map(n => ({n, exact: Math.log10(Number(partitions[n])), formula: Math.log10(asymptotic(n))}))
 ```
 
 ```{ojs}
-html`<table class="table table-sm" style="max-width: 360px; font-family: var(--bs-font-monospace);">
-<thead><tr><th>Item</th><th style="text-align:right">Estimate</th></tr></thead>
-<tbody>${rows.map(d => html`<tr><td>${d.name}</td><td style="text-align:right">${show(d.value)}</td></tr>`)}</tbody></table>`
+html`<table class="table table-sm" style="max-width: 420px; font-family: var(--bs-font-monospace);">
+<thead><tr><th style="text-align:right">n</th><th style="text-align:right">p(n)</th></tr></thead>
+<tbody>${range(nMax / 10).map(i => (i + 1) * 10).map(n => html`<tr><td style="text-align:right">${n}</td><td style="text-align:right">${partitions[n].toString()}</td></tr>`)}</tbody></table>`
 ```
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "The Ramanujan Principle: partition numbers on the log scale",
+  ariaDescription: "Horizontal axis: n. Vertical axis: base-10 logarithm of the partition number p(n), roughly its number of digits. Dots show the exact values and a line shows the Hardy–Ramanujan formula. The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 300,
-  marginLeft: 70,
-  x: {type: "log", label: "Estimate (log scale)", grid: true},
-  y: {label: null, domain: rows.map(d => d.name)},
-  marks: [Plot.barX(rows, {y: "name", x1: 0.01, x2: "value", fill: "#2166ac"}), Plot.text(rows, {y: "name", x: "value", text: d => show(d.value), dx: 4, textAnchor: "start", fontSize: 10})]
+  x: {label: "n", grid: true},
+  y: {label: "log₁₀ p(n), about the number of digits", grid: true},
+  marks: [
+    Plot.dot(curve, {x: "n", y: "exact", r: 2.5, fill: "#2166ac"}),
+    showFormula ? Plot.line(curve, {x: "n", y: "formula", stroke: "#d6604d", strokeWidth: 2}) : null
+  ]
 })
 ```
 
 ```{ojs}
 //| echo: false
-html`<div class="sim-readout">${md`Right-aligned, the table's number widths trace roughly the same profile as the log-scale bars. The table *is* a crude graph. ${digits.startsWith("Raw") ? "With six decimals the trailing digits add visual noise and no information. Switch to 2 significant digits." : "Rounded, the shape is cleaner."} ${sorted ? "Sorting turns it into a ranking." : "Turn on sorting to read it as a ranking."}`}</div>`
+{
+  const exact = Number(partitions[nMax]), approx = asymptotic(nMax);
+  return html`<div class="sim-readout">${md`p(${nMax}) has **${partitions[nMax].toString().length}** digits. Down the table, the length of each number grows like the square root of n, which is the shape of the curve on the log scale. At n = ${nMax}, the Hardy–Ramanujan formula gives **${approx.toPrecision(3)}** against the exact **${exact.toPrecision(3)}**, a ratio of **${fmt(approx / exact, 3)}**. Reading the table by the lengths of its numbers is reading this graph.`}</div>`;
+}
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {range, fmt} from "../js/stats.js"
+
+viewof nMax = Inputs.range([20, 200], {value: 100, step: 10, label: "Largest n"})
+viewof showFormula = Inputs.toggle({label: "Show the Hardy–Ramanujan formula", value: true})
+
+partitions = {
+  // Euler's pentagonal-number recurrence, in exact integer arithmetic.
+  const p = [1n];
+  for (let n = 1; n <= 200; n++) {
+    let s = 0n;
+    for (let k = 1; k * (3 * k - 1) / 2 <= n; k++) {
+      const sign = k % 2 ? 1n : -1n, g1 = k * (3 * k - 1) / 2, g2 = k * (3 * k + 1) / 2;
+      s += sign * p[n - g1];
+      if (g2 <= n) s += sign * p[n - g2];
+    }
+    p.push(s);
+  }
+  return p;
+}
+asymptotic = n => Math.exp(Math.PI * Math.sqrt(2 * n / 3)) / (4 * n * Math.sqrt(3))
+curve = range(nMax).map(i => i + 1).map(n => ({n, exact: Math.log10(Number(partitions[n])), formula: Math.log10(asymptotic(n))}))
+
+html`<table class="table table-sm" style="max-width: 420px; font-family: var(--bs-font-monospace);">
+<thead><tr><th style="text-align:right">n</th><th style="text-align:right">p(n)</th></tr></thead>
+<tbody>${range(nMax / 10).map(i => (i + 1) * 10).map(n => html`<tr><td style="text-align:right">${n}</td><td style="text-align:right">${partitions[n].toString()}</td></tr>`)}</tbody></table>`
+
+Plot.plot({
+  ariaLabel: "The Ramanujan Principle: partition numbers on the log scale",
+  ariaDescription: "Horizontal axis: n. Vertical axis: base-10 logarithm of the partition number p(n), roughly its number of digits. Dots show the exact values and a line shows the Hardy–Ramanujan formula. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "n", grid: true},
+  y: {label: "log₁₀ p(n), about the number of digits", grid: true},
+  marks: [
+    Plot.dot(curve, {x: "n", y: "exact", r: 2.5, fill: "#2166ac"}),
+    showFormula ? Plot.line(curve, {x: "n", y: "formula", stroke: "#d6604d", strokeWidth: 2}) : null
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
 ::: takeaways
-- Readers see tables as shapes, so design tables as graphs.
-- Round to the precision the uncertainty supports. Align digits. Sort meaningfully.
-- When a comparison really matters, draw the graph.
+- People read a table of numbers as a crude graph: first the minus signs, then the lengths of the numbers.
+- A right-aligned column of numbers is, in effect, a bar chart on the log scale. Ramanujan read one well enough to guess an asymptotic formula.
+- Design tables for that reading: round, align and sort, and make the signs easy to see. When the comparison really matters, draw the graph.
 :::
 
 ## Related entries
@@ -85,7 +159,8 @@ html`<div class="sim-readout">${md`Right-aligned, the table's number widths trac
 - [What to include](what-to-include.qmd)
 - [Alabama First](alabama-first.qmd)
 - [A picture plus 1000 words](picture-plus-1000-words.qmd)
+- [The Click-Through Solution](click-through-solution.qmd)
 
 ## Source
 
-- Andrew Gelman, [Tables as graphs: the Ramanujan principle](http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/) (2011).
+- Andrew Gelman, [Tables as graphs: the Ramanujan principle](https://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/) (2011).

@@ -7,21 +7,27 @@ theme: "Noise and evidence"
 kind: "Principle or heuristic"
 categories: ["Noise and evidence", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/"
+verified: true
+source-note: "Checked against the post, which points to Gelman (2003) for the definitions."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#8** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/).
 
 Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+
+Source check: ✓ The explanation was checked against the source. Checked against the post, which points to Gelman (2003) for the definitions.
 :::
 
 ## What it is
 
 A **p-value** is a probability: the chance, under some model, of seeing a test statistic as or more extreme than the observed one. A **u-value** is any statistic that has a *uniform(0, 1)* distribution when the model is true. Gelman's point is that the two are different things. Classical p-values for simple continuous tests happen to be u-values. Many perfectly sensible p-values are not, and posterior predictive p-values are the leading example.
 
+The post itself, titled "I hate the so-called Fisher exact test", is a pointer to one of Gelman's favorite articles, "A Bayesian formulation of exploratory data analysis and goodness-of-fit testing" (*International Statistical Review*, 2003). That article has what he calls "the first published definition (I think) of U-values and P-values" (section 2.3), and section 3.3 makes his argument against the Fisher exact test in detail.
+
 ## Why it matters
 
-People calibrate their reactions to p-values by assuming uniformity: "under the null, p < 0.05 happens 5% of the time." That works for u-values. A posterior predictive p-value, used to check a Bayesian model, is typically *concentrated near 0.5* when the model is true, because the same data are used to fit the model and to check it. Treating it as uniform gives the wrong impression of how surprising a result is. Conversely, a non-uniform p-value is not "broken." It is still a valid probability statement about the replicated data.
+People calibrate their reactions to p-values by assuming uniformity: *under the null, p < 0.05 happens 5% of the time.* That works for u-values. A posterior predictive p-value, used to check a Bayesian model, is typically *concentrated near 0.5* when the model is true, because the same data are used to fit the model and to check it. Treating it as uniform gives the wrong impression of how surprising a result is. Conversely, a non-uniform p-value is not "broken." It is still a valid probability statement about the replicated data.
 
 ## How it works
 
@@ -32,23 +38,24 @@ For a test statistic $T$:
 
 ## Simulated example
 
-We generate 300 datasets from a normal model with known variance and compute two checks on each. One is a classical z-test p-value at the true mean. The other is a posterior predictive p-value under a vague prior, for a chosen test statistic. The model is *true* in every dataset.
+We generate 1,000 datasets from a normal model with known variance and compute two checks on each. One is a classical z-test p-value at the true mean. The other is a posterior predictive p-value under a vague prior, for a chosen test statistic. The model is *true* in every dataset.
 
 ```{ojs}
+//| echo: false
 import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
 viewof stat = Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"})
 viewof n = Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"})
-viewof seed = Inputs.range([1, 500], {value: 4, step: 1, label: "Random seed"})
+viewof seed = Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"})
 ```
 
 ```{ojs}
 pvals = {
   const r = rng(seed);
   const T = y => stat === "Sample mean" ? mean(y) : stat === "Sample maximum" ? Math.max(...y) : mean(y.map(v => (v - mean(y)) ** 2));
-  return range(300).map(k => {
+  return range(1000).map(k => {
     const theta = 0;
     const y = r.normals(n, theta, 1), ybar = mean(y);
     const classical = 1 - pnorm((ybar - theta) * Math.sqrt(n));
@@ -66,13 +73,15 @@ pLong = pvals.flatMap(d => [{type: "Classical p-value (a u-value)", p: d.classic
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "P-values and U-values: simulation chart",
+  ariaDescription: "Horizontal axis: p. Vertical axis: Datasets. The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 300,
   facet: {data: pLong, y: "type", marginRight: 190},
   x: {label: "p", domain: [0, 1]},
   y: {label: "Datasets", grid: true},
   marks: [
     Plot.rectY(pLong, Plot.binX({y: "count"}, {x: "p", fill: "type", thresholds: 20, domain: [0, 1]})),
-    Plot.ruleY([300 / 20], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([1000 / 20], {stroke: "currentColor", strokeDasharray: "4 3"}),
     Plot.ruleY([0])
   ],
   color: {range: ["#2166ac", "#d6604d"]}
@@ -86,6 +95,56 @@ Plot.plot({
   return html`<div class="sim-readout">${md`The model is correct in every dataset. Share of p-values in the outer 10% (below 0.05 or above 0.95): classical **${fmt(100 * tail(pvals.map(d => d.classical)), 0)}%** (about 10% expected for a u-value), posterior predictive **${fmt(100 * tail(pvals.map(d => d.ppp)), 0)}%**. The dashed line is what a uniform distribution would give.`}</div>`;
 }
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
+
+viewof stat = Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"})
+viewof n = Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"})
+viewof seed = Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"})
+
+pvals = {
+  const r = rng(seed);
+  const T = y => stat === "Sample mean" ? mean(y) : stat === "Sample maximum" ? Math.max(...y) : mean(y.map(v => (v - mean(y)) ** 2));
+  return range(1000).map(k => {
+    const theta = 0;
+    const y = r.normals(n, theta, 1), ybar = mean(y);
+    const classical = 1 - pnorm((ybar - theta) * Math.sqrt(n));
+    const tObs = T(y);
+    let exceed = 0;
+    for (let s = 0; s < 200; s++) {
+      const th = r.normal(ybar, 1 / Math.sqrt(n));     // posterior under flat prior
+      if (T(r.normals(n, th, 1)) >= tObs) exceed++;
+    }
+    return {k, classical, ppp: exceed / 200};
+  });
+}
+pLong = pvals.flatMap(d => [{type: "Classical p-value (a u-value)", p: d.classical}, {type: "Posterior predictive p-value", p: d.ppp}])
+
+Plot.plot({
+  ariaLabel: "P-values and U-values: simulation chart",
+  ariaDescription: "Horizontal axis: p. Vertical axis: Datasets. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  facet: {data: pLong, y: "type", marginRight: 190},
+  x: {label: "p", domain: [0, 1]},
+  y: {label: "Datasets", grid: true},
+  marks: [
+    Plot.rectY(pLong, Plot.binX({y: "count"}, {x: "p", fill: "type", thresholds: 20, domain: [0, 1]})),
+    Plot.ruleY([1000 / 20], {stroke: "currentColor", strokeDasharray: "4 3"}),
+    Plot.ruleY([0])
+  ],
+  color: {range: ["#2166ac", "#d6604d"]}
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
@@ -104,4 +163,5 @@ Plot.plot({
 ## Source
 
 - Andrew Gelman, [P-values and u-values](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/) (2009).
-- Andrew Gelman, "Two simple examples for understanding posterior p-values whose distributions are far from uniform," *Electronic Journal of Statistics* (2013).
+- Andrew Gelman, ["Two simple examples for understanding posterior p-values whose distributions are far from uniform"](https://doi.org/10.1214/13-EJS854), *Electronic Journal of Statistics* (2013).
+- Andrew Gelman, ["A Bayesian formulation of exploratory data analysis and goodness-of-fit testing"](https://doi.org/10.1111/j.1751-5823.2003.tb00203.x), *International Statistical Review* (2003), sections 2.3 and 3.3.

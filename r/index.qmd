@@ -1,0 +1,21 @@
+---
+title: "Try it in R"
+date: 2026-11-11
+description: "Simulations from the lexicon, written in R and running in your browser with webR."
+sidebar: false
+toc: false
+listing:
+  contents: "*.qmd"
+  type: table
+  sort: "title"
+  fields: [title, description]
+  field-display-names:
+    title: "Page"
+    description: "What it does"
+---
+
+A few entries also have their simulation written in R. Each R version runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. You can edit the code and run it again.
+
+The R pages are separate from the entries because webR is a large download. The first R page you open downloads R itself, which can take a minute. The entry pages stay fast.
+
+This is a pilot with four entries. If it proves useful, more will follow.

@@ -1,0 +1,149 @@
+---
+title: "The transitive property of money"
+date: 2026-11-11
+description: "Many of the tech lords are actually tech investors; they've absorbed the prestige of information science through the transitive property of money."
+order: 155
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
+source: "https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/"
+verified: true
+source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list."
+---
+
+::: {.callout-note appearance="minimal" .lexicon-source}
+Entry **#155** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Computer scientists today are in the position of economists in the early 2000s and Freudian psychiatrists in the 1950s](https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+
+Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list.
+:::
+
+## What it is
+
+Gelman's post compares the standing of computer science today with that of economics in the early 2000s and of Freudian psychiatry in the 1950s: each at the "apex academic and social prestige and influence" of its time. Economists used to be "the country's all-purpose pundits"; now "there's a new hegemonic science in town, and it's information science, or computer science." Computer scientists, he grants, have "earned it through all the amazing things they've built."
+
+The phrase comes in a parenthesis about who now speaks with that authority: "Nowadays, many computer scientists and tech lords present themselves, and are often taken as, all-purpose pundits. (Many of the tech lords are actually tech investors; they've absorbed the prestige of information science through the transitive property of money.)" The prestige flows from the science to the people who fund it, and from there to whatever they choose to talk about. Gelman's worry is the familiar one: "you get the same problem we had before, which is when the gurus and their hangers-on start to believe their own hype."
+
+## Why it matters
+
+Prestige is supposed to track expertise, and expertise is specific to a field. When an audience treats money, or closeness to a prestigious field, as a sign of general authority, the people who get heard on a question are not the people who know most about it. Gelman also notes a pattern in how this ends: "It's when a group is at its most overvalued that it wants even more", and economists stopped asking for more influence once they became "just one more group."
+
+## How it works
+
+Gelman's post makes a sociological observation and has no model. Here is a toy version, our own. Each would-be pundit has some expertise on a given topic and some wealth. An audience decides whom to listen to by a mix of the two: credibility = expertise + $w$ × wealth, plus noise. With $w = 0$, attention goes to expertise. As $w$ grows, prestige passes from money to the speaker, whatever the topic.
+
+## Simulated example
+
+On a topic outside technology, 100 domain experts and 100 tech investors offer opinions. The experts know more about the topic; the investors have more money. The audience listens to the 20 voices it finds most credible.
+
+```{ojs}
+//| echo: false
+import {rng, range, mean, fmt} from "../js/stats.js"
+```
+
+```{ojs}
+viewof w = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Weight the audience gives to wealth (w)"})
+viewof seed = Inputs.range([1, 500], {value: 155, step: 1, label: "Random seed"})
+```
+
+```{ojs}
+pundits = {
+  const r = rng(seed);
+  const people = range(200).map(i => {
+    const investor = i >= 100;
+    const expertise = investor ? r.normal(-1, 1) : r.normal(1, 1);   // on this topic, sd units
+    const wealth = investor ? r.normal(2, 0.7) : r.normal(0, 0.7);   // log scale, sd units
+    return {who: investor ? "Tech investor" : "Domain expert", expertise, wealth, cred: expertise + w * wealth + r.normal(0, 0.5)};
+  });
+  const cut = people.map(d => d.cred).sort((a, b) => b - a)[19];
+  const rated = people.map(d => ({...d, heard: d.cred >= cut}));
+  const heard = rated.filter(d => d.heard);
+  const mostExpert = people.slice().sort((a, b) => b.expertise - a.expertise).slice(0, 20);
+  return {rated, investorsHeard: heard.filter(d => d.who === "Tech investor").length,
+          expHeard: mean(heard.map(d => d.expertise)), expBest: mean(mostExpert.map(d => d.expertise))};
+}
+```
+
+```{ojs}
+Plot.plot({
+  ariaLabel: "The transitive property of money: simulation chart",
+  ariaDescription: "Horizontal axis: wealth (log scale, standard deviations). Vertical axis: expertise on the topic (standard deviations). Color shows domain experts and tech investors; filled dots are the 20 voices the audience listens to. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "Wealth (log scale, sd units)", grid: true},
+  y: {label: "Expertise on the topic (sd units)", grid: true},
+  color: {legend: true, domain: ["Domain expert", "Tech investor"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.dot(pundits.rated.filter(d => !d.heard), {x: "wealth", y: "expertise", stroke: "who", r: 3}),
+    Plot.dot(pundits.rated.filter(d => d.heard), {x: "wealth", y: "expertise", fill: "who", r: 5})
+  ]
+})
+```
+
+```{ojs}
+//| echo: false
+html`<div class="sim-readout">${md`With wealth weighted at **${fmt(w, 2)}**, **${pundits.investorsHeard}** of the 20 most-heard voices on this topic are tech investors. Those 20 voices have an average expertise on the topic of **${fmt(pundits.expHeard, 2)}**, against **${fmt(pundits.expBest, 2)}** for the 20 people who actually know the most. ${w === 0 ? "With no weight on money, attention follows expertise." : "The money passes its prestige on to the speaker, whatever the topic."}`}</div>`
+```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, fmt} from "../js/stats.js"
+
+viewof w = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Weight the audience gives to wealth (w)"})
+viewof seed = Inputs.range([1, 500], {value: 155, step: 1, label: "Random seed"})
+
+pundits = {
+  const r = rng(seed);
+  const people = range(200).map(i => {
+    const investor = i >= 100;
+    const expertise = investor ? r.normal(-1, 1) : r.normal(1, 1);   // on this topic, sd units
+    const wealth = investor ? r.normal(2, 0.7) : r.normal(0, 0.7);   // log scale, sd units
+    return {who: investor ? "Tech investor" : "Domain expert", expertise, wealth, cred: expertise + w * wealth + r.normal(0, 0.5)};
+  });
+  const cut = people.map(d => d.cred).sort((a, b) => b - a)[19];
+  const rated = people.map(d => ({...d, heard: d.cred >= cut}));
+  const heard = rated.filter(d => d.heard);
+  const mostExpert = people.slice().sort((a, b) => b.expertise - a.expertise).slice(0, 20);
+  return {rated, investorsHeard: heard.filter(d => d.who === "Tech investor").length,
+          expHeard: mean(heard.map(d => d.expertise)), expBest: mean(mostExpert.map(d => d.expertise))};
+}
+
+Plot.plot({
+  ariaLabel: "The transitive property of money: simulation chart",
+  ariaDescription: "Horizontal axis: wealth (log scale, standard deviations). Vertical axis: expertise on the topic (standard deviations). Color shows domain experts and tech investors; filled dots are the 20 voices the audience listens to. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {label: "Wealth (log scale, sd units)", grid: true},
+  y: {label: "Expertise on the topic (sd units)", grid: true},
+  color: {legend: true, domain: ["Domain expert", "Tech investor"], range: ["#2166ac", "#d6604d"]},
+  marks: [
+    Plot.dot(pundits.rated.filter(d => !d.heard), {x: "wealth", y: "expertise", stroke: "who", r: 3}),
+    Plot.dot(pundits.rated.filter(d => d.heard), {x: "wealth", y: "expertise", fill: "who", r: 5})
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
+
+## Key takeaways
+
+::: takeaways
+- Prestige earned by a field (computer science) passes to the people who fund it, and from them to whatever they talk about.
+- Gelman sees the same pattern as economics in the early 2000s and Freudian psychiatry in the 1950s: a field at its peak, whose gurus become all-purpose pundits.
+- Expertise is specific to a field. Money and association are not evidence of knowing about the topic at hand.
+:::
+
+## Related entries
+
+- [In a dark room with many of the lights covered up by opaque dollar bills](dark-room-dollar-bills.qmd)
+- [Brilliance](brilliance.qmd)
+- [Meritocracy won't happen](meritocracy.qmd)
+
+## Source
+
+- Andrew Gelman, [Computer scientists today are in the position of economists in the early 2000s and Freudian psychiatrists in the 1950s](https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/) (2026).

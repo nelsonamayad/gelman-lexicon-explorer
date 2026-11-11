@@ -51,7 +51,7 @@ Something you can do: a model, a display, a check.
 
 ## Principles and heuristics (4)
 
-A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds.
+A rule of thumb, or a fact about how statistics works, with a simulation that illustrates it, often a toy model of our own.
 
 ::: {#k-principles}
 :::

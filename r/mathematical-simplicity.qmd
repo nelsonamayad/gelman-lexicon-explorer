@@ -1,0 +1,59 @@
+---
+title: "Try it in R: Mathematical Simplicity"
+date: 2026-11-11
+description: "The golf-putting geometry model against logistic regression, fitted in R in your browser with webR."
+engine: markdown
+filters:
+  - live
+ojs-engine: true
+toc: false
+sidebar: false
+webr:
+  cell-options:
+    autorun: true
+---
+
+This is the simulation from [Mathematical Simplicity](../concepts/mathematical-simplicity.qmd), written in R. It runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. The first time, your browser downloads R itself, which can take a minute. Edit any line and click **Run Code** to try it with other values.
+
+## Two models for golf putts
+
+Putts are simulated from a geometric model. A putt goes in if its angular error is small enough for the ball to drop into the hole. The geometric model has one parameter, the golfer's angular error `sigma`. The comparison is a logistic regression on distance, with two parameters. Both are fitted to putts from 2 to 20 feet and then extended to 40 feet.
+
+```{webr}
+set.seed(90)
+R_hole <- 4.25 / 2 / 12   # hole radius, in feet
+r_ball <- 1.68 / 2 / 12   # ball radius, in feet
+
+# Probability of success at distance x for angular error sigma (radians)
+p_geo <- function(x, sigma) 2 * pnorm(asin((R_hole - r_ball) / x) / sigma) - 1
+
+sigma_true <- 1.5 * pi / 180     # 1.5 degrees
+x <- 2:20                         # distances, in feet
+n <- rep(200, length(x))          # putts per distance
+y <- rbinom(length(x), n, p_geo(x, sigma_true))
+
+# Geometric model: one parameter, fitted by maximum likelihood
+nll <- function(sigma) -sum(dbinom(y, n, p_geo(x, sigma), log = TRUE))
+sigma_hat <- optimize(nll, c(0.005, 0.1))$minimum
+
+# Logistic regression: two parameters
+fit <- glm(cbind(y, n - y) ~ x, family = binomial)
+
+cat("Geometric model: sigma =", round(sigma_hat * 180 / pi, 2), "degrees (truth: 1.5)\n")
+grid <- seq(2, 40, by = 0.5)
+plot(x, y / n, pch = 19, xlim = c(2, 40), ylim = c(0, 1),
+     xlab = "Distance (feet)", ylab = "Probability of success")
+rect(20, -1, 42, 2, col = adjustcolor("grey", 0.2), border = NA)
+text(30, 0.95, "extrapolation")
+lines(grid, p_geo(grid, sigma_true), lty = 2, col = "grey40")
+lines(grid, p_geo(grid, sigma_hat), col = "#2166ac", lwd = 2)
+lines(grid, predict(fit, data.frame(x = grid), type = "response"), col = "#d6604d", lwd = 2)
+legend("topright", c("Geometry (1 parameter)", "Logistic (2 parameters)", "Truth"),
+       col = c("#2166ac", "#d6604d", "grey40"), lty = c(1, 1, 2), lwd = c(2, 2, 1), bty = "n")
+
+# Predicted success at 40 feet
+round(c(truth = p_geo(40, sigma_true), geometry = p_geo(40, sigma_hat),
+        logistic = unname(predict(fit, data.frame(x = 40), type = "response"))), 3)
+```
+
+The logistic curve fits the observed range well, but its two parameters have no physical meaning, and beyond 20 feet it follows the shape of the logistic function rather than the geometry of the putt. The geometric model is harder to write down, and its single parameter is an angle you can interpret.

@@ -7,31 +7,39 @@ theme: "Thinking about statistics"
 kind: "Law or aphorism"
 categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/"
+verified: true
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#145** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Self-similarity of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+
+Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-Thomas Kuhn described science as long periods of "normal science" broken by rare paradigm-shifting revolutions. Gelman suggests revolutions are **fractal**, meaning self-similar across scales. There are a few huge revolutions (Newton, Darwin, quantum mechanics), more medium-sized ones that reshape a subfield, and many small ones that change how a research group or a single project thinks. Zoom in on any part of science and you see the same pattern of mostly-normal work punctuated by upheavals.
+Thomas Kuhn described science as long periods of "normal science" broken by rare paradigm-shifting revolutions. Thinking about his own research, Gelman characterizes scientific progress as "self-similar (that is, fractal). Each level of abstraction, from local problem solving to big-picture science, features progress of the 'normal science' type, punctuated by occasional revolutions." The revolutions "have a fractal time scale, with small revolutions occurring fairly frequently (every few minutes for an exam-type problem, up to every few years or decades for a major scientific consensus)."
+
+His examples run from the very large (from a magical to a scientific paradigm, or from behaviorism to cognitive psychology) to the very small. On a consulting problem, he writes, "I typically will start in a certain direction, then suddenly realize I was thinking about it wrong, then move forward," and that reevaluation "can happen several times in a couple of hours." His summary: "Scientific progress is fractal in size of problem and in time scale."
 
 ## Why it matters
 
-The fractal view softens the sharp Kuhnian split between "normal science" and "revolution." Your own work can have revolutions: a new model that changes how you see a dataset, or a new method that changes a subfield. They are the same kind of event as the big ones, only smaller. Statistically, it implies a heavy-tailed, power-law distribution of the sizes of conceptual changes, with no natural cutoff between "small" and "revolutionary."
+The fractal view softens the sharp Kuhnian split between normal science and revolution. Your own work has revolutions: realizing you were thinking about a problem wrong is the same kind of event as a field changing its paradigm, only smaller and faster. Gelman ties this to his view of Bayesian data analysis: "deductive Bayesian inference as normal science and model checking as potentially revolutionary."
 
 ## How it works
 
-A fractal or self-similar size distribution follows a power law: $\Pr(\text{size} > s) \propto s^{-\alpha}$. On a log-log plot, the survival function is a straight line with slope $-\alpha$. The same line appears whether you look at the whole of science or zoom into a subfield. Only the scale changes, not the shape.
+Gelman's claim is qualitative: the same pattern of normal science punctuated by revolutions appears at every scale. He doesn't propose a particular statistical distribution for the sizes of revolutions.
+
+**The simulation is our toy illustration, not part of his argument.** One standard way to make "self-similar across scales" concrete is a power law, $\Pr(\text{size} > s) \propto s^{-\alpha}$. On log-log axes its survival curve is a straight line, and the line keeps the same slope when you zoom into a smaller range and rescale. Whether real scientific change follows a power law is an open empirical question. The simulation only shows what scale-free self-similarity looks like.
 
 ## Simulated example
 
-Sizes of conceptual changes are drawn from a power law. Plot the survival curve on log-log axes for all changes, and then for a "zoomed-in" subfield that only sees changes below some size.
+A **toy model**: hypothetical sizes of conceptual changes are drawn from a power law, one simple scale-free distribution. Plot the survival curve on log-log axes for all changes, and then for a "zoomed-in" view that only sees changes below some size, rescaled. The point is the shape (the same at every scale), not the specific distribution.
 
 ```{ojs}
+//| echo: false
 import {rng, range, fmt} from "../js/stats.js"
 ```
 
@@ -52,6 +60,8 @@ rev = {
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "Scientific revolutions: simulation chart",
+  ariaDescription: "Horizontal axis: Size of the conceptual change (log scale). Vertical axis: Share of changes at least this big (log scale). The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 300,
   x: {type: "log", label: "Size of the conceptual change (log scale)", grid: true},
   y: {type: "log", label: "Share of changes at least this big (log scale)", grid: true},
@@ -65,16 +75,50 @@ Plot.plot({
 {
   const all = rev.filter(d => d.view === "All of science");
   const big = all.filter(d => d.s > 100).length;
-  return html`<div class="sim-readout">${md`Both views fall along nearly straight lines on log-log axes, with the same pattern at every scale. Of 5,000 changes, **${big}** are more than 100 times the minimum size (the "Kuhnian revolutions"), and there is no gap separating them from the rest. Revolutions come in all sizes.`}</div>`;
+  return html`<div class="sim-readout">${md`In this toy model, both views fall along nearly straight lines on log-log axes, so the pattern looks the same at every scale. Of 5,000 simulated changes, **${big}** are more than 100 times the minimum size (the "Kuhnian revolutions"), with no gap separating them from the rest. This illustrates self-similarity. It isn't evidence about how real scientific change is distributed.`}</div>`;
 }
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, fmt} from "../js/stats.js"
+
+viewof alpha = Inputs.range([0.5, 2.5], {value: 1.2, step: 0.1, label: "Power-law exponent α"})
+viewof seed = Inputs.range([1, 500], {value: 145, step: 1, label: "Random seed"})
+
+rev = {
+  const r = rng(seed);
+  const sizes = range(5000).map(() => Math.pow(1 - r(), -1 / alpha)).sort((a, b) => b - a);
+  const ccdf = arr => arr.map((s, i) => ({s, p: (i + 1) / arr.length}));
+  const sub = sizes.filter(s => s < 20);
+  return [...ccdf(sizes).map(d => ({...d, view: "All of science"})), ...ccdf(sub.map(s => s * 5)).map(d => ({...d, view: "Zoomed into a subfield (rescaled)"}))];
+}
+
+Plot.plot({
+  ariaLabel: "Scientific revolutions: simulation chart",
+  ariaDescription: "Horizontal axis: Size of the conceptual change (log scale). Vertical axis: Share of changes at least this big (log scale). The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 300,
+  x: {type: "log", label: "Size of the conceptual change (log scale)", grid: true},
+  y: {type: "log", label: "Share of changes at least this big (log scale)", grid: true},
+  color: {legend: true, range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(rev, {x: "s", y: "p", stroke: "view", strokeWidth: 2})]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 
 ::: takeaways
-- Conceptual change in science happens at all scales, with the same pattern at each.
-- There's no sharp line between "normal science" and "revolution."
-- Small revolutions in your own work are the same kind of thing as the famous ones.
+- Gelman sees the normal-science-and-revolution pattern at every scale, from minutes on a consulting problem to decades in a field.
+- Realizing you were thinking about a problem wrong is a small revolution of the same kind as the famous ones.
+- In his Bayesian view, inference within a model is normal science and model checking is potentially revolutionary.
 :::
 
 ## Related entries

@@ -1,38 +1,36 @@
-# Build the Quarto site and publish it to Posit Connect Cloud.
+# Check the site, build it and publish it to Netlify.
 #
-# One-time setup (on your own machine):
-#   1. Run `quarto publish posit-connect-cloud` in the project folder. It opens
-#      a browser to sign in to Posit Connect Cloud, renders the site, uploads
-#      it, and writes _publish.yml with the content ID and URL.
-#      Commit _publish.yml: it holds no secrets, and this workflow needs it to
-#      update the same content item instead of creating a new one.
-#   2. After that first sign-in, Quarto stores your tokens under
-#        Windows:     %LOCALAPPDATA%\quarto\publish\accounts\posit-connect-cloud\
-#        macOS/Linux: ~/.local/share/quarto/publish/accounts/posit-connect-cloud/
-#      Copy the access token, refresh token and account ID from there into
-#      three GitHub Actions secrets (Settings -> Secrets and variables ->
-#      Actions):
-#        POSIT_CONNECT_CLOUD_ACCESS_TOKEN
-#        POSIT_CONNECT_CLOUD_REFRESH_TOKEN
-#        POSIT_CONNECT_CLOUD_ACCOUNT_ID
-#      Quarto refreshes the access token on its own when it expires, using the
-#      refresh token.
+# - Every pull request: run all checks, deploy nothing. A suggested correction
+#   can't break a page without the check failing first.
+# - Every push to main: run all checks, then deploy to production.
 #
-# After that, every push to main republishes the site.
+# One-time setup:
+#   1. Publish once by hand with `quarto publish netlify`. That created the
+#      site https://gelman-lexicon-explorer.netlify.app and wrote _publish.yml
+#      (the site's ID and URL, no secrets). Commit _publish.yml: this workflow
+#      uses it to update the same site.
+#   2. In the GitHub repository, add one secret (Settings -> Secrets and
+#      variables -> Actions):
+#        NETLIFY_AUTH_TOKEN  a personal access token from Netlify
+#                            (User settings -> Applications -> Personal access tokens)
+#      Until it exists, pushes to main still run the checks and skip the deploy.
+#
+# Netlify never builds the site itself (see netlify.toml); this workflow does.
 
-name: Publish to Posit Connect Cloud
+name: Check and publish
 
 on:
   push:
     branches: [main]
+  pull_request:
   workflow_dispatch:
 
 concurrency:
-  group: connect-cloud
+  group: publish-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  publish:
+  check-and-publish:
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -53,21 +51,34 @@ jobs:
             [ -n "$ts" ] && touch -d "$ts" "$f"
           done
 
-      - name: Check that the site has been published once
-        run: |
-          if [ ! -f _publish.yml ]; then
-            echo "::error::_publish.yml is missing. Run 'quarto publish posit-connect-cloud' locally once and commit _publish.yml."
-            exit 1
-          fi
+      # Front matter, section order, plot accessibility labels, seeds, links,
+      # reciprocal Related entries.
+      - name: Check entries
+        run: python3 scripts/check_entries.py
 
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:
-          version: 1.10.11
+          version: 1.12.1
 
-      - name: Render and publish
+      - name: Render site
+        run: quarto render
+
+      # quarto render only checks OJS syntax. This loads every page in headless
+      # Chrome (preinstalled on GitHub's Ubuntu runners) and fails on any
+      # runtime error box or entry page without a chart.
+      - name: Check every page in a browser
+        run: python3 scripts/check_pages.py _site
+
+      # Publishes the _site/ checked above (--no-render) to the site recorded
+      # in _publish.yml.
+      - name: Publish to Netlify
+        if: github.event_name != 'pull_request'
         env:
-          POSIT_CONNECT_CLOUD_ACCESS_TOKEN: ${{ secrets.POSIT_CONNECT_CLOUD_ACCESS_TOKEN }}
-          POSIT_CONNECT_CLOUD_REFRESH_TOKEN: ${{ secrets.POSIT_CONNECT_CLOUD_REFRESH_TOKEN }}
-          POSIT_CONNECT_CLOUD_ACCOUNT_ID: ${{ secrets.POSIT_CONNECT_CLOUD_ACCOUNT_ID }}
-        run: quarto publish posit-connect-cloud --no-prompt --no-browser
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+        run: |
+          if [ -z "$NETLIFY_AUTH_TOKEN" ]; then
+            echo "::warning::NETLIFY_AUTH_TOKEN is not set, so the site was checked but not published. See the setup notes at the top of .github/workflows/publish.yml."
+            exit 0
+          fi
+          quarto publish netlify --no-render --no-prompt --no-browser

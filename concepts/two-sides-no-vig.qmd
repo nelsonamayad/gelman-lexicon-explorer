@@ -7,17 +7,21 @@ theme: "Thinking about statistics"
 kind: "Fallacy"
 categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/"
+verified: true
+source-note: "The post gives the abstract only; the reading of the title is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#137** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Two sides, no vig: the problem with generative and inferential reasoning in social science](https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/).
 
 Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
+
+Source check: ✓ The explanation was checked against the source. The post gives the abstract only; the reading of the title is ours.
 :::
 
 ## What it is
 
-The "vig" (vigorish) is the bookmaker's cut, the cost of placing a bet. A bet with "two sides, no vig" costs nothing, and you collect whichever way it goes. The entry is the title of a paper Gelman planned, and the post gives its abstract. Social science can reason in two directions. **Generative modeling** predicts behavior from assumed preferences. **Inferential reasoning** deduces preferences from observed behavior. Both are valuable, but "in choosing which mode to use, social scientists have the freedom to come to essentially opposite conclusions for any problem that comes in." His examples come from economics, political science and public health.
+The "vig" (vigorish) is the bookmaker's cut, the cost of placing a bet. A bet with "two sides, no vig" is one where you may take either side without paying that fee. The entry is the title of a paper Gelman planned, and the post gives only its abstract, so the reading of the title here is ours: a researcher who can take either side of an argument at no cost. Social science can reason in two directions. **Generative modeling** predicts behavior from assumed preferences. **Inferential reasoning** deduces preferences from observed behavior. Both are valuable, but "in choosing which mode to use, social scientists have the freedom to come to essentially opposite conclusions for any problem that comes in." His examples come from economics, political science and public health.
 
 ## Why it matters
 
@@ -32,6 +36,7 @@ Evidence for a theory $T$ from an outcome $D$ is the likelihood ratio $\Pr(D \mi
 Two theories face 30 studies of an effect that is actually zero. The committed theory predicts a positive effect. The two-sided theory explains either sign. A naive scorekeeper counts "confirmations," meaning noticeable results (|z| > 1) that the theory can explain, while a Bayesian tracks the evidence.
 
 ```{ojs}
+//| echo: false
 import {rng, range, fmt, pct} from "../js/stats.js"
 ```
 
@@ -60,9 +65,13 @@ vig = {
 
 ```{ojs}
 html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
-${Plot.plot({width: 320, height: 240, title: "Naive count of 'confirmations'", x: {label: "Studies"}, y: {label: "Confirmations", grid: true}, color: {legend: true, domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+${Plot.plot({
+  ariaLabel: "Two sides, no vig: Naive count of 'confirmations'",
+  ariaDescription: "Horizontal axis: Studies. Vertical axis: Confirmations. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 240, title: "Naive count of 'confirmations'", x: {label: "Studies"}, y: {label: "Confirmations", grid: true}, color: {legend: true, domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
   marks: [Plot.line(vig, {x: "k", y: "commitConf", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoConf", stroke: () => "Two-sided theory", strokeWidth: 2})]})}
-${Plot.plot({width: 320, height: 240, title: "Actual evidence (posterior)", x: {label: "Studies"}, y: {label: "Pr(theory)", domain: [0, 1], grid: true}, color: {domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+${Plot.plot({
+  ariaLabel: "Two sides, no vig: Actual evidence (posterior)",
+  ariaDescription: "Horizontal axis: Studies. Vertical axis: Pr(theory). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 240, title: "Actual evidence (posterior)", x: {label: "Studies"}, y: {label: "Pr(theory)", domain: [0, 1], grid: true}, color: {domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
   marks: [Plot.line(vig, {x: "k", y: "commitP", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoP", stroke: () => "Two-sided theory", strokeWidth: 2, strokeDasharray: "4 3"})]})}
 </div>`
 ```
@@ -71,6 +80,49 @@ ${Plot.plot({width: 320, height: 240, title: "Actual evidence (posterior)", x: {
 //| echo: false
 html`<div class="sim-readout">${md`After 30 studies, the two-sided theory has **${vig.at(-1).twoConf}** "confirmations" and the committed theory **${vig.at(-1).commitConf}**. Yet the two-sided theory's evidence hasn't moved from 50%, since it bet on both sides and risked nothing. The committed theory, which paid the vig, is now at **${pct(vig.at(-1).commitP)}**. Only theories that can lose can win.`}</div>`
 ```
+
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, fmt, pct} from "../js/stats.js"
+
+viewof trueEffect = Inputs.range([-0.5, 0.5], {value: 0, step: 0.05, label: "True effect"})
+viewof seed = Inputs.range([1, 500], {value: 137, step: 1, label: "Random seed"})
+
+vig = {
+  const r = rng(seed);
+  let commitConf = 0, twoConf = 0, commitLO = 0, twoLO = 0;
+  return range(30).map(k => {
+    const z = r.normal(trueEffect / 0.2, 1);
+    const sig = Math.abs(z) > 1, pos = z > 0;            // a "noticeable" result, |z| > 1
+    if (sig && pos) commitConf++;
+    if (sig) twoConf++;                                      // either sign "confirms" it
+    // Evidence: committed theory predicts positive with prob .8 vs .5 under the null of no theory.
+    if (sig) commitLO += pos ? Math.log(0.8 / 0.5) : Math.log(0.2 / 0.5);
+    // Two-sided theory: predicts the observed sign with the same probability as no theory.
+    twoLO += 0;
+    return {k: k + 1, commitConf, twoConf, commitP: 1 / (1 + Math.exp(-commitLO)), twoP: 0.5};
+  });
+}
+
+html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
+${Plot.plot({
+  ariaLabel: "Two sides, no vig: Naive count of 'confirmations'",
+  ariaDescription: "Horizontal axis: Studies. Vertical axis: Confirmations. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 240, title: "Naive count of 'confirmations'", x: {label: "Studies"}, y: {label: "Confirmations", grid: true}, color: {legend: true, domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(vig, {x: "k", y: "commitConf", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoConf", stroke: () => "Two-sided theory", strokeWidth: 2})]})}
+${Plot.plot({
+  ariaLabel: "Two sides, no vig: Actual evidence (posterior)",
+  ariaDescription: "Horizontal axis: Studies. Vertical axis: Pr(theory). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 240, title: "Actual evidence (posterior)", x: {label: "Studies"}, y: {label: "Pr(theory)", domain: [0, 1], grid: true}, color: {domain: ["Committed theory", "Two-sided theory"], range: ["#2166ac", "#d6604d"]},
+  marks: [Plot.line(vig, {x: "k", y: "commitP", stroke: () => "Committed theory", strokeWidth: 2}), Plot.line(vig, {x: "k", y: "twoP", stroke: () => "Two-sided theory", strokeWidth: 2, strokeDasharray: "4 3"})]})}
+</div>`
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
 
 ## Key takeaways
 

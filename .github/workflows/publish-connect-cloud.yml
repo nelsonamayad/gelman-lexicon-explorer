@@ -1,0 +1,77 @@
+# ALTERNATIVE DEPLOY TARGET (manual only). The primary deploy is Netlify
+# (publish.yml), which also runs the checks. Run this from the Actions tab if
+# you also want a copy on Posit Connect Cloud. On a basic Connect Cloud
+# account the public URL includes your account name:
+# https://<account-name>-<custom-name>.share.connect.posit.cloud
+#
+# Build the Quarto site and publish it to Posit Connect Cloud.
+#
+# One-time setup (on your own machine):
+#   1. Run `quarto publish posit-connect-cloud` in the project folder. It opens
+#      a browser to sign in to Posit Connect Cloud, renders the site, uploads
+#      it, and writes _publish.yml with the content ID and URL.
+#      Commit _publish.yml: it holds no secrets, and this workflow needs it to
+#      update the same content item instead of creating a new one.
+#   2. After that first sign-in, Quarto stores your tokens under
+#        Windows:     %LOCALAPPDATA%\quarto\publish\accounts\posit-connect-cloud\
+#        macOS/Linux: ~/.local/share/quarto/publish/accounts/posit-connect-cloud/
+#      Copy the access token, refresh token and account ID from there into
+#      three GitHub Actions secrets (Settings -> Secrets and variables ->
+#      Actions):
+#        POSIT_CONNECT_CLOUD_ACCESS_TOKEN
+#        POSIT_CONNECT_CLOUD_REFRESH_TOKEN
+#        POSIT_CONNECT_CLOUD_ACCOUNT_ID
+#      Quarto refreshes the access token on its own when it expires, using the
+#      refresh token.
+#
+# After that, each manual run republishes the site to the same content item.
+
+name: Publish to Posit Connect Cloud (manual)
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: connect-cloud
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0   # full history, needed for the modified dates below
+
+      # Pages show "Modified" from each file's modification time
+      # (date-modified: last-modified in _quarto.yml). A fresh checkout stamps
+      # every file with the current time, so reset each tracked file's mtime to
+      # its last commit date.
+      - name: Restore file modification times from git
+        run: |
+          git ls-files -z | while IFS= read -r -d '' f; do
+            ts=$(git log -1 --format=%cI -- "$f")
+            [ -n "$ts" ] && touch -d "$ts" "$f"
+          done
+
+      - name: Check that the site has been published once
+        run: |
+          if [ ! -f _publish.yml ]; then
+            echo "::error::_publish.yml is missing. Run 'quarto publish posit-connect-cloud' locally once and commit _publish.yml."
+            exit 1
+          fi
+
+      - name: Set up Quarto
+        uses: quarto-dev/quarto-actions/setup@v2
+        with:
+          version: 1.12.1
+
+      - name: Render and publish
+        env:
+          POSIT_CONNECT_CLOUD_ACCESS_TOKEN: ${{ secrets.POSIT_CONNECT_CLOUD_ACCESS_TOKEN }}
+          POSIT_CONNECT_CLOUD_REFRESH_TOKEN: ${{ secrets.POSIT_CONNECT_CLOUD_REFRESH_TOKEN }}
+          POSIT_CONNECT_CLOUD_ACCOUNT_ID: ${{ secrets.POSIT_CONNECT_CLOUD_ACCOUNT_ID }}
+        run: quarto publish posit-connect-cloud --no-prompt --no-browser

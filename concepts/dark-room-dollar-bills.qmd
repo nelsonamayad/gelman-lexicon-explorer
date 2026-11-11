@@ -6,18 +6,24 @@ order: 140
 theme: "How science behaves"
 kind: "Law or aphorism"
 categories: ["How science behaves", "Law or aphorism"]
-source: "https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/"
+source: "https://statmodeling.stat.columbia.edu/2024/07/11/ancestor-worship-in-academia-where-does-it-happen/"
+verified: true
+source-note: "Checked against an archived copy; the reading of the image in the simulation is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#140** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/)
+Entry **#140** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/07/11/ancestor-worship-in-academia-where-does-it-happen/)
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+
+Source check: ✓ The explanation was checked against the source. Checked against an archived copy; the reading of the image in the simulation is ours.
 :::
 
 ## What it is
 
-How bright a light looks depends on how dark the room is. In a room where most of the other lights are covered up, here by "opaque dollar bills," meaning money, prestige and institutional interests that keep alternatives out of view, even a weak, flickering beam looks brilliant if you stare at it. Gelman uses the image in a post about "ancestor worship" in academia, where certain figures or ideas are revered partly because the competing ones have been kept out of sight.
+The line comes from a post on ancestor worship in academia, about which fields treat their leading figures as heroes. Gelman notes "the habit of economists describing other economists in heroic terms", which he thinks economics took from mathematics and physics, and contrasts it with political science, where modern scholars "don't seem to be idolizing the political scientists of the mid and late twentieth century." Then: "Some more examples from economics are the extravagant and, in my impression, unreasonable adulation given to Gary Becker and Lawrence Summers. I'm sure these guys were impressive, but I don't think the whole thing of treating them as geniuses worked out so well. In a dark room with many of the lights covered up by opaque dollar bills, even a weak and intermittent beam can appear brilliant, if you look right at it."
+
+He wonders whether part of the problem is that economics "has traditionally been taught as a history of great men as much as a history of ideas", and his conclusion applies to statistics too: "We should be able to celebrate great work without idealizing the individuals involved. They're just people!" Gelman doesn't spell out the image. Our reading: when money and prestige cover up the other lights, the few left in view look brighter than they are.
 
 ## Why it matters
 
@@ -32,12 +38,13 @@ A toy model. Each idea has a true brightness. An observer sees the focal idea pl
 There are 200 ideas in a field, and the focal one is truly middling, at the 40th percentile. Cover up more and more of the alternatives and watch its apparent standing.
 
 ```{ojs}
+//| echo: false
 import {rng, range, mean, fmt, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
 viewof truePct = Inputs.range([0.05, 0.95], {value: 0.4, step: 0.05, label: "True percentile of the focal idea"})
-viewof favoured = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "How much covering favours weaker rivals"})
+viewof favored = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "How much covering favors weaker rivals"})
 viewof seed = Inputs.range([1, 500], {value: 140, step: 1, label: "Random seed"})
 ```
 
@@ -52,7 +59,7 @@ room = {
     for (let rep = 0; rep < 200; rep++) {
       // Covering hits brighter rivals harder (they threaten the incumbent).
       const c = 1 - visible;
-      const seen = others.filter(v => r() >= Math.min(1, c * (v > focal ? 1 + favoured : 1 - favoured)));
+      const seen = others.filter(v => r() >= Math.min(1, c * (v > focal ? 1 + favored : 1 - favored)));
       sum += seen.length ? seen.filter(v => v < focal).length / seen.length : 1;
     }
     return {visible, apparent: sum / 200};
@@ -62,6 +69,8 @@ room = {
 
 ```{ojs}
 Plot.plot({
+  ariaLabel: "In a dark room with many of the lights covered up by opaque dollar bills: simulation chart",
+  ariaDescription: "Horizontal axis: Share of rival lights left uncovered. Vertical axis: Share of visible rivals the focal idea outshines. The chart updates with the controls above it, and the summary below the charts states the result in words.",
   height: 280,
   x: {label: "Share of rival lights left uncovered", tickFormat: "%", reverse: true},
   y: {label: "Share of visible rivals the focal idea outshines", domain: [0, 1], tickFormat: "%", grid: true},
@@ -77,6 +86,52 @@ Plot.plot({
 html`<div class="sim-readout">${md`The focal idea truly outshines **${pct(truePct)}** of its rivals (dashed line). With every light visible, it outshines **${pct(room[0].apparent)}** of what you can see. With most of the room covered, it appears to outshine **${pct(room.at(-1).apparent)}**. The beam didn't get brighter. The room got darker.`}</div>`
 ```
 
+<!-- Simulation code: generated by scripts/build_groups.py from the cells above. Don't edit. -->
+
+<details class="code-fold sim-code">
+<summary>Show simulation code</summary>
+
+```{.js}
+import {rng, range, mean, fmt, pct} from "../js/stats.js"
+
+viewof truePct = Inputs.range([0.05, 0.95], {value: 0.4, step: 0.05, label: "True percentile of the focal idea"})
+viewof favored = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "How much covering favors weaker rivals"})
+viewof seed = Inputs.range([1, 500], {value: 140, step: 1, label: "Random seed"})
+
+room = {
+  const r = rng(seed);
+  const others = r.normals(199).sort((a, b) => a - b);
+  const focal = others[Math.floor(truePct * 198)];
+  return range(20).map(k => {
+    const visible = 1 - k * 0.05;
+    let sum = 0;
+    for (let rep = 0; rep < 200; rep++) {
+      // Covering hits brighter rivals harder (they threaten the incumbent).
+      const c = 1 - visible;
+      const seen = others.filter(v => r() >= Math.min(1, c * (v > focal ? 1 + favored : 1 - favored)));
+      sum += seen.length ? seen.filter(v => v < focal).length / seen.length : 1;
+    }
+    return {visible, apparent: sum / 200};
+  });
+}
+
+Plot.plot({
+  ariaLabel: "In a dark room with many of the lights covered up by opaque dollar bills: simulation chart",
+  ariaDescription: "Horizontal axis: Share of rival lights left uncovered. Vertical axis: Share of visible rivals the focal idea outshines. The chart updates with the controls above it, and the summary below the charts states the result in words.",
+  height: 280,
+  x: {label: "Share of rival lights left uncovered", tickFormat: "%", reverse: true},
+  y: {label: "Share of visible rivals the focal idea outshines", domain: [0, 1], tickFormat: "%", grid: true},
+  marks: [
+    Plot.line(room, {x: "visible", y: "apparent", stroke: "#e6ab02", strokeWidth: 3}),
+    Plot.ruleY([truePct], {stroke: "currentColor", strokeDasharray: "4 3"})
+  ]
+})
+```
+
+</details>
+
+<!-- End of generated simulation code. -->
+
 ## Key takeaways
 
 ::: takeaways
@@ -90,7 +145,8 @@ html`<div class="sim-readout">${md`The focal idea truly outshines **${pct(truePc
 - [Research Incumbency Rule](research-incumbency-rule.qmd)
 - [Brilliance](brilliance.qmd)
 - [Meritocracy won't happen](meritocracy.qmd)
+- [The transitive property of money](transitive-property-of-money.qmd)
 
 ## Source
 
-- Andrew Gelman, [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/) (2024).
+- Andrew Gelman, [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/07/11/ancestor-worship-in-academia-where-does-it-happen/) (2024).
