@@ -3,12 +3,16 @@ title: "Arrow's Other Theorem (strong form)"
 date: 2026-11-09
 description: "Any result will be published five times."
 order: 34
-categories: [Research culture, Significance & noise]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#34** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

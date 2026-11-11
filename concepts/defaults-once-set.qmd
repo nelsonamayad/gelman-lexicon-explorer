@@ -3,12 +3,16 @@ title: "Defaults, once set"
 date: 2026-11-09
 description: "Hard to change."
 order: 39
-categories: [Research culture, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#39** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

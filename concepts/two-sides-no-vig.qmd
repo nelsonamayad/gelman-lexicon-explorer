@@ -3,12 +3,16 @@ title: "Two sides, no vig"
 date: 2026-11-09
 description: "The problem with generative and inferential reasoning in social science"
 order: 137
-categories: [Reasoning & fallacies, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#137** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Two sides, no vig: the problem with generative and inferential reasoning in social science](https://statmodeling.stat.columbia.edu/2021/12/07/two-sides-no-vig-the-problem-with-generative-and-inferential-reasoning-in-social-science/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

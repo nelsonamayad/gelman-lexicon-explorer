@@ -3,12 +3,16 @@ title: "Objects of the class"
 date: 2026-11-09
 description: "From Foghorn Leghorn to Jacques Cousteau."
 order: 141
-categories: [Reasoning & fallacies, Communication]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2013/11/16/objects-of-the-class-objects-of-the-class/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#141** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Objects of the class "Objects of the class"](https://statmodeling.stat.columbia.edu/2013/11/16/objects-of-the-class-objects-of-the-class/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

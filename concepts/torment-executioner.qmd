@@ -3,12 +3,16 @@ title: "Torment executioner"
 date: 2026-11-09
 description: "Pain killer in Reno, Nevada."
 order: 130
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#130** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Torment executioners in Reno, Nevada](https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

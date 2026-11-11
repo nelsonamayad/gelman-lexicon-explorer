@@ -3,12 +3,16 @@ title: "Until it runs twice"
 date: 2026-11-09
 description: "I don't trust anything until it runs. In fact, I don't trust anything until . . ."
 order: 129
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Law or aphorism"
+categories: ["Building and checking models", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#129** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Who said: "I don't trust anything until it runs. In fact, I don't trust anything until it runs twice"?](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/)
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

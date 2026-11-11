@@ -23,7 +23,7 @@ listing:
     order: "#"
     title: "Entry"
     description: "Gelman's definition"
-    categories: "Topic"
+    categories: "Theme · Kind"
 ---
 
 ::: {.hero}
@@ -34,13 +34,21 @@ I love this page and have learned a lot from reading it through the years. With 
 [Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
 :::
 
-## Browse by topic {#topics}
+## Browse by theme {#themes}
 
-{{< include _topic-cards.md >}}
+What each entry is about. Every entry belongs to exactly one theme.
+
+{{< include _group-cards.md >}}
+
+## Browse by kind {#kinds}
+
+What sort of entry it is, whatever its theme.
+
+{{< include _kind-cards.md >}}
 
 ## Every entry {#all-entries}
 
-Entries are numbered in the order they appear in Gelman's list. Type in the filter box to search titles and definitions, click a column header to sort, or click a topic tag to filter.
+Entries are numbered in the order they appear in Gelman's list. Type in the filter box to search titles and definitions, click a column header to sort, or click a theme or kind tag to filter.
 
 ::: {#entries}
 :::

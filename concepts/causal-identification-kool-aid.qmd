@@ -3,12 +3,16 @@ title: "The Causal Identification Kool-Aid"
 date: 2026-11-09
 description: "The attitude by which any statistically significant difference is considered to represent some true population effect, as long as it is associated with a randomized treatment assignment, instrumental variable analysis, or regression discontinuity."
 order: 83
-categories: [Causal inference, Significance & noise]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#83** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 2019 project: how false beliefs in statistical differences still live in social science and journalism today](https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

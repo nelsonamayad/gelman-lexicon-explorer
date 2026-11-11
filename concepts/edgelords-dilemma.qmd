@@ -3,12 +3,16 @@ title: "The Edgelord's Dilemma"
 date: 2026-11-09
 description: "It's not so much fun being a contrarian when you're suddenly sharing a platform with prominent stupid and dangerous people around the world."
 order: 148
-categories: [Research culture, Reasoning & fallacies]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#148** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

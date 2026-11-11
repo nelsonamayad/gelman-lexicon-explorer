@@ -3,12 +3,16 @@ title: "Correlation"
 date: 2026-11-09
 description: "It does not even imply correlation."
 order: 70
-categories: [Significance & noise, Reasoning & fallacies]
+theme: "Noise and evidence"
+kind: "Law or aphorism"
+categories: ["Noise and evidence", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2014/08/04/correlation-even-imply-correlation/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#70** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Correlation does not even imply correlation](http://statmodeling.stat.columbia.edu/2014/08/04/correlation-even-imply-correlation/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

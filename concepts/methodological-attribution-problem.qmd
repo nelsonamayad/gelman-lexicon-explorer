@@ -3,12 +3,16 @@ title: "The Methodological Attribution Problem"
 date: 2026-11-09
 description: "The many useful contributions of a good statistical consultant, or collaborator, will often be overly attributed to the statistician's methods or philosophy."
 order: 40
-categories: [Research culture, Causal inference]
+theme: "How science behaves"
+kind: "Fallacy"
+categories: ["How science behaves", "Fallacy"]
 source: "http://www.stat.columbia.edu/~gelman/research/published/gelman_discussion_of_efron.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#40** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [discussion of Efron (PDF)](http://www.stat.columbia.edu/~gelman/research/published/gelman_discussion_of_efron.pdf).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

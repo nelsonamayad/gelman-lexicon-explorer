@@ -3,12 +3,16 @@ title: "The \"What does not kill my statistical significance makes it stronger\"
 date: 2026-11-09
 description: "The belief that statistical significance is particularly impressive when it was obtained under noisy conditions."
 order: 62
-categories: [Significance & noise, Reasoning & fallacies]
+theme: "Noise and evidence"
+kind: "Fallacy"
+categories: ["Noise and evidence", "Fallacy"]
 source: "http://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#62** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "Theoretical and Applied Statisticians, how to tell them apart"
 date: 2026-11-09
 description: "A theoretical statistician calls the data x, an applied statistician says y."
 order: 12
-categories: [Philosophy of statistics, Modeling workflow]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#12** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/11/how_to_tell_the/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

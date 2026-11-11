@@ -3,12 +3,16 @@ title: "Evidence and Truth"
 date: 2026-11-09
 description: "They're different."
 order: 85
-categories: [Philosophy of statistics, Reasoning & fallacies]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2018/04/06/important-distinction-truth-evidence/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#85** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [An important distinction between truth and evidence](https://statmodeling.stat.columbia.edu/2018/04/06/important-distinction-truth-evidence/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

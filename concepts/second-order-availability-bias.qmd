@@ -3,12 +3,16 @@ title: "Second-Order Availability Bias"
 date: 2026-11-09
 description: "Generalizing from correlations you see in your personal experience to correlations in the population."
 order: 16
-categories: [Reasoning & fallacies, Surveys & MRP]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2005/10/red_and_blue_vo/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#16** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/10/red_and_blue_vo/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

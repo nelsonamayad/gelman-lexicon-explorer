@@ -3,12 +3,16 @@ title: "In high-dimensional space"
 date: 2026-11-09
 description: "No one can hear you scream."
 order: 132
-categories: [Computing, Bayesian inference]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#132** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The typical set and its relevance to Bayesian computation](https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

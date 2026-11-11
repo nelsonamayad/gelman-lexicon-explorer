@@ -30,20 +30,21 @@ website:
     left:
       - href: index.qmd
         text: Browse all
-      - text: Topics
+      - text: Themes
         menu:
-          - href: topics/bayesian-inference.qmd
-          - href: topics/significance-and-noise.qmd
-          - href: topics/causal-inference.qmd
-          - href: topics/modeling-workflow.qmd
-          - href: topics/statistical-graphics.qmd
-          - href: topics/surveys-and-mrp.qmd
-          - text: "---"
-          - href: topics/research-culture.qmd
-          - href: topics/reasoning-and-fallacies.qmd
-          - href: topics/philosophy-of-statistics.qmd
-          - href: topics/communication.qmd
-          - href: topics/computing.qmd
+          - href: themes/noise-and-evidence.qmd
+          - href: themes/building-and-checking-models.qmd
+          - href: themes/causes-samples-populations.qmd
+          - href: themes/showing-and-telling.qmd
+          - href: themes/how-science-behaves.qmd
+          - href: themes/thinking-about-statistics.qmd
+      - text: Kinds
+        menu:
+          - href: kinds/methods.qmd
+          - href: kinds/principles.qmd
+          - href: kinds/fallacies.qmd
+          - href: kinds/laws-and-aphorisms.qmd
+          - href: kinds/advice.qmd
       - href: start-here.qmd
         text: Start here
       - href: random.qmd
@@ -57,15 +58,8 @@ website:
       - icon: box-arrow-up-right
         href: https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/
         aria-label: Gelman's original lexicon
-  sidebar:
-    - id: entries
-      title: "Entries"
-      style: docked
-      collapse-level: 1
-      contents:
-        - section: "All 153 entries, in Gelman's order"
-          contents:
-            - auto: "concepts/*.qmd"
+  # The sidebar (entries grouped by theme) is generated into _sidebar.yml by
+  # scripts/build_groups.py and merged in through metadata-files below.
   page-footer:
     left: "Concepts from Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Explanations and simulations by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5, an independent study aid."
     right:
@@ -76,6 +70,9 @@ website:
         aria-label: Random entry
 
 brand: _brand.yml
+
+metadata-files:
+  - _sidebar.yml
 
 # Every page shows its published date (`date` in each file's front matter) and
 # its last-modified date, taken from the file's modification time. The publish

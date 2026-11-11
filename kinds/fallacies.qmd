@@ -1,0 +1,100 @@
+---
+title: "Fallacies"
+date: 2026-11-11
+subtitle: "19 entries"
+description: "A tempting error in reasoning, with a simulation showing how it misleads."
+sidebar: false
+listing:
+  - id: t-noise-and-evidence
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Noise and evidence"
+      kind: "Fallacy"
+  - id: t-building-and-checking-models
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Fallacy"
+  - id: t-causes-samples-populations
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Causes, samples and populations"
+      kind: "Fallacy"
+  - id: t-how-science-behaves
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "How science behaves"
+      kind: "Fallacy"
+  - id: t-thinking-about-statistics
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Thinking about statistics"
+      kind: "Fallacy"
+---
+
+Entries are listed in the order they appear in Gelman's list. See [all themes](../index.qmd#themes), [all kinds](../index.qmd#kinds), or [browse every entry](../index.qmd#all-entries).
+
+## Noise and evidence (2)
+
+[See the whole theme](../themes/noise-and-evidence.qmd).
+
+::: {#t-noise-and-evidence}
+:::
+
+## Building and checking models (1)
+
+[See the whole theme](../themes/building-and-checking-models.qmd).
+
+::: {#t-building-and-checking-models}
+:::
+
+## Causes, samples and populations (8)
+
+[See the whole theme](../themes/causes-samples-populations.qmd).
+
+::: {#t-causes-samples-populations}
+:::
+
+## How science behaves (2)
+
+[See the whole theme](../themes/how-science-behaves.qmd).
+
+::: {#t-how-science-behaves}
+:::
+
+## Thinking about statistics (6)
+
+[See the whole theme](../themes/thinking-about-statistics.qmd).
+
+::: {#t-thinking-about-statistics}
+:::

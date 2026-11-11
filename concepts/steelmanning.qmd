@@ -3,12 +3,16 @@ title: "Steelmanning"
 date: 2026-11-09
 description: "Why I'm skeptical of it."
 order: 142
-categories: [Reasoning & fallacies, Research culture]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#142** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The challenge of bending over backward to see things from the other person's point of view](https://statmodeling.stat.columbia.edu/2022/04/28/the-challenge-of-bending-over-backward-to-see-things-from-the-other-persons-point-of-view/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

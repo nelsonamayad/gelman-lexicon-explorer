@@ -3,12 +3,16 @@ title: "Freedom"
 date: 2026-11-09
 description: "It's not user friendly."
 order: 102
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Law or aphorism"
+categories: ["Building and checking models", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#102** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Freedom is not user-friendly](https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

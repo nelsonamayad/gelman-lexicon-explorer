@@ -3,12 +3,16 @@ title: "What to include"
 date: 2026-11-09
 description: "Just as we should not publish include any sentences that we do not want to be read, we also should avoid publishing numbers that will not be of any use to a reader."
 order: 108
-categories: [Communication, Statistical graphics]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#108** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

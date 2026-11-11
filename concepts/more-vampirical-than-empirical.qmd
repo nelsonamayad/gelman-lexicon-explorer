@@ -3,12 +3,16 @@ title: "More Vampirical Than Empirical"
 date: 2026-11-09
 description: "Those hypotheses that are unable to be killed by mere evidence. (from Jeremy Freese)"
 order: 47
-categories: [Research culture, Bayesian inference]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#47** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Jeremy Freese adds a new item to the lexicon](http://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

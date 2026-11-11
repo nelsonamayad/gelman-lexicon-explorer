@@ -3,12 +3,16 @@ title: "The Taxonomy of Confusion"
 date: 2026-11-09
 description: "What to do when you're stuck."
 order: 19
-categories: [Modeling workflow]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#19** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

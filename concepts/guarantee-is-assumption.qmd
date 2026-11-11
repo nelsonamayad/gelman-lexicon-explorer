@@ -3,12 +3,16 @@ title: "When researchers say \"guarantee\""
 date: 2026-11-09
 description: "They're really talking about an assumption."
 order: 115
-categories: [Philosophy of statistics, Significance & noise]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2019/07/22/guarantee-is-another-word-for-assumption/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#115** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: ["Guarantee" is another word for "assumption"](https://statmodeling.stat.columbia.edu/2019/07/22/guarantee-is-another-word-for-assumption/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

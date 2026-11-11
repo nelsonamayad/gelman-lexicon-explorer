@@ -3,12 +3,16 @@ title: "Conservatism"
 date: 2026-11-09
 description: "In statistics, the desire to use methods that have been used before."
 order: 9
-categories: [Research culture, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2007/06/bayes_radical_l/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#9** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayes: radical, liberal, or conservative?](https://statmodeling.stat.columbia.edu/2007/06/bayes_radical_l/)
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

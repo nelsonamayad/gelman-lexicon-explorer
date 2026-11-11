@@ -3,12 +3,16 @@ title: "Meritocracy won't happen"
 date: 2026-11-09
 description: "The problem's with the \"ocracy.\""
 order: 128
-categories: [Research culture, Reasoning & fallacies]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2005/03/03/meritocracy_the/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#128** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Meritocracy...](https://statmodeling.stat.columbia.edu/2005/03/03/meritocracy_the/)
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

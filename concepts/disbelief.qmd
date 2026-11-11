@@ -3,12 +3,16 @@ title: "Disbelief"
 date: 2026-11-09
 description: "Remains an option."
 order: 103
-categories: [Reasoning & fallacies, Bayesian inference]
+theme: "How science behaves"
+kind: "Principle or heuristic"
+categories: ["How science behaves", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2014/09/03/disagree-alan-turing-daniel-kahneman-regarding-strength-statistical-evidence/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#103** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I disagree with Alan Turing and Daniel Kahneman regarding the strength of statistical evidence](https://statmodeling.stat.columbia.edu/2014/09/03/disagree-alan-turing-daniel-kahneman-regarding-strength-statistical-evidence/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

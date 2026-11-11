@@ -3,12 +3,16 @@ title: "If zero is in the neighborhood"
 date: 2026-11-09
 description: "Invite it in."
 order: 100
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#100** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Graphing advice: if zero is in the neighborhood, invite it in](https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

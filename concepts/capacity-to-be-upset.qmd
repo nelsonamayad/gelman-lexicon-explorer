@@ -3,12 +3,16 @@ title: "The capacity to be upset"
 date: 2026-11-09
 description: "An important characteristic of a good scientist, to recognize anomalies for what they are, and to track them down and figure out what in our understanding is lacking."
 order: 146
-categories: [Modeling workflow, Research culture]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#146** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The role of doubt in conceiving research](https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "The Folk Theorem of Statistical Computing"
 date: 2026-11-09
 description: "When you have computational problems, often there's a problem with your model."
 order: 5
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#5** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

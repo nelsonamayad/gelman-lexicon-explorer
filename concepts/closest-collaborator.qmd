@@ -3,12 +3,16 @@ title: "Your closest collaborator"
 date: 2026-11-09
 description: "You, six months ago—and she doesn't respond to emails. (from Karl Broman via Erin Jonaitis)"
 order: 104
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Law or aphorism"
+categories: ["Building and checking models", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2014/12/31/closest-collaborator-cant-talk/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#104** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Your closest collaborator . . . and she can't talk](https://statmodeling.stat.columbia.edu/2014/12/31/closest-collaborator-cant-talk/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

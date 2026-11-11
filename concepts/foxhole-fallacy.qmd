@@ -3,12 +3,16 @@ title: "The Foxhole Fallacy"
 date: 2026-11-09
 description: "There are no X's in foxholes (where X = people who disagree with me on some issue of faith)."
 order: 30
-categories: [Reasoning & fallacies, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#30** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [No Bayesians in foxholes](https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

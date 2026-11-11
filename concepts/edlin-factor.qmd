@@ -3,12 +3,16 @@ title: "The Edlin Factor"
 date: 2026-11-09
 description: "How much you should scale down published estimates."
 order: 51
-categories: [Significance & noise, Bayesian inference]
+theme: "Noise and evidence"
+kind: "Method or technique"
+categories: ["Noise and evidence", "Method or technique"]
 source: "http://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#51** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Edlin's rule for routinely scaling down published estimates](http://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

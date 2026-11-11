@@ -3,12 +3,16 @@ title: "The year Jesus was born"
 date: 2026-11-09
 description: "Be careful when centering and scaling your regression predictors."
 order: 147
-categories: [Modeling workflow]
+theme: "Building and checking models"
+kind: "Advice"
+categories: ["Building and checking models", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2025/03/11/what-does-jesus-have-to-do-with-linear-regression/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#147** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What does Jesus have to do with linear regression?](https://statmodeling.stat.columbia.edu/2025/03/11/what-does-jesus-have-to-do-with-linear-regression/)
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

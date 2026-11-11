@@ -3,12 +3,16 @@ title: "Defaults"
 date: 2026-11-09
 description: "What statistics is the science of."
 order: 37
-categories: [Philosophy of statistics, Modeling workflow]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2012/11/statistics-is-the-science-of-defaults/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#37** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics is the science of defaults](http://statmodeling.stat.columbia.edu/2012/11/statistics-is-the-science-of-defaults/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

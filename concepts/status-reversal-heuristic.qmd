@@ -3,12 +3,16 @@ title: "The Status-Reversal Heuristic"
 date: 2026-11-09
 description: "When you're evaluating a published claim by someone in a high-status profession or a high-status institution, imagine it was coming from someone of lower status."
 order: 58
-categories: [Reasoning & fallacies, Research culture]
+theme: "How science behaves"
+kind: "Principle or heuristic"
+categories: ["How science behaves", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2019/10/16/the-status-reversal-heuristic/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#58** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The status-reversal heuristic](https://statmodeling.stat.columbia.edu/2019/10/16/the-status-reversal-heuristic/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

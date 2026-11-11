@@ -3,12 +3,16 @@ title: "Making errors is inevitable"
 date: 2026-11-09
 description: "Learning from them is not."
 order: 136
-categories: [Research culture, Modeling workflow]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#136** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ethics and statistics column (PDF)](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

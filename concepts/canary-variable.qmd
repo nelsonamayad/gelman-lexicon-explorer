@@ -3,12 +3,16 @@ title: "Canary variable"
 date: 2026-11-09
 description: "Like the canary in the coal mine, a canary variable is something with a known distribution that was not adjusted for in your model."
 order: 117
-categories: [Surveys & MRP, Modeling workflow]
+theme: "Causes, samples and populations"
+kind: "Method or technique"
+categories: ["Causes, samples and populations", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2023/02/07/checking-survey-representativeness-by-looking-at-canary-variables"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#117** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Checking survey representativeness by looking at canary variables](https://statmodeling.stat.columbia.edu/2023/02/07/checking-survey-representativeness-by-looking-at-canary-variables).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

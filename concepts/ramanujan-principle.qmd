@@ -3,12 +3,16 @@ title: "The Ramanujan Principle"
 date: 2026-11-09
 description: "Tables are read as crude graphs."
 order: 35
-categories: [Statistical graphics, Communication]
+theme: "Showing and telling"
+kind: "Principle or heuristic"
+categories: ["Showing and telling", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#35** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tables as graphs: the Ramanujan principle](http://statmodeling.stat.columbia.edu/2011/12/tables-as-graphs-the-ramanujan-principle/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

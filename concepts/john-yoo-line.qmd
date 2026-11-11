@@ -3,12 +3,16 @@ title: "The John Yoo Line"
 date: 2026-11-09
 description: "The point at which nothing you write gets taken seriously, and so you might as well become a hack because you have no scholarly reputation remaining."
 order: 41
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2012/09/12/niall-ferguson-the-john-yoo-line-and-the-paradox-of-influence/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#41** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Niall Ferguson, the John Yoo line, and the paradox of influence](https://statmodeling.stat.columbia.edu/2012/09/12/niall-ferguson-the-john-yoo-line-and-the-paradox-of-influence/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

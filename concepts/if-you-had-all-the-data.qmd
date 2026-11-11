@@ -3,12 +3,16 @@ title: "What would you do if you had all the data?"
 date: 2026-11-09
 description: "Rubin's first question."
 order: 55
-categories: [Causal inference, Modeling workflow]
+theme: "Causes, samples and populations"
+kind: "Principle or heuristic"
+categories: ["Causes, samples and populations", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#55** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

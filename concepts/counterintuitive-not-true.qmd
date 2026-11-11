@@ -3,12 +3,16 @@ title: "Just because something is counterintuitive"
 date: 2026-11-09
 description: "Doesn't mean it's true."
 order: 76
-categories: [Reasoning & fallacies, Bayesian inference]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#76** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Just because something is counterintuitive doesn't mean it's true](https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

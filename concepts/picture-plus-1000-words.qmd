@@ -3,12 +3,16 @@ title: "A picture plus 1000 words"
 date: 2026-11-09
 description: "Better than two pictures or 2000 words."
 order: 73
-categories: [Statistical graphics, Communication]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "http://statmodeling.stat.columbia.edu/2011/02/14/the_best_data_v/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#73** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The best data visualizations...](http://statmodeling.stat.columbia.edu/2011/02/14/the_best_data_v/)
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

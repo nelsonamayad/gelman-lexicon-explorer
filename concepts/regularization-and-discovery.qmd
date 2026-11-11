@@ -3,12 +3,16 @@ title: "Between regularization and discovery"
 date: 2026-11-09
 description: "There is no tradeoff."
 order: 122
-categories: [Bayesian inference, Significance & noise]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2017/10/18/no-tradeoff-regularization-discovery/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#122** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [There is no tradeoff between regularization and discovery](https://statmodeling.stat.columbia.edu/2017/10/18/no-tradeoff-regularization-discovery/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

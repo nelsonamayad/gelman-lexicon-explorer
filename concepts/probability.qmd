@@ -3,12 +3,16 @@ title: "Probability"
 date: 2026-11-09
 description: "A mathematical concept with no single correct foundation."
 order: 113
-categories: [Philosophy of statistics, Bayesian inference]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2018/12/26/what-is-probability/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#113** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What is probability?](https://statmodeling.stat.columbia.edu/2018/12/26/what-is-probability/)
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

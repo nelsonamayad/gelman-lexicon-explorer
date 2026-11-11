@@ -3,12 +3,16 @@ title: "Preregistration"
 date: 2026-11-09
 description: "It's a floor, not a ceiling."
 order: 133
-categories: [Research culture, Significance & noise]
+theme: "Noise and evidence"
+kind: "Advice"
+categories: ["Noise and evidence", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#133** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What's the difference between Derek Jeter and preregistration?](https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/)
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

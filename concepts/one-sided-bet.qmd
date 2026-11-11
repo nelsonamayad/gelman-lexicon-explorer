@@ -3,12 +3,16 @@ title: "The Fallacy of the One-Sided Bet"
 date: 2026-11-09
 description: "Pascal's wager, lottery tickets, and the rest."
 order: 13
-categories: [Reasoning & fallacies]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#13** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/02/the_fallacy_of/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

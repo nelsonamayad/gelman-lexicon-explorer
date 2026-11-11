@@ -3,12 +3,16 @@ title: "As They Say in the Stagecoach Business"
 date: 2026-11-09
 description: "Remove the padding from the seats and you get a bumpy ride."
 order: 28
-categories: [Communication]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2010/04/rhythm_vs_meani/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#28** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Rhythm vs. meaning](https://statmodeling.stat.columbia.edu/2010/04/rhythm_vs_meani/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

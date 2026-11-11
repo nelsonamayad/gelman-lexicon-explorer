@@ -3,12 +3,16 @@ title: "That toothpaste feeling"
 date: 2026-11-09
 description: "A spoonful of jargon with our factoids serves a similar function as the stuff in the toothpaste that gives you that tingly feeling when you brush: it has no direct function, but it conveys that it's doing something."
 order: 92
-categories: [Communication, Research culture]
+theme: "Showing and telling"
+kind: "Law or aphorism"
+categories: ["Showing and telling", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#92** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

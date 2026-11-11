@@ -3,12 +3,16 @@ title: "Uncertainty Interval"
 date: 2026-11-09
 description: "Say this instead of confidence or credible interval."
 order: 54
-categories: [Communication, Bayesian inference]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "http://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#54** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Let's say uncertainty intervals](http://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

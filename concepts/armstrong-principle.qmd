@@ -3,12 +3,16 @@ title: "The (Lance) Armstrong Principle"
 date: 2026-11-09
 description: "If you push people to promise more than they can deliver, they're motivated to cheat."
 order: 64
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#64** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Lance Armstrong principle](http://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "Basketball, or knitting"
 date: 2026-11-09
 description: "Like these activities, statistics is hard."
 order: 98
-categories: [Communication, Research culture]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2016/03/11/statistics-is-like-basketball-or-knitting/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#98** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics is like basketball, or knitting](https://statmodeling.stat.columbia.edu/2016/03/11/statistics-is-like-basketball-or-knitting/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

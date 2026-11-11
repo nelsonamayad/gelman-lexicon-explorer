@@ -3,12 +3,16 @@ title: "In a dark room with many of the lights covered up by opaque dollar bills
 date: 2026-11-09
 description: "Even a weak and intermittent beam can appear brilliant, if you look right at it."
 order: 140
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#140** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/08/19/ancestor-worship-in-academia-where-does-it-happen/)
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

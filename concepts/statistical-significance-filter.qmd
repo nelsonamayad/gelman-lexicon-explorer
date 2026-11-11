@@ -3,12 +3,16 @@ title: "The Statistical Significance Filter"
 date: 2026-11-09
 description: "If an estimate is statistically significant, it's probably an overestimate."
 order: 32
-categories: [Significance & noise]
+theme: "Noise and evidence"
+kind: "Principle or heuristic"
+categories: ["Noise and evidence", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2011/09/the-statistical-significance-filter/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#32** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The statistical significance filter](http://statmodeling.stat.columbia.edu/2011/09/the-statistical-significance-filter/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "The Paradox of Philosophizing"
 date: 2026-11-09
 description: "If philosophy is outlawed, only outlaws will do philosophy."
 order: 36
-categories: [Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#36** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2010/06/hey_dude_ya_don/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

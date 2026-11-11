@@ -3,12 +3,16 @@ title: "A probability isn't just a number"
 date: 2026-11-09
 description: "It's part of a network of conditional statements."
 order: 114
-categories: [Bayesian inference, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2022/12/23/a-probability-isnt-just-a-number-its-part-of-a-network-of-conditional-statements/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#114** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [A probability isn't just a number; it's part of a network of conditional statements](https://statmodeling.stat.columbia.edu/2022/12/23/a-probability-isnt-just-a-number-its-part-of-a-network-of-conditional-statements/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

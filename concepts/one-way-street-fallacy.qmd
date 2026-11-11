@@ -3,12 +3,16 @@ title: "The One-Way Street Fallacy"
 date: 2026-11-09
 description: "Considering only one possibility of a change that can go in either direction."
 order: 45
-categories: [Reasoning & fallacies, Causal inference]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "http://statmodeling.stat.columbia.edu/2013/12/20/discovered-new-fallacy-now-need-name/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#45** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Discovered a new fallacy, now need a name](http://statmodeling.stat.columbia.edu/2013/12/20/discovered-new-fallacy-now-need-name/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

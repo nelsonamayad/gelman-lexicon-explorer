@@ -3,12 +3,16 @@ title: "Schoolyard Evolutionary Biology"
 date: 2026-11-09
 description: "The idea that, because of evolution, all people are equivalent to all other people, except that all boys are different from all girls."
 order: 107
-categories: [Reasoning & fallacies]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2012/01/12/controversy-about-average-personality-differences-between-men-and-women/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#107** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Controversy about average personality differences between men and women](https://statmodeling.stat.columbia.edu/2012/01/12/controversy-about-average-personality-differences-between-men-and-women/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

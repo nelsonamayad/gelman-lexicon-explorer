@@ -3,12 +3,16 @@ title: "The Pluralist's Dilemma"
 date: 2026-11-09
 description: "How to recognize that my philosophy is just one among many, that my own embrace of this philosophy is contingent on many things beyond my control, while still expressing the reasons why I prefer my philosophy to the alternatives (at least for the problems I work on)."
 order: 46
-categories: [Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "http://www.stat.columbia.edu/~gelman/research/published/copss.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#46** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How do we choose our default methods? (PDF)](http://www.stat.columbia.edu/~gelman/research/published/copss.pdf).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

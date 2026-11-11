@@ -3,12 +3,16 @@ title: "The Javert Paradox"
 date: 2026-11-09
 description: "Suppose you find a problem with published work. If you just point it out once or twice, the authors of the work are likely to do nothing. But if you really pursue the problem, then you look like a Javert."
 order: 71
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#71** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It's hard to criticize science without looking like an obsessive (Slate)](https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "Looking for a needle in a pile of needles"
 date: 2026-11-09
 description: "They're not looking for a needle in a haystack, they're . . ."
 order: 88
-categories: [Causal inference, Significance & noise]
+theme: "Causes, samples and populations"
+kind: "Principle or heuristic"
+categories: ["Causes, samples and populations", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#88** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [They're not looking for a needle in a haystack, they're looking for a needle in a pile of needles](https://statmodeling.stat.columbia.edu/2020/05/06/theyre-not-looking-for-a-needle-in-a-haystack-theyre-looking-for-a-needle-in-a-pile-of-needles/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

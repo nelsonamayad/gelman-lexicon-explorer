@@ -3,12 +3,16 @@ title: "Mistakes"
 date: 2026-11-09
 description: "We all make them; what's important is to learn from them."
 order: 96
-categories: [Research culture, Modeling workflow]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2018/05/24/admire-authors-simply-admitting-made-error-stating-clearly-without-equivocation-original-conclusions-not-substantiated/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#96** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I admire these authors for simply admitting they made an error](https://statmodeling.stat.columbia.edu/2018/05/24/admire-authors-simply-admitting-made-error-stating-clearly-without-equivocation-original-conclusions-not-substantiated/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

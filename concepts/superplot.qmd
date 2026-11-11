@@ -3,12 +3,16 @@ title: "The Superplot"
 date: 2026-11-09
 description: "Line plot of estimates in an interaction, with circles showing group sizes and a line showing the regression of the aggregate averages."
 order: 3
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Method or technique"
+categories: ["Showing and telling", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2005/11/income_matters/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#3** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/11/income_matters/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

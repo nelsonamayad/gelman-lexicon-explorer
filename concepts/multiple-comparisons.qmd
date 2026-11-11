@@ -3,12 +3,16 @@ title: "Multiple Comparisons"
 date: 2026-11-09
 description: "Generally not an issue if you're doing things right but can be a big problem if you sloppily model hierarchical structures non-hierarchically."
 order: 25
-categories: [Significance & noise, Bayesian inference]
+theme: "Noise and evidence"
+kind: "Principle or heuristic"
+categories: ["Noise and evidence", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#25** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/10/multiple_compar_1/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

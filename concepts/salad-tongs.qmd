@@ -3,12 +3,16 @@ title: "Salad Tongs"
 date: 2026-11-09
 description: "Not to be used for painting."
 order: 50
-categories: [Significance & noise]
+theme: "Noise and evidence"
+kind: "Law or aphorism"
+categories: ["Noise and evidence", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#50** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Uri Simonsohn warns us not to be falsely reassured](http://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

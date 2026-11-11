@@ -3,12 +3,16 @@ title: "Cheeseburger-snarfing diet gurus"
 date: 2026-11-09
 description: "When we teach, we don't practice what we preach."
 order: 91
-categories: [Research culture, Causal inference]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics2.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#91** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ethics and statistics column (PDF)](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics2.pdf).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

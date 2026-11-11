@@ -3,12 +3,16 @@ title: "Seeds of its own destruction"
 date: 2026-11-09
 description: "Any graph should contain these."
 order: 112
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2021/05/06/any-graph-should-contain-the-seeds-of-its-own-destruction/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#112** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Any graph should contain the seeds of its own destruction](https://statmodeling.stat.columbia.edu/2021/05/06/any-graph-should-contain-the-seeds-of-its-own-destruction/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

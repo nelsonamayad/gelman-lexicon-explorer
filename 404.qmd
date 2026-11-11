@@ -8,6 +8,7 @@ toc: false
 That page doesn't exist. It may have been renamed when the site was reorganized.
 
 - [Browse all 153 entries](/index.html#all-entries)
-- [Browse by topic](/index.html#topics)
+- [Browse by theme](/index.html#themes)
+- [Browse by kind](/index.html#kinds)
 - [Start here](/start-here.html)
 - [Try a random entry](/random.html)

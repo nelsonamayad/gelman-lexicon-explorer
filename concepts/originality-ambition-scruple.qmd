@@ -3,12 +3,16 @@ title: "The combination of originality, ambition, and lack of scruple"
 date: 2026-11-09
 description: "Can take you far in social science."
 order: 151
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#151** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More on that claim that scientific citations are worth $100,000 each](https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

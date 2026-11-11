@@ -3,12 +3,16 @@ title: "The worst visual display of all time"
 date: 2026-11-09
 description: "the black and white Stroop test."
 order: 109
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Law or aphorism"
+categories: ["Showing and telling", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2014/11/21/50-shades-gray-goes-pie-chart/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#109** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [50 shades of gray goes pie-chart](https://statmodeling.stat.columbia.edu/2014/11/21/50-shades-gray-goes-pie-chart/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "Kangaroo"
 date: 2026-11-09
 description: "When it is vigorously jumping up and down, don't use a bathroom scale to weigh a feather that is resting loosely in its pouch."
 order: 52
-categories: [Significance & noise]
+theme: "Noise and evidence"
+kind: "Principle or heuristic"
+categories: ["Noise and evidence", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2015/04/21/feather-bathroom-scale-kangaroo/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#52** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The feather, the bathroom scale, and the kangaroo](http://statmodeling.stat.columbia.edu/2015/04/21/feather-bathroom-scale-kangaroo/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

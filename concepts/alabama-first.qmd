@@ -3,12 +3,16 @@ title: "Alabama First"
 date: 2026-11-09
 description: "Howard Wainer's term for the common error of plotting in alphabetical order rather than based on some more informative variable."
 order: 14
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#14** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

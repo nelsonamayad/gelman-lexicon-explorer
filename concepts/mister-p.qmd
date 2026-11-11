@@ -3,12 +3,16 @@ title: "Mister P"
 date: 2026-11-09
 description: "Multilevel regression and poststratification."
 order: 1
-categories: [Surveys & MRP, Bayesian inference]
+theme: "Causes, samples and populations"
+kind: "Method or technique"
+categories: ["Causes, samples and populations", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#1** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

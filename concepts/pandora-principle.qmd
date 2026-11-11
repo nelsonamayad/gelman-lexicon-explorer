@@ -3,12 +3,16 @@ title: "The Pandora Principle"
 date: 2026-11-09
 description: "Once you've considered a possible interaction or bias or confounder, you can't un-think it."
 order: 67
-categories: [Modeling workflow, Causal inference]
+theme: "Causes, samples and populations"
+kind: "Principle or heuristic"
+categories: ["Causes, samples and populations", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#67** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Pandora principle in statistics, and its malign converse, the ostrich](http://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

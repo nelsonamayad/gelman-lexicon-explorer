@@ -3,12 +3,16 @@ title: "The Pinch-Hitter Syndrome"
 date: 2026-11-09
 description: "People whose job it is to do just one thing are not always so good at that one thing."
 order: 6
-categories: [Research culture, Reasoning & fallacies]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#6** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

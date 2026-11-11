@@ -3,12 +3,16 @@ title: "Theoretical statistics"
 date: 2026-11-09
 description: "The theory of applied statistics."
 order: 121
-categories: [Philosophy of statistics, Modeling workflow]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2017/05/26/theoretical-statistics-theory-applied-statistics-think/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#121** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Theoretical statistics is the theory of applied statistics: how to think about what we do](https://statmodeling.stat.columbia.edu/2017/05/26/theoretical-statistics-theory-applied-statistics-think/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "End of novel. Beginning of job."
 date: 2026-11-09
 description: "That point at which you make the decision to stop thinking and start finishing."
 order: 131
-categories: [Modeling workflow]
+theme: "Building and checking models"
+kind: "Advice"
+categories: ["Building and checking models", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#131** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [End of novel. Beginning of job.](https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/)
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

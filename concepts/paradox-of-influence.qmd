@@ -3,12 +3,16 @@ title: "The Paradox of Influence"
 date: 2026-11-09
 description: "Anticipated influence becomes valueless if you end up saying whatever it takes to keep it."
 order: 68
-categories: [Research culture, Communication]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#68** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](http://statmodeling.stat.columbia.edu/2013/05/04/one-more-thought-on-hoover-historian-niall-fergusons-thing-about-keynes-being-gay-and-marrying-a-ballerina-and-talking-about-poetry/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

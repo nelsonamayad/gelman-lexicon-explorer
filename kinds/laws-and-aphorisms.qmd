@@ -1,0 +1,100 @@
+---
+title: "Laws and aphorisms"
+date: 2026-11-11
+subtitle: "59 entries"
+description: "A pithy saying, often a joke about research culture, with a toy model of the mechanism behind it."
+sidebar: false
+listing:
+  - id: t-noise-and-evidence
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Noise and evidence"
+      kind: "Law or aphorism"
+  - id: t-building-and-checking-models
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Law or aphorism"
+  - id: t-showing-and-telling
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Showing and telling"
+      kind: "Law or aphorism"
+  - id: t-how-science-behaves
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "How science behaves"
+      kind: "Law or aphorism"
+  - id: t-thinking-about-statistics
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Thinking about statistics"
+      kind: "Law or aphorism"
+---
+
+Entries are listed in the order they appear in Gelman's list. See [all themes](../index.qmd#themes), [all kinds](../index.qmd#kinds), or [browse every entry](../index.qmd#all-entries).
+
+## Noise and evidence (5)
+
+[See the whole theme](../themes/noise-and-evidence.qmd).
+
+::: {#t-noise-and-evidence}
+:::
+
+## Building and checking models (4)
+
+[See the whole theme](../themes/building-and-checking-models.qmd).
+
+::: {#t-building-and-checking-models}
+:::
+
+## Showing and telling (4)
+
+[See the whole theme](../themes/showing-and-telling.qmd).
+
+::: {#t-showing-and-telling}
+:::
+
+## How science behaves (31)
+
+[See the whole theme](../themes/how-science-behaves.qmd).
+
+::: {#t-how-science-behaves}
+:::
+
+## Thinking about statistics (15)
+
+[See the whole theme](../themes/thinking-about-statistics.qmd).
+
+::: {#t-thinking-about-statistics}
+:::

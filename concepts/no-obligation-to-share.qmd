@@ -3,12 +3,16 @@ title: "You have no obligation to share your data and code"
 date: 2026-11-09
 description: "And I have no obligation to believe anything you write."
 order: 150
-categories: [Research culture, Bayesian inference]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2023/09/10/the-authors-of-research-papers-have-no-obligation-to-share-their-data-and-code-and-i-have-no-obligation-to-believe-anything-they-write/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#150** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The authors of research papers have no obligation to share their data and code, and I have no obligation to believe anything they write](https://statmodeling.stat.columbia.edu/2023/09/10/the-authors-of-research-papers-have-no-obligation-to-share-their-data-and-code-and-i-have-no-obligation-to-believe-anything-they-write/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

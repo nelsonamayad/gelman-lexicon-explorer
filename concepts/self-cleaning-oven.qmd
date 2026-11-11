@@ -3,12 +3,16 @@ title: "The Self-Cleaning Oven"
 date: 2026-11-09
 description: "A good package should contain the means of its own testing."
 order: 18
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Method or technique"
+categories: ["Building and checking models", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#18** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

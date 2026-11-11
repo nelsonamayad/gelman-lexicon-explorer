@@ -3,12 +3,16 @@ title: "The Australia principle"
 date: 2026-11-09
 description: "Build the parts of the model you need, as you need them."
 order: 75
-categories: [Bayesian inference, Modeling workflow]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#75** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Prior distributions and the Australia principle](https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

@@ -3,12 +3,16 @@ title: "The Groovy Grandma Problem"
 date: 2026-11-09
 description: "When your sample differs systematically from your population within adjustment cells."
 order: 149
-categories: [Surveys & MRP]
+theme: "Causes, samples and populations"
+kind: "Principle or heuristic"
+categories: ["Causes, samples and populations", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#149** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The groovy grandma problem in survey research](https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

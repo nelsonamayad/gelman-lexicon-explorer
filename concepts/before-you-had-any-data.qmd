@@ -3,12 +3,16 @@ title: "What were you doing before you had any data?"
 date: 2026-11-09
 description: "Rubin's second question."
 order: 56
-categories: [Bayesian inference, Modeling workflow]
+theme: "Building and checking models"
+kind: "Principle or heuristic"
+categories: ["Building and checking models", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#56** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](http://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

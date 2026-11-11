@@ -3,12 +3,16 @@ title: "Bayesian"
 date: 2026-11-09
 description: "A statistician who uses Bayesian inference for all problems even when it is inappropriate. I am a Bayesian statistician myself."
 order: 23
-categories: [Bayesian inference, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#23** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2008/10/bayes_bayesians/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

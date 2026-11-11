@@ -22,9 +22,10 @@ The explanations and simulations were written for this site and are not Gelman's
 ## How to browse
 
 - **[Start here](start-here.qmd)** is a twelve-stop tour of the ideas the rest of the lexicon builds on.
-- **[Browse by topic](index.qmd#topics)** groups the entries into eleven topics, such as significance and noise, Bayesian inference and research culture.
+- **[Browse by theme](index.qmd#themes)** puts every entry in one of six themes, from *Noise and evidence* to *How science behaves*.
+- **[Browse by kind](index.qmd#kinds)** groups the same entries by what sort of idea they are: methods, principles, fallacies, laws and aphorisms, or advice.
 - **[Every entry](index.qmd#all-entries)** is a searchable, sortable table in Gelman's order.
-- On any entry page, the **sidebar** and the **previous/next** links step through all 153 entries in order.
+- On any entry page, the **sidebar** lists all 153 entries grouped by theme, and the **previous/next** links step through a theme in Gelman's order. Each entry's *Filed under* line links to its theme and kind.
 - **[Random entry](random.qmd)** takes you somewhere unexpected.
 
 ## How the simulations work

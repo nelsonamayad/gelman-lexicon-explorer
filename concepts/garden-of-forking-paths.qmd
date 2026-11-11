@@ -3,12 +3,16 @@ title: "The Garden of Forking Paths"
 date: 2026-11-09
 description: "Multiple comparisons can be a problem, even when there is no \"fishing expedition\" or \"p-hacking\" and the research hypothesis was posited ahead of time."
 order: 44
-categories: [Significance & noise]
+theme: "Noise and evidence"
+kind: "Principle or heuristic"
+categories: ["Noise and evidence", "Principle or heuristic"]
 source: "http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#44** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The garden of forking paths (PDF)](http://www.stat.columbia.edu/~gelman/research/unpublished/p_hacking.pdf).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

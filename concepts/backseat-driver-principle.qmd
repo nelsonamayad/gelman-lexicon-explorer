@@ -3,12 +3,16 @@ title: "The Backseat Driver Principle"
 date: 2026-11-09
 description: "Even if the advice or criticism is annoying, it makes sense to listen."
 order: 10
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Principle or heuristic"
+categories: ["How science behaves", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#10** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

@@ -1,0 +1,100 @@
+---
+title: "Building and checking models"
+date: 2026-11-11
+subtitle: "31 entries"
+description: "Priors, partial pooling, model checking, computation and workflow: how to build a model, find out what's wrong with it, and know when to stop."
+sidebar: false
+listing:
+  - id: k-methods
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Method or technique"
+  - id: k-principles
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Principle or heuristic"
+  - id: k-fallacies
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Fallacy"
+  - id: k-laws-and-aphorisms
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Law or aphorism"
+  - id: k-advice
+    contents: "../concepts/*.qmd"
+    type: grid
+    sort: "order"
+    categories: false
+    fields: [title, description]
+    grid-columns: 3
+    page-size: 100
+    include:
+      theme: "Building and checking models"
+      kind: "Advice"
+---
+
+Entries are listed in the order they appear in Gelman's list. See [all themes](../index.qmd#themes), [all kinds](../index.qmd#kinds), or [browse every entry](../index.qmd#all-entries).
+
+## Methods and techniques (6)
+
+Something you can do: a model, a display, a check.
+
+::: {#k-methods}
+:::
+
+## Principles and heuristics (17)
+
+A rule of thumb, or a fact about how statistics works, with a simulation showing why it holds.
+
+::: {#k-principles}
+:::
+
+## Fallacies (1)
+
+A tempting error in reasoning, with a simulation showing how it misleads.
+
+::: {#k-fallacies}
+:::
+
+## Laws and aphorisms (4)
+
+A pithy saying, often a joke about research culture, with a toy model of the mechanism behind it.
+
+::: {#k-laws-and-aphorisms}
+:::
+
+## Advice (3)
+
+Practical guidance for graphics, writing and analysis.
+
+::: {#k-advice}
+:::

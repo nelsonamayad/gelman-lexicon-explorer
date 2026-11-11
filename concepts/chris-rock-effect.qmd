@@ -3,12 +3,16 @@ title: "The Chris Rock Effect"
 date: 2026-11-09
 description: "Some graphs give the pleasant feature of visualizing things we already knew, shown so well that we get a shock of recognition, the joy of relearning what we already know, but seeing it in a new way that makes us think more deeply about all sorts of related topics."
 order: 42
-categories: [Statistical graphics]
+theme: "Showing and telling"
+kind: "Principle or heuristic"
+categories: ["Showing and telling", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2011/07/05/different_goals/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#42** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Different goals, different looks](http://statmodeling.stat.columbia.edu/2011/07/05/different_goals/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

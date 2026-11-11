@@ -3,12 +3,16 @@ title: "Honesty and transparency"
 date: 2026-11-09
 description: "They're not enough."
 order: 77
-categories: [Research culture, Significance & noise]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#77** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Honesty and transparency are not enough (PDF)](http://www.stat.columbia.edu/~gelman/research/published/ChanceEthics14.pdf).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

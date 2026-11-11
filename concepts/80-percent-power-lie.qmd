@@ -3,12 +3,16 @@ title: "The 80% Power Lie"
 date: 2026-11-09
 description: "None of this should be a surprise."
 order: 82
-categories: [Significance & noise, Research culture]
+theme: "Noise and evidence"
+kind: "Fallacy"
+categories: ["Noise and evidence", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#82** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 80% power lie](https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

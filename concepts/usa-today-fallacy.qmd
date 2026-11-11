@@ -3,12 +3,16 @@ title: "The USA Today Fallacy"
 date: 2026-11-09
 description: "Counting all states (or countries) equally, forgetting that many more people live in larger jurisdictions, and so you're ignoring millions and millions of Californians if you give their state the same space you give Montana and Delaware."
 order: 15
-categories: [Statistical graphics, Surveys & MRP]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#15** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2004/10/overrepresentat/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

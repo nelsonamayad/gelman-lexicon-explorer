@@ -3,12 +3,16 @@ title: "Marginal"
 date: 2026-11-09
 description: "Has two opposite meanings: in statistics, it's the integral; in economics, it's the derivative."
 order: 126
-categories: [Communication, Philosophy of statistics]
+theme: "Showing and telling"
+kind: "Advice"
+categories: ["Showing and telling", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2006/05/01/marginal_and_ma/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#126** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Marginal and marginal](https://statmodeling.stat.columbia.edu/2006/05/01/marginal_and_ma/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

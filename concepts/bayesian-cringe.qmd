@@ -3,12 +3,16 @@ title: "The Bayesian cringe"
 date: 2026-11-09
 description: "The attitude that we need to apologize for using prior information."
 order: 97
-categories: [Bayesian inference]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2021/09/15/the-bayesian-cringe/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#97** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Bayesian cringe](https://statmodeling.stat.columbia.edu/2021/09/15/the-bayesian-cringe/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

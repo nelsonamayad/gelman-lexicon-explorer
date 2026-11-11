@@ -3,12 +3,16 @@ title: "Premature collapsing of the wave function"
 date: 2026-11-09
 description: "Avoid it. But do collapse the wave function when the decision finally comes."
 order: 152
-categories: [Significance & noise, Bayesian inference]
+theme: "Noise and evidence"
+kind: "Advice"
+categories: ["Noise and evidence", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2019/09/13/deterministic-thinking-dichotomania/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#152** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Deterministic thinking (dichotomania)](https://statmodeling.stat.columbia.edu/2019/09/13/deterministic-thinking-dichotomania/), and on [decision analysis](https://statmodeling.stat.columbia.edu/2005/07/12/decision_analys_1/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

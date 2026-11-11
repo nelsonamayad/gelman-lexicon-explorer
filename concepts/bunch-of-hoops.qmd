@@ -3,12 +3,16 @@ title: "A bunch of hoops to jump through"
 date: 2026-11-09
 description: "Research methods and statistics, as viewed by many researchers."
 order: 93
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#93** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Reflections after reading 2578 papers](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

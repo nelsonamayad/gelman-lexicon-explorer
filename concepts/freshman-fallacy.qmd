@@ -3,12 +3,16 @@ title: "The Freshman Fallacy"
 date: 2026-11-09
 description: "Just because a freshman might raise a question, that does not make the issue irrelevant."
 order: 43
-categories: [Reasoning & fallacies, Causal inference]
+theme: "Causes, samples and populations"
+kind: "Fallacy"
+categories: ["Causes, samples and populations", "Fallacy"]
 source: "http://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#43** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Does it matter that a sample is unrepresentative? It depends on the size of the treatment interactions](http://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/).
+
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

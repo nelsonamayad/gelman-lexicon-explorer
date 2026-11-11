@@ -3,12 +3,16 @@ title: "Eureka bias"
 date: 2026-11-09
 description: "When you think you made a discovery and then you don't want to give it up, even if it turns out you interpreted your data wrong."
 order: 72
-categories: [Reasoning & fallacies, Research culture]
+theme: "How science behaves"
+kind: "Fallacy"
+categories: ["How science behaves", "Fallacy"]
 source: "http://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#72** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Eureka bias](http://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

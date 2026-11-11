@@ -3,12 +3,16 @@ title: "Panglossian Fallacy"
 date: 2026-11-09
 description: "The flip side of the hindsight fallacy."
 order: 116
-categories: [Reasoning & fallacies]
+theme: "Thinking about statistics"
+kind: "Fallacy"
+categories: ["Thinking about statistics", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#116** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

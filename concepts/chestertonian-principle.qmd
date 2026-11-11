@@ -3,12 +3,16 @@ title: "The Chestertonian Principle"
 date: 2026-11-09
 description: "Extreme skepticism is a form of credulity."
 order: 65
-categories: [Reasoning & fallacies, Surveys & MRP]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2017/05/10/everybody-lies-seth-stevens-davidowitz/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#65** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [*Everybody Lies*, by Seth Stephens-Davidowitz](http://statmodeling.stat.columbia.edu/2017/05/10/everybody-lies-seth-stevens-davidowitz/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

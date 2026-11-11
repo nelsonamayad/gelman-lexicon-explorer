@@ -3,12 +3,16 @@ title: "The Time-Reversal Heuristic"
 date: 2026-11-09
 description: "How to think about a published finding that is followed up by a careful preregistered replication."
 order: 57
-categories: [Reasoning & fallacies, Significance & noise]
+theme: "How science behaves"
+kind: "Principle or heuristic"
+categories: ["How science behaves", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#57** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More power posing](http://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

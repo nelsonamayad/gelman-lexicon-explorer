@@ -3,12 +3,16 @@ title: "That narrow beach"
 date: 2026-11-09
 description: "Where statistics lives, this zone of phase transition between the continent of clear effects and the sea of confusion."
 order: 135
-categories: [Philosophy of statistics, Significance & noise]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#135** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Statistics in the sweet spot](https://statmodeling.stat.columbia.edu/2023/05/30/statistics-in-the-sweet-spot-between-signals-that-are-so-clear-you-dont-need-statistics-and-signals-that-are-so-weak-that-statistical-analysis-cant-help/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

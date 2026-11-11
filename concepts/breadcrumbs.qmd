@@ -3,12 +3,16 @@ title: "Breadcrumbs"
 date: 2026-11-09
 description: "I need that trail."
 order: 78
-categories: [Research culture, Computing]
+theme: "Building and checking models"
+kind: "Advice"
+categories: ["Building and checking models", "Advice"]
 source: "https://statmodeling.stat.columbia.edu/2019/04/04/the-long-run-effects-of-americas-first-paid-maternity-leave-policy-i-need-that-trail-of-breadcrumbs/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#78** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The long-run effects of America's first paid maternity leave policy: I need that trail of breadcrumbs](https://statmodeling.stat.columbia.edu/2019/04/04/the-long-run-effects-of-americas-first-paid-maternity-leave-policy-i-need-that-trail-of-breadcrumbs/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
 :::
 
 ## What it is

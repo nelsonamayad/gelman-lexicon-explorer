@@ -3,12 +3,16 @@ title: "Clarke's Law"
 date: 2026-11-09
 description: "Any sufficiently crappy research is indistinguishable from fraud."
 order: 59
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "http://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#59** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Clarke's law of research](http://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

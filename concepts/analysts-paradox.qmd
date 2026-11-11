@@ -3,12 +3,16 @@ title: "The Analyst's Paradox"
 date: 2026-11-09
 description: "A good analyst has special data analysis and interpretation skills. But it's considered a bad or surprising thing that if you give the same data to different analysts, they come to different conclusions."
 order: 127
-categories: [Research culture, Modeling workflow]
+theme: "How science behaves"
+kind: "Principle or heuristic"
+categories: ["How science behaves", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2024/01/27/pt/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#127** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2024/01/27/pt/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

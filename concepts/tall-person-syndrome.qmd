@@ -3,12 +3,16 @@ title: "Tall-Person Syndrome"
 date: 2026-11-09
 description: "the problem that some people of above-average height have, that they think they're more important than other people because they literally look down on them."
 order: 110
-categories: [Reasoning & fallacies]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#110** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How tall is Jon Lee Anderson?](https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/)
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

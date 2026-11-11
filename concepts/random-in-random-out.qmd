@@ -3,12 +3,16 @@ title: "Random in"
 date: 2026-11-09
 description: "Random out."
 order: 79
-categories: [Significance & noise]
+theme: "Noise and evidence"
+kind: "Law or aphorism"
+categories: ["Noise and evidence", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2019/06/19/random-patterns-in-data-yield-random-conclusions/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#79** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Random patterns in data yield random conclusions](https://statmodeling.stat.columbia.edu/2019/06/19/random-patterns-in-data-yield-random-conclusions/).
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

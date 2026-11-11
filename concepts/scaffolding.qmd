@@ -3,12 +3,16 @@ title: "Scaffolding"
 date: 2026-11-09
 description: "Understanding your model by comparing it to related models."
 order: 21
-categories: [Modeling workflow]
+theme: "Building and checking models"
+kind: "Method or technique"
+categories: ["Building and checking models", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2009/10/statistical_sca/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#21** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/10/statistical_sca/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

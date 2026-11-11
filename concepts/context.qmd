@@ -3,12 +3,16 @@ title: "Context"
 date: 2026-11-09
 description: "A story doesn't exist on its own, it exists in . . ."
 order: 111
-categories: [Communication, Reasoning & fallacies]
+theme: "Showing and telling"
+kind: "Principle or heuristic"
+categories: ["Showing and telling", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#111** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2014/12/12/saying-things-place/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

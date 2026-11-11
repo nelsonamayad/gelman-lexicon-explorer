@@ -3,12 +3,16 @@ title: "Research Incumbency Rule"
 date: 2026-11-09
 description: "Once an article is published in some approved venue, it is taken as truth. Criticisms which would absolutely derail a submission in pre-publication review can be brushed aside if they are presented after publication."
 order: 89
-categories: [Research culture]
+theme: "How science behaves"
+kind: "Law or aphorism"
+categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2016/09/21/what-has-happened-down-here-is-the-winds-have-changed/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#89** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What has happened down here is the winds have changed](https://statmodeling.stat.columbia.edu/2016/09/21/what-has-happened-down-here-is-the-winds-have-changed/).
+
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

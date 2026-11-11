@@ -3,12 +3,16 @@ title: "Physics is like Brazil"
 date: 2026-11-09
 description: "Statistics is like Chile."
 order: 143
-categories: [Philosophy of statistics, Research culture]
+theme: "Thinking about statistics"
+kind: "Law or aphorism"
+categories: ["Thinking about statistics", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2024/11/27/physics-is-like-brazil-statistics-is-like-chile/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#143** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Physics is like Brazil, statistics is like Chile](https://statmodeling.stat.columbia.edu/2024/11/27/physics-is-like-brazil-statistics-is-like-chile/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

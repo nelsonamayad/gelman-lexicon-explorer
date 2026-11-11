@@ -3,12 +3,16 @@ title: "Uncertainty"
 date: 2026-11-09
 description: "It greases the wheels of commerce."
 order: 134
-categories: [Computing, Modeling workflow]
+theme: "Building and checking models"
+kind: "Method or technique"
+categories: ["Building and checking models", "Method or technique"]
 source: "https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#134** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hierarchical model for golf putting: a struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
 :::
 
 ## What it is

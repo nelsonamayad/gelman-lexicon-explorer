@@ -3,12 +3,16 @@ title: "Assumptions and Rigor"
 date: 2026-11-09
 description: "You can't have one without the other."
 order: 86
-categories: [Philosophy of statistics, Causal inference]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#86** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

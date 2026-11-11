@@ -3,12 +3,16 @@ title: "Ockhamite Tendencies"
 date: 2026-11-09
 description: "The irritating habit of trying to get other people to use oversimplified models."
 order: 22
-categories: [Philosophy of statistics, Modeling workflow]
+theme: "Building and checking models"
+kind: "Fallacy"
+categories: ["Building and checking models", "Fallacy"]
 source: "https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#22** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2009/05/bayes_jeffreys/).
+
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Fallacy](../kinds/fallacies.qmd).
 :::
 
 ## What it is

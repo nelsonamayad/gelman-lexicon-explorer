@@ -3,12 +3,16 @@ title: "Bayesians"
 date: 2026-11-09
 description: "They are frequentists."
 order: 24
-categories: [Bayesian inference, Philosophy of statistics]
+theme: "Thinking about statistics"
+kind: "Principle or heuristic"
+categories: ["Thinking about statistics", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#24** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayesians are frequentists](https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/).
+
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

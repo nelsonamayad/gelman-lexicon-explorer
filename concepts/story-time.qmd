@@ -3,12 +3,16 @@ title: "Story Time"
 date: 2026-11-09
 description: "When the numbers are put to bed, the stories come out."
 order: 29
-categories: [Communication, Significance & noise]
+theme: "Showing and telling"
+kind: "Law or aphorism"
+categories: ["Showing and telling", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2010/10/story_time/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#29** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [source post](https://statmodeling.stat.columbia.edu/2010/10/story_time/).
+
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 :::
 
 ## What it is

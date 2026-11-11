@@ -3,12 +3,16 @@ title: "The Piranha Principle"
 date: 2026-11-09
 description: "These large effects can't all coherently coexist."
 order: 74
-categories: [Significance & noise, Reasoning & fallacies]
+theme: "Noise and evidence"
+kind: "Principle or heuristic"
+categories: ["Noise and evidence", "Principle or heuristic"]
 source: "http://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#74** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The piranha problem in social psychology / behavioral economics](http://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/). (Spelled "Pinciple" in the original list.)
+
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 :::
 
 ## What it is

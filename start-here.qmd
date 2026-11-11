@@ -33,6 +33,7 @@ The lexicon has 153 entries, in no particular order. If you're not sure where to
 
 ## Where next
 
-- Pick a [topic](index.qmd#topics) that matches your interests.
-- Use the sidebar on any entry page to step through all 153 entries in Gelman's order. The links at the bottom of each page go to the previous and next entries.
+- Pick a [theme](index.qmd#themes) that matches your interests, such as noise and evidence, models, or how science behaves.
+- Or browse by [kind](index.qmd#kinds): all the fallacies, all the methods, all the laws and aphorisms.
+- On any entry page, the sidebar groups all 153 entries by theme. The links at the bottom of each page step to the previous and next entry in that theme.
 - Or try a [random entry](random.qmd).
