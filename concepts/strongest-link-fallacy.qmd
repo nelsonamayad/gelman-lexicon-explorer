@@ -24,7 +24,7 @@ A chain is as strong as its *weakest* link. The strongest-link fallacy reasons a
 
 ## Why it matters
 
-"It was a randomized trial" can end a conversation, even when the trial had a tiny sample, an unvalidated outcome, a population unlike the target, or a treatment unlike the policy being discussed. Each of those links can break the conclusion independently. Putting the evidence's credibility on its strongest link overstates how well supported the conclusion is.
+*It was a randomized trial* can end a conversation, even when the trial had a tiny sample, an unvalidated outcome, a population unlike the target, or a treatment unlike the policy being discussed. Each of those links can break the conclusion independently. Putting the evidence's credibility on its strongest link overstates how well supported the conclusion is.
 
 ## How it works
 
@@ -42,7 +42,7 @@ Set the reliability of each link in a typical policy claim based on an RCT. Comp
 
 ```{ojs}
 //| echo: false
-import {fmt, pct} from "../js/stats.js"
+import {pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -84,8 +84,14 @@ html`<div class="sim-readout">${md`Strongest link: **${pct(Math.max(pRand, pMeas
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {fmt, pct} from "../js/stats.js"
+import {pct} from "../js/stats.js"
 
 viewof pRand = Inputs.range([0.5, 1], {value: 0.98, step: 0.01, label: "Randomization was done properly"})
 viewof pMeas = Inputs.range([0.3, 1], {value: 0.75, step: 0.01, label: "Outcome measures what we care about"})
@@ -110,6 +116,61 @@ Plot.plot({
   marks: [Plot.barX(links, {y: "link", x: "p", fill: d => d.link === "Whole chain" ? "#d6604d" : "#2166ac"}), Plot.ruleX([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Strongest-link Fallacy: a chain of evidence is as strong as all its links.
+links <- c( # <1>
+  Randomization = 0.98, # randomization was done properly
+  Measurement = 0.75, # outcome measures what we care about
+  "Power / noise" = 0.6, # estimate isn't noise
+  Generalization = 0.65
+) # result generalizes to the policy
+# Deterministic: no random numbers. If the links are independent, the
+# whole chain holds with the product of their probabilities.
+
+chain <- c(links, "Whole chain" = prod(links)) # <2>
+print(round(chain, 2))
+
+par(mar = c(4, 8, 1, 1))
+barplot(rev(chain), # <3>
+  horiz = TRUE, las = 1, xlim = c(0, 1),
+  col = c("#d6604d", rep("#2166ac", 4)),
+  xlab = "Probability the link holds"
+)
+```
+1. The page's controls: the probability that each link of the argument holds. There is no seed: the model is deterministic.
+2. If the links are independent, the whole chain holds with the product of their probabilities, which is less than the weakest link.
+3. Each link and the whole chain. Pointing to the strongest link, the randomization, says nothing about the chain.
+
+## Python {.unlisted}
+
+```{.python}
+# Strongest-link Fallacy: a chain of evidence is as strong as all its links.
+import numpy as np
+import matplotlib.pyplot as plt
+
+links = {"Randomization": 0.98,    # randomization was done properly
+         "Measurement": 0.75,      # outcome measures what we care about
+         "Power / noise": 0.6,     # estimate isn't noise
+         "Generalization": 0.65}   # result generalizes to the policy
+# Deterministic: no random numbers. If the links are independent, the
+# whole chain holds with the product of their probabilities.
+
+chain = {**links, "Whole chain": np.prod(list(links.values()))}
+for k, v in chain.items():
+    print(f"{k}: {v:.2f}")
+
+plt.barh(list(chain)[::-1], list(chain.values())[::-1],
+         color=["#d6604d"] + ["#2166ac"] * 4)
+plt.xlim(0, 1)
+plt.xlabel("Probability the link holds")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

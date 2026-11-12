@@ -49,7 +49,7 @@ A thousand people buy lottery tickets every week for a number of years. Tickets 
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, median, fmt, pct} from "../js/stats.js"
+import {rng, range, median, fmt, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -105,8 +105,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, median, fmt, pct} from "../js/stats.js"
+import {rng, range, median, fmt, pct} from "../js/stats.js"
 
 viewof years = Inputs.range([1, 40], {value: 20, step: 1, label: "Years of weekly play"})
 viewof jackpotOdds = Inputs.range([4, 8], {value: 6, step: 0.5, label: "Jackpot odds: 1 in 10^"})
@@ -141,6 +147,70 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Fallacy of the One-Sided Bet: weekly lottery tickets over the years.
+years <- 20 # years of weekly play # <1>
+jackpot_odds <- 6 # jackpot odds: 1 in 10^jackpot_odds
+set.seed(30) # <2>
+
+weeks <- years * 52
+p_jack <- 10^-jackpot_odds
+# Each ticket costs $2: jackpot $1,000,000, $50 with 1%, $4 with 9%
+u <- matrix(runif(1000 * weeks), 1000)
+prize <- ifelse(u < p_jack, 1e6, ifelse(u < 0.01, 50, ifelse(u < 0.1, 4, 0))) # <3>
+net <- rowSums(prize) - 2 * weeks # net winnings of 1000 players # <4>
+ev <- -2 + 1e6 * p_jack + 50 * (0.01 - p_jack) + 4 * 0.09 # <5>
+
+cat(sum(net > 0), " of 1000 players come out ahead after ", years,
+  " years\nExpected net per ticket: $", round(ev, 2), "\n",
+  sep = ""
+)
+
+hist(pmax(net, -5000), # <6>
+  breaks = 40, col = "#d6604d", border = "white",
+  main = "", xlab = "Net winnings ($)", ylab = "Players"
+)
+abline(v = 0, lty = 2)
+```
+1. The page's controls: years of weekly play and the jackpot odds.
+2. Fixes the random numbers so the run is reproducible.
+3. Each ticket's prize: a jackpot, a small prize, a token prize, or nothing.
+4. Each player's net winnings after all those weeks, with the $2 tickets counted. The one-sided view forgets the tickets.
+5. The expected value of a ticket, which is negative.
+6. Net winnings across 1,000 players. The thought *someone wins big* ignores the other side of the bet.
+
+## Python {.unlisted}
+
+```{.python}
+# The Fallacy of the One-Sided Bet: weekly lottery tickets over the years.
+import numpy as np
+import matplotlib.pyplot as plt
+
+years = 20        # years of weekly play
+jackpot_odds = 6  # jackpot odds: 1 in 10^jackpot_odds
+rng = np.random.default_rng(30)
+
+weeks, p_jack = years * 52, 10.0 ** -jackpot_odds
+# Each ticket costs $2: jackpot $1,000,000, $50 with 1%, $4 with 9%
+u = rng.uniform(size=(1000, weeks))
+prize = np.select([u < p_jack, u < 0.01, u < 0.1], [1e6, 50, 4], 0)
+net = prize.sum(axis=1) - 2 * weeks  # net winnings of 1000 players
+ev = -2 + 1e6 * p_jack + 50 * (0.01 - p_jack) + 4 * 0.09
+
+print(f"{np.sum(net > 0)} of 1000 players come out ahead after {years} "
+      f"years\nExpected net per ticket: ${ev:.2f}")
+
+plt.hist(np.maximum(net, -5000), bins=40, color="#d6604d")
+plt.axvline(0, color="black", linestyle="--")
+plt.xlabel("Net winnings ($)")
+plt.ylabel("Players")
+plt.show()
+```
+
+:::
 
 </details>
 

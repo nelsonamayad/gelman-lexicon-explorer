@@ -32,11 +32,11 @@ Think of each check as a test that should separate true findings from false ones
 
 ## Simulated example
 
-There are 2,000 findings, some true and some false. Compare how well a set of hoops and a substantive check separate them.
+A toy model, our own. There are 2,000 findings, some true and some false. Compare how well a set of hoops and a substantive check separate them.
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -89,8 +89,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pct} from "../js/stats.js"
 
 viewof pi = Inputs.range([0.1, 0.9], {value: 0.4, step: 0.05, label: "Share of findings that are true"})
 viewof gaming = Inputs.range([0, 1], {value: 0.85, step: 0.05, label: "How easily false findings pass the hoops"})
@@ -123,6 +129,90 @@ Plot.plot({
   marks: [Plot.barX(rates, {fy: "check", y: "truth", x: "pass", fill: "truth"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# A bunch of hoops: checks that false findings pass easily.
+pi_true <- 0.4 # share of findings that are true # <1>
+gaming <- 0.85 # how easily false findings pass each hoop
+set.seed(93) # <2>
+
+real <- runif(2000) < pi_true
+pass <- function(p_true, p_false) runif(2000) < ifelse(real, p_true, p_false)
+hoops <- pass(0.95, gaming) & pass(0.95, gaming) & pass(0.95, gaming) # <3>
+substantive <- pass(0.8, 0.15) # e.g. a replication # <4>
+
+ppv <- function(passed) mean(real[passed]) # <5>
+cat("True among findings that pass the hoops: ",
+  round(100 * ppv(hoops)), "% (base rate ", 100 * pi_true, "%)\n",
+  sep = ""
+)
+cat("True among findings that pass the substantive check: ",
+  round(100 * ppv(substantive)), "%\n",
+  sep = ""
+)
+
+rates <- rbind(
+  Hoops = c(mean(hoops[real]), mean(hoops[!real])),
+  Substantive = c(
+    mean(substantive[real]),
+    mean(substantive[!real])
+  )
+)
+barplot(t(rates), # <6>
+  beside = TRUE, col = c("#2166ac", "#d6604d"),
+  ylim = c(0, 1), ylab = "Share that pass"
+)
+legend("topright", c("True findings", "False findings"),
+  fill = c("#2166ac", "#d6604d"), bty = "n"
+)
+```
+1. The page's controls: the share of findings that are true, and how easily a false finding passes a hoop.
+2. Fixes the random numbers so the run is reproducible.
+3. Three hoops in a row. True findings pass each one 95% of the time; false ones pass almost as often, so the hoops barely discriminate.
+4. One substantive check, such as a replication, that false findings mostly fail.
+5. The share of true findings among those that pass: what a reader learns from seeing the check passed.
+6. Pass rates for true and false findings under each kind of check.
+
+## Python {.unlisted}
+
+```{.python}
+# A bunch of hoops: checks that false findings pass easily.
+import numpy as np
+import matplotlib.pyplot as plt
+
+pi_true = 0.4  # share of findings that are true
+gaming = 0.85  # how easily false findings pass each hoop
+rng = np.random.default_rng(93)
+
+real = rng.uniform(size=2000) < pi_true
+
+
+def passes(p_true, p_false):
+    return rng.uniform(size=2000) < np.where(real, p_true, p_false)
+
+
+hoops = passes(0.95, gaming) & passes(0.95, gaming) & passes(0.95, gaming)
+substantive = passes(0.8, 0.15)  # e.g. a replication
+
+print(f"True among findings that pass the hoops: "
+      f"{100 * real[hoops].mean():.0f}% (base rate {100 * pi_true:.0f}%)")
+print(f"True among findings that pass the substantive check: "
+      f"{100 * real[substantive].mean():.0f}%")
+
+x = np.arange(2)
+plt.bar(x - 0.2, [hoops[real].mean(), substantive[real].mean()], 0.4,
+        color="#2166ac", label="True findings")
+plt.bar(x + 0.2, [hoops[~real].mean(), substantive[~real].mean()], 0.4,
+        color="#d6604d", label="False findings")
+plt.xticks(x, ["Hoops", "Substantive check"])
+plt.ylabel("Share that pass")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -36,7 +36,7 @@ A stream of 300 measurements fits a model well, except that a real anomaly, a sh
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -64,8 +64,8 @@ Plot.plot({
   x: {label: "Measurement"},
   y: {label: "Residual from the model (sd units)", grid: true},
   marks: [
-    Plot.rect([0], {x1: 200, x2: 240, y1: -5, y2: 6, fill: "#e6ab02", fillOpacity: 0.12}),
-    Plot.dot(upset, {x: "t", y: "resid", r: d => d.flagged ? 4 : 2, fill: d => d.flagged ? "#d6604d" : "#999"}),
+    Plot.rect([0], {x1: 200, x2: 240, y1: -5, y2: 6, fill: "#b8860b", fillOpacity: 0.12}),
+    Plot.dot(upset, {x: "t", y: "resid", r: d => d.flagged ? 4 : 2, fill: d => d.flagged ? "#d6604d" : "#8a8a8a"}),
     Plot.ruleY([k, -k], {stroke: "#d6604d", strokeDasharray: "4 3"})
   ]
 })
@@ -84,8 +84,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof k = Inputs.range([1, 5], {value: 2, step: 0.1, label: "How hard to upset (flag residuals beyond k sd)"})
 viewof shift = Inputs.range([0, 3], {value: 1.2, step: 0.1, label: "Size of the real anomaly (sd units)"})
@@ -107,12 +113,75 @@ Plot.plot({
   x: {label: "Measurement"},
   y: {label: "Residual from the model (sd units)", grid: true},
   marks: [
-    Plot.rect([0], {x1: 200, x2: 240, y1: -5, y2: 6, fill: "#e6ab02", fillOpacity: 0.12}),
-    Plot.dot(upset, {x: "t", y: "resid", r: d => d.flagged ? 4 : 2, fill: d => d.flagged ? "#d6604d" : "#999"}),
+    Plot.rect([0], {x1: 200, x2: 240, y1: -5, y2: 6, fill: "#b8860b", fillOpacity: 0.12}),
+    Plot.dot(upset, {x: "t", y: "resid", r: d => d.flagged ? 4 : 2, fill: d => d.flagged ? "#d6604d" : "#8a8a8a"}),
     Plot.ruleY([k, -k], {stroke: "#d6604d", strokeDasharray: "4 3"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The capacity to be upset: flagging residuals that don't fit.
+k <- 2 # how hard to upset: flag residuals beyond k sd # <1>
+shift <- 1.2 # size of the real anomaly (sd units)
+set.seed(146) # <2>
+
+t <- 0:299
+real <- t >= 200 & t < 240 # the real anomaly # <3>
+resid <- rnorm(300, ifelse(real, shift, 0), 1) # <4>
+flagged <- abs(resid) > k # <5>
+
+cat(
+  "Flagged", sum(real & flagged), "of the anomaly's 40 points, with",
+  sum(!real & flagged), "false alarms elsewhere\n"
+)
+
+plot(t, resid, # <6>
+  pch = 19, cex = 0.6,
+  col = ifelse(flagged, "#d6604d", "grey50"),
+  xlab = "Measurement", ylab = "Residual (sd units)"
+)
+rect(200, -10, 240, 10, col = adjustcolor("#2166ac", 0.1), border = NA)
+abline(h = c(-k, k), lty = 2)
+```
+1. The page's controls: how far a residual must stray before it upsets you, and how large the real anomaly is.
+2. Fixes the random numbers so the run is reproducible.
+3. Forty consecutive measurements where the model is genuinely wrong.
+4. Residuals: pure noise everywhere except inside the anomaly, where they are shifted.
+5. The rule for being upset: flag any residual beyond k standard deviations.
+6. Residuals over time, flagged ones in red, with the true anomaly shaded. Too high a k and the anomaly slips through; too low and false alarms pile up.
+
+## Python {.unlisted}
+
+```{.python}
+# The capacity to be upset: flagging residuals that don't fit.
+import numpy as np
+import matplotlib.pyplot as plt
+
+k = 2        # how hard to upset: flag residuals beyond k sd
+shift = 1.2  # size of the real anomaly (sd units)
+rng = np.random.default_rng(146)
+
+t = np.arange(300)
+real = (t >= 200) & (t < 240)  # the real anomaly
+resid = rng.normal(np.where(real, shift, 0), 1)
+flagged = np.abs(resid) > k
+
+print(f"Flagged {(real & flagged).sum()} of the anomaly's 40 points, with "
+      f"{(~real & flagged).sum()} false alarms elsewhere")
+
+plt.axvspan(200, 240, color="#2166ac", alpha=0.1)
+plt.scatter(t, resid, s=8, c=np.where(flagged, "#d6604d", "0.5"))
+plt.axhline(k, color="black", linestyle="--")
+plt.axhline(-k, color="black", linestyle="--")
+plt.xlabel("Measurement")
+plt.ylabel("Residual (sd units)")
+plt.show()
+```
+
+:::
 
 </details>
 

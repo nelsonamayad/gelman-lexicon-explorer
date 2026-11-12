@@ -39,7 +39,7 @@ Fit a regression with errors drawn from increasingly non-normal distributions an
 
 ```{ojs}
 //| echo: false
-import {rng, range, lm, fmt, pct} from "../js/stats.js"
+import {rng, range, lm, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -65,7 +65,7 @@ house = {
 html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
 ${Plot.plot({
   ariaLabel: "The house: The 'foundation': error distribution",
-  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
+  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#8a8a8a", thresholds: 40})), Plot.ruleY([0])]})}
 ${Plot.plot({
   ariaLabel: "The house: The 'house': slope estimates",
   ariaDescription: "Horizontal axis: Estimated slope (truth 0.5). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
@@ -85,8 +85,14 @@ ${Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, lm, fmt, pct} from "../js/stats.js"
+import {rng, range, lm, pct} from "../js/stats.js"
 
 viewof errDist = Inputs.radio(["Normal (the foundation)", "Skewed (exponential)", "Heavy-tailed (t, 3 df)", "Bimodal"], {value: "Skewed (exponential)", label: "Error distribution"})
 viewof n = Inputs.range([10, 300], {value: 50, step: 10, label: "Sample size"})
@@ -106,12 +112,105 @@ house = {
 html`<div style="display:flex; gap:1rem; flex-wrap:wrap">
 ${Plot.plot({
   ariaLabel: "The house: The 'foundation': error distribution",
-  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#999", thresholds: 40})), Plot.ruleY([0])]})}
+  ariaDescription: "Horizontal axis: Error. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'foundation': error distribution", x: {label: "Error"}, y: {label: null}, marks: [Plot.rectY(house.residSample, Plot.binX({y: "count"}, {x: d => d, fill: "#8a8a8a", thresholds: 40})), Plot.ruleY([0])]})}
 ${Plot.plot({
   ariaLabel: "The house: The 'house': slope estimates",
   ariaDescription: "Horizontal axis: Estimated slope (truth 0.5). The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 220, title: "The 'house': slope estimates", x: {label: "Estimated slope (truth 0.5)"}, y: {label: null}, marks: [Plot.rectY(house.reps, Plot.binX({y: "count"}, {x: "b", fill: "#2166ac", thresholds: 40})), Plot.ruleX([0.5], {stroke: "currentColor", strokeDasharray: "4 3"}), Plot.ruleY([0])]})}
 </div>`
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The house: regression with non-normal errors still stands.
+err_dist <- "Skewed" # "Normal", "Skewed", "Heavy-tailed" or "Bimodal" # <1>
+n <- 50 # sample size
+set.seed(138) # <2>
+
+err <- function(m) { # <3>
+  switch(err_dist,
+    Normal = rnorm(m),
+    Skewed = rexp(m) - 1,
+    "Heavy-tailed" = rt(m, 3) / sqrt(3),
+    Bimodal = sample(c(-1, 1), m, replace = TRUE) + rnorm(m, 0, 0.3)
+  )
+}
+reps <- t(replicate(1500, {
+  x <- rnorm(n)
+  y <- 1 + 0.5 * x + err(n)
+  b <- cov(x, y) / var(x)
+  a <- mean(y) - b * mean(x)
+  se <- sqrt(sum((y - a - b * x)^2) / (n - 2) / sum((x - mean(x))^2)) # <4>
+  c(b = b, cover = abs(b - 0.5) < 1.96 * se)
+}))
+cat("With ", tolower(err_dist), " errors and n = ", n, ", the 95% ",
+  "interval covers the true slope ", round(100 * mean(reps[, "cover"]), 1),
+  "% of the time\nAverage slope estimate: ",
+  round(mean(reps[, "b"]), 3), " (truth 0.5)\n",
+  sep = ""
+)
+
+par(mfrow = c(1, 2)) # <5>
+hist(err(800),
+  breaks = 40, col = "grey70", border = "white",
+  main = "The errors", xlab = ""
+)
+hist(reps[, "b"],
+  breaks = 40, col = "#2166ac", border = "white",
+  main = "Slope estimates", xlab = ""
+)
+abline(v = 0.5, lwd = 2)
+```
+1. The page's controls: the shape of the error distribution and the sample size.
+2. Fixes the random numbers so the run is reproducible.
+3. Errors that are anything but normal: the foundation the textbook assumes is missing.
+4. The usual least-squares standard error, derived under normality.
+5. The errors and the slope estimates. The house stands: the estimates center on the truth and the intervals still cover about 95% of the time.
+
+## Python {.unlisted}
+
+```{.python}
+# The house: regression with non-normal errors still stands.
+import numpy as np
+import matplotlib.pyplot as plt
+
+err_dist = "Skewed"  # "Normal", "Skewed", "Heavy-tailed" or "Bimodal"
+n = 50               # sample size
+rng = np.random.default_rng(138)
+
+
+def err(size):
+    if err_dist == "Normal":
+        return rng.normal(size=size)
+    if err_dist == "Skewed":
+        return rng.exponential(1, size) - 1
+    if err_dist == "Heavy-tailed":
+        return rng.standard_t(3, size) / np.sqrt(3)
+    return rng.choice([-1, 1], size) + rng.normal(0, 0.3, size)
+
+
+x = rng.normal(size=(1500, n))
+y = 1 + 0.5 * x + err((1500, n))
+xc = x - x.mean(axis=1, keepdims=True)
+b = np.sum(xc * y, axis=1) / np.sum(xc ** 2, axis=1)
+a = y.mean(axis=1) - b * x.mean(axis=1)
+resid = y - a[:, None] - b[:, None] * x
+se = np.sqrt(np.sum(resid ** 2, axis=1) / (n - 2) / np.sum(xc ** 2, axis=1))
+cover = np.abs(b - 0.5) < 1.96 * se
+print(f"With {err_dist.lower()} errors and n = {n}, the 95% interval "
+      f"covers the true slope {100 * cover.mean():.1f}% of the time")
+print(f"Average slope estimate: {b.mean():.3f} (truth 0.5)")
+
+fig, ax = plt.subplots(1, 2, figsize=(9, 4))
+ax[0].hist(err(800), bins=40, color="0.7")
+ax[0].set_title("The errors")
+ax[1].hist(b, bins=40, color="#2166ac")
+ax[1].axvline(0.5, color="black", linewidth=2)
+ax[1].set_title("Slope estimates")
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -95,6 +95,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
 
@@ -128,6 +134,78 @@ Plot.plot({
   marks: [Plot.line(risk, {x: "s", y: "err", stroke: "#2166ac", strokeWidth: 2}), Plot.dot(risk, {x: "s", y: "err", fill: "#2166ac"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Defaults: one default prior scale for thousands of different problems.
+spread <- 1 # typical effect size across users # <1>
+set.seed(37) # <2>
+
+tau <- spread * exp(rnorm(3000, 0, 0.7)) # each user's effect scale # <3>
+se <- exp(rnorm(3000, -0.3, 0.6)) # each user's standard error
+theta <- rnorm(3000, 0, tau)
+y <- rnorm(3000, theta, se)
+scales <- c(0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.5, 2, 3, 5, 10, 100) # <4>
+rmse <- sapply(scales, function(s) {
+  w <- s^2 / (s^2 + se^2) # posterior mean under a N(0, s) default prior # <5>
+  sqrt(mean((w * y - theta)^2))
+})
+
+cat(
+  "Best default scale:", scales[which.min(rmse)], "(RMSE",
+  round(min(rmse), 3), ")\n"
+)
+cat(
+  "Flat 'no default' (scale 100): RMSE", round(rmse[length(rmse)], 3),
+  "\n"
+)
+
+plot(scales, rmse, # <6>
+  log = "x", type = "b", pch = 19, col = "#2166ac",
+  xlab = "Default prior scale s (log scale)",
+  ylab = "Average error across users (RMSE)"
+)
+```
+1. The page's control: the typical effect size across the software's users.
+2. Fixes the random numbers so the run is reproducible.
+3. Three thousand users, each with a different effect scale and a different standard error.
+4. Candidate default prior scales, from very tight to effectively flat.
+5. Under a N(0, s) default prior, each user's estimate is shrunk by this factor.
+6. Average error across all users for each default. A sensible default beats no default, and the flat prior is itself a default, just a bad one.
+
+## Python {.unlisted}
+
+```{.python}
+# Defaults: one default prior scale for thousands of different problems.
+import numpy as np
+import matplotlib.pyplot as plt
+
+spread = 1  # typical effect size across users
+rng = np.random.default_rng(37)
+
+tau = spread * np.exp(rng.normal(0, 0.7, 3000))  # each user's effect scale
+se = np.exp(rng.normal(-0.3, 0.6, 3000))         # each user's standard error
+theta = rng.normal(0, tau)
+y = rng.normal(theta, se)
+scales = np.array([0.1, 0.2, 0.3, 0.5, 0.75, 1, 1.5, 2, 3, 5, 10, 100])
+rmse = []
+for s in scales:
+    w = s ** 2 / (s ** 2 + se ** 2)  # posterior mean under a N(0, s) prior
+    rmse.append(np.sqrt(np.mean((w * y - theta) ** 2)))
+rmse = np.array(rmse)
+
+print(f"Best default scale: {scales[rmse.argmin()]} "
+      f"(RMSE {rmse.min():.3f})")
+print(f"Flat 'no default' (scale 100): RMSE {rmse[-1]:.3f}")
+
+plt.semilogx(scales, rmse, "o-", color="#2166ac")
+plt.xlabel("Default prior scale s (log scale)")
+plt.ylabel("Average error across users (RMSE)")
+plt.show()
+```
+
+:::
 
 </details>
 

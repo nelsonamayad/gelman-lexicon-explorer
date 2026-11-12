@@ -42,7 +42,7 @@ A randomized experiment run only on 18–22-year-olds. The treatment effect chan
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt, twoGroup} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -89,8 +89,14 @@ html`<div class="sim-readout">${md`The experiment estimates **${fmt(fresh.est)}*
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt, twoGroup} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 
 viewof gamma = Inputs.range([-0.03, 0.03], {value: -0.015, step: 0.001, label: "Change in effect per year of age (γ)"})
 viewof seed = Inputs.range([1, 500], {value: 43, step: 1, label: "Random seed"})
@@ -121,6 +127,74 @@ Plot.plot({
 })
 ```
 
+## R {.unlisted}
+
+```{.r}
+# The Freshman Fallacy: an experiment on college students only.
+gamma <- -0.015 # change in the treatment effect per year of age # <1>
+set.seed(43) # <2>
+
+effect <- function(age) 0.5 + gamma * (age - 20)
+age <- runif(600, 18, 22) # the experiment: ages 18 to 22 # <3>
+z <- rbinom(600, 1, 0.5) # randomized treatment
+y <- effect(age) * z + rnorm(600)
+est <- mean(y[z == 1]) - mean(y[z == 0]) # <4>
+pop_effect <- mean(effect(runif(5000, 18, 80))) # ages 18 to 80 # <5>
+
+cat("Experiment's estimate:", round(est, 2), "\n")
+cat("Population-average effect:", round(pop_effect, 2), "\n")
+
+curve(effect, 18, 80, # <6>
+  lwd = 2, col = "#2166ac", xlab = "Age",
+  ylab = "Treatment effect"
+)
+rect(18, -10, 22, 10, col = adjustcolor("#2166ac", 0.1), border = NA)
+abline(h = est, col = "#2166ac", lty = 2)
+abline(h = pop_effect, col = "#d6604d", lty = 2)
+```
+1. The page's control: how much the treatment effect changes per year of age.
+2. Fixes the random numbers so the run is reproducible.
+3. The experiment's subjects are all college students, aged 18 to 22.
+4. The experiment's estimate, which is unbiased for its own subjects.
+5. The average effect in the population of interest, aged 18 to 80.
+6. The effect by age, with the experiment's age range shaded. The two dashed lines differ because the effect varies with a characteristic the sample lacks.
+
+## Python {.unlisted}
+
+```{.python}
+# The Freshman Fallacy: an experiment on college students only.
+import numpy as np
+import matplotlib.pyplot as plt
+
+gamma = -0.015  # change in the treatment effect per year of age
+rng = np.random.default_rng(43)
+
+
+def effect(age):
+    return 0.5 + gamma * (age - 20)
+
+
+age = rng.uniform(18, 22, 600)      # the experiment: ages 18 to 22
+z = rng.binomial(1, 0.5, 600)       # randomized treatment
+y = effect(age) * z + rng.normal(size=600)
+est = y[z == 1].mean() - y[z == 0].mean()
+pop_effect = effect(rng.uniform(18, 80, 5000)).mean()  # ages 18 to 80
+
+print(f"Experiment's estimate: {est:.2f}")
+print(f"Population-average effect: {pop_effect:.2f}")
+
+ages = np.linspace(18, 80, 100)
+plt.axvspan(18, 22, color="#2166ac", alpha=0.1)
+plt.plot(ages, effect(ages), color="#2166ac", linewidth=2)
+plt.axhline(est, color="#2166ac", linestyle="--")
+plt.axhline(pop_effect, color="#d6604d", linestyle="--")
+plt.xlabel("Age")
+plt.ylabel("Treatment effect")
+plt.show()
+```
+
+:::
+
 </details>
 
 <!-- End of generated simulation code. -->
@@ -130,7 +204,7 @@ Plot.plot({
 ::: takeaways
 - A naive-sounding question can still point at a real problem.
 - Unrepresentative samples matter for experiments when treatment effects vary with characteristics the sample lacks.
-- Answer "it's just students" with an analysis of plausible interactions, not with a shrug.
+- Answer *it's just students* with an analysis of plausible interactions, not with a shrug.
 :::
 
 ## Related entries

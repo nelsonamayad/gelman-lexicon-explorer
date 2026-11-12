@@ -21,7 +21,7 @@ Source check: ✓ The explanation was checked against the source. The story came
 
 ## What it is
 
-When an error is found in a study, people often say "it doesn't change the conclusion." The error-reversal heuristic asks you to imagine the mistake had gone the *other* way. Suppose it made the risk look *smaller* rather than larger, or weakened the authors' preferred finding instead of strengthening it. Would it have been caught sooner? Would you shrug it off as easily? The context was a widely reported study on black plastic kitchen utensils. Its authors turned out to be off by a factor of 10 in a risk comparison and responded that "this does not impact our results and our recommendations remain the same." Dean Eckles sent Gelman the story, under the subject line "order-of-magnitude errors that don't affect the conclusions", and the lexicon entry links to Eckles's comment on the post.
+When an error is found in a study, people often say *it doesn't change the conclusion.* The error-reversal heuristic asks you to imagine the mistake had gone the *other* way. Suppose it made the risk look *smaller* rather than larger, or weakened the authors' preferred finding instead of strengthening it. Would it have been caught sooner? Would you shrug it off as easily? The context was a widely reported study on black plastic kitchen utensils. Its authors turned out to be off by a factor of 10 in a risk comparison and responded that "this does not impact our results and our recommendations remain the same." Dean Eckles sent Gelman the story, under the subject line "order-of-magnitude errors that don't affect the conclusions", and the lexicon entry links to Eckles's comment on the post.
 
 ## Why it matters
 
@@ -84,6 +84,12 @@ html`<div class="sim-readout">${md`The errors themselves are centered on zero. B
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
 
@@ -115,6 +121,82 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Error-Reversal Heuristic: checking harder when errors hurt the story.
+p_conv <- 0.2 # chance of catching an error that helps the story # <1>
+p_inconv <- 0.8 # chance of catching an error that hurts the story
+set.seed(144) # <2>
+
+est <- rnorm(3000, 0, 0.2) # the true effect is zero
+has_err <- runif(3000) < 0.3
+err <- ifelse(has_err, rnorm(3000, 0, 0.6), 0) # <3>
+caught <- has_err & runif(3000) < ifelse(err > 0, p_conv, p_inconv) # <4>
+published <- est + ifelse(caught, 0, err) # <5>
+
+cat(
+  "Average published estimate:", round(mean(published), 3),
+  "(true effect: 0)\n"
+)
+
+breaks <- seq(min(est, published) - 0.1, max(est, published) + 0.1,
+  length.out = 60
+)
+hist(est, # <6>
+  breaks = breaks, col = adjustcolor("#2166ac", 0.5),
+  border = "white", main = "", xlab = "Estimate", ylab = "Studies"
+)
+hist(published,
+  breaks = breaks, col = adjustcolor("#d6604d", 0.5),
+  border = "white", add = TRUE
+)
+abline(v = 0, lwd = 2)
+legend("topright", c("Honest estimates", "Published"),
+  fill = adjustcolor(c("#2166ac", "#d6604d"), 0.5), bty = "n"
+)
+```
+1. The page's controls: how likely an error is to be caught when it helps the story, and when it hurts it.
+2. Fixes the random numbers so the run is reproducible.
+3. Three thousand honest estimates of a zero effect; 30% of them contain an error that pushes either way.
+4. Errors that hurt the story get caught; errors that help it mostly don't. That asymmetry is the whole mechanism.
+5. What gets published: the honest estimate plus any error that survived.
+6. Honest estimates against published ones. The published distribution has drifted away from zero without anyone intending it.
+
+## Python {.unlisted}
+
+```{.python}
+# The Error-Reversal Heuristic: checking harder when errors hurt the story.
+import numpy as np
+import matplotlib.pyplot as plt
+
+p_conv = 0.2    # chance of catching an error that helps the story
+p_inconv = 0.8  # chance of catching an error that hurts the story
+rng = np.random.default_rng(144)
+
+est = rng.normal(0, 0.2, 3000)  # the true effect is zero
+has_err = rng.uniform(size=3000) < 0.3
+err = np.where(has_err, rng.normal(0, 0.6, 3000), 0)
+caught = has_err & (rng.uniform(size=3000) < np.where(err > 0, p_conv,
+                                                       p_inconv))
+published = est + np.where(caught, 0, err)
+
+print(f"Average published estimate: {published.mean():.3f} "
+      "(true effect: 0)")
+
+bins = np.linspace(min(est.min(), published.min()) - 0.1,
+                   max(est.max(), published.max()) + 0.1, 60)
+plt.hist(est, bins, color="#2166ac", alpha=0.5, label="Honest estimates")
+plt.hist(published, bins, color="#d6604d", alpha=0.5, label="Published")
+plt.axvline(0, color="black", linewidth=2)
+plt.xlabel("Estimate")
+plt.ylabel("Studies")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

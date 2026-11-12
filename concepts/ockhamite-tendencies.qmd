@@ -77,7 +77,7 @@ Plot.plot({
   y: {label: "Estimate used", grid: true},
   color: {legend: true, domain: ["Ockhamite selection", "Partial pooling"], range: ["#d6604d", "#2166ac"]},
   marks: [
-    Plot.line([[-3 * tau, -3 * tau], [3 * tau, 3 * tau]], {stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line([[-3 * tau, -3 * tau], [3 * tau, 3 * tau]], {stroke: "#8a8a8a", strokeDasharray: "4 3"}),
     Plot.dot(effects, {x: "truth", y: "selected", fill: () => "Ockhamite selection", r: 3.5}),
     Plot.dot(effects, {x: "truth", y: "pooled", fill: () => "Partial pooling", r: 3.5})
   ]
@@ -97,6 +97,12 @@ Plot.plot({
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
@@ -127,12 +133,88 @@ Plot.plot({
   y: {label: "Estimate used", grid: true},
   color: {legend: true, domain: ["Ockhamite selection", "Partial pooling"], range: ["#d6604d", "#2166ac"]},
   marks: [
-    Plot.line([[-3 * tau, -3 * tau], [3 * tau, 3 * tau]], {stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line([[-3 * tau, -3 * tau], [3 * tau, 3 * tau]], {stroke: "#8a8a8a", strokeDasharray: "4 3"}),
     Plot.dot(effects, {x: "truth", y: "selected", fill: () => "Ockhamite selection", r: 3.5}),
     Plot.dot(effects, {x: "truth", y: "pooled", fill: () => "Partial pooling", r: 3.5})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Ockhamite Tendencies: zeroing out small effects vs partial pooling.
+tau <- 0.4 # spread of true effects # <1>
+se <- 0.4 # standard error of each estimate
+set.seed(22) # <2>
+
+truth <- rnorm(40, 0, tau)
+est <- rnorm(40, truth, se)
+tau2_hat <- max(0.0001, mean(est^2) - se^2)
+selected <- ifelse(abs(est / se) > 2, est, 0) # keep only "significant" # <3>
+pooled <- tau2_hat / (tau2_hat + se^2) * est # shrink everything a bit # <4>
+
+rmse <- function(x) sqrt(mean((x - truth)^2))
+cat("Error (RMSE): raw ", round(rmse(est), 2), ", select-or-zero ",
+  round(rmse(selected), 2), " (", sum(selected != 0), " of 40 kept), ",
+  "partial pooling ", round(rmse(pooled), 2), "\n",
+  sep = ""
+)
+
+plot(truth, selected, # <5>
+  pch = 19, col = "#d6604d", xlab = "True effect",
+  ylab = "Estimate", ylim = range(est)
+)
+points(truth, pooled, pch = 19, col = "#2166ac")
+abline(0, 1, lty = 2)
+legend("topleft", c("Select or zero", "Partial pooling"),
+  pch = 19,
+  col = c("#d6604d", "#2166ac"), bty = "n"
+)
+```
+1. The page's controls: the spread of the 40 true effects and each estimate's standard error.
+2. Fixes the random numbers so the run is reproducible.
+3. The Ockhamite move: keep the significant effects at face value and set the rest to exactly zero.
+4. The alternative: keep every effect, shrunk a little toward zero.
+5. Both against the truth. Zeroing out small effects is a model with many parameters set to exactly zero, and it loses to shrinking them.
+
+## Python {.unlisted}
+
+```{.python}
+# Ockhamite Tendencies: zeroing out small effects vs partial pooling.
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau = 0.4  # spread of true effects
+se = 0.4   # standard error of each estimate
+rng = np.random.default_rng(22)
+
+truth = rng.normal(0, tau, 40)
+est = rng.normal(truth, se)
+tau2_hat = max(0.0001, np.mean(est ** 2) - se ** 2)
+selected = np.where(np.abs(est / se) > 2, est, 0)  # keep "significant"
+pooled = tau2_hat / (tau2_hat + se ** 2) * est     # shrink everything
+
+
+def rmse(x):
+    return np.sqrt(np.mean((x - truth) ** 2))
+
+
+print(f"Error (RMSE): raw {rmse(est):.2f}, select-or-zero "
+      f"{rmse(selected):.2f} ({np.sum(selected != 0)} of 40 kept), "
+      f"partial pooling {rmse(pooled):.2f}")
+
+plt.scatter(truth, selected, color="#d6604d", label="Select or zero")
+plt.scatter(truth, pooled, color="#2166ac", label="Partial pooling")
+lim = [truth.min(), truth.max()]
+plt.plot(lim, lim, "k--")
+plt.xlabel("True effect")
+plt.ylabel("Estimate")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

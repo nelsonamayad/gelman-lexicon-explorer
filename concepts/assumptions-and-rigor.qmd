@@ -94,6 +94,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, variance, fmt, pct} from "../js/stats.js"
 
@@ -125,6 +131,86 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Assumptions and Rigor: difference-in-differences without parallel trends.
+delta <- 0.4 # violation of parallel trends # <1>
+n <- 100 # units per group
+set.seed(86) # <2>
+
+did <- t(replicate(300, {
+  c_pre <- rnorm(n, 0)
+  c_post <- rnorm(n, 0.5) # control group
+  t_pre <- rnorm(n, 0.3)
+  t_post <- rnorm(n, 0.3 + 0.5 + delta + 1) # <3>
+  est <- (mean(t_post) - mean(t_pre)) - (mean(c_post) - mean(c_pre)) # <4>
+  se <- sqrt((var(t_post) + var(t_pre) + var(c_post) + var(c_pre)) / n)
+  c(est = est, lo = est - 1.96 * se, hi = est + 1.96 * se)
+}))
+covered <- did[, "lo"] <= 1 & did[, "hi"] >= 1 # the true effect is 1 # <5>
+
+cat("Coverage of the nominal 95% interval: ",
+  round(100 * mean(covered), 1), "%\n",
+  sep = ""
+)
+cat("Average estimate:", round(mean(did[, "est"]), 2), "(true effect: 1)\n")
+
+d <- did[1:50, ]
+plot(1:50, d[, "est"], # <6>
+  pch = 19, cex = 0.6, ylim = range(d[, -1]),
+  xlab = "Replication", ylab = "Estimate with 95% interval"
+)
+segments(1:50, d[, "lo"], 1:50, d[, "hi"],
+  col = ifelse(covered[1:50], "#2166ac", "#d6604d")
+)
+abline(h = 1, lty = 2)
+```
+1. The page's controls: how far the treated group's trend departs from the control group's, and the group sizes.
+2. Fixes the random numbers so the run is reproducible.
+3. The treated group's post-period outcome: its own trend, plus the violation of parallel trends, plus the true effect of 1.
+4. The difference-in-differences estimate, which is rigorous only if the parallel-trends assumption holds.
+5. Whether each replication's 95% interval covers the true effect of 1.
+6. Fifty replications with their intervals. Red intervals miss the truth, and the share that miss is the cost of the violated assumption.
+
+## Python {.unlisted}
+
+```{.python}
+# Assumptions and Rigor: difference-in-differences without parallel trends.
+import numpy as np
+import matplotlib.pyplot as plt
+
+delta = 0.4  # violation of parallel trends
+n = 100      # units per group
+rng = np.random.default_rng(86)
+
+est, lo, hi = [], [], []
+for _ in range(300):
+    c_pre, c_post = rng.normal(0, 1, n), rng.normal(0.5, 1, n)  # control
+    t_pre = rng.normal(0.3, 1, n)
+    t_post = rng.normal(0.3 + 0.5 + delta + 1, 1, n)
+    e = (t_post.mean() - t_pre.mean()) - (c_post.mean() - c_pre.mean())
+    se = np.sqrt((t_post.var(ddof=1) + t_pre.var(ddof=1) + c_post.var(ddof=1)
+                  + c_pre.var(ddof=1)) / n)
+    est.append(e); lo.append(e - 1.96 * se); hi.append(e + 1.96 * se)
+est, lo, hi = map(np.array, (est, lo, hi))
+covered = (lo <= 1) & (hi >= 1)  # the true effect is 1
+
+print(f"Coverage of the nominal 95% interval: {100 * covered.mean():.1f}%")
+print(f"Average estimate: {est.mean():.2f} (true effect: 1)")
+
+k = np.arange(50)
+plt.vlines(k, lo[:50], hi[:50],
+           colors=np.where(covered[:50], "#2166ac", "#d6604d"))
+plt.plot(k, est[:50], "o", color="black", markersize=3)
+plt.axhline(1, color="black", linestyle="--")
+plt.xlabel("Replication")
+plt.ylabel("Estimate with 95% interval")
+plt.show()
+```
+
+:::
 
 </details>
 

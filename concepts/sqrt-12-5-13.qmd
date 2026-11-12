@@ -86,6 +86,12 @@ html`<div class="sim-readout">${md`√(${s1}² + ${s2}²) = **${fmt(quad[0].form
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, sd, fmt} from "../js/stats.js"
 
@@ -114,6 +120,68 @@ Plot.plot({
   marks: [Plot.barX(quad, {y: "scenario", x: "formula", fill: "#2166ac"}), Plot.dot(quad, {y: "scenario", x: "sim", fill: "#d6604d", r: 5}), Plot.ruleX([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# sqrt(12^2 + 5^2) = 13: independent errors add in quadrature.
+s1 <- 12 # error source 1 (sd) # <1>
+s2 <- 5 # error source 2 (sd)
+set.seed(101) # <2>
+
+mc <- function(a, b) sd(rnorm(20000, 0, a) + rnorm(20000, 0, b)) # <3>
+scen <- rbind(
+  "As is" = c(s1, s2), "Halve source 1" = c(s1 / 2, s2),
+  "Halve source 2" = c(s1, s2 / 2),
+  "Eliminate source 2" = c(s1, 0)
+)
+total <- cbind(
+  formula = sqrt(scen[, 1]^2 + scen[, 2]^2), # <4>
+  simulated = apply(scen, 1, function(s) mc(s[1], s[2]))
+)
+print(round(total, 2)) # total error (sd) in each scenario
+
+par(mar = c(4, 9, 1, 1))
+barplot(rev(total[, "formula"]), # <5>
+  horiz = TRUE, las = 1,
+  col = "#2166ac", xlab = "Total error (sd)"
+)
+```
+1. The page's controls: the two error sources' standard deviations.
+2. Fixes the random numbers so the run is reproducible.
+3. A Monte Carlo check: the standard deviation of the sum of two independent errors.
+4. The formula: independent errors add in quadrature, so the larger one dominates.
+5. Total error in each scenario. Halving the small source barely helps; work on the big one.
+
+## Python {.unlisted}
+
+```{.python}
+# sqrt(12^2 + 5^2) = 13: independent errors add in quadrature.
+import numpy as np
+import matplotlib.pyplot as plt
+
+s1 = 12  # error source 1 (sd)
+s2 = 5   # error source 2 (sd)
+rng = np.random.default_rng(101)
+
+
+def mc(a, b):
+    return np.std(rng.normal(0, a, 20000) + rng.normal(0, b, 20000))
+
+
+scen = {"As is": (s1, s2), "Halve source 1": (s1 / 2, s2),
+        "Halve source 2": (s1, s2 / 2), "Eliminate source 2": (s1, 0)}
+for k, (a, b) in scen.items():
+    print(f"{k}: formula {np.hypot(a, b):.2f}, simulated {mc(a, b):.2f}")
+
+plt.barh(list(scen)[::-1], [np.hypot(a, b) for a, b in scen.values()][::-1],
+         color="#2166ac")
+plt.xlabel("Total error (sd)")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -38,7 +38,7 @@ We repeat an estimation problem 500 times with the true value fixed. Compare the
 
 ```{ojs}
 //| echo: false
-import {rng, range, normalPosterior, fmt, pct} from "../js/stats.js"
+import {rng, range, normalPosterior, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -72,7 +72,7 @@ Plot.plot({
   height: 260,
   x: {label: "Point estimate", grid: true},
   y: {label: "Replications"},
-  color: {legend: true, domain: ["Data only", "Bayesian posterior mean"], range: ["#999", "#2166ac"]},
+  color: {legend: true, domain: ["Data only", "Bayesian posterior mean"], range: ["#8a8a8a", "#2166ac"]},
   marks: [
     Plot.rectY(bayesReps, Plot.binX({y: "count"}, {x: "est", fill: () => "Data only", fillOpacity: 0.5, thresholds: 40})),
     Plot.rectY(bayesReps, Plot.binX({y: "count"}, {x: "post", fill: () => "Bayesian posterior mean", fillOpacity: 0.6, thresholds: 40})),
@@ -87,7 +87,7 @@ Plot.plot({
 //| echo: false
 {
   const c = k => bayesReps.filter(d => d[k]).length / bayesReps.length;
-  return html`<div class="sim-readout">${md`Coverage of nominal 90% intervals: data only **${pct(c("dataCover"))}**, Bayesian **${pct(c("bayesCover"))}**. The truth is the black line and the prior center is the red dashed line. A confident, misplaced prior gives a tight posterior in the wrong place. Widen the prior or move it to the truth and the Bayesian interval becomes both narrower *and* calibrated.`}</div>`;
+  return html`<div class="sim-readout">${md`Coverage of nominal 90% intervals: data only **${pct(c("dataCover"))}**, Bayesian **${pct(c("bayesCover"))}**. The truth is the solid line and the prior center is the red dashed line. A confident, misplaced prior gives a tight posterior in the wrong place. Widen the prior or move it to the truth and the Bayesian interval becomes both narrower *and* calibrated.`}</div>`;
 }
 ```
 
@@ -96,8 +96,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, normalPosterior, fmt, pct} from "../js/stats.js"
+import {rng, range, normalPosterior, pct} from "../js/stats.js"
 
 viewof priorOff = Inputs.range([0, 3], {value: 1.5, step: 0.1, label: "Prior center minus truth"})
 viewof priorSd = Inputs.range([0.1, 3], {value: 0.4, step: 0.05, label: "Prior sd (confidence)"})
@@ -125,7 +131,7 @@ Plot.plot({
   height: 260,
   x: {label: "Point estimate", grid: true},
   y: {label: "Replications"},
-  color: {legend: true, domain: ["Data only", "Bayesian posterior mean"], range: ["#999", "#2166ac"]},
+  color: {legend: true, domain: ["Data only", "Bayesian posterior mean"], range: ["#8a8a8a", "#2166ac"]},
   marks: [
     Plot.rectY(bayesReps, Plot.binX({y: "count"}, {x: "est", fill: () => "Data only", fillOpacity: 0.5, thresholds: 40})),
     Plot.rectY(bayesReps, Plot.binX({y: "count"}, {x: "post", fill: () => "Bayesian posterior mean", fillOpacity: 0.6, thresholds: 40})),
@@ -135,6 +141,90 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Bayesian: a confident prior in the wrong place.
+prior_off <- 1.5 # prior center minus truth # <1>
+prior_sd <- 0.4 # prior sd (confidence)
+se <- 0.5 # data standard error
+set.seed(23) # <2>
+
+truth <- 0
+est <- rnorm(500, truth, se)
+w0 <- 1 / prior_sd^2
+w1 <- 1 / se^2
+post_mean <- (w0 * (truth + prior_off) + w1 * est) / (w0 + w1) # <3>
+post_sd <- sqrt(1 / (w0 + w1)) # <4>
+
+cat("Coverage of nominal 90% intervals: data only ",
+  round(100 * mean(abs(est - truth) < 1.645 * se)), "%, Bayesian ",
+  round(100 * mean(abs(post_mean - truth) < 1.645 * post_sd)), "%\n", # <5>
+  sep = ""
+)
+
+breaks <- seq(min(est, post_mean) - 0.1, max(est, post_mean) + 0.1,
+  length.out = 41
+)
+hist(est, # <6>
+  breaks = breaks, col = adjustcolor("#2166ac", 0.5),
+  border = "white", main = "", xlab = "Estimate", ylab = "Replications"
+)
+hist(post_mean,
+  breaks = breaks, col = adjustcolor("#d6604d", 0.6),
+  border = "white", add = TRUE
+)
+abline(v = truth, lwd = 2)
+abline(v = prior_off, col = "#d6604d", lty = 2)
+legend("topright", c("Data only", "Bayesian posterior mean"),
+  fill = adjustcolor(c("#2166ac", "#d6604d"), 0.6), bty = "n"
+)
+```
+1. The page's controls: how far the prior's center sits from the truth, how confident the prior is, and the data's standard error.
+2. Fixes the random numbers so the run is reproducible.
+3. The posterior mean, a precision-weighted average of the prior center and the estimate. A confident prior in the wrong place pulls it off the truth.
+4. The posterior standard deviation is smaller than the data's, so the interval is narrower, whether or not it is in the right place.
+5. Coverage of the Bayesian 90% interval, compared with the data-only interval printed just before.
+6. Histograms of the data-only estimates and the posterior means, with the truth as a solid line and the prior center dashed.
+
+## Python {.unlisted}
+
+```{.python}
+# Bayesian: a confident prior in the wrong place.
+import numpy as np
+import matplotlib.pyplot as plt
+
+prior_off = 1.5  # prior center minus truth
+prior_sd = 0.4   # prior sd (confidence)
+se = 0.5         # data standard error
+rng = np.random.default_rng(23)
+
+truth = 0
+est = rng.normal(truth, se, 500)
+w0, w1 = 1 / prior_sd ** 2, 1 / se ** 2
+post_mean = (w0 * (truth + prior_off) + w1 * est) / (w0 + w1)
+post_sd = np.sqrt(1 / (w0 + w1))
+
+data_cover = np.mean(np.abs(est - truth) < 1.645 * se)
+bayes_cover = np.mean(np.abs(post_mean - truth) < 1.645 * post_sd)
+print(f"Coverage of nominal 90% intervals: data only {100 * data_cover:.0f}%,"
+      f" Bayesian {100 * bayes_cover:.0f}%")
+
+bins = np.linspace(min(est.min(), post_mean.min()) - 0.1,
+                   max(est.max(), post_mean.max()) + 0.1, 41)
+plt.hist(est, bins, color="#2166ac", alpha=0.5, label="Data only")
+plt.hist(post_mean, bins, color="#d6604d", alpha=0.6,
+         label="Bayesian posterior mean")
+plt.axvline(truth, color="black", linewidth=2)
+plt.axvline(prior_off, color="#d6604d", linestyle="--")
+plt.xlabel("Estimate")
+plt.ylabel("Replications")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

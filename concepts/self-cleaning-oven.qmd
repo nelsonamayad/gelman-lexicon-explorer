@@ -41,7 +41,7 @@ Our "package" estimates a treatment effect from a two-group experiment and repor
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, variance, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -92,8 +92,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, variance, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pct} from "../js/stats.js"
 
 viewof buggy = Inputs.toggle({label: "Introduce the standard-error bug", value: true})
 viewof nFake = Inputs.range([50, 1000], {value: 300, step: 50, label: "Fake datasets"})
@@ -124,6 +130,88 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Self-Cleaning Oven: fake-data simulation catches a bug.
+buggy <- TRUE # introduce the standard-error bug # <1>
+n_fake <- 300 # fake datasets
+set.seed(18) # <2>
+
+truth <- 0.4
+n <- 50
+res <- t(replicate(n_fake, { # <3>
+  tr <- rnorm(n, truth, 1)
+  ct <- rnorm(n, 0, 1)
+  est <- mean(tr) - mean(ct)
+  se <- if (buggy) {
+    sqrt(var(tr) / n) # <4>
+  } # bug: forgets the control
+  else {
+    sqrt(var(tr) / n + var(ct) / n)
+  }
+  c(est = est, lo = est - 1.96 * se, hi = est + 1.96 * se)
+}))
+covered <- res[, "lo"] <= truth & truth <= res[, "hi"] # <5>
+cat("95% intervals cover the true effect ", round(100 * mean(covered)),
+  "% of the time", if (buggy) " (the bug shows up)" else "", "\n",
+  sep = ""
+)
+
+k <- 1:min(100, n_fake)
+plot(res[k, "est"], k, # <6>
+  pch = 19, cex = 0.5, xlim = range(res[k, -1]),
+  col = ifelse(covered[k], "#2166ac", "#d6604d"),
+  xlab = "Estimate with 95% interval", ylab = "Fake dataset"
+)
+segments(res[k, "lo"], k, res[k, "hi"], k,
+  col = ifelse(covered[k], "#2166ac", "#d6604d")
+)
+abline(v = truth, lty = 2)
+```
+1. The page's controls: whether to plant the standard-error bug, and how many fake datasets to simulate.
+2. Fixes the random numbers so the run is reproducible.
+3. Fake-data simulation: generate data from known parameters, run the analysis, and check that it recovers them.
+4. The planted bug: the standard error forgets the control group's variance.
+5. Coverage of the nominal 95% intervals. With the bug, it falls well short, and the oven has cleaned itself.
+6. Intervals from the first 100 fake datasets, misses in red.
+
+## Python {.unlisted}
+
+```{.python}
+# The Self-Cleaning Oven: fake-data simulation catches a bug.
+import numpy as np
+import matplotlib.pyplot as plt
+
+buggy = True  # introduce the standard-error bug
+n_fake = 300  # fake datasets
+rng = np.random.default_rng(18)
+
+truth, n = 0.4, 50
+t = rng.normal(truth, 1, (n_fake, n))
+c = rng.normal(0, 1, (n_fake, n))
+est = t.mean(axis=1) - c.mean(axis=1)
+if buggy:
+    se = np.sqrt(t.var(axis=1, ddof=1) / n)  # bug: forgets the control
+else:
+    se = np.sqrt(t.var(axis=1, ddof=1) / n + c.var(axis=1, ddof=1) / n)
+lo, hi = est - 1.96 * se, est + 1.96 * se
+covered = (lo <= truth) & (truth <= hi)
+print(f"95% intervals cover the true effect {100 * covered.mean():.0f}% of "
+      "the time" + (" (the bug shows up)" if buggy else ""))
+
+k = np.arange(min(100, n_fake))
+cols = np.where(covered[k], "#2166ac", "#d6604d")
+plt.hlines(k, lo[k], hi[k], colors=cols)
+plt.scatter(est[k], k, s=8, c=cols)
+plt.axvline(truth, color="black", linestyle="--")
+plt.xlabel("Estimate with 95% interval")
+plt.ylabel("Fake dataset")
+plt.show()
+```
+
+:::
 
 </details>
 

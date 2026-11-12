@@ -89,6 +89,12 @@ html`<div class="sim-readout">${md`The histogram shows simulated draws of τ fro
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, fmt, quantile} from "../js/stats.js"
 
@@ -124,6 +130,65 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Pinocchio Principle: a half-t prior on a group-level scale.
+A <- 2.5 # scale of the prior # <1>
+nu <- 1 # degrees of freedom (1 = half-Cauchy)
+set.seed(31) # <2>
+
+# |N(0, A)| * sqrt(nu / chi-squared(nu)) is A times the absolute value of a
+# t variable with nu degrees of freedom: a half-t prior
+tau <- A * abs(rt(20000, nu)) # <3>
+print(round(quantile(tau, c(0.5, 0.9, 0.95, 0.99)), 1))
+
+cap <- quantile(tau, 0.95)
+hist(tau[tau < cap], # <4>
+  breaks = 50, freq = FALSE, col = "grey80",
+  border = "white", main = "", xlab = "Group-level scale tau"
+)
+curve(2 / A * dt(x / A, nu), 0, cap, add = TRUE, col = "#2166ac", lwd = 2)
+```
+1. The page's controls: the scale of the prior and its degrees of freedom (1 gives a half-Cauchy).
+2. Fixes the random numbers so the run is reproducible.
+3. Draws from the half-t prior: the absolute value of a t variable, scaled by A. The redundant multiplicative parameterization that motivates the principle collapses to this.
+4. The histogram of draws with the density overlaid, showing the prior's heavy tail.
+
+## Python {.unlisted}
+
+```{.python}
+# The Pinocchio Principle: a half-t prior on a group-level scale.
+from math import lgamma, pi
+import numpy as np
+import matplotlib.pyplot as plt
+
+A = 2.5  # scale of the prior
+nu = 1   # degrees of freedom (1 = half-Cauchy)
+rng = np.random.default_rng(31)
+
+# |N(0, A)| * sqrt(nu / chi-squared(nu)) is A times the absolute value of a
+# t variable with nu degrees of freedom: a half-t prior
+tau = np.abs(rng.normal(0, A, 20000)) * np.sqrt(nu / rng.chisquare(nu, 20000))
+for q in [50, 90, 95, 99]:
+    print(f"{q}th percentile: {np.percentile(tau, q):.1f}")
+
+
+def half_t(x):  # density of the half-t prior
+    c = np.exp(lgamma((nu + 1) / 2) - lgamma(nu / 2)) / np.sqrt(nu * pi)
+    return 2 / A * c * (1 + (x / A) ** 2 / nu) ** (-(nu + 1) / 2)
+
+
+cap = np.percentile(tau, 95)
+plt.hist(tau[tau < cap], bins=50, density=True, color="0.8")
+xs = np.linspace(0, cap, 200)
+plt.plot(xs, half_t(xs), color="#2166ac", linewidth=2)
+plt.xlabel("Group-level scale tau")
+plt.show()
+```
+
+:::
 
 </details>
 

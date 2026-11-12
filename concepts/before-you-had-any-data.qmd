@@ -37,7 +37,7 @@ Simulate from the prior of a logistic regression with standardized predictors. L
 
 ```{ojs}
 //| echo: false
-import {rng, range, invLogit, fmt, pct} from "../js/stats.js"
+import {rng, range, invLogit, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -81,8 +81,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, invLogit, fmt, pct} from "../js/stats.js"
+import {rng, range, invLogit, pct} from "../js/stats.js"
 
 viewof s = Inputs.range([0.1, 20], {value: 10, step: 0.1, label: "Prior sd on each coefficient"})
 viewof K = Inputs.range([1, 20], {value: 5, step: 1, label: "Number of predictors"})
@@ -106,6 +112,69 @@ Plot.plot({
   marks: [Plot.rectY(priorPred, Plot.binX({y: "count"}, {x: "p", fill: "#2166ac", thresholds: 40, domain: [0, 1]})), Plot.ruleY([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# What were you doing before you had any data? A prior predictive check.
+s <- 10 # prior sd on each logistic regression coefficient # <1>
+K <- 5 # number of standardized predictors
+set.seed(56) # <2>
+
+# Linear predictor under the prior: intercept + sum of beta_k * x_k
+eta <- rnorm(4000) + rowSums(matrix(rnorm(4000 * K, 0, s) * rnorm(4000 * K), # <3>
+  ncol = K
+))
+p <- plogis(eta) # implied predicted probabilities # <4>
+extreme <- mean(p < 0.01 | p > 0.99) # <5>
+
+cat("Predicted probabilities below 1% or above 99%: ",
+  round(100 * extreme), "%\n",
+  sep = ""
+)
+cat("Try s <- 1 for a prior that implies a reasonable spread.\n")
+
+hist(p, # <6>
+  breaks = seq(0, 1, 0.025), col = "#2166ac", border = "white",
+  main = "", xlab = "Predicted probability implied by the prior",
+  ylab = "Draws"
+)
+```
+1. The page's controls: the prior standard deviation of each coefficient, and the number of standardized predictors.
+2. Fixes the random numbers so the run is reproducible.
+3. Draw coefficients from the prior and predictors from their distribution, and form the linear predictor. Its spread is about s times the square root of K.
+4. The predicted probabilities the prior implies, before any data.
+5. The share of predictions that are essentially 0 or 1. A wide prior says almost every case is a certainty.
+6. The prior predictive histogram. Set s to 1 and the pile-up at the edges disappears.
+
+## Python {.unlisted}
+
+```{.python}
+# What were you doing before you had any data? A prior predictive check.
+import numpy as np
+import matplotlib.pyplot as plt
+
+s = 10  # prior sd on each logistic regression coefficient
+K = 5   # number of standardized predictors
+rng = np.random.default_rng(56)
+
+# Linear predictor under the prior: intercept + sum of beta_k * x_k
+beta = rng.normal(0, s, (4000, K))
+x = rng.normal(size=(4000, K))
+eta = rng.normal(size=4000) + (beta * x).sum(axis=1)
+p = 1 / (1 + np.exp(-eta))  # implied predicted probabilities
+extreme = np.mean((p < 0.01) | (p > 0.99))
+
+print(f"Predicted probabilities below 1% or above 99%: {100 * extreme:.0f}%")
+print("Try s = 1 for a prior that implies a reasonable spread.")
+
+plt.hist(p, bins=np.arange(0, 1.001, 0.025), color="#2166ac")
+plt.xlabel("Predicted probability implied by the prior")
+plt.ylabel("Draws")
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -36,7 +36,7 @@ A toy model of a project with hidden errors. Over 40 rounds, critics raise comme
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -91,8 +91,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof precision = Inputs.range([0.05, 0.8], {value: 0.25, step: 0.05, label: "Share of critiques that are correct"})
 viewof rudeCorrect = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Pr(correct critique is rude)"})
@@ -127,6 +133,87 @@ Plot.plot({
   marks: [Plot.line(driving, {x: "round", y: "errors", stroke: "policy", strokeWidth: 2, curve: "step-after"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Backseat Driver Principle: listen to criticism, even rude criticism.
+precision <- 0.25 # share of critiques that are correct # <1>
+rude_correct <- 0.6 # probability that a correct critique is rude
+set.seed(10) # <2>
+
+run <- function(listen_to_all) { # <3>
+  errors <- 12
+  path <- errors
+  for (t in 1:40) { # one critique per round
+    correct <- errors > 0 && runif(1) < precision # <4>
+    rude <- if (correct) runif(1) < rude_correct else runif(1) < 0.5
+    if (correct && (listen_to_all || !rude)) errors <- errors - 1 # <5>
+    path <- c(path, errors)
+  }
+  path
+}
+everyone <- run(TRUE)
+polite_only <- run(FALSE)
+
+cat(
+  "Errors left after 40 rounds: listens to everyone", tail(everyone, 1),
+  "| ignores rude critics", tail(polite_only, 1), "\n"
+)
+
+matplot(0:40, cbind(everyone, polite_only), # <6>
+  type = "s", lty = 1, lwd = 2,
+  col = c("#2166ac", "#d6604d"), xlab = "Round",
+  ylab = "Errors left (of 12)"
+)
+legend("topright", c("Listen to everyone", "Ignore rude critics"),
+  col = c("#2166ac", "#d6604d"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: the share of critiques that are correct, and how often a correct critique is rude.
+2. Fixes the random numbers so the run is reproducible.
+3. A researcher with 12 errors receives one critique per round for 40 rounds. The argument says whether rude critiques get a hearing.
+4. Each critique is correct with the given probability, as long as there are errors left to find.
+5. A correct critique fixes an error only if the researcher listens to it. Ignoring rude critics throws away the correct ones among them.
+6. Errors left over time under the two policies.
+
+## Python {.unlisted}
+
+```{.python}
+# The Backseat Driver Principle: listen to criticism, even rude criticism.
+import numpy as np
+import matplotlib.pyplot as plt
+
+precision = 0.25     # share of critiques that are correct
+rude_correct = 0.6   # probability that a correct critique is rude
+rng = np.random.default_rng(10)
+
+
+def run(listen_to_all):
+    errors, path = 12, [12]
+    for _ in range(40):                   # one critique per round
+        correct = errors > 0 and rng.uniform() < precision
+        rude = rng.uniform() < (rude_correct if correct else 0.5)
+        if correct and (listen_to_all or not rude):
+            errors -= 1
+        path.append(errors)
+    return path
+
+
+everyone, polite_only = run(True), run(False)
+print(f"Errors left after 40 rounds: listens to everyone {everyone[-1]} "
+      f"| ignores rude critics {polite_only[-1]}")
+
+plt.step(range(41), everyone, color="#2166ac", label="Listen to everyone")
+plt.step(range(41), polite_only, color="#d6604d",
+         label="Ignore rude critics")
+plt.xlabel("Round")
+plt.ylabel("Errors left (of 12)")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

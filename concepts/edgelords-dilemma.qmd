@@ -42,7 +42,7 @@ Here 10,000 careful thinkers and a smaller group of bad-faith actors are spread 
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -92,8 +92,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof myPos = Inputs.range([0, 4], {value: 2.2, step: 0.1, label: "Your distance from consensus (sd units)"})
 viewof badShare = Inputs.range([0.01, 0.2], {value: 0.05, step: 0.01, label: "Bad-faith actors as a share of everyone"})
@@ -122,6 +128,81 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Edgelord's Dilemma: who stands near you far from the consensus?
+my_pos <- 2.2 # your distance from consensus (sd units) # <1>
+bad_share <- 0.05 # bad-faith actors as a share of everyone
+set.seed(148) # <2>
+
+N <- 10000
+n_bad <- round(N * bad_share)
+careful <- rnorm(N - n_bad) # careful thinkers # <3>
+bad <- sample(c(-1, 1), n_bad, replace = TRUE) * rnorm(n_bad, 3, 0.7) # <4>
+near_careful <- sum(abs(careful - my_pos) < 0.25)
+near_bad <- sum(abs(bad - my_pos) < 0.25) # <5>
+
+cat("Near you: ", near_bad, " bad-faith actors and ", near_careful,
+  " careful thinkers (", round(100 * near_bad / (near_bad + near_careful)),
+  "% bad faith)\n",
+  sep = ""
+)
+
+breaks <- seq(-7, 7, by = 0.25)
+h1 <- hist(careful[abs(careful) < 7], breaks = breaks, plot = FALSE)
+h2 <- hist(bad[abs(bad) < 7], breaks = breaks, plot = FALSE)
+barplot(rbind(h1$counts, h2$counts), # <6>
+  col = c("#2166ac", "#d6604d"),
+  border = NA, space = 0, names.arg = round(h1$mids, 1),
+  xlab = "Position (sd units from consensus)", ylab = "People"
+)
+legend("topright", c("Careful thinkers", "Bad-faith actors"),
+  fill = c("#2166ac", "#d6604d"), bty = "n"
+)
+```
+1. The page's controls: how far from the consensus you stand, and what share of everyone argues in bad faith.
+2. Fixes the random numbers so the run is reproducible.
+3. Careful thinkers cluster near the consensus.
+4. Bad-faith actors cluster far from it, on both sides.
+5. Who else stands where you stand.
+6. The two distributions. Far from the consensus, your neighbors are mostly the people you would least like to be mistaken for.
+
+## Python {.unlisted}
+
+```{.python}
+# The Edgelord's Dilemma: who stands near you far from the consensus?
+import numpy as np
+import matplotlib.pyplot as plt
+
+my_pos = 2.2      # your distance from consensus (sd units)
+bad_share = 0.05  # bad-faith actors as a share of everyone
+rng = np.random.default_rng(148)
+
+N = 10000
+n_bad = round(N * bad_share)
+careful = rng.normal(size=N - n_bad)                    # careful thinkers
+bad = rng.choice([-1, 1], n_bad) * rng.normal(3, 0.7, n_bad)
+near_careful = np.sum(np.abs(careful - my_pos) < 0.25)
+near_bad = np.sum(np.abs(bad - my_pos) < 0.25)
+
+share = near_bad / (near_bad + near_careful)
+print(f"Near you: {near_bad} bad-faith actors and {near_careful} careful "
+      f"thinkers ({100 * share:.0f}% bad faith)")
+
+bins = np.arange(-7, 7.01, 0.25)
+plt.hist([careful, bad], bins=bins, stacked=True,
+         color=["#2166ac", "#d6604d"],
+         label=["Careful thinkers", "Bad-faith actors"])
+plt.axvline(my_pos, color="black", linestyle="--")
+plt.xlabel("Position (sd units from consensus)")
+plt.ylabel("People")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -1,8 +1,9 @@
 # Brand definition for the Andrew Gelman Statistical Lexicon Explorer.
 # Spec: https://posit-dev.github.io/brand-yml/
 # Colors with light/dark values give the site an automatic dark-mode toggle.
-# The palette matches the colors used in the OJS simulations
-# (blue #2166ac, red #d6604d, green #5aae61, gold #e6ab02).
+# The palette matches the colors used in the OJS simulations (blue #2166ac,
+# red #d6604d). The simulations use darker green #1a9850, gold #b8860b and
+# gray #8a8a8a for marks, so they pass 3:1 contrast in light and dark mode.
 
 meta:
   name:
@@ -54,24 +55,24 @@ color:
     dark: "#8cc4e8"
 
 typography:
+  # News Cycle (a revival of News Gothic) for body text and titles. Google
+  # Fonts has it in 400 and 700 only, with no italic: browsers slant the
+  # regular weight for emphasis.
   fonts:
-    - family: Source Sans 3
+    - family: News Cycle
       source: google
-      weight: [400, 600, 700]
-      style: [normal, italic]
-    - family: Source Serif 4
-      source: google
-      weight: [600, 700]
+      weight: [400, 700]
     - family: JetBrains Mono
       source: google
       weight: [400, 600]
   base:
-    family: Source Sans 3
+    family: News Cycle
     size: 17px
     line-height: 1.6
   headings:
-    family: Source Serif 4
+    family: News Cycle
     weight: 700
+    line-height: 1.2
   monospace:
     family: JetBrains Mono
     size: 0.9em

@@ -31,7 +31,7 @@ Readers remember stories, not standard errors. When a paper's narrative goes bey
 
 ## How it works
 
-Suppose an intervention has *no effect at all* and you look at ten subgroups. By chance, one subgroup will show the largest "effect." Story time supplies an explanation: "the program worked especially well for older women because..." The explanation is plausible, it is untested, and with a different random seed a different subgroup would have been on top, with an equally plausible story.
+Suppose an intervention has *no effect at all* and you look at ten subgroups. By chance, one subgroup will show the largest "effect." Story time supplies an explanation: *the program worked especially well for older women because...* The explanation is plausible, it is untested, and with a different random seed a different subgroup would have been on top, with an equally plausible story.
 
 ## Simulated example
 
@@ -39,7 +39,7 @@ This intervention has zero true effect in every subgroup. Each draw produces a "
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, twoGroup, fmt} from "../js/stats.js"
+import {rng, range, twoGroup, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -66,7 +66,7 @@ Plot.plot({
   x: {label: "Estimated effect (95% interval). True effect is 0 everywhere.", grid: true},
   y: {label: null, domain: story.map(d => d.g)},
   marks: [
-    Plot.ruleY(story, {y: "g", x1: d => d.est - 1.96 * d.se, x2: d => d.est + 1.96 * d.se, stroke: (d, i) => i === 0 ? "#d6604d" : "#999"}),
+    Plot.ruleY(story, {y: "g", x1: d => d.est - 1.96 * d.se, x2: d => d.est + 1.96 * d.se, stroke: (d, i) => i === 0 ? "#d6604d" : "#8a8a8a"}),
     Plot.dot(story, {y: "g", x: "est", fill: (d, i) => i === 0 ? "#d6604d" : "#2166ac", r: 4}),
     Plot.ruleX([0], {stroke: "currentColor"})
   ]
@@ -77,7 +77,7 @@ Plot.plot({
 //| echo: false
 {
   const top = story[0];
-  return html`<div class="sim-readout">${md`Tonight's story: *"The program was especially effective for **${phrase[top.g] ?? top.g.toLowerCase()}**"* (estimate ${fmt(top.est)}, p = ${fmt(top.p, 3)}). There is nothing to explain, since every true effect is zero. Change the seed and a different subgroup becomes the hero.`}</div>`;
+  return html`<div class="sim-readout">${md`Tonight's story: *The program was especially effective for* **${phrase[top.g] ?? top.g.toLowerCase()}** (estimate ${fmt(top.est)}, p = ${fmt(top.p, 3)}). There is nothing to explain, since every true effect is zero. Change the seed and a different subgroup becomes the hero.`}</div>`;
 }
 ```
 
@@ -86,8 +86,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, twoGroup, fmt} from "../js/stats.js"
+import {rng, range, twoGroup, fmt} from "../js/stats.js"
 
 viewof nPer = Inputs.range([20, 400], {value: 60, step: 10, label: "People per arm per subgroup"})
 viewof seed = Inputs.range([1, 500], {value: 29, step: 1, label: "Random seed (new study)"})
@@ -108,12 +114,105 @@ Plot.plot({
   x: {label: "Estimated effect (95% interval). True effect is 0 everywhere.", grid: true},
   y: {label: null, domain: story.map(d => d.g)},
   marks: [
-    Plot.ruleY(story, {y: "g", x1: d => d.est - 1.96 * d.se, x2: d => d.est + 1.96 * d.se, stroke: (d, i) => i === 0 ? "#d6604d" : "#999"}),
+    Plot.ruleY(story, {y: "g", x1: d => d.est - 1.96 * d.se, x2: d => d.est + 1.96 * d.se, stroke: (d, i) => i === 0 ? "#d6604d" : "#8a8a8a"}),
     Plot.dot(story, {y: "g", x: "est", fill: (d, i) => i === 0 ? "#d6604d" : "#2166ac", r: 4}),
     Plot.ruleX([0], {stroke: "currentColor"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Story Time: a subgroup "finding" when every true effect is zero.
+n_per <- 60 # people per arm per subgroup # <1>
+set.seed(29) # <2>
+
+subgroups <- c(
+  "Young men", "Young women", "Older men", "Older women",
+  "Urban", "Rural", "Low income", "High income", "College",
+  "No college"
+)
+res <- t(sapply(subgroups, function(g) {
+  tt <- t.test(rnorm(n_per), rnorm(n_per)) # no effect anywhere # <3>
+  c(est = unname(diff(rev(tt$estimate))), p = tt$p.value)
+}))
+res <- res[order(-res[, "est"]), ] # <4>
+print(round(res, 3))
+phrase <- c(
+  Urban = "urban residents", Rural = "rural residents",
+  "Low income" = "people with low incomes",
+  "High income" = "people with high incomes",
+  College = "college graduates",
+  "No college" = "people without a college degree"
+)
+top <- rownames(res)[1] # <5>
+who <- if (top %in% names(phrase)) phrase[[top]] else tolower(top)
+cat("Tonight's story: \"The program was especially effective for ", who,
+  "\" (p = ", round(res[1, "p"], 3), ")\n",
+  sep = ""
+)
+
+par(mar = c(4, 7, 1, 1))
+plot(res[, "est"], 10:1, # <6>
+  pch = 19, yaxt = "n", ylab = "",
+  col = ifelse(res[, "p"] < 0.05, "#d6604d", "grey40"),
+  xlab = "Estimated effect (true effect: 0)"
+)
+axis(2, 10:1, rownames(res), las = 1, cex.axis = 0.8)
+abline(v = 0, lty = 2)
+```
+1. The page's control: people per arm in each subgroup.
+2. Fixes the random numbers so the run is reproducible.
+3. Ten subgroup comparisons in which the true effect is zero everywhere.
+4. Sort them: some subgroup always comes out on top.
+5. Tonight's protagonist, chosen by noise, with a ready-made story. A different seed picks a different hero.
+6. The ten estimates, significant ones in red. Story time begins where the data stop.
+
+## Python {.unlisted}
+
+```{.python}
+# Story Time: a subgroup "finding" when every true effect is zero.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+n_per = 60  # people per arm per subgroup
+rng = np.random.default_rng(25)
+
+subgroups = ["Young men", "Young women", "Older men", "Older women",
+             "Urban", "Rural", "Low income", "High income", "College",
+             "No college"]
+res = []
+for g in subgroups:
+    t, c = rng.normal(size=n_per), rng.normal(size=n_per)  # no effect
+    est = t.mean() - c.mean()
+    se = np.sqrt(t.var(ddof=1) / n_per + c.var(ddof=1) / n_per)
+    p = 2 * (1 - NormalDist().cdf(abs(est / se)))  # normal approximation
+    res.append((g, est, p))
+res.sort(key=lambda r: -r[1])
+for g, est, p in res:
+    print(f"{g:12s} estimate {est:6.3f}  p = {p:.3f}")
+phrase = {"Urban": "urban residents", "Rural": "rural residents",
+          "Low income": "people with low incomes",
+          "High income": "people with high incomes",
+          "College": "college graduates",
+          "No college": "people without a college degree"}
+who = phrase.get(res[0][0], res[0][0].lower())
+print(f'Tonight\'s story: "The program was especially effective for '
+      f'{who}" (p = {res[0][2]:.3f})')
+
+y = np.arange(10)[::-1]
+plt.scatter([r[1] for r in res], y,
+            c=["#d6604d" if r[2] < 0.05 else "0.25" for r in res])
+plt.yticks(y, [r[0] for r in res])
+plt.axvline(0, color="black", linestyle="--")
+plt.xlabel("Estimated effect (true effect: 0)")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

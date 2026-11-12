@@ -97,6 +97,12 @@ html`<div class="sim-readout">${md`Slope of vote on income among your acquaintan
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, lm, invLogit, fmt} from "../js/stats.js"
 
@@ -138,6 +144,89 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Second-Order Availability Bias: your own circle is not the country.
+my_state <- 38 # your state (1 = poorest, 40 = richest) # <1>
+set.seed(16) # <2>
+
+# 40 states, 400 voters each. Income matters a lot in poor states and
+# hardly at all in rich ones.
+state <- rep(1:40, each = 400)
+wealth <- (state - 1 - 19.5) / 20 # -1 .. 1
+slope <- 0.9 - 0.85 * (wealth + 1) / 2 # <3>
+inc <- rnorm(16000, wealth, 1)
+vote <- rbinom(16000, 1, plogis(-0.4 * wealth + slope * inc))
+
+mine <- which(state == my_state)[1:200] # your acquaintances # <4>
+cat("Slope of vote on income among your acquaintances: ",
+  round(coef(lm(vote[mine] ~ inc[mine]))[[2]], 3), "\nIn the whole ",
+  "country: ", round(coef(lm(vote ~ inc))[[2]], 3), "\n",
+  sep = ""
+)
+
+bin <- cut(inc, seq(-3, 3, by = 0.75))
+plot(seq(-2.625, 2.625, by = 0.75), tapply(vote, bin, mean), # <5>
+  type = "b",
+  pch = 19, col = "#2166ac", ylim = c(0, 1), xlab = "Income",
+  ylab = "Share voting for the party"
+)
+bin_mine <- cut(inc[mine], seq(-3, 3, by = 0.75))
+points(seq(-2.625, 2.625, by = 0.75), tapply(vote[mine], bin_mine, mean),
+  type = "b", pch = 19, col = "#d6604d"
+)
+legend("topleft", c("Whole country", "Your acquaintances"),
+  pch = 19,
+  col = c("#2166ac", "#d6604d"), bty = "n"
+)
+```
+1. The page's control: which of 40 states, from poorest to richest, you live in.
+2. Fixes the random numbers so the run is reproducible.
+3. Income predicts the vote strongly in poor states and hardly at all in rich ones.
+4. Your acquaintances: 200 people from your own state.
+5. Vote against income for the whole country and for your acquaintances. Your circle is a sample from one state, and the national pattern can be the opposite of what it shows.
+
+## Python {.unlisted}
+
+```{.python}
+# Second-Order Availability Bias: your own circle is not the country.
+import numpy as np
+import matplotlib.pyplot as plt
+
+my_state = 38  # your state (1 = poorest, 40 = richest)
+rng = np.random.default_rng(16)
+
+# 40 states, 400 voters each. Income matters a lot in poor states and
+# hardly at all in rich ones.
+state = np.repeat(np.arange(1, 41), 400)
+wealth = (state - 1 - 19.5) / 20                  # -1 .. 1
+slope = 0.9 - 0.85 * (wealth + 1) / 2
+inc = rng.normal(wealth, 1)
+vote = rng.binomial(1, 1 / (1 + np.exp(-(-0.4 * wealth + slope * inc))))
+
+mine = np.flatnonzero(state == my_state)[:200]   # your acquaintances
+print(f"Slope of vote on income among your acquaintances: "
+      f"{np.polyfit(inc[mine], vote[mine], 1)[0]:.3f}")
+print(f"In the whole country: {np.polyfit(inc, vote, 1)[0]:.3f}")
+
+edges = np.arange(-3, 3.01, 0.75)
+mids = edges[:-1] + 0.375
+for idx, c, label in [(slice(None), "#2166ac", "Whole country"),
+                      (mine, "#d6604d", "Your acquaintances")]:
+    b = np.digitize(inc[idx], edges) - 1
+    p = [vote[idx][b == k].mean() if np.sum(b == k) > 5 else np.nan
+         for k in range(8)]
+    plt.plot(mids, p, "o-", color=c, label=label)
+plt.ylim(0, 1)
+plt.xlabel("Income")
+plt.ylabel("Share voting for the party")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

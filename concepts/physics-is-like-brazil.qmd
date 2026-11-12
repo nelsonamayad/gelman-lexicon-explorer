@@ -36,7 +36,7 @@ There are 1,000 newcomers in each field. Set how long the trek is in Brazil and 
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -63,7 +63,7 @@ Plot.plot({
   height: 280,
   x: {label: "Years since entering the field"},
   y: {label: "Share who have reached an open research problem", domain: [0, 1], tickFormat: "%", grid: true},
-  color: {legend: true, range: ["#5aae61", "#2166ac"]},
+  color: {legend: true, range: ["#1a9850", "#2166ac"]},
   marks: [Plot.line(frontier, {x: "year", y: "share", stroke: "label", strokeWidth: 2.5, curve: "step-after"})]
 })
 ```
@@ -81,8 +81,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof trek = Inputs.range([1, 12], {value: 8, step: 1, label: "Brazil: years of study before reaching the frontier"})
 viewof pHit = Inputs.range([0.05, 0.6], {value: 0.25, step: 0.05, label: "Chile: chance a routine project hits an open problem"})
@@ -103,10 +109,95 @@ Plot.plot({
   height: 280,
   x: {label: "Years since entering the field"},
   y: {label: "Share who have reached an open research problem", domain: [0, 1], tickFormat: "%", grid: true},
-  color: {legend: true, range: ["#5aae61", "#2166ac"]},
+  color: {legend: true, range: ["#1a9850", "#2166ac"]},
   marks: [Plot.line(frontier, {x: "year", y: "share", stroke: "label", strokeWidth: 2.5, curve: "step-after"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Physics is like Brazil, statistics is like Chile: how soon do you reach
+# the frontier?
+trek <- 8 # Brazil: years of study before reaching the frontier # <1>
+p_hit <- 0.25 # Chile: chance a routine project hits an open problem
+set.seed(143) # <2>
+
+# Year each of 1000 students first works on an open problem (Inf = never)
+reach <- function(first_year, p) { # <3>
+  replicate(1000, {
+    hit <- which(1:15 >= first_year & runif(15) < p)
+    if (length(hit)) hit[1] else Inf
+  })
+}
+physics <- reach(trek, 0.35) # <4>
+statistics <- reach(1, p_hit) # <5>
+share <- sapply(0:15, function(y) {
+  c(
+    physics = mean(physics <= y),
+    statistics = mean(statistics <= y)
+  )
+})
+cat("Reached the frontier by year 5: physics ",
+  round(100 * share["physics", 6]), "%, statistics ",
+  round(100 * share["statistics", 6]), "%\n",
+  sep = ""
+)
+
+matplot(0:15, t(share), # <6>
+  type = "s", lty = 1, lwd = 2, ylim = c(0, 1),
+  col = c("#d6604d", "#2166ac"), xlab = "Years of study",
+  ylab = "Share who have worked on an open problem"
+)
+legend("topleft", c("Physics (Brazil)", "Statistics (Chile)"),
+  col = c("#d6604d", "#2166ac"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: how many years of study physics demands before the frontier, and how likely a routine statistics project is to hit an open problem.
+2. Fixes the random numbers so the run is reproducible.
+3. The year each of 1,000 students first works on an open problem, given when they are allowed to start and how likely each year is to succeed.
+4. Physics is like Brazil: a long trek inland before the mountains.
+5. Statistics is like Chile: the mountains are a few steps from the beach.
+6. The share of students who have reached the frontier, year by year.
+
+## Python {.unlisted}
+
+```{.python}
+# Physics is like Brazil, statistics is like Chile: how soon do you reach
+# the frontier?
+import numpy as np
+import matplotlib.pyplot as plt
+
+trek = 8      # Brazil: years of study before reaching the frontier
+p_hit = 0.25  # Chile: chance a routine project hits an open problem
+rng = np.random.default_rng(143)
+
+
+def reach(first_year, p):  # year each of 1000 students first gets there
+    years = np.arange(1, 16)
+    hit = (years >= first_year) & (rng.uniform(size=(1000, 15)) < p)
+    return np.where(hit.any(axis=1), years[hit.argmax(axis=1)], np.inf)
+
+
+physics, statistics = reach(trek, 0.35), reach(1, p_hit)
+y = np.arange(16)
+share_p = [(physics <= k).mean() for k in y]
+share_s = [(statistics <= k).mean() for k in y]
+print(f"Reached the frontier by year 5: physics {100 * share_p[5]:.0f}%, "
+      f"statistics {100 * share_s[5]:.0f}%")
+
+plt.step(y, share_p, where="post", color="#d6604d", linewidth=2,
+         label="Physics (Brazil)")
+plt.step(y, share_s, where="post", color="#2166ac", linewidth=2,
+         label="Statistics (Chile)")
+plt.ylim(0, 1)
+plt.xlabel("Years of study")
+plt.ylabel("Share who have worked on an open problem")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

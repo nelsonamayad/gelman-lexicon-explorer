@@ -36,7 +36,7 @@ There are 1,000 practitioners in high-pressure situations. Set the true switchin
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -91,8 +91,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof toMine = Inputs.range([0, 0.2], {value: 0.05, step: 0.01, label: "True rate of switching TO my method"})
 viewof fromMine = Inputs.range([0, 0.2], {value: 0.05, step: 0.01, label: "True rate of switching AWAY"})
@@ -127,6 +133,79 @@ Plot.plot({
   marks: [Plot.barX(foxhole, {fy: "what", y: "dir", x: "n", fill: "dir"}), Plot.ruleX([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Foxhole Fallacy: selective memory turns two-way traffic one-way.
+to_mine <- 0.05 # true rate of switching to my method # <1>
+from_mine <- 0.05 # true rate of switching away
+memory_bias <- 0.8 # memory selectivity
+set.seed(30) # <2>
+
+# 500 practitioners use my method and 500 don't
+to <- runif(500) < to_mine # <3>
+away <- runif(500) < from_mine
+to_remembered <- to & runif(500) < 0.5 + memory_bias / 2 # <4>
+away_remembered <- away & runif(500) < 0.5 - memory_bias / 2
+
+counts <- rbind(
+  "Actually happened" = c(sum(to), sum(away)),
+  "What I remember" = c(
+    sum(to_remembered),
+    sum(away_remembered)
+  )
+)
+colnames(counts) <- c("Switched to my side", "Switched away")
+print(counts)
+
+barplot(t(counts), # <5>
+  beside = TRUE, col = c("#2166ac", "#d6604d"),
+  ylab = "Practitioners", legend.text = TRUE,
+  args.legend = list(bty = "n")
+)
+```
+1. The page's controls: the true rates of switching to and away from my method, and how selective my memory is.
+2. Fixes the random numbers so the run is reproducible.
+3. What actually happens: equal traffic in both directions.
+4. What I remember: conversions to my side stick, defections fade.
+5. Actual against remembered counts. Selective memory turns two-way traffic into a one-way street.
+
+## Python {.unlisted}
+
+```{.python}
+# The Foxhole Fallacy: selective memory turns two-way traffic one-way.
+import numpy as np
+import matplotlib.pyplot as plt
+
+to_mine = 0.05     # true rate of switching to my method
+from_mine = 0.05   # true rate of switching away
+memory_bias = 0.8  # memory selectivity
+rng = np.random.default_rng(30)
+
+# 500 practitioners use my method and 500 don't
+to = rng.uniform(size=500) < to_mine
+away = rng.uniform(size=500) < from_mine
+to_remembered = to & (rng.uniform(size=500) < 0.5 + memory_bias / 2)
+away_remembered = away & (rng.uniform(size=500) < 0.5 - memory_bias / 2)
+
+print(f"Actually happened: {to.sum()} switched to my side, "
+      f"{away.sum()} switched away")
+print(f"What I remember: {to_remembered.sum()} switched to my side, "
+      f"{away_remembered.sum()} switched away")
+
+x = np.arange(2)
+plt.bar(x - 0.2, [to.sum(), to_remembered.sum()], 0.4, color="#2166ac",
+        label="Switched to my side")
+plt.bar(x + 0.2, [away.sum(), away_remembered.sum()], 0.4, color="#d6604d",
+        label="Switched away")
+plt.xticks(x, ["Actually happened", "What I remember"])
+plt.ylabel("Practitioners")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

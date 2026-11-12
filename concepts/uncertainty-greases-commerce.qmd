@@ -92,7 +92,7 @@ Plot.plot({
   x: {label: "Distance bin", grid: true},
   y: {label: "Outcome", grid: true},
   marks: [
-    Plot.ruleX(grease.xs.map((x, j) => ({x, lo: grease.y[j] - 2 * grease.se[j], hi: grease.y[j] + 2 * grease.se[j]})), {x: "x", y1: "lo", y2: "hi", stroke: "#999"}),
+    Plot.ruleX(grease.xs.map((x, j) => ({x, lo: grease.y[j] - 2 * grease.se[j], hi: grease.y[j] + 2 * grease.se[j]})), {x: "x", y1: "lo", y2: "hi", stroke: "#8a8a8a"}),
     Plot.dot(grease.xs.map((x, j) => ({x, y: grease.y[j]})), {x: "x", y: "y", fill: "currentColor", r: 3}),
     Plot.line([2, 20].map(x => ({x, y: grease.aHat + grease.bHat * x})), {x: "x", y: "y", stroke: "#d6604d", strokeWidth: 2})
   ]
@@ -108,6 +108,12 @@ html`<div class="sim-readout">${md`With τ = ${tau}, the sampler accepts **${pct
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, fmt, pct} from "../js/stats.js"
@@ -152,12 +158,111 @@ Plot.plot({
   x: {label: "Distance bin", grid: true},
   y: {label: "Outcome", grid: true},
   marks: [
-    Plot.ruleX(grease.xs.map((x, j) => ({x, lo: grease.y[j] - 2 * grease.se[j], hi: grease.y[j] + 2 * grease.se[j]})), {x: "x", y1: "lo", y2: "hi", stroke: "#999"}),
+    Plot.ruleX(grease.xs.map((x, j) => ({x, lo: grease.y[j] - 2 * grease.se[j], hi: grease.y[j] + 2 * grease.se[j]})), {x: "x", y1: "lo", y2: "hi", stroke: "#8a8a8a"}),
     Plot.dot(grease.xs.map((x, j) => ({x, y: grease.y[j]})), {x: "x", y: "y", fill: "currentColor", r: 3}),
     Plot.line([2, 20].map(x => ({x, y: grease.aHat + grease.bHat * x})), {x: "x", y: "y", stroke: "#d6604d", strokeWidth: 2})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Uncertainty: it greases the wheels of commerce. An added error term
+# lets a Metropolis sampler move.
+tau <- 0 # added error term; try 0.03 # <1>
+set.seed(134) # <2>
+
+x <- 2:20
+se <- 0.003 * (1 + (0:18) / 3) # very precise data # <3>
+y <- 2 - 0.15 * x + 0.004 * x^2 + rnorm(19, 0, se) # slightly curved
+lp <- function(a, b) -0.5 * sum((y - a - b * x)^2 / (se^2 + tau^2)) # <4>
+
+run <- function(a, b) { # random-walk Metropolis # <5>
+  l <- lp(a, b)
+  acc <- 0
+  draws <- matrix(NA, 3000, 2)
+  for (t in 1:3000) {
+    a2 <- a + rnorm(1, 0, 0.02)
+    b2 <- b + rnorm(1, 0, 0.002)
+    l2 <- lp(a2, b2)
+    if (log(runif(1)) < l2 - l) {
+      a <- a2
+      b <- b2
+      l <- l2
+      acc <- acc + 1
+    }
+    draws[t, ] <- c(a, b)
+  }
+  list(draws = draws, acc = acc / 3000)
+}
+c1 <- run(1.5, -0.1)
+c2 <- run(2.5, -0.05)
+b_hat <- mean(c(c1$draws[1501:3000, 2], c2$draws[1501:3000, 2]))
+cat("With tau = ", tau, ", the sampler accepts ",
+  round(100 * (c1$acc + c2$acc) / 2, 1), "% of proposals; fitted ",
+  "slope ", round(b_hat, 4), "\n",
+  sep = ""
+)
+
+matplot(1:3000, cbind(c1$draws[, 2], c2$draws[, 2]), # <6>
+  type = "l", lty = 1,
+  col = c("#2166ac", "#d6604d"), xlab = "Iteration",
+  ylab = "Slope b"
+)
+```
+1. The page's control: the added error term. With zero, the model claims to be exact.
+2. Fixes the random numbers so the run is reproducible.
+3. Very precise data, as in the golf-putting bins with huge counts.
+4. The log posterior of a straight line fitted to slightly curved data, with the error term added to each bin's variance. That is the grease.
+5. A random-walk Metropolis sampler.
+6. Two chains' draws of the slope. With no error term they crawl; with a little uncertainty they mix, and the line balances all the bins.
+
+## Python {.unlisted}
+
+```{.python}
+# Uncertainty: it greases the wheels of commerce. An added error term
+# lets a Metropolis sampler move.
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau = 0  # added error term; try 0.03
+rng = np.random.default_rng(134)
+
+x = np.arange(2, 21)
+se = 0.003 * (1 + np.arange(19) / 3)     # very precise data
+y = 2 - 0.15 * x + 0.004 * x ** 2 + rng.normal(0, se)  # slightly curved
+
+
+def lp(a, b):
+    return -0.5 * np.sum((y - a - b * x) ** 2 / (se ** 2 + tau ** 2))
+
+
+def run(a, b):  # random-walk Metropolis
+    l, acc, draws = lp(a, b), 0, []
+    for _ in range(3000):
+        a2, b2 = a + rng.normal(0, 0.02), b + rng.normal(0, 0.002)
+        l2 = lp(a2, b2)
+        if np.log(rng.uniform()) < l2 - l:
+            a, b, l, acc = a2, b2, l2, acc + 1
+        draws.append(b)
+    return np.array(draws), acc / 3000
+
+
+(b1, acc1), (b2, acc2) = run(1.5, -0.1), run(2.5, -0.05)
+b_hat = np.mean(np.concatenate([b1[1500:], b2[1500:]]))
+print(f"With tau = {tau}, the sampler accepts "
+      f"{100 * (acc1 + acc2) / 2:.1f}% of proposals; fitted slope "
+      f"{b_hat:.4f}")
+
+plt.plot(b1, color="#2166ac")
+plt.plot(b2, color="#d6604d")
+plt.xlabel("Iteration")
+plt.ylabel("Slope b")
+plt.show()
+```
+
+:::
 
 </details>
 

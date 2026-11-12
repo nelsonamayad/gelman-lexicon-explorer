@@ -36,7 +36,7 @@ Twenty-nine teams analyze the *same* dataset. Each makes four reasonable choices
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sd, sum, fmt} from "../js/stats.js"
+import {rng, range, sd, sum, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -81,8 +81,14 @@ html`<div class="sim-readout">${md`Same data, 29 teams: estimates range from **$
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sd, sum, fmt} from "../js/stats.js"
+import {rng, range, sd, sum, fmt} from "../js/stats.js"
 
 viewof choiceImpact = Inputs.range([0, 0.3], {value: 0.12, step: 0.01, label: "How much each analytic choice moves the estimate"})
 viewof seed = Inputs.range([1, 500], {value: 127, step: 1, label: "Random seed"})
@@ -110,6 +116,80 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Analyst's Paradox: 29 teams, one dataset, different choices.
+choice_impact <- 0.12 # how much each analytic choice moves the estimate # <1>
+set.seed(127) # <2>
+
+se <- 0.1
+base <- 0.3
+shifts <- matrix(rnorm(12, 0, choice_impact), nrow = 4) # 4 choices x 3 # <3>
+est <- replicate(29, {
+  picks <- cbind(1:4, sample(3, 4, replace = TRUE)) # one option per choice # <4>
+  base + sum(shifts[picks]) + rnorm(1, 0, 0.02)
+})
+est <- sort(est)
+
+cat(
+  "Estimates range from", round(min(est), 2), "to", round(max(est), 2),
+  "(sd across teams", round(sd(est), 2), ")\n"
+)
+cat("Each team's own standard error:", se, "\n")
+cat(
+  "Teams finding a significant positive effect:",
+  sum(est - 1.96 * se > 0), "of 29\n" # <5>
+)
+
+plot(1:29, est, # <6>
+  pch = 19, col = "#2166ac",
+  ylim = range(est - 1.96 * se, est + 1.96 * se),
+  xlab = "Team (sorted by estimate)",
+  ylab = "Estimate with the team's own 95% interval"
+)
+segments(1:29, est - 1.96 * se, 1:29, est + 1.96 * se, col = "#2166ac")
+abline(h = 0)
+```
+1. The page's control: how much each analytic choice moves the estimate.
+2. Fixes the random numbers so the run is reproducible.
+3. Four analytic choices with three options each, and how much each option shifts the estimate.
+4. Each of the 29 teams picks one option per choice, as the teams in the many-analysts study did.
+5. How many teams would report a significant positive effect, each using its own standard error.
+6. The 29 estimates with their own intervals. The spread across teams is much wider than any one team's interval.
+
+## Python {.unlisted}
+
+```{.python}
+# The Analyst's Paradox: 29 teams, one dataset, different choices.
+import numpy as np
+import matplotlib.pyplot as plt
+
+choice_impact = 0.12  # how much each analytic choice moves the estimate
+rng = np.random.default_rng(127)
+
+se, base = 0.1, 0.3
+shifts = rng.normal(0, choice_impact, (4, 3))  # 4 choices x 3 options
+picks = rng.integers(0, 3, (29, 4))            # one option per choice
+est = base + shifts[np.arange(4), picks].sum(axis=1) + rng.normal(0, 0.02, 29)
+est = np.sort(est)
+
+print(f"Estimates range from {est.min():.2f} to {est.max():.2f} "
+      f"(sd across teams {est.std(ddof=1):.2f})")
+print(f"Each team's own standard error: {se}")
+print(f"Teams finding a significant positive effect: "
+      f"{(est - 1.96 * se > 0).sum()} of 29")
+
+teams = np.arange(1, 30)
+plt.errorbar(teams, est, yerr=1.96 * se, fmt="o", color="#2166ac")
+plt.axhline(0, color="black", linewidth=0.8)
+plt.xlabel("Team (sorted by estimate)")
+plt.ylabel("Estimate with the team's own 95% interval")
+plt.show()
+```
+
+:::
 
 </details>
 

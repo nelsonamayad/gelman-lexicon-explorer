@@ -38,7 +38,7 @@ The same estimate from 15 replications of a study, printed to six decimals. Digi
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof se = Inputs.range([0.001, 2], {value: 0.3, step: 0.001, label: "Standard error of the estimate"})
 viewof seed = Inputs.range([1, 500], {value: 108, step: 1, label: "Random seed"})
@@ -117,6 +123,45 @@ Plot.plot({
   marks: [Plot.dot(reps, {x: "est", fill: "#2166ac", r: 4}), Plot.ruleX([3.141593], {stroke: "currentColor", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# What to include: print only the digits that survive replication.
+se <- 0.3 # standard error of the estimate # <1>
+set.seed(108) # <2>
+
+est <- 3.141593 + rnorm(15, 0, se) # 15 replications of the estimate # <3>
+print(formatC(est, format = "f", digits = 6, width = 10), quote = FALSE)
+dec <- max(0, -floor(log10(se))) # decimals worth reporting # <4>
+cat("A sensible report: ", formatC(est[1], format = "f", digits = dec),
+  " (", formatC(se, format = "f", digits = dec), ")\n",
+  sep = ""
+)
+```
+1. The page's control: the estimate's standard error.
+2. Fixes the random numbers so the run is reproducible.
+3. Fifteen replications of the estimate, printed to six decimals. Only the first digit or two survive from one replication to the next.
+4. The number of decimals worth reporting, set by the standard error.
+
+## Python {.unlisted}
+
+```{.python}
+# What to include: print only the digits that survive replication.
+import math
+import numpy as np
+
+se = 0.3  # standard error of the estimate
+rng = np.random.default_rng(108)
+
+est = 3.141593 + rng.normal(0, se, 15)  # 15 replications of the estimate
+for i, e in enumerate(est, 1):
+    print(f"{i:2d} {e:10.6f}")
+dec = max(0, -math.floor(math.log10(se)))  # decimals worth reporting
+print(f"A sensible report: {est[0]:.{dec}f} ({se:.{dec}f})")
+```
+
+:::
 
 </details>
 

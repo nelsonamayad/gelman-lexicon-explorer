@@ -40,7 +40,7 @@ A **toy model**: hypothetical sizes of conceptual changes are drawn from a power
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -84,8 +84,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof alpha = Inputs.range([0.5, 2.5], {value: 1.2, step: 0.1, label: "Power-law exponent α"})
 viewof seed = Inputs.range([1, 500], {value: 145, step: 1, label: "Random seed"})
@@ -108,6 +114,71 @@ Plot.plot({
   marks: [Plot.line(rev, {x: "s", y: "p", stroke: "view", strokeWidth: 2})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Scientific revolutions are fractal: power-law sizes look the same at
+# every scale (a toy model).
+alpha <- 1.2 # power-law exponent # <1>
+set.seed(145) # <2>
+
+sizes <- sort((1 - runif(5000))^(-1 / alpha), decreasing = TRUE) # <3>
+sub <- sizes[sizes < 20] * 5 # zoom into a subfield, rescaled # <4>
+ccdf <- function(s) (seq_along(s)) / length(s) # share at least this big
+cat(
+  sum(sizes > 100), "of 5000 changes are more than 100 times the",
+  "minimum size\n"
+)
+
+plot(sizes, ccdf(sizes), # <5>
+  log = "xy", type = "l", lwd = 2, col = "#2166ac",
+  xlab = "Size of the change", ylab = "Share at least this big"
+)
+lines(sub, ccdf(sub), lwd = 2, col = "#d6604d", lty = 2)
+legend("bottomleft", c("All of science", "Zoomed into a subfield"),
+  col = c("#2166ac", "#d6604d"), lwd = 2, lty = 1:2, bty = "n"
+)
+```
+1. The page's control: the exponent of the power law. This is the site's toy model, not evidence about how science changes.
+2. Fixes the random numbers so the run is reproducible.
+3. Five thousand scientific changes with power-law sizes.
+4. Zoom into a subfield (the small changes) and rescale it.
+5. The size distribution of all changes and of the zoomed subfield, on log scales. They look the same: that is what fractal means here.
+
+## Python {.unlisted}
+
+```{.python}
+# Scientific revolutions are fractal: power-law sizes look the same at
+# every scale (a toy model).
+import numpy as np
+import matplotlib.pyplot as plt
+
+alpha = 1.2  # power-law exponent
+rng = np.random.default_rng(145)
+
+sizes = np.sort((1 - rng.uniform(size=5000)) ** (-1 / alpha))[::-1]
+sub = sizes[sizes < 20] * 5  # zoom into a subfield, rescaled
+
+
+def ccdf(s):  # share at least this big
+    return np.arange(1, len(s) + 1) / len(s)
+
+
+print(f"{np.sum(sizes > 100)} of 5000 changes are more than 100 times "
+      "the minimum size")
+
+plt.loglog(sizes, ccdf(sizes), color="#2166ac", linewidth=2,
+           label="All of science")
+plt.loglog(sub, ccdf(sub), "--", color="#d6604d", linewidth=2,
+           label="Zoomed into a subfield")
+plt.xlabel("Size of the change")
+plt.ylabel("Share at least this big")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

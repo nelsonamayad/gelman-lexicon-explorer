@@ -36,7 +36,7 @@ There are 300 effects, most small and a few large, estimated with very different
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -71,7 +71,7 @@ Plot.plot({
   x: {label: "Raw estimate"},
   y: {label: "Regularized estimate"},
   marks: [
-    Plot.dot(disc.all, {x: "y", y: "shrunk", r: d => 1.5 + 3 / d.se / 2, fill: d => d.trueTop ? "#2166ac" : "#ccc", stroke: d => d.rawTop && !d.regTop ? "#d6604d" : "none", strokeWidth: 2}),
+    Plot.dot(disc.all, {x: "y", y: "shrunk", r: d => 1.5 + 3 / d.se / 2, fill: d => d.trueTop ? "#2166ac" : "#8a8a8a", stroke: d => d.rawTop && !d.regTop ? "#d6604d" : "none", strokeWidth: 2}),
     Plot.ruleX([0]), Plot.ruleY([0])
   ]
 })
@@ -87,8 +87,14 @@ html`<div class="sim-readout">${md`Of the top 20 discoveries, **${disc.rawHits}*
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean} from "../js/stats.js"
 
 viewof spreadN = Inputs.range([0, 2], {value: 1.2, step: 0.1, label: "Variation in sample sizes (log scale)"})
 viewof seed = Inputs.range([1, 500], {value: 122, step: 1, label: "Random seed"})
@@ -117,11 +123,93 @@ Plot.plot({
   x: {label: "Raw estimate"},
   y: {label: "Regularized estimate"},
   marks: [
-    Plot.dot(disc.all, {x: "y", y: "shrunk", r: d => 1.5 + 3 / d.se / 2, fill: d => d.trueTop ? "#2166ac" : "#ccc", stroke: d => d.rawTop && !d.regTop ? "#d6604d" : "none", strokeWidth: 2}),
+    Plot.dot(disc.all, {x: "y", y: "shrunk", r: d => 1.5 + 3 / d.se / 2, fill: d => d.trueTop ? "#2166ac" : "#8a8a8a", stroke: d => d.rawTop && !d.regTop ? "#d6604d" : "none", strokeWidth: 2}),
     Plot.ruleX([0]), Plot.ruleY([0])
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Between regularization and discovery: ranking noisy estimates.
+spread_n <- 1.2 # variation in sample sizes (log scale) # <1>
+set.seed(122) # <2>
+
+# 300 groups: most effects tiny, 8% large; sample sizes vary
+theta <- ifelse(runif(300) < 0.08, rnorm(300, 0, 1.5), rnorm(300, 0, 0.2)) # <3>
+n <- round(30 * exp(rnorm(300, 0, spread_n))) + 2
+se <- 2 / sqrt(n)
+y <- rnorm(300, theta, se)
+tau2 <- max(0.01, mean(y^2 - se^2))
+shrunk <- tau2 / (tau2 + se^2) * y # <4>
+
+top <- function(v) order(-abs(v))[1:20] # the 20 most extreme groups # <5>
+cat("Of the true top 20, the raw estimates find ",
+  length(intersect(top(y), top(theta))), " and the regularized ",
+  "estimates find ", length(intersect(top(shrunk), top(theta))), "\n",
+  sep = ""
+)
+
+plot(theta, y, # <6>
+  pch = 19, cex = 0.6, col = "grey60",
+  xlab = "True effect", ylab = "Estimate"
+)
+points(theta[top(y)], y[top(y)], col = "#d6604d", cex = 1.4)
+points(theta[top(shrunk)], shrunk[top(shrunk)], pch = 19, col = "#2166ac")
+legend("topleft", c("Raw top 20", "Regularized top 20"),
+  pch = c(1, 19),
+  col = c("#d6604d", "#2166ac"), bty = "n"
+)
+```
+1. The page's control: how much sample sizes vary across the 300 groups.
+2. Fixes the random numbers so the run is reproducible.
+3. Most true effects are tiny; a few are large. Those few are the discoveries worth making.
+4. Regularized estimates: each shrunk toward zero in proportion to its noise.
+5. The 20 most extreme groups under each estimator, compared with the true top 20.
+6. Raw estimates against the truth, with each estimator's top 20 marked. Regularization finds more of the real discoveries, because the raw top 20 is full of noisy small groups.
+
+## Python {.unlisted}
+
+```{.python}
+# Between regularization and discovery: ranking noisy estimates.
+import numpy as np
+import matplotlib.pyplot as plt
+
+spread_n = 1.2  # variation in sample sizes (log scale)
+rng = np.random.default_rng(122)
+
+# 300 groups: most effects tiny, 8% large; sample sizes vary
+theta = np.where(rng.uniform(size=300) < 0.08, rng.normal(0, 1.5, 300),
+                 rng.normal(0, 0.2, 300))
+n = np.round(30 * np.exp(rng.normal(0, spread_n, 300))) + 2
+se = 2 / np.sqrt(n)
+y = rng.normal(theta, se)
+tau2 = max(0.01, np.mean(y ** 2 - se ** 2))
+shrunk = tau2 / (tau2 + se ** 2) * y
+
+
+def top(v):  # the 20 most extreme groups
+    return set(np.argsort(-np.abs(v))[:20])
+
+
+print(f"Of the true top 20, the raw estimates find "
+      f"{len(top(y) & top(theta))} and the regularized estimates find "
+      f"{len(top(shrunk) & top(theta))}")
+
+raw_top, reg_top = list(top(y)), list(top(shrunk))
+plt.scatter(theta, y, s=8, color="0.6")
+plt.scatter(theta[raw_top], y[raw_top], s=60, facecolors="none",
+            edgecolors="#d6604d", label="Raw top 20")
+plt.scatter(theta[reg_top], shrunk[reg_top], color="#2166ac",
+            label="Regularized top 20")
+plt.xlabel("True effect")
+plt.ylabel("Estimate")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

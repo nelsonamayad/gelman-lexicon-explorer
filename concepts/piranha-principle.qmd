@@ -81,6 +81,12 @@ html`<div class="sim-readout">${md`${K} independent factors with r = ${fmt(r)} w
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {range, fmt} from "../js/stats.js"
 
@@ -104,6 +110,65 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Piranha Principle: there can't be many large independent effects.
+r <- 0.3 # claimed correlation of each factor with the outcome # <1>
+K <- 20 # number of claimed independent factors
+# Deterministic: no random numbers. Independent factors with correlation
+# r each explain r^2 of the variance, and the shares can't add past 100%.
+
+explained <- K * r^2 # <2>
+max_k <- floor(1 / r^2) # <3>
+cat(K, " factors with r = ", r, " would explain ", round(100 * explained),
+  "% of the variance\nAt most ", max_k, " such factors can coexist\n",
+  sep = ""
+)
+
+k <- 1:50
+plot(k, k * r^2, # <4>
+  type = "h", lwd = 4,
+  col = ifelse(k * r^2 > 1, "#d6604d", "#2166ac"),
+  xlab = "Number of independent factors",
+  ylab = "Share of variance explained"
+)
+abline(h = 1, lty = 2)
+abline(v = K, col = "grey50")
+```
+1. The page's controls: the claimed correlation of each factor with the outcome, and how many such factors are claimed. There is no seed: the model is deterministic.
+2. Independent factors each explain r squared of the variance, and the shares add.
+3. The most such factors that can coexist before the shares exceed 100%.
+4. Variance explained against the number of factors. The red bars are impossible: the piranhas would have eaten each other.
+
+## Python {.unlisted}
+
+```{.python}
+# The Piranha Principle: there can't be many large independent effects.
+import numpy as np
+import matplotlib.pyplot as plt
+
+r = 0.3  # claimed correlation of each factor with the outcome
+K = 20   # number of claimed independent factors
+# Deterministic: no random numbers. Independent factors with correlation
+# r each explain r^2 of the variance, and the shares can't add past 100%.
+
+explained = K * r ** 2
+max_k = int(1 / r ** 2)
+print(f"{K} factors with r = {r} would explain {100 * explained:.0f}% of "
+      f"the variance\nAt most {max_k} such factors can coexist")
+
+k = np.arange(1, 51)
+plt.bar(k, k * r ** 2, color=np.where(k * r ** 2 > 1, "#d6604d", "#2166ac"))
+plt.axhline(1, color="black", linestyle="--")
+plt.axvline(K, color="0.5")
+plt.xlabel("Number of independent factors")
+plt.ylabel("Share of variance explained")
+plt.show()
+```
+
+:::
 
 </details>
 

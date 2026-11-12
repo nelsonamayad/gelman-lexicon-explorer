@@ -36,7 +36,7 @@ An author publishes 60 pieces. Each piece is accurate with probability equal to 
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -95,8 +95,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt} from "../js/stats.js"
+import {rng, range} from "../js/stats.js"
 
 viewof lapseStart = Inputs.range([5, 40], {value: 15, step: 1, label: "When the author gets careless (piece #)"})
 viewof lapseLength = Inputs.range([0, 30], {value: 12, step: 1, label: "How long the lapse lasts"})
@@ -134,6 +140,105 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The John Yoo Line: once trust is lost, careful work goes unnoticed.
+lapse_start <- 15 # when the author gets careless (piece #) # <1>
+lapse_length <- 12 # how long the lapse lasts
+line <- 0.5 # trust threshold (the line)
+set.seed(41) # <2>
+
+# Belief that the author is reliable (right 90% of the time) rather than a
+# hack (30%). Below the line, readers mostly stop paying attention.
+log_odds <- 3
+trust <- numeric(60)
+for (t in 1:60) {
+  careless <- t > lapse_start & t <= lapse_start + lapse_length
+  good <- runif(1) < if (careless) 0.3 else 0.9 # <3>
+  noticed <- plogis(log_odds) >= line || runif(1) < 0.15 # <4>
+  if (noticed) {
+    log_odds <- log_odds + if (good) log(0.9 / 0.3) else log(0.1 / 0.7) # <5>
+  }
+  log_odds <- min(12, max(-12, log_odds))
+  trust[t] <- plogis(log_odds)
+}
+below <- which(trust < line)
+if (length(below)) {
+  cat("Trust falls below the line at piece ", below[1], "\n", sep = "")
+  back <- which(trust >= line & seq_along(trust) > below[1])
+  cat(if (length(back)) {
+    paste("Back above the line at piece", back[1])
+  } else {
+    "Trust never recovers within 60 pieces"
+  }, "\n", sep = "")
+} else {
+  cat("Trust never falls below the line\n")
+}
+
+plot(1:60, trust, # <6>
+  type = "l", lwd = 2, col = "#2166ac", ylim = c(0, 1),
+  xlab = "Piece", ylab = "Audience trust"
+)
+rect(lapse_start + 0.5, -1, lapse_start + lapse_length + 0.5, 2,
+  col = adjustcolor("#d6604d", 0.1), border = NA
+)
+abline(h = line, lty = 2)
+```
+1. The page's controls: when the author's careless stretch starts, how long it lasts, and where the trust threshold sits.
+2. Fixes the random numbers so the run is reproducible.
+3. Each piece is good with high probability, except during the careless stretch.
+4. Readers notice a piece only while they still trust the author, or by chance.
+5. A noticed piece updates the readers' belief that the author is reliable.
+6. Trust over 60 pieces. Once it falls below the line, careful work goes unread and trust rarely recovers.
+
+## Python {.unlisted}
+
+```{.python}
+# The John Yoo Line: once trust is lost, careful work goes unnoticed.
+import numpy as np
+import matplotlib.pyplot as plt
+
+lapse_start = 15   # when the author gets careless (piece #)
+lapse_length = 12  # how long the lapse lasts
+line = 0.5         # trust threshold (the line)
+rng = np.random.default_rng(47)
+
+# Belief that the author is reliable (right 90% of the time) rather than a
+# hack (30%). Below the line, readers mostly stop paying attention.
+log_odds = 3
+trust = []
+for t in range(1, 61):
+    careless = lapse_start < t <= lapse_start + lapse_length
+    good = rng.uniform() < (0.3 if careless else 0.9)
+    noticed = 1 / (1 + np.exp(-log_odds)) >= line or rng.uniform() < 0.15
+    if noticed:
+        log_odds += np.log(0.9 / 0.3) if good else np.log(0.1 / 0.7)
+    log_odds = min(12, max(-12, log_odds))
+    trust.append(1 / (1 + np.exp(-log_odds)))
+trust = np.array(trust)
+pieces = np.arange(1, 61)
+below = pieces[trust < line]
+if below.size:
+    print(f"Trust falls below the line at piece {below[0]}")
+    back = pieces[(trust >= line) & (pieces > below[0])]
+    print(f"Back above the line at piece {back[0]}" if back.size
+          else "Trust never recovers within 60 pieces")
+else:
+    print("Trust never falls below the line")
+
+plt.axvspan(lapse_start + 0.5, lapse_start + lapse_length + 0.5,
+            color="#d6604d", alpha=0.1)
+plt.plot(pieces, trust, color="#2166ac", linewidth=2)
+plt.axhline(line, color="black", linestyle="--")
+plt.ylim(0, 1)
+plt.xlabel("Piece")
+plt.ylabel("Audience trust")
+plt.show()
+```
+
+:::
 
 </details>
 

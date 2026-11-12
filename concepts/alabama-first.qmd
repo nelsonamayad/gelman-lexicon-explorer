@@ -95,6 +95,12 @@ html`<div class="sim-readout">${md`Current order: **${order}**. In alphabetical 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, fmt} from "../js/stats.js"
 
@@ -130,6 +136,89 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Alabama First: the same 50 states sorted three ways.
+order_by <- "alphabetical" # "alphabetical", "value" or "region" # <1>
+region_gap <- 6 # size of regional differences
+set.seed(14) # <2>
+
+region <- as.character(state.region) # R's built-in census regions
+region[region == "North Central"] <- "Midwest"
+effect <- c(Northeast = 1, Midwest = 0, South = -1, West = 0.4)
+value <- 50 + region_gap * effect[region] + rnorm(50, 0, 3) # <3>
+states <- data.frame(state = state.name, region, value)
+
+states <- switch(order_by, # <4>
+  alphabetical = states,
+  value = states[order(-states$value), ],
+  region = states[order(states$region, -states$value), ]
+)
+cols <- c(
+  Midwest = "#2166ac", Northeast = "#d6604d", South = "#4daf4a",
+  West = "#984ea3"
+)
+dotchart(rev(states$value), # <5>
+  labels = rev(states$state), pch = 19,
+  col = cols[rev(states$region)], cex = 0.6,
+  xlab = "Simulated outcome"
+)
+legend("bottomright", names(cols), col = cols, pch = 19, cex = 0.7)
+cat("Regional gap (Northeast minus South):", 2 * region_gap, "points\n")
+```
+1. The page's controls: how to order the states, and how large the regional differences are.
+2. Fixes the random numbers so the run is reproducible.
+3. A made-up outcome with a regional pattern plus noise. R's built-in census regions supply the structure.
+4. The same 50 values, ordered alphabetically (Alabama first), by value, or by region and then value.
+5. The dot chart. Alphabetical order hides the regional pattern that the other two orders make obvious.
+
+## Python {.unlisted}
+
+```{.python}
+# Alabama First: the same 50 states sorted three ways.
+import numpy as np
+import matplotlib.pyplot as plt
+
+order_by = "alphabetical"  # "alphabetical", "value" or "region"
+region_gap = 6             # size of regional differences
+rng = np.random.default_rng(14)
+
+regions = {
+    "Northeast": "Connecticut Maine Massachusetts New_Hampshire New_Jersey "
+                 "New_York Pennsylvania Rhode_Island Vermont",
+    "Midwest": "Illinois Indiana Iowa Kansas Michigan Minnesota Missouri "
+               "Nebraska North_Dakota Ohio South_Dakota Wisconsin",
+    "South": "Alabama Arkansas Delaware Florida Georgia Kentucky Louisiana "
+             "Maryland Mississippi North_Carolina Oklahoma South_Carolina "
+             "Tennessee Texas Virginia West_Virginia",
+    "West": "Alaska Arizona California Colorado Hawaii Idaho Montana Nevada "
+            "New_Mexico Oregon Utah Washington Wyoming",
+}
+effect = {"Northeast": 1, "Midwest": 0, "South": -1, "West": 0.4}
+states = sorted((s.replace("_", " "), r) for r, names in regions.items()
+                for s in names.split())
+rows = [(s, r, 50 + region_gap * effect[r] + rng.normal(0, 3))
+        for s, r in states]
+
+if order_by == "value":
+    rows.sort(key=lambda d: -d[2])
+elif order_by == "region":
+    rows.sort(key=lambda d: (d[1], -d[2]))
+colors = {"Midwest": "#2166ac", "Northeast": "#d6604d", "South": "#4daf4a",
+          "West": "#984ea3"}
+y = np.arange(len(rows))[::-1]
+plt.figure(figsize=(6, 10))
+plt.scatter([d[2] for d in rows], y, c=[colors[d[1]] for d in rows])
+plt.yticks(y, [d[0] for d in rows], fontsize=7)
+plt.xlabel("Simulated outcome")
+plt.tight_layout()
+plt.show()
+print(f"Regional gap (Northeast minus South): {2 * region_gap} points")
+```
+
+:::
 
 </details>
 

@@ -77,7 +77,24 @@ Entry **#0** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling
      don't write recursive cells (OJS reports a circular definition).
      Cells don't show their code (concepts/_metadata.yml sets echo: false).
      scripts/build_groups.py adds a single "Show simulation code" block after
-     the cells; don't write or edit it by hand. -->
+     the cells; don't write or edit it by hand. The block has tabs for
+     Observable JS (copied from the cells), R (sims/r/<slug>.R, base R only)
+     and Python (sims/python/<slug>.py, NumPy and Matplotlib only). Write
+     both scripts for a new entry: same model and defaults, plain variables
+     at the top for the controls, a seed, printed results that say what the
+     readout says, and a base-graphics or Matplotlib chart. Keep lines to 78
+     characters (a trailing `# <n>` marker doesn't count), then run
+     scripts/check_code.py <slug>. The R script follows the tidyverse style
+     guide (https://style.tidyverse.org: `<-`, snake_case, one statement per
+     line, spaces around operators and after commas) and carries Quarto code
+     annotations: mark the lines that matter with `# <1>`, `# <2>`, ... and
+     end the file with a trailer that explains each number, one line each:
+       # Annotations
+       # 1. The controls, as plain variables: change them and rerun.
+       # 2. ...
+     build_groups.py strips the trailer and puts it under the R tab as the
+     numbered list Quarto expects; check_entries.py checks that the markers
+     and the trailer match. -->
 
 ```{ojs}
 //| echo: false

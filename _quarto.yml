@@ -47,33 +47,53 @@ website:
   navbar:
     logo: assets/logo.svg
     logo-alt: "Lexicon Explorer logo"
-    title: "Statistical Lexicon Explorer"
+    title: ""
+    # Icons are Bootstrap Icons (https://icons.getbootstrap.com). The theme and
+    # kind icons match ICONS in scripts/build_groups.py (the home-page cards).
     left:
       - href: index.qmd
         text: Browse all
+        icon: grid-3x3-gap
       - text: Themes
+        icon: collection
         menu:
           - href: themes/noise-and-evidence.qmd
+            icon: soundwave
           - href: themes/building-and-checking-models.qmd
+            icon: tools
           - href: themes/causes-samples-populations.qmd
+            icon: people
           - href: themes/showing-and-telling.qmd
+            icon: bar-chart-line
           - href: themes/how-science-behaves.qmd
+            icon: mortarboard
           - href: themes/thinking-about-statistics.qmd
+            icon: lightbulb
       - text: Kinds
+        icon: tags
         menu:
           - href: kinds/methods.qmd
+            icon: gear
           - href: kinds/principles.qmd
+            icon: compass
           - href: kinds/fallacies.qmd
+            icon: exclamation-triangle
           - href: kinds/laws-and-aphorisms.qmd
+            icon: quote
           - href: kinds/advice.qmd
+            icon: chat-left-text
       - href: start-here.qmd
         text: Start here
+        icon: signpost-2
       - href: random.qmd
         text: Random entry
+        icon: shuffle
       - href: r/index.qmd
         text: Try it in R
+        icon: terminal
       - href: about.qmd
         text: About
+        icon: info-circle
     right:
       - icon: github
         href: https://github.com/nelsonamayad/gelman-lexicon-explorer

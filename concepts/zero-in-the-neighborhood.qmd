@@ -78,6 +78,12 @@ html`<div class="sim-readout">${md`The data range from **${fmt(rule.lo, 1)}** to
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, fmt} from "../js/stats.js"
 
@@ -103,6 +109,70 @@ ${Plot.plot({
   ariaDescription: "Horizontal axis: Month. Vertical axis: Value. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 240, title: "Neighborhood rule", y: {grid: true, label: "Value", domain: rule.invite ? [0, rule.hi * 1.05] : undefined}, x: {label: "Month"}, marks: [Plot.line(series, {x: "t", y: "v", stroke: "#2166ac", strokeWidth: 2}), Plot.ruleY(rule.invite ? [0] : [])]})}
 </div>`
 ```
+
+## R {.unlisted}
+
+```{.r}
+# If zero is in the neighborhood, invite it in.
+level <- 5 # typical level of the series # <1>
+set.seed(100) # <2>
+
+v <- level + cumsum(rnorm(24, 0.15, 0.6)) # a series over 24 periods # <3>
+lo <- min(v)
+hi <- max(v)
+invite <- lo <= 0 || lo < 1.5 * (hi - lo) # is zero in the neighborhood? # <4>
+cat("The data range from ", round(lo, 1), " to ", round(hi, 1), ": ",
+  if (invite) {
+    "zero is in the neighborhood, so include it"
+  } else {
+    "zero is far away, so keep the zoomed axis"
+  }, "\n",
+  sep = ""
+)
+
+par(mfrow = c(1, 2)) # <5>
+plot(1:24, v,
+  type = "b", pch = 19, main = "Zoomed axis", xlab = "Period",
+  ylab = "Value"
+)
+plot(1:24, v,
+  type = "b", pch = 19, ylim = c(min(0, lo), hi),
+  main = "Axis including zero", xlab = "Period", ylab = "Value"
+)
+```
+1. The page's control: the typical level of the series.
+2. Fixes the random numbers so the run is reproducible.
+3. A series over 24 periods.
+4. The site's rule of thumb: invite zero in when its distance from the data is comparable to the data's own spread.
+5. The same series on the software's zoomed axis and on an axis that includes zero.
+
+## Python {.unlisted}
+
+```{.python}
+# If zero is in the neighborhood, invite it in.
+import numpy as np
+import matplotlib.pyplot as plt
+
+level = 5  # typical level of the series
+rng = np.random.default_rng(100)
+
+v = level + np.cumsum(rng.normal(0.15, 0.6, 24))  # a series, 24 periods
+lo, hi = v.min(), v.max()
+invite = lo <= 0 or lo < 1.5 * (hi - lo)  # is zero in the neighborhood?
+print(f"The data range from {lo:.1f} to {hi:.1f}: "
+      + ("zero is in the neighborhood, so include it" if invite
+         else "zero is far away, so keep the zoomed axis"))
+
+fig, ax = plt.subplots(1, 2, figsize=(9, 4))
+for a, title in zip(ax, ["Zoomed axis", "Axis including zero"]):
+    a.plot(np.arange(1, 25), v, "o-", color="#2166ac")
+    a.set_title(title)
+    a.set_xlabel("Period")
+ax[1].set_ylim(min(0, lo), hi * 1.05)
+plt.show()
+```
+
+:::
 
 </details>
 

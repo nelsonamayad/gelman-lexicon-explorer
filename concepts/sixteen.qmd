@@ -41,7 +41,7 @@ A 2×2 experiment with main effect θ and an interaction of θ/2. For a range of
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, qnorm, pnorm, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, qnorm, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -79,7 +79,7 @@ Plot.plot({
   x: {type: "log", label: "People per cell (log scale)", grid: true},
   y: {label: "Power", domain: [0, 1], tickFormat: "%", grid: true},
   color: {legend: true, range: ["#d6604d", "#2166ac"]},
-  marks: [Plot.line(power16, {x: "n", y: "power", stroke: "what", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.8], {stroke: "#999", strokeDasharray: "4 3"})]
+  marks: [Plot.line(power16, {x: "n", y: "power", stroke: "what", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.8], {stroke: "#8a8a8a", strokeDasharray: "4 3"})]
 })
 ```
 
@@ -97,8 +97,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, qnorm, pnorm, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, qnorm, fmt} from "../js/stats.js"
 
 viewof theta = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"})
 viewof intRatio = Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"})
@@ -130,9 +136,106 @@ Plot.plot({
   x: {type: "log", label: "People per cell (log scale)", grid: true},
   y: {label: "Power", domain: [0, 1], tickFormat: "%", grid: true},
   color: {legend: true, range: ["#d6604d", "#2166ac"]},
-  marks: [Plot.line(power16, {x: "n", y: "power", stroke: "what", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.8], {stroke: "#999", strokeDasharray: "4 3"})]
+  marks: [Plot.line(power16, {x: "n", y: "power", stroke: "what", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0.8], {stroke: "#8a8a8a", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# 16: you need 16 times the sample size to estimate an interaction.
+theta <- 0.4 # main effect (in sd units) # <1>
+int_ratio <- 0.5 # interaction as a fraction of the main effect
+set.seed(80) # <2>
+
+ns <- c(10, 20, 40, 80, 160, 320, 640, 1280) # people per cell
+gamma <- int_ratio * theta # <3>
+power <- sapply(ns, function(n) {
+  hits <- replicate(400, {
+    # Cells (treatment a, group b); main effect theta, interaction gamma
+    cell <- function(a, b) { # <4>
+      mean(rnorm(n, theta * (a - 0.5) +
+        gamma * (a - 0.5) * (b - 0.5), 1))
+    }
+    m00 <- cell(0, 0)
+    m10 <- cell(1, 0)
+    m01 <- cell(0, 1)
+    m11 <- cell(1, 1)
+    main <- ((m10 - m00) + (m11 - m01)) / 2 # <5>
+    inter <- (m11 - m01) - (m10 - m00) # <6>
+    c(main = abs(main * sqrt(n)) > 1.96, inter = abs(inter * sqrt(n) / 2) >
+      1.96)
+  })
+  rowMeans(hits)
+})
+z <- qnorm(0.975) + qnorm(0.8) # <7>
+cat("People per cell for 80% power: main effect ", ceiling(z^2 / theta^2),
+  ", interaction ", ceiling(z^2 * 4 / gamma^2), "\n",
+  sep = ""
+)
+
+matplot(ns, t(power), # <8>
+  type = "b", pch = 19, lty = 1, log = "x",
+  col = c("#2166ac", "#d6604d"), ylim = c(0, 1),
+  xlab = "People per cell", ylab = "Power"
+)
+abline(h = 0.8, lty = 2)
+legend("topleft", c("Main effect", "Interaction"),
+  col = c("#2166ac", "#d6604d"), pch = 19, bty = "n"
+)
+```
+1. The page's controls: the main effect and the interaction as a fraction of it.
+2. Fixes the random numbers so the run is reproducible.
+3. The interaction: half the main effect by default.
+4. A cell mean of a 2 by 2 design with n people per cell, coded plus or minus one half, so the interaction is the difference of differences.
+5. The main effect estimate, with standard error 1 over the square root of n.
+6. The interaction estimate, with twice that standard error.
+7. The analytic answer: half the effect with twice the standard error is a quarter of the z-score, so 16 times the sample.
+8. Power against people per cell for both. The interaction's curve is the main effect's shifted 16-fold to the right.
+
+## Python {.unlisted}
+
+```{.python}
+# 16: you need 16 times the sample size to estimate an interaction.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+theta = 0.4      # main effect (in sd units)
+int_ratio = 0.5  # interaction as a fraction of the main effect
+rng = np.random.default_rng(80)
+
+ns = [10, 20, 40, 80, 160, 320, 640, 1280]  # people per cell
+gamma = int_ratio * theta
+p_main, p_inter = [], []
+for n in ns:
+    # Cells (treatment a, group b); main effect theta, interaction gamma.
+    # A cell mean of n draws is normal with sd 1 / sqrt(n).
+    def cell(a, b):
+        mu = theta * (a - 0.5) + gamma * (a - 0.5) * (b - 0.5)
+        return rng.normal(mu, 1 / np.sqrt(n), 400)
+    m00, m10, m01, m11 = cell(0, 0), cell(1, 0), cell(0, 1), cell(1, 1)
+    main = ((m10 - m00) + (m11 - m01)) / 2
+    inter = (m11 - m01) - (m10 - m00)
+    p_main.append(np.mean(np.abs(main * np.sqrt(n)) > 1.96))
+    p_inter.append(np.mean(np.abs(inter * np.sqrt(n) / 2) > 1.96))
+q = NormalDist().inv_cdf
+z = q(0.975) + q(0.8)
+print(f"People per cell for 80% power: main effect "
+      f"{np.ceil(z ** 2 / theta ** 2):.0f}, interaction "
+      f"{np.ceil(z ** 2 * 4 / gamma ** 2):.0f}")
+
+plt.semilogx(ns, p_main, "o-", color="#2166ac", label="Main effect")
+plt.semilogx(ns, p_inter, "o-", color="#d6604d", label="Interaction")
+plt.axhline(0.8, color="black", linestyle="--")
+plt.ylim(0, 1)
+plt.xlabel("People per cell")
+plt.ylabel("Power")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

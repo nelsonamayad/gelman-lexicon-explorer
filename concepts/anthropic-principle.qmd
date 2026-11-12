@@ -36,7 +36,7 @@ Effects in a domain span many orders of magnitude. Set the largest feasible samp
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -63,7 +63,7 @@ Plot.plot({
   height: 260,
   x: {type: "log", label: "True effect size (sd units, log scale)"},
   y: {label: "Phenomena"},
-  color: {legend: true, domain: ["Too small to detect", "Statistics territory", "Obvious without statistics"], range: ["#bbb", "#2166ac", "#d6604d"]},
+  color: {legend: true, domain: ["Too small to detect", "Statistics territory", "Obvious without statistics"], range: ["#8a8a8a", "#2166ac", "#d6604d"]},
   marks: [Plot.rectY(universe, Plot.binX({y: "count"}, {x: "eff", fill: "zone", thresholds: 50})), Plot.ruleY([0])]
 })
 ```
@@ -81,8 +81,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof nMax = Inputs.range([1, 6], {value: 3, step: 0.25, label: "log10 of the largest feasible sample size"})
 viewof obvious = Inputs.range([0.5, 5], {value: 2, step: 0.1, label: "Naked-eye threshold (effect in sd units)"})
@@ -103,10 +109,78 @@ Plot.plot({
   height: 260,
   x: {type: "log", label: "True effect size (sd units, log scale)"},
   y: {label: "Phenomena"},
-  color: {legend: true, domain: ["Too small to detect", "Statistics territory", "Obvious without statistics"], range: ["#bbb", "#2166ac", "#d6604d"]},
+  color: {legend: true, domain: ["Too small to detect", "Statistics territory", "Obvious without statistics"], range: ["#8a8a8a", "#2166ac", "#d6604d"]},
   marks: [Plot.rectY(universe, Plot.binX({y: "count"}, {x: "eff", fill: "zone", thresholds: 50})), Plot.ruleY([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Anthropic principle: which effects can statistics study at all?
+n_max <- 3 # log10 of the largest feasible sample size # <1>
+obvious <- 2 # naked-eye threshold (effect in sd units)
+set.seed(119) # <2>
+
+detect <- 2.8 / sqrt(10^n_max) # effect detectable with ~80% power # <3>
+eff <- 10^runif(4000, -4, 1) # effects spread over five orders of magnitude # <4>
+zone <- ifelse(eff < detect, "Too small to detect", # <5>
+  ifelse(eff > obvious, "Obvious without statistics",
+    "Statistics territory"
+  )
+)
+print(round(100 * prop.table(table(zone))))
+
+breaks <- seq(-4, 1, length.out = 51)
+mid <- (head(breaks, -1) + tail(breaks, -1)) / 2
+cols <- ifelse(10^mid < detect, "grey70",
+  ifelse(10^mid > obvious, "#d6604d", "#2166ac")
+)
+hist(log10(eff), # <6>
+  breaks = breaks, col = cols, border = "white", main = "",
+  xlab = "True effect size (sd units, log10 scale)", ylab = "Phenomena"
+)
+legend("topleft", c("Too small", "Statistics territory", "Obvious"),
+  fill = c("grey70", "#2166ac", "#d6604d"), cex = 0.8, bty = "n"
+)
+```
+1. The page's controls: the largest feasible sample size, as a power of ten, and the effect size that is obvious without statistics.
+2. Fixes the random numbers so the run is reproducible.
+3. The smallest effect a study of the largest feasible size can detect with about 80% power.
+4. True effects spread evenly over five orders of magnitude.
+5. Each effect lands in one of three zones. Only the middle one is where statistics is needed and can work.
+6. The histogram on a log scale, colored by zone. The blue band is the anthropic window.
+
+## Python {.unlisted}
+
+```{.python}
+# Anthropic principle: which effects can statistics study at all?
+import numpy as np
+import matplotlib.pyplot as plt
+
+n_max = 3     # log10 of the largest feasible sample size
+obvious = 2   # naked-eye threshold (effect in sd units)
+rng = np.random.default_rng(119)
+
+detect = 2.8 / np.sqrt(10 ** n_max)  # detectable with ~80% power
+eff = 10 ** rng.uniform(-4, 1, 4000)  # effects over five orders of magnitude
+zones = {"Too small to detect": eff < detect,
+         "Statistics territory": (eff >= detect) & (eff <= obvious),
+         "Obvious without statistics": eff > obvious}
+for name, inside in zones.items():
+    print(f"{name}: {100 * inside.mean():.0f}%")
+
+bins = np.linspace(-4, 1, 51)
+colors = ["0.7", "#2166ac", "#d6604d"]
+plt.hist([np.log10(eff[m]) for m in zones.values()], bins=bins,
+         stacked=True, color=colors, label=list(zones))
+plt.xlabel("True effect size (sd units, log10 scale)")
+plt.ylabel("Phenomena")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

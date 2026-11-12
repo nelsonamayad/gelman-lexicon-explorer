@@ -24,7 +24,7 @@ Source check: ✓ The explanation was checked against the source.
 
 ## Why it matters
 
-Refutations travel more slowly and less widely than original claims (see [The wedding, never about the marriage](wedding-not-marriage.qmd)). New researchers, journalists and students come across the original finding without its refutation. If critics stop repeating the critique because "everyone knows," the refuted idea simply carries on among people who don't.
+Refutations travel more slowly and less widely than original claims (see [The wedding, never about the marriage](wedding-not-marriage.qmd)). New researchers, journalists and students come across the original finding without its refutation. If critics stop repeating the critique because *everyone knows,* the refuted idea simply carries on among people who don't.
 
 ## How it works
 
@@ -80,6 +80,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {range, fmt} from "../js/stats.js"
 
@@ -106,6 +112,71 @@ Plot.plot({
 })
 ```
 
+## R {.unlisted}
+
+```{.r}
+# The Horse: keep beating it, or the refuted finding keeps spreading.
+q_beat <- 0.5 # share of new citers who learn of the refutation # <1>
+q_stop <- 0.1 # the same share if critics stop
+growth <- 1.15 # citation growth factor
+# Deterministic: no random numbers.
+
+years <- 0:25
+keep <- 100 * (growth * (1 - q_beat))^years # uncritical citations/year # <2>
+stop <- 100 * (growth * (1 - q_stop))^years # <3>
+cat("After 25 years, uncritical citations per year: ",
+  round(tail(keep, 1), 1), " if critics keep at it, ",
+  round(tail(stop, 1), 1), " if they stop\n",
+  sep = ""
+)
+
+matplot(years, cbind(keep, stop), # <4>
+  type = "l", lty = 1, lwd = 2, log = "y",
+  col = c("#2166ac", "#d6604d"), xlab = "Year",
+  ylab = "Uncritical citations per year"
+)
+legend("left", c(
+  "Critics keep beating the horse",
+  "Critics stop: 'everyone knows'"
+),
+col = c("#2166ac", "#d6604d"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: the share of new citers who learn of the refutation while critics keep at it, the same share once they stop, and how fast citations grow. There is no seed: the model is deterministic.
+2. Uncritical citations per year if the critics keep beating the horse.
+3. The same if they stop because everyone knows.
+4. Both paths on a log scale. The audience keeps changing, so the horse is never really dead.
+
+## Python {.unlisted}
+
+```{.python}
+# The Horse: keep beating it, or the refuted finding keeps spreading.
+import numpy as np
+import matplotlib.pyplot as plt
+
+q_beat = 0.5   # share of new citers who learn of the refutation
+q_stop = 0.1   # the same share if critics stop
+growth = 1.15  # citation growth factor
+# Deterministic: no random numbers.
+
+years = np.arange(26)
+keep = 100 * (growth * (1 - q_beat)) ** years  # uncritical citations/year
+stop = 100 * (growth * (1 - q_stop)) ** years
+print(f"After 25 years, uncritical citations per year: {keep[-1]:.1f} if "
+      f"critics keep at it, {stop[-1]:.1f} if they stop")
+
+plt.semilogy(years, keep, color="#2166ac", linewidth=2,
+             label="Critics keep beating the horse")
+plt.semilogy(years, stop, color="#d6604d", linewidth=2,
+             label="Critics stop: 'everyone knows'")
+plt.xlabel("Year")
+plt.ylabel("Uncritical citations per year")
+plt.legend()
+plt.show()
+```
+
+:::
+
 </details>
 
 <!-- End of generated simulation code. -->
@@ -115,7 +186,7 @@ Plot.plot({
 ::: takeaways
 - Refuted ideas keep circulating among people who never heard the refutation.
 - Repeating a critique isn't redundant when the audience keeps changing.
-- "Everyone knows" usually means "my circle knows."
+- *Everyone knows* usually means *my circle knows.*
 :::
 
 ## Related entries

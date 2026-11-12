@@ -99,6 +99,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, sum, fmt} from "../js/stats.js"
 
@@ -139,6 +145,92 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Panglossian Fallacy: assuming the odds were right because they're odds.
+k <- 4 # how much long shots are underpriced # <1>
+n_events <- 20000 # priced events in the track record
+set.seed(116) # <2>
+
+# Implied probabilities from 1 in 5,000 to 1 in 2, even on the log scale
+implied <- exp(log(1 / 5000) + runif(n_events) * log(5000 / 2))
+true_odds <- k * implied / (1 - implied) # true odds k times implied odds # <3>
+won <- runif(n_events) < true_odds / (1 + true_odds)
+
+edges <- c(1 / 5000, 1 / 1000, 1 / 200, 1 / 50, 1 / 10, 1 / 2)
+bin <- cut(implied, edges, right = FALSE)
+calib <- data.frame( # <4>
+  implied = tapply(implied, bin, mean),
+  observed = tapply(won, bin, mean)
+)
+print(signif(calib, 2))
+
+long <- as.integer(bin) <= 3 # long shots: worse than 1 in 50
+ratio <- sum(won[long]) / sum(implied[long]) # <5>
+se <- sqrt(max(sum(won[long]), 1)) / sum(implied[long])
+cat("Long shots won ", round(ratio, 1), " times as often as the odds ",
+  "implied\n", if (ratio - 2 * se > 1) {
+    "The odds were wrong."
+  } else {
+    "Consistent with calibrated odds."
+  }, "\n",
+  sep = ""
+)
+
+plot(calib$implied, calib$observed, # <6>
+  log = "xy", pch = 19, col = "#d6604d",
+  xlab = "Implied probability", ylab = "Observed win rate"
+)
+abline(0, 1, lty = 2)
+```
+1. The page's controls: how much the market underprices long shots, and how many priced events are in the record.
+2. Fixes the random numbers so the run is reproducible.
+3. The true odds of each event, k times the odds the market implied: the market is wrong about long shots.
+4. Calibration: the observed win rate in bins of implied probability.
+5. How much more often long shots won than the odds implied, and whether the gap is beyond chance.
+6. Observed against implied win rates. Points above the diagonal are the market's long-shot error, visible only because someone checked.
+
+## Python {.unlisted}
+
+```{.python}
+# Panglossian Fallacy: assuming the odds were right because they're odds.
+import numpy as np
+import matplotlib.pyplot as plt
+
+k = 4             # how much long shots are underpriced
+n_events = 20000  # priced events in the track record
+rng = np.random.default_rng(116)
+
+# Implied probabilities from 1 in 5,000 to 1 in 2, even on the log scale
+implied = np.exp(np.log(1 / 5000) + rng.uniform(size=n_events)
+                 * np.log(5000 / 2))
+true_odds = k * implied / (1 - implied)  # true odds k times implied odds
+won = rng.uniform(size=n_events) < true_odds / (1 + true_odds)
+
+edges = [1 / 5000, 1 / 1000, 1 / 200, 1 / 50, 1 / 10, 1 / 2]
+bin_ = np.digitize(implied, edges) - 1
+mean_implied = [implied[bin_ == b].mean() for b in range(5)]
+observed = [won[bin_ == b].mean() for b in range(5)]
+for a, o in zip(mean_implied, observed):
+    print(f"implied {a:.2g} -> observed {o:.2g}")
+
+long = bin_ <= 2                        # long shots: worse than 1 in 50
+ratio = won[long].sum() / implied[long].sum()
+se = np.sqrt(max(won[long].sum(), 1)) / implied[long].sum()
+print(f"Long shots won {ratio:.1f} times as often as the odds implied")
+print("The odds were wrong." if ratio - 2 * se > 1
+      else "Consistent with calibrated odds.")
+
+plt.loglog(mean_implied, np.maximum(observed, 1e-5), "o", color="#d6604d")
+plt.plot([2e-4, 0.5], [2e-4, 0.5], "k--")
+plt.xlabel("Implied probability")
+plt.ylabel("Observed win rate")
+plt.show()
+```
+
+:::
 
 </details>
 

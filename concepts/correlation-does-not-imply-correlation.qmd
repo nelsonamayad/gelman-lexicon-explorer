@@ -24,7 +24,7 @@ Everyone knows that correlation does not imply causation. Gelman's sharper point
 
 ## Why it matters
 
-Analysts jump from "we found r = 0.4" straight to arguing about causal direction, skipping the step of asking whether the correlation is real. With small samples, many candidate variable pairs, or selected samples (who gets into the hospital, who applies to the program, who answers the survey), sample correlations can be pure artifacts. Arguing about the causal story of an artifact wastes everyone's time.
+Analysts jump from *we found r = 0.4* straight to arguing about causal direction, skipping the step of asking whether the correlation is real. With small samples, many candidate variable pairs, or selected samples (who gets into the hospital, who applies to the program, who answers the survey), sample correlations can be pure artifacts. Arguing about the causal story of an artifact wastes everyone's time.
 
 ## How it works
 
@@ -87,6 +87,12 @@ html`<div class="sim-readout">${md`The true population correlation is **0**. Of 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, cor, fmt} from "../js/stats.js"
 
@@ -118,6 +124,80 @@ Plot.plot({
   marks: [Plot.dot(corrs.pts, {x: "x", y: "y", fill: "#2166ac", r: 3}), Plot.linearRegressionY(corrs.pts, {x: "x", y: "y", stroke: "#d6604d"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Correlation does not even imply correlation.
+n <- 25 # sample size # <1>
+selection <- FALSE # only observe units with x + y > 1 (Berkson)
+k <- 20 # number of variable pairs examined
+set.seed(70) # <2>
+
+draw <- function() { # x and y are independent in the population # <3>
+  x <- rnorm(20 * n)
+  y <- rnorm(20 * n)
+  keep <- if (selection) which(x + y > 1)[1:n] else 1:n # <4>
+  data.frame(x = x[keep], y = y[keep])
+}
+samples <- replicate(k, draw(), simplify = FALSE)
+r <- sapply(samples, function(d) cor(d$x, d$y))
+best <- which.max(abs(r)) # <5>
+
+cat(
+  "True correlation: 0. Most striking of", k, "sample correlations:",
+  round(r[best], 2), "\n"
+)
+
+plot(samples[[best]], # <6>
+  pch = 19, col = "#2166ac",
+  main = paste("r =", round(r[best], 2))
+)
+abline(lm(y ~ x, data = samples[[best]]), col = "#d6604d", lwd = 2)
+```
+1. The page's controls: the sample size, whether units are selected on x + y, and how many variable pairs are examined.
+2. Fixes the random numbers so the run is reproducible.
+3. One sample in which x and y are independent in the population.
+4. Berkson's selection: keeping only units with a high x + y builds in a negative sample correlation.
+5. The forking path: of k pairs examined, report the most striking.
+6. The chosen sample with its fitted line. Its correlation came from noise, selection or search, not from the population.
+
+## Python {.unlisted}
+
+```{.python}
+# Correlation does not even imply correlation.
+import numpy as np
+import matplotlib.pyplot as plt
+
+n = 25            # sample size
+selection = False  # only observe units with x + y > 1 (Berkson)
+k = 20            # number of variable pairs examined
+rng = np.random.default_rng(70)
+
+
+def draw():
+    """x and y are independent in the population."""
+    x, y = rng.normal(size=20 * n), rng.normal(size=20 * n)
+    keep = np.flatnonzero(x + y > 1)[:n] if selection else np.arange(n)
+    return x[keep], y[keep]
+
+
+samples = [draw() for _ in range(k)]
+r = np.array([np.corrcoef(x, y)[0, 1] for x, y in samples])
+best = np.argmax(np.abs(r))
+print(f"True correlation: 0. Most striking of {k} sample correlations: "
+      f"{r[best]:.2f}")
+
+x, y = samples[best]
+slope, intercept = np.polyfit(x, y, 1)
+xs = np.linspace(x.min(), x.max(), 2)
+plt.scatter(x, y, color="#2166ac")
+plt.plot(xs, intercept + slope * xs, color="#d6604d", linewidth=2)
+plt.title(f"r = {r[best]:.2f}")
+plt.show()
+```
+
+:::
 
 </details>
 

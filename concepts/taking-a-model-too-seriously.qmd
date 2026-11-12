@@ -99,6 +99,12 @@ html`<div class="sim-readout">${md`The straight line predicts y(${xFar}) = **${f
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, lm, fmt} from "../js/stats.js"
 
@@ -140,6 +146,80 @@ Plot.plot({
   marks: [Plot.dot(mdl.resid, {x: "x", y: "resid", r: 2}), Plot.ruleY([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Taking a Model Too Seriously: a straight line, extrapolated far away.
+curve <- 0.12 # curvature in the truth # <1>
+x_far <- 15 # extrapolate to this x
+set.seed(26) # <2>
+
+truth <- function(x) 1 + 0.8 * x - curve * x^2
+x <- runif(60, 0, 5) # <3>
+y <- truth(x) + rnorm(60, 0, 0.6)
+fit <- lm(y ~ x)
+pred <- predict(fit, data.frame(x = x_far), se.fit = TRUE) # <4>
+cat("The line predicts y(", x_far, ") = ", round(pred$fit, 1), " +/- ",
+  round(1.96 * pred$se.fit, 1), "; the truth is ",
+  round(truth(x_far), 1), "\n",
+  sep = ""
+)
+
+par(mfrow = c(1, 2))
+plot(x, y,
+  pch = 19, xlim = c(0, x_far),
+  ylim = range(y, truth(x_far), pred$fit), xlab = "x", ylab = "y"
+)
+abline(fit, col = "#2166ac", lwd = 2)
+curve(truth, 0, x_far, add = TRUE, lty = 2, col = "#d6604d", lwd = 2)
+plot(x, resid(fit), pch = 19, xlab = "x", ylab = "Residual") # <5>
+abline(h = 0, lty = 2)
+```
+1. The page's controls: how much the truth curves, and how far out to extrapolate.
+2. Fixes the random numbers so the run is reproducible.
+3. Data observed only between 0 and 5, where a straight line fits well.
+4. The line's prediction far outside the data, with the narrow interval the model believes in.
+5. The residual plot: the check that taking the model seriously demands. Its curvature says not to extrapolate.
+
+## Python {.unlisted}
+
+```{.python}
+# Taking a Model Too Seriously: a straight line, extrapolated far away.
+import numpy as np
+import matplotlib.pyplot as plt
+
+curve = 0.12  # curvature in the truth
+x_far = 15    # extrapolate to this x
+rng = np.random.default_rng(26)
+
+
+def truth(v):
+    return 1 + 0.8 * v - curve * v ** 2
+
+
+x = rng.uniform(0, 5, 60)
+y = truth(x) + rng.normal(0, 0.6, 60)
+b, a = np.polyfit(x, y, 1)
+resid = y - (a + b * x)
+sigma = np.sqrt(resid @ resid / 58)
+se_far = sigma * np.sqrt(1 / 60 + (x_far - x.mean()) ** 2
+                         / np.sum((x - x.mean()) ** 2))
+print(f"The line predicts y({x_far}) = {a + b * x_far:.1f} +/- "
+      f"{1.96 * se_far:.1f}; the truth is {truth(x_far):.1f}")
+
+fig, ax = plt.subplots(1, 2, figsize=(9, 4))
+xs = np.linspace(0, x_far, 100)
+ax[0].scatter(x, y, s=10, color="black")
+ax[0].plot(xs, a + b * xs, color="#2166ac", linewidth=2)
+ax[0].plot(xs, truth(xs), "--", color="#d6604d", linewidth=2)
+ax[1].scatter(x, resid, s=10, color="black")
+ax[1].axhline(0, color="black", linestyle="--")
+ax[1].set_ylabel("Residual")
+plt.show()
+```
+
+:::
 
 </details>
 

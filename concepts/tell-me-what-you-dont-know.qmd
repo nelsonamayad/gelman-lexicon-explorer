@@ -20,7 +20,7 @@ Source check: ✓ The explanation was checked against the source.
 
 ## What it is
 
-When you consult an expert, the usual question is "What do you know?" Gelman suggests asking the opposite: "What *don't* you know?" He divides anyone's understanding of a topic into three parts: what you know, what you don't know, and what you don't know you don't know. Asking about the first only shows the boundary between the first two. Asking about the second also brings out a lot of the first, shows that boundary, and gives a sense of where the third part begins. The answer shows the edges of the expert's knowledge: the assumptions they're unsure of, the cases where their model breaks down, the data they wish they had. That is often more useful than another confident summary.
+When you consult an expert, the usual question is *What do you know?* Gelman suggests asking the opposite: "What *don't* you know?" He divides anyone's understanding of a topic into three parts: what you know, what you don't know, and what you don't know you don't know. Asking about the first only shows the boundary between the first two. Asking about the second also brings out a lot of the first, shows that boundary, and gives a sense of where the third part begins. The answer shows the edges of the expert's knowledge: the assumptions they're unsure of, the cases where their model breaks down, the data they wish they had. That is often more useful than another confident summary.
 
 ## Why it matters
 
@@ -36,7 +36,7 @@ There are 200 forecasting questions. Experts are overconfident by a factor you c
 
 ```{ojs}
 //| echo: false
-import {rng, range, pnorm, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -86,8 +86,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, pnorm, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof k = Inputs.range([0.2, 1], {value: 0.5, step: 0.05, label: "Overconfidence factor k (1 = calibrated)"})
 viewof prompt = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "How much the question helps"})
@@ -117,6 +123,75 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Tell Me What You Don't Know: asking about uncertainty widens intervals.
+k <- 0.5 # overconfidence factor (1 = calibrated) # <1>
+prompt <- 0.6 # how much the question helps
+set.seed(49) # <2>
+
+k_after <- k + prompt * (1 - k) # <3>
+sigma <- exp(rnorm(200, 0, 0.5)) # real uncertainty of 200 questions
+truth <- rnorm(200, 0, sigma) # error of the expert's best guess
+cover_before <- abs(truth) < 1.645 * k * sigma # stated 90% interval # <4>
+cover_after <- abs(truth) < 1.645 * k_after * sigma # after the question
+cat("Coverage of stated 90% intervals: initial ",
+  round(100 * mean(cover_before)), "%, after \"tell me what you don't ",
+  "know\" ", round(100 * mean(cover_after)), "%\n",
+  sep = ""
+)
+
+q <- 1:50
+plot(q, truth[q], pch = 19, ylim = range(truth[q], 1.645 * k_after * # <5>
+  c(-1, 1) * max(sigma[q])), xlab = "Question", ylab = "Error")
+segments(q, -1.645 * k_after * sigma[q], q, 1.645 * k_after * sigma[q],
+  col = "#2166ac", lwd = 3
+)
+segments(q, -1.645 * k * sigma[q], q, 1.645 * k * sigma[q],
+  col = "#d6604d", lwd = 2
+)
+```
+1. The page's controls: the expert's overconfidence (1 is calibrated) and how much the question helps.
+2. Fixes the random numbers so the run is reproducible.
+3. After being asked what they don't know, the expert's intervals widen part of the way toward calibration.
+4. Coverage of the expert's stated 90% intervals before the question.
+5. The expert's errors with the intervals before (red) and after (blue) the question. The wider intervals cover more of the errors.
+
+## Python {.unlisted}
+
+```{.python}
+# Tell Me What You Don't Know: asking about uncertainty widens intervals.
+import numpy as np
+import matplotlib.pyplot as plt
+
+k = 0.5       # overconfidence factor (1 = calibrated)
+prompt = 0.6  # how much the question helps
+rng = np.random.default_rng(49)
+
+k_after = k + prompt * (1 - k)
+sigma = np.exp(rng.normal(0, 0.5, 200))  # real uncertainty of 200 questions
+truth = rng.normal(0, sigma)             # error of the expert's best guess
+cover_before = np.abs(truth) < 1.645 * k * sigma      # stated 90% interval
+cover_after = np.abs(truth) < 1.645 * k_after * sigma  # after the question
+print(f"Coverage of stated 90% intervals: initial "
+      f"{100 * cover_before.mean():.0f}%, after \"tell me what you don't "
+      f"know\" {100 * cover_after.mean():.0f}%")
+
+q = np.arange(50)
+plt.vlines(q, -1.645 * k_after * sigma[q], 1.645 * k_after * sigma[q],
+           color="#2166ac", linewidth=3, label="After the question")
+plt.vlines(q, -1.645 * k * sigma[q], 1.645 * k * sigma[q],
+           color="#d6604d", linewidth=2, label="Initial")
+plt.scatter(q, truth[q], s=10, color="black", zorder=3)
+plt.xlabel("Question")
+plt.ylabel("Error")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

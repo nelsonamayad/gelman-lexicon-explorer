@@ -52,7 +52,7 @@ viewof seed = Inputs.range([1, 500], {value: 109, step: 1, label: "Random seed"}
 
 ```{ojs}
 {
-  const words = [["RED", "#2166ac"], ["GREEN", "#d6604d"], ["BLUE", "#1a9850"], ["YELLOW", "#984ea3"], ["PURPLE", "#e6ab02"], ["BLUE", "#d6604d"]];
+  const words = [["RED", "#2166ac"], ["GREEN", "#d6604d"], ["BLUE", "#1a9850"], ["YELLOW", "#984ea3"], ["PURPLE", "#b8860b"], ["BLUE", "#d6604d"]];
   return html`<div style="font-size: 1.8rem; font-weight: 700; letter-spacing: 0.05em; display:flex; gap:1rem; flex-wrap:wrap; margin: 0.5rem 0 1rem;">
     ${words.map(([w, c]) => html`<span style="color:${bw ? "currentColor" : c}">${w}</span>`)}
   </div>`;
@@ -96,6 +96,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
 
@@ -103,7 +109,7 @@ viewof bw = Inputs.toggle({label: "Print in black and white", value: false})
 viewof seed = Inputs.range([1, 500], {value: 109, step: 1, label: "Random seed"})
 
 {
-  const words = [["RED", "#2166ac"], ["GREEN", "#d6604d"], ["BLUE", "#1a9850"], ["YELLOW", "#984ea3"], ["PURPLE", "#e6ab02"], ["BLUE", "#d6604d"]];
+  const words = [["RED", "#2166ac"], ["GREEN", "#d6604d"], ["BLUE", "#1a9850"], ["YELLOW", "#984ea3"], ["PURPLE", "#b8860b"], ["BLUE", "#d6604d"]];
   return html`<div style="font-size: 1.8rem; font-weight: 700; letter-spacing: 0.05em; display:flex; gap:1rem; flex-wrap:wrap; margin: 0.5rem 0 1rem;">
     ${words.map(([w, c]) => html`<span style="color:${bw ? "currentColor" : c}">${w}</span>`)}
   </div>`;
@@ -129,6 +135,66 @@ Plot.plot({
   marks: [Plot.rectY(stroop, Plot.binX({y: "count"}, {x: "rt", fill: "cond", fillOpacity: 0.55, thresholds: 50, mixBlendMode: "multiply"})), Plot.ruleY([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The worst visual display of all time: the Stroop test in black and white.
+bw <- FALSE # print in black and white? # <1>
+set.seed(109) # <2>
+
+# Reaction times (ms). Ink that conflicts with the word slows reading,
+# but only if the reader can see the colors.
+trial <- function(incongruent) {
+  base <- rlnorm(400, log(600), 0.15)
+  base + if (incongruent && !bw) rnorm(400, 120, 40) else 0 # <3>
+}
+congruent <- trial(FALSE)
+incongruent <- trial(TRUE)
+cat("Interference effect (incongruent minus congruent): ",
+  round(mean(incongruent) - mean(congruent)), " ms\n",
+  sep = ""
+)
+
+boxplot(list(Congruent = congruent, Incongruent = incongruent), # <4>
+  col = c("grey70", if (bw) "grey70" else "#d6604d"),
+  ylab = "Reaction time (ms)"
+)
+```
+1. The page's control: whether the test is printed in black and white.
+2. Fixes the random numbers so the run is reproducible.
+3. The Stroop interference: conflicting ink slows the reader, but only if the reader can see the colors.
+4. Reaction times for congruent and incongruent words. In black and white the effect vanishes, and the display can't do its one job.
+
+## Python {.unlisted}
+
+```{.python}
+# The worst visual display of all time: the Stroop test in black and white.
+import numpy as np
+import matplotlib.pyplot as plt
+
+bw = False  # print in black and white?
+rng = np.random.default_rng(109)
+
+
+# Reaction times (ms). Ink that conflicts with the word slows reading,
+# but only if the reader can see the colors.
+def trial(incongruent):
+    base = rng.lognormal(np.log(600), 0.15, 400)
+    return base + (rng.normal(120, 40, 400) if incongruent and not bw else 0)
+
+
+congruent, incongruent = trial(False), trial(True)
+print(f"Interference effect (incongruent minus congruent): "
+      f"{incongruent.mean() - congruent.mean():.0f} ms")
+
+plt.boxplot([congruent, incongruent])
+plt.xticks([1, 2], ["Congruent", "Incongruent"])
+plt.ylabel("Reaction time (ms)")
+plt.show()
+```
+
+:::
 
 </details>
 

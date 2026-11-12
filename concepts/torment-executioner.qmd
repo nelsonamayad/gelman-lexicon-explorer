@@ -49,7 +49,7 @@ A toy synonym spinner with a small dictionary. Spin some technical phrases and s
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -92,8 +92,14 @@ html`<div class="sim-readout">${md`At p = ${p}, a two-word term survives **${pct
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof p = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Probability each word is swapped"})
 viewof seed = Inputs.range([1, 500], {value: 130, step: 1, label: "Random seed (spin again)"})
@@ -117,6 +123,84 @@ Plot.plot({
   marks: [Plot.line(range(6).map(k => ({k: k + 1, s: (1 - p) ** (k + 1)})), {x: "k", y: "s", stroke: "#2166ac", strokeWidth: 2, marker: "circle"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Torment executioner: what a paraphrasing tool does to technical terms.
+p <- 0.6 # probability each word is swapped # <1>
+set.seed(130) # <2>
+
+synonyms <- c( # <3>
+  pain = "torment", killer = "executioners",
+  intensity = "concentration", repetitive = "tedious",
+  movements = "developments", artificial = "counterfeit",
+  intelligence = "consciousness", deep = "profound",
+  big = "colossal", data = "information", random = "irregular",
+  forest = "woodland", network = "organization",
+  mean = "normal", error = "blunder", signal = "flag",
+  noise = "commotion"
+)
+phrases <- c(
+  "pain killer", "intensity of pain", "repetitive movements",
+  "artificial intelligence", "deep learning", "big data",
+  "random forest", "neural network", "mean square error",
+  "signal to noise"
+)
+spin <- function(ph) { # <4>
+  w <- strsplit(ph, " ")[[1]]
+  swap <- w %in% names(synonyms) & runif(length(w)) < p
+  w[swap] <- synonyms[w[swap]]
+  paste(w, collapse = " ")
+}
+spun <- sapply(phrases, spin) # <5>
+print(data.frame(term = phrases, spun = unname(spun)), row.names = FALSE)
+cat("A two-word term survives intact ", round(100 * (1 - p)^2),
+  "% of the time\n",
+  sep = ""
+)
+```
+1. The page's control: the probability that the spinner swaps each word.
+2. Fixes the random numbers so the run is reproducible.
+3. A small synonym dictionary of the kind a paraphrasing tool uses. Pain killer becomes torment executioner.
+4. The spinner: swap each word it knows with its synonym, with probability p.
+5. Ten technical phrases after spinning. A k-word term survives only if every word is left alone, so longer terms are mangled more often.
+
+## Python {.unlisted}
+
+```{.python}
+# Torment executioner: what a paraphrasing tool does to technical terms.
+import numpy as np
+
+p = 0.6  # probability each word is swapped
+rng = np.random.default_rng(130)
+
+synonyms = {"pain": "torment", "killer": "executioners",
+            "intensity": "concentration", "repetitive": "tedious",
+            "movements": "developments", "artificial": "counterfeit",
+            "intelligence": "consciousness", "deep": "profound",
+            "big": "colossal", "data": "information", "random": "irregular",
+            "forest": "woodland", "network": "organization",
+            "mean": "normal", "error": "blunder", "signal": "flag",
+            "noise": "commotion"}
+phrases = ["pain killer", "intensity of pain", "repetitive movements",
+           "artificial intelligence", "deep learning", "big data",
+           "random forest", "neural network", "mean square error",
+           "signal to noise"]
+
+
+def spin(phrase):
+    return " ".join(synonyms[w] if w in synonyms and rng.uniform() < p
+                    else w for w in phrase.split())
+
+
+for ph in phrases:
+    print(f"{ph:25s} -> {spin(ph)}")
+print(f"A two-word term survives intact {100 * (1 - p) ** 2:.0f}% of "
+      "the time")
+```
+
+:::
 
 </details>
 

@@ -83,7 +83,7 @@ Plot.plot({
   y: {label: "Outcome y", grid: true},
   color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Control", "Treated"]},
   marks: [
-    Plot.rect([0], {x1: results.lo, x2: results.hi, y1: -4, y2: 14, fill: "#999", fillOpacity: 0.1}),
+    Plot.rect([0], {x1: results.lo, x2: results.hi, y1: -4, y2: 14, fill: "#8a8a8a", fillOpacity: 0.1}),
     Plot.dot(obs, {x: "x", y: "y", stroke: "group", r: 2, strokeOpacity: 0.6}),
     Plot.text([0], {x: (results.lo + results.hi) / 2, y: 13.5, text: () => "common support"})
   ]
@@ -99,6 +99,12 @@ html`<div class="sim-readout">${md`Naive linear regression on all units: estimat
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, ols, fmt} from "../js/stats.js"
@@ -134,12 +140,94 @@ Plot.plot({
   y: {label: "Outcome y", grid: true},
   color: {legend: true, range: ["#d6604d", "#2166ac"], domain: ["Control", "Treated"]},
   marks: [
-    Plot.rect([0], {x1: results.lo, x2: results.hi, y1: -4, y2: 14, fill: "#999", fillOpacity: 0.1}),
+    Plot.rect([0], {x1: results.lo, x2: results.hi, y1: -4, y2: 14, fill: "#8a8a8a", fillOpacity: 0.1}),
     Plot.dot(obs, {x: "x", y: "y", stroke: "group", r: 2, strokeOpacity: 0.6}),
     Plot.text([0], {x: (results.lo + results.hi) / 2, y: 13.5, text: () => "common support"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# WWJD (What would Jennifer Hill do?): restrict to the region of overlap.
+separation <- 2 # covariate gap between groups # <1>
+curvature <- 0.5 # nonlinearity in the outcome
+set.seed(6) # <2>
+
+z <- rbinom(600, 1, 0.5)
+x <- ifelse(z == 1, rnorm(600, separation, 0.6), rnorm(600, 0, 1.2)) # <3>
+y <- curvature * x^2 + 1 * z + rnorm(600) # true treatment effect: 1
+
+naive <- coef(lm(y ~ z + x))[["z"]] # <4>
+lo <- max(tapply(x, z, min))
+hi <- min(tapply(x, z, max))
+cs <- x >= lo & x <= hi # common support # <5>
+restricted <- coef(lm(y ~ z + x + I(x^2), subset = cs))[["z"]] # <6>
+cat("Naive linear regression, all units: ", round(naive, 2), "\n",
+  "Overlap only (", sum(cs), " units), with a quadratic: ",
+  round(restricted, 2), "\nTrue effect: 1\n",
+  sep = ""
+)
+
+plot(x, y, # <7>
+  pch = 19, cex = 0.5, col = ifelse(z == 1, "#d6604d", "#2166ac"),
+  xlab = "Covariate x", ylab = "Outcome y"
+)
+rect(lo, -100, hi, 100, col = adjustcolor("grey", 0.2), border = NA)
+legend("topleft", c("Treated", "Control"),
+  pch = 19,
+  col = c("#d6604d", "#2166ac"), bty = "n"
+)
+```
+1. The page's controls: how far apart the treated and control groups sit on the covariate, and how curved the outcome is.
+2. Fixes the random numbers so the run is reproducible.
+3. Treated units cluster at high values of the covariate; controls spread more widely.
+4. The naive answer: a linear regression on everyone, which extrapolates into regions where one group has no data.
+5. The WWJD check: where do both groups have data?
+6. The answer restricted to that region, with a flexible fit.
+7. The data with the region of common support shaded.
+
+## Python {.unlisted}
+
+```{.python}
+# WWJD (What would Jennifer Hill do?): restrict to the region of overlap.
+import numpy as np
+import matplotlib.pyplot as plt
+
+separation = 2   # covariate gap between groups
+curvature = 0.5  # nonlinearity in the outcome
+rng = np.random.default_rng(6)
+
+z = rng.binomial(1, 0.5, 600)
+x = np.where(z == 1, rng.normal(separation, 0.6, 600),
+             rng.normal(0, 1.2, 600))
+y = curvature * x ** 2 + 1 * z + rng.normal(size=600)  # true effect: 1
+
+
+def coef_z(cols, keep):  # OLS coefficient on z
+    X = np.column_stack([np.ones(keep.sum())] + [c[keep] for c in cols])
+    return np.linalg.lstsq(X, y[keep], rcond=None)[0][1]
+
+
+everyone = np.ones(600, dtype=bool)
+naive = coef_z([z, x], everyone)
+lo = max(x[z == 1].min(), x[z == 0].min())
+hi = min(x[z == 1].max(), x[z == 0].max())
+cs = (x >= lo) & (x <= hi)                 # common support
+restricted = coef_z([z, x, x ** 2], cs)
+print(f"Naive linear regression, all units: {naive:.2f}")
+print(f"Overlap only ({cs.sum()} units), with a quadratic: "
+      f"{restricted:.2f}\nTrue effect: 1")
+
+plt.axvspan(lo, hi, color="0.9")
+plt.scatter(x, y, s=6, c=np.where(z == 1, "#d6604d", "#2166ac"))
+plt.xlabel("Covariate x (shaded: overlap)")
+plt.ylabel("Outcome y")
+plt.show()
+```
+
+:::
 
 </details>
 

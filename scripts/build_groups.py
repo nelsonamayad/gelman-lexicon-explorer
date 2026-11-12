@@ -65,6 +65,23 @@ KINDS = [
      "Practical guidance for graphics, writing and analysis."),
 ]
 
+# Bootstrap Icons (https://icons.getbootstrap.com) for each theme and kind,
+# by slug. The home-page cards use them; keep the Themes and Kinds menus in
+# _quarto.yml's navbar in step by hand.
+ICONS = {
+    "noise-and-evidence": "soundwave",
+    "building-and-checking-models": "tools",
+    "causes-samples-populations": "people",
+    "showing-and-telling": "bar-chart-line",
+    "how-science-behaves": "mortarboard",
+    "thinking-about-statistics": "lightbulb",
+    "methods": "gear",
+    "principles": "compass",
+    "fallacies": "exclamation-triangle",
+    "laws-and-aphorisms": "quote",
+    "advice": "chat-left-text",
+}
+
 PUBLISHED = "2026-11-11"   # date these group pages were first published
 
 
@@ -121,7 +138,7 @@ def sync_entry(e, theme_slug, kind_slug):
     else:
         text = re.sub(r"^(Filed under .*)$", lambda m: m.group(1) + 2 * chr(10) + check,
                       text, count=1, flags=re.M)
-    text = sync_sim_code(text)
+    text = sync_sim_code(text, e["slug"])
     if text != e["text"]:
         open(e["path"], "w", encoding="utf-8").write(text)
 
@@ -131,13 +148,43 @@ SIM_END = "<!-- End of generated simulation code. -->"
 OJS_CELL_RE = re.compile(r"```\{ojs\}\n(.*?)```", re.S)
 
 
-def sync_sim_code(text):
+ANNOT_HEADER = "# Annotations"
+
+
+def split_annotations(script):
+    """Split an R script into its code and its Quarto code annotations.
+
+    The script marks lines with `# <1>`, `# <2>`, ... and ends with a trailer:
+
+        # Annotations
+        # 1. What the first marked line does.
+        # 2. ...
+
+    Returns (code, notes): the code without the trailer, and the trailer as a
+    Markdown ordered list that Quarto attaches to the code block
+    (https://quarto.org/docs/authoring/code-annotation.html). A script with no
+    trailer returns (script, "").
+    """
+    script = script.strip("\n")
+    i = script.rfind("\n" + ANNOT_HEADER + "\n")
+    if i < 0:
+        return script, ""
+    code, trailer = script[:i].rstrip("\n"), script[i + len(ANNOT_HEADER) + 2:]
+    items = re.findall(r"^# (\d+)\. (.*)$", trailer, re.M)
+    notes = "".join(f"{n}. {text.strip()}\n" for n, text in items)
+    return code, notes
+
+
+def sync_sim_code(text, slug):
     """One "Show simulation code" block per entry, after the simulation.
 
     Entry cells don't echo their code (concepts/_metadata.yml sets echo: false),
     so readers see the whole simulation in a single collapsible block instead
-    of one toggle per cell. The block is rebuilt from the OJS cells of the
-    "Simulated example" section, minus cell options and the readout cell.
+    of one toggle per cell. The block is a tabset: the OJS cells of the
+    "Simulated example" section (minus cell options and the readout cell),
+    plus the same simulation in R and Python from sims/r/<slug>.R and
+    sims/python/<slug>.py. The tabs share a group, so a reader's choice of
+    language carries over to every page.
     """
     start, end = text.find("## Simulated example"), text.find("## Key takeaways")
     if start < 0 or end < 0:
@@ -153,8 +200,21 @@ def sync_sim_code(text):
         cells.append("\n".join(lines).strip("\n"))
     if not cells:
         return text
+    tabs = [("Observable JS", "js", "\n\n".join(cells), "")]
+    for name, lang, path in [("R", "r", f"sims/r/{slug}.R"), ("Python", "python", f"sims/python/{slug}.py")]:
+        full = os.path.join(ROOT, path)
+        if slug and os.path.exists(full):
+            code, notes = split_annotations(open(full, encoding="utf-8").read())
+            tabs.append((name, lang, code, notes))
+    note = ""
+    if len(tabs) > 1:
+        note = ("The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation "
+                "draws random numbers, each language draws its own, so exact numbers differ slightly but show the "
+                "same pattern. The numbered markers in the R code are explained under it.\n\n")
+    body = "::: {.panel-tabset group=\"sim-language\"}\n\n" + "".join(
+        f"## {name} {{.unlisted}}\n\n```{{.{lang}}}\n{code}\n```\n{notes}\n" for name, lang, code, notes in tabs) + ":::\n\n"
     block = (SIM_START + "\n\n<details class=\"code-fold sim-code\">\n<summary>Show simulation code</summary>\n\n"
-             "```{.js}\n" + "\n\n".join(cells) + "\n```\n\n</details>\n\n" + SIM_END)
+             + note + body + "</details>\n\n" + SIM_END)
     if i >= 0:
         j = section.index(SIM_END, i) + len(SIM_END)
         section = section[:i] + block + section[j:]
@@ -277,15 +337,18 @@ def main():
     def esc(s):
         return s.replace("&", "&amp;").replace("<", "&lt;")
 
+    def icon(slug):
+        return f'<i class="bi bi-{ICONS[slug]} topic-icon" aria-hidden="true"></i>'
+
     cards = ["```{=html}", '<div class="topic-grid">']
     for name, slug, desc in THEMES:
         first = desc.split(". ")[0].rstrip(".") + "."
-        cards.append(f'<a class="topic-card" href="themes/{slug}.html"><span class="topic-name">{esc(name)}</span>'
+        cards.append(f'<a class="topic-card" href="themes/{slug}.html"><span class="topic-name">{icon(slug)}{esc(name)}</span>'
                      f'<span class="topic-count">{count(name)} entries</span><span class="topic-desc">{esc(first)}</span></a>')
     cards += ["</div>", "```"]
     kcards = ["```{=html}", '<div class="topic-grid kind-grid">']
     for name, slug, plural, desc in KINDS:
-        kcards.append(f'<a class="topic-card kind-card" href="kinds/{slug}.html"><span class="topic-name">{esc(plural)}</span>'
+        kcards.append(f'<a class="topic-card kind-card" href="kinds/{slug}.html"><span class="topic-name">{icon(slug)}{esc(plural)}</span>'
                       f'<span class="topic-count">{count(kind=name)} entries</span><span class="topic-desc">{esc(desc)}</span></a>')
     kcards += ["</div>", "```"]
     with open(os.path.join(ROOT, "_group-cards.md"), "w", encoding="utf-8") as f:

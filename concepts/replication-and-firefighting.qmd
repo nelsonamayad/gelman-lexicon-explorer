@@ -69,7 +69,7 @@ Plot.plot({
   height: 300,
   x: {label: "Year"},
   y: {label: "Stock of fragile published findings", grid: true},
-  color: {legend: true, range: ["#5aae61", "#d6604d"], domain: ["No suppression (controlled burns)", "Your suppression level"]},
+  color: {legend: true, range: ["#1a9850", "#d6604d"], domain: ["No suppression (controlled burns)", "Your suppression level"]},
   marks: [
     Plot.areaY(fire.rows, {x: "t", y: "fuel", fill: "label", fillOpacity: 0.25, z: "label"}),
     Plot.line(fire.rows, {x: "t", y: "fuel", stroke: "label", strokeWidth: 2}),
@@ -91,6 +91,12 @@ Plot.plot({
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, fmt} from "../js/stats.js"
@@ -120,7 +126,7 @@ Plot.plot({
   height: 300,
   x: {label: "Year"},
   y: {label: "Stock of fragile published findings", grid: true},
-  color: {legend: true, range: ["#5aae61", "#d6604d"], domain: ["No suppression (controlled burns)", "Your suppression level"]},
+  color: {legend: true, range: ["#1a9850", "#d6604d"], domain: ["No suppression (controlled burns)", "Your suppression level"]},
   marks: [
     Plot.areaY(fire.rows, {x: "t", y: "fuel", fill: "label", fillOpacity: 0.25, z: "label"}),
     Plot.line(fire.rows, {x: "t", y: "fuel", stroke: "label", strokeWidth: 2}),
@@ -129,6 +135,97 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Replication and firefighting: suppressing small fires feeds a big one.
+suppression <- 0.85 # suppression of routine criticism # <1>
+set.seed(139) # <2>
+
+crisis_year <- sample(30:55, 1) # when the crisis comes # <3>
+run <- function(sup) {
+  fuel <- 10
+  path <- numeric(61)
+  burned <- 0
+  for (t in 0:60) {
+    if (t == crisis_year) {
+      burned <- fuel
+      fuel <- 0
+    }
+    path[t + 1] <- fuel
+    fuel <- fuel + 20 - fuel * 0.25 * (1 - sup) # criticism burns 25%/yr # <4>
+  }
+  list(path = path, burned = burned)
+}
+yours <- run(suppression)
+open <- run(0)
+cat("Crisis in year ", crisis_year, ": it burns ", round(yours$burned),
+  " units of unexamined work with your suppression level, ",
+  round(open$burned), " with none\n",
+  sep = ""
+)
+
+matplot(0:60, cbind(yours$path, open$path), # <5>
+  type = "l", lty = 1, lwd = 2,
+  col = c("#d6604d", "#2166ac"), xlab = "Year",
+  ylab = "Unexamined work (fuel)"
+)
+abline(v = crisis_year, lty = 2)
+legend("topleft", c(
+  "Your suppression level",
+  "No suppression (controlled burns)"
+),
+col = c("#d6604d", "#2166ac"), lwd = 2, bty = "n"
+)
+```
+1. The page's control: how much routine criticism is suppressed.
+2. Fixes the random numbers so the run is reproducible.
+3. A replication crisis arrives at some point and burns all the unexamined work at once.
+4. Each year new work arrives and routine criticism burns off a share of the backlog, unless it is suppressed.
+5. Unexamined work over time. Suppressing the small fires lets the fuel build up for the big one.
+
+## Python {.unlisted}
+
+```{.python}
+# Replication and firefighting: suppressing small fires feeds a big one.
+import numpy as np
+import matplotlib.pyplot as plt
+
+suppression = 0.85  # suppression of routine criticism
+rng = np.random.default_rng(139)
+
+crisis_year = rng.integers(30, 56)  # when the crisis comes
+
+
+def run(sup):
+    fuel, path, burned = 10, [], 0
+    for t in range(61):
+        if t == crisis_year:
+            burned, fuel = fuel, 0
+        path.append(fuel)
+        fuel = fuel + 20 - fuel * 0.25 * (1 - sup)  # criticism burns 25%/yr
+    return path, burned
+
+
+yours, burned_yours = run(suppression)
+none, burned_none = run(0)
+print(f"Crisis in year {crisis_year}: it burns {burned_yours:.0f} units of "
+      f"unexamined work with your suppression level, {burned_none:.0f} "
+      "with none")
+
+plt.plot(yours, color="#d6604d", linewidth=2,
+         label="Your suppression level")
+plt.plot(none, color="#2166ac", linewidth=2,
+         label="No suppression (controlled burns)")
+plt.axvline(crisis_year, color="black", linestyle="--")
+plt.xlabel("Year")
+plt.ylabel("Unexamined work (fuel)")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

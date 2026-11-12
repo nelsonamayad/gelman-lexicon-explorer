@@ -21,33 +21,40 @@ A 2×2 experiment with `n` people in each cell and an outcome with standard devi
 
 ```{webr}
 set.seed(80)
-theta <- 0.4          # main effect, in standard-deviation units
-delta <- theta / 2    # interaction (difference of differences): half the main effect
+theta <- 0.4 # main effect, in standard-deviation units
+delta <- theta / 2 # interaction (difference of differences): half of theta
 
 # Cells in the order (a, b) = (0,0), (1,0), (0,1), (1,1), coded -1/2 and +1/2
-a  <- c(0, 1, 0, 1) - 0.5
-b  <- c(0, 0, 1, 1) - 0.5
-mu <- theta * a + delta * a * b   # true cell means: main effect theta, interaction delta
+a <- c(0, 1, 0, 1) - 0.5
+b <- c(0, 0, 1, 1) - 0.5
+mu <- theta * a + delta * a * b # true cell means
 
 power_at <- function(n, n_sims = 2000) {
   # Each row is one simulated study: the four observed cell means
-  m <- matrix(rnorm(4 * n_sims, sd = 1 / sqrt(n)), ncol = 4) + rep(mu, each = n_sims)
-  main  <- ((m[, 2] - m[, 1]) + (m[, 4] - m[, 3])) / 2   # se = 1 / sqrt(n)
-  inter <- (m[, 4] - m[, 3]) - (m[, 2] - m[, 1])         # se = 2 / sqrt(n)
-  c(main = mean(abs(main) > 1.96 / sqrt(n)),
-    interaction = mean(abs(inter) > 1.96 * 2 / sqrt(n)))
+  m <- matrix(rnorm(4 * n_sims, sd = 1 / sqrt(n)), ncol = 4) +
+    rep(mu, each = n_sims)
+  main <- ((m[, 2] - m[, 1]) + (m[, 4] - m[, 3])) / 2 # se = 1 / sqrt(n)
+  inter <- (m[, 4] - m[, 3]) - (m[, 2] - m[, 1]) # se = 2 / sqrt(n)
+  c(
+    main = mean(abs(main) > 1.96 / sqrt(n)),
+    interaction = mean(abs(inter) > 1.96 * 2 / sqrt(n))
+  )
 }
 
 ns <- c(10, 20, 40, 80, 160, 320, 640, 1280)
 pw <- sapply(ns, power_at)
 colnames(pw) <- ns
 
-matplot(ns, t(pw), type = "b", pch = 19, lty = 1, log = "x",
-        col = c("#d6604d", "#2166ac"), ylim = c(0, 1),
-        xlab = "People per cell (log scale)", ylab = "Power")
+matplot(ns, t(pw),
+  type = "b", pch = 19, lty = 1, log = "x",
+  col = c("#d6604d", "#2166ac"), ylim = c(0, 1),
+  xlab = "People per cell (log scale)", ylab = "Power"
+)
 abline(h = 0.8, lty = 2, col = "grey50")
-legend("bottomright", c("Main effect", "Interaction"), col = c("#d6604d", "#2166ac"),
-       pch = 19, lty = 1, bty = "n")
+legend("bottomright", c("Main effect", "Interaction"),
+  col = c("#d6604d", "#2166ac"),
+  pch = 19, lty = 1, bty = "n"
+)
 round(pw, 2)
 ```
 
@@ -57,7 +64,7 @@ The normal approximation gives the same answer without simulation. The interacti
 
 ```{webr}
 z <- qnorm(0.975) + qnorm(0.80)
-n_main <- (z * 1 / theta)^2   # people per cell, main effect
-n_int  <- (z * 2 / delta)^2   # people per cell, interaction
+n_main <- (z * 1 / theta)^2 # people per cell, main effect
+n_int <- (z * 2 / delta)^2 # people per cell, interaction
 round(c(main_effect = n_main, interaction = n_int, ratio = n_int / n_main), 1)
 ```

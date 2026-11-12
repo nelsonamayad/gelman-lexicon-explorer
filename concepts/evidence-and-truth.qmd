@@ -20,7 +20,7 @@ Source check: ✓ The explanation was checked against the source.
 
 ## What it is
 
-"Is this claim true?" and *Does this study provide good evidence for this claim?* are different questions. A claim can be true while a study supporting it is worthless. A study can give apparently strong evidence for a claim that is false. Criticizing the evidence is not the same as denying the claim, and defending the claim doesn't rescue bad evidence.
+*Is this claim true?* and *Does this study provide good evidence for this claim?* are different questions. A claim can be true while a study supporting it is worthless. A study can give apparently strong evidence for a claim that is false. Criticizing the evidence is not the same as denying the claim, and defending the claim doesn't rescue bad evidence.
 
 ## Why it matters
 
@@ -41,7 +41,7 @@ There are 3,000 claims. A fraction are true, and each comes with a study whose e
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -89,8 +89,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof pi = Inputs.range([0.05, 0.9], {value: 0.3, step: 0.05, label: "Share of claims that are true"})
 viewof signal = Inputs.range([0.5, 4], {value: 1.5, step: 0.1, label: "Typical evidence strength for true claims"})
@@ -118,6 +124,82 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Evidence and Truth: they're different.
+pi_true <- 0.3 # share of claims that are true # <1>
+signal <- 1.5 # typical evidence strength (z) for true claims
+set.seed(85) # <2>
+
+true_claim <- runif(3000) < pi_true
+z <- rnorm(3000, ifelse(true_claim, signal, 0), 1) # each claim's evidence # <3>
+strong <- z > 1.96 # <4>
+
+cat("Claims with strong evidence that are false: ",
+  round(100 * mean(!true_claim[strong])), "%\n",
+  sep = ""
+)
+cat("True claims with only weak evidence: ",
+  round(100 * mean(!strong[true_claim])), "%\n",
+  sep = ""
+)
+
+breaks <- seq(floor(min(z)), ceiling(max(z)), by = 0.25)
+hist(z[!true_claim], # <5>
+  breaks = breaks, col = adjustcolor("#d6604d", 0.5),
+  border = "white", main = "", xlab = "Strength of evidence (z)",
+  ylab = "Claims"
+)
+hist(z[true_claim],
+  breaks = breaks, col = adjustcolor("#2166ac", 0.5),
+  border = "white", add = TRUE
+)
+abline(v = 1.96, lty = 2)
+legend("topright", c("False claims", "True claims"),
+  fill = adjustcolor(c("#d6604d", "#2166ac"), 0.5), bty = "n"
+)
+```
+1. The page's controls: what share of claims are true, and how strong the evidence for a true claim typically is.
+2. Fixes the random numbers so the run is reproducible.
+3. Each claim's evidence: shifted upward if the claim is true, pure noise otherwise.
+4. Which claims have strong evidence, by the usual threshold.
+5. Evidence for false and for true claims overlaps. Strong evidence for a false claim and weak evidence for a true one both happen all the time.
+
+## Python {.unlisted}
+
+```{.python}
+# Evidence and Truth: they're different.
+import numpy as np
+import matplotlib.pyplot as plt
+
+pi_true = 0.3  # share of claims that are true
+signal = 1.5   # typical evidence strength (z) for true claims
+rng = np.random.default_rng(85)
+
+true_claim = rng.uniform(size=3000) < pi_true
+z = rng.normal(np.where(true_claim, signal, 0), 1)  # each claim's evidence
+strong = z > 1.96
+
+print(f"Claims with strong evidence that are false: "
+      f"{100 * np.mean(~true_claim[strong]):.0f}%")
+print(f"True claims with only weak evidence: "
+      f"{100 * np.mean(~strong[true_claim]):.0f}%")
+
+bins = np.arange(np.floor(z.min()), np.ceil(z.max()) + 0.25, 0.25)
+plt.hist(z[~true_claim], bins, color="#d6604d", alpha=0.5,
+         label="False claims")
+plt.hist(z[true_claim], bins, color="#2166ac", alpha=0.5,
+         label="True claims")
+plt.axvline(1.96, color="black", linestyle="--")
+plt.xlabel("Strength of evidence (z)")
+plt.ylabel("Claims")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

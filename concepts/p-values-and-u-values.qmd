@@ -101,6 +101,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
 
@@ -141,6 +147,93 @@ Plot.plot({
   color: {range: ["#2166ac", "#d6604d"]}
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# P-values and U-values: posterior predictive p-values are not uniform.
+stat <- "Sample maximum" # or "Sample mean", "Sample variance" # <1>
+n <- 20 # observations per dataset
+set.seed(12) # <2>
+
+T_stat <- switch(stat,
+  "Sample mean" = mean,
+  "Sample maximum" = max,
+  "Sample variance" = function(y) mean((y - mean(y))^2)
+)
+res <- t(replicate(1000, {
+  y <- rnorm(n, 0, 1)
+  ybar <- mean(y) # data from the true model
+  classical <- 1 - pnorm(ybar * sqrt(n)) # a u-value: uniform # <3>
+  th <- rnorm(200, ybar, 1 / sqrt(n)) # posterior, flat prior # <4>
+  yrep <- matrix(rnorm(200 * n, th, 1), 200) # replicated datasets
+  ppp <- mean(apply(yrep, 1, T_stat) >= T_stat(y)) # <5>
+  c(classical = classical, ppp = ppp)
+}))
+extreme <- colMeans(res < 0.05 | res > 0.95)
+cat("Share of p-values below 0.05 or above 0.95 (uniform: 10%):\n",
+  "classical ", round(100 * extreme[1]), "%, posterior predictive ",
+  round(100 * extreme[2]), "%\n",
+  sep = ""
+)
+
+par(mfrow = c(1, 2)) # <6>
+hist(res[, 1],
+  breaks = 20, col = "grey70", border = "white",
+  main = "Classical p-value", xlab = "p"
+)
+hist(res[, 2],
+  breaks = 20, col = "#2166ac", border = "white",
+  main = "Posterior predictive p-value", xlab = "p"
+)
+```
+1. The page's controls: the test statistic and the observations per dataset.
+2. Fixes the random numbers so the run is reproducible.
+3. A classical p-value, computed from the sampling distribution of the mean. Under the true model it is uniform: a u-value.
+4. Draws from the posterior, with a flat prior.
+5. The posterior predictive p-value: how often a replicated dataset's statistic exceeds the observed one. It need not be uniform.
+6. The two histograms. The classical one is flat; the posterior predictive one piles up in the middle, because the data were used twice.
+
+## Python {.unlisted}
+
+```{.python}
+# P-values and U-values: posterior predictive p-values are not uniform.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+stat = "Sample maximum"  # or "Sample mean", "Sample variance"
+n = 20                   # observations per dataset
+rng = np.random.default_rng(12)
+
+T = {"Sample mean": lambda y: y.mean(axis=-1),
+     "Sample maximum": lambda y: y.max(axis=-1),
+     "Sample variance": lambda y: y.var(axis=-1)}[stat]
+y = rng.normal(0, 1, (1000, n))  # 1000 datasets from the true model
+ybar = y.mean(axis=1)
+classical = 1 - np.array([NormalDist().cdf(v) for v in ybar * np.sqrt(n)])
+th = rng.normal(ybar[:, None], 1 / np.sqrt(n), (1000, 200))  # posterior
+yrep = rng.normal(th[:, :, None], 1, (1000, 200, n))  # replicated datasets
+ppp = np.mean(T(yrep) >= T(y)[:, None], axis=1)
+
+
+def extreme(p):
+    return 100 * np.mean((p < 0.05) | (p > 0.95))
+
+
+print("Share of p-values below 0.05 or above 0.95 (uniform: 10%):")
+print(f"classical {extreme(classical):.0f}%, posterior predictive "
+      f"{extreme(ppp):.0f}%")
+
+fig, ax = plt.subplots(1, 2, sharey=True)
+ax[0].hist(classical, bins=20, color="0.7")
+ax[0].set_title("Classical p-value")
+ax[1].hist(ppp, bins=20, color="#2166ac")
+ax[1].set_title("Posterior predictive p-value")
+plt.show()
+```
+
+:::
 
 </details>
 

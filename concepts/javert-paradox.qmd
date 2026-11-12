@@ -36,7 +36,7 @@ Vary how responsive authors are and how tolerant the community is. Look for a pe
 
 ```{ojs}
 //| echo: false
-import {range, fmt, pct} from "../js/stats.js"
+import {range} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -63,7 +63,7 @@ Plot.plot({
   marks: [
     Plot.line(javert, {x: "e", y: "corrected", stroke: () => "Error gets corrected", strokeWidth: 2}),
     Plot.line(javert, {x: "e", y: "obsessive", stroke: () => "Critic seen as Javert", strokeWidth: 2}),
-    Plot.areaY(javert, {x: "e", y1: 0, y2: d => Math.min(d.corrected, 1 - d.obsessive), fill: "#5aae61", fillOpacity: 0.2})
+    Plot.areaY(javert, {x: "e", y1: 0, y2: d => Math.min(d.corrected, 1 - d.obsessive), fill: "#1a9850", fillOpacity: 0.2})
   ]
 })
 ```
@@ -81,8 +81,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {range, fmt, pct} from "../js/stats.js"
+import {range} from "../js/stats.js"
 
 viewof responsiveness = Inputs.range([0.01, 0.5], {value: 0.06, step: 0.01, label: "Author responsiveness to each push"})
 viewof tolerance = Inputs.range([1, 15], {value: 4, step: 0.5, label: "Community tolerance before 'obsessive'"})
@@ -103,10 +109,79 @@ Plot.plot({
   marks: [
     Plot.line(javert, {x: "e", y: "corrected", stroke: () => "Error gets corrected", strokeWidth: 2}),
     Plot.line(javert, {x: "e", y: "obsessive", stroke: () => "Critic seen as Javert", strokeWidth: 2}),
-    Plot.areaY(javert, {x: "e", y1: 0, y2: d => Math.min(d.corrected, 1 - d.obsessive), fill: "#5aae61", fillOpacity: 0.2})
+    Plot.areaY(javert, {x: "e", y1: 0, y2: d => Math.min(d.corrected, 1 - d.obsessive), fill: "#1a9850", fillOpacity: 0.2})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Javert Paradox: persistent enough to work, not so much as to be Javert.
+responsiveness <- 0.06 # how much each push moves the authors # <1>
+tolerance <- 4 # pushes the community tolerates before "obsessive"
+# Deterministic: no random numbers.
+
+pushes <- 0:20
+corrected <- 1 - exp(-responsiveness * pushes^2 / 4) # chance of a fix # <2>
+obsessive <- plogis(pushes - tolerance) # seen as a Javert # <3>
+sweet <- pushes[corrected > 0.5 & obsessive < 0.5] # <4>
+
+if (length(sweet)) {
+  cat("Sweet spot:", min(sweet), "to", max(sweet), "pushes\n")
+} else {
+  cat("No persistence level works without looking like Javert\n")
+}
+
+matplot(pushes, cbind(corrected, obsessive), # <5>
+  type = "l", lty = 1, lwd = 2,
+  col = c("#2166ac", "#d6604d"), xlab = "Times the critic pushes",
+  ylab = "Probability"
+)
+abline(h = 0.5, lty = 2)
+legend("right", c("Error gets corrected", "Critic seen as obsessive"),
+  col = c("#2166ac", "#d6604d"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: how much each push moves the authors, and how many pushes the community tolerates. There is no seed: the model is deterministic.
+2. The chance that the error gets corrected, which rises slowly with persistence.
+3. The chance that the critic is seen as a Javert, which rises past the community's tolerance.
+4. The sweet spot, if any: persistence that probably works without looking obsessive.
+5. Both curves. When they cross before correction becomes likely, no level of persistence is both effective and respectable.
+
+## Python {.unlisted}
+
+```{.python}
+# The Javert Paradox: persistent enough to work, not so much as to be Javert.
+import numpy as np
+import matplotlib.pyplot as plt
+
+responsiveness = 0.06  # how much each push moves the authors
+tolerance = 4          # pushes the community tolerates before "obsessive"
+# Deterministic: no random numbers.
+
+pushes = np.arange(21)
+corrected = 1 - np.exp(-responsiveness * pushes ** 2 / 4)  # chance of a fix
+obsessive = 1 / (1 + np.exp(-(pushes - tolerance)))       # seen as Javert
+sweet = pushes[(corrected > 0.5) & (obsessive < 0.5)]
+
+if sweet.size:
+    print(f"Sweet spot: {sweet.min()} to {sweet.max()} pushes")
+else:
+    print("No persistence level works without looking like Javert")
+
+plt.plot(pushes, corrected, color="#2166ac", linewidth=2,
+         label="Error gets corrected")
+plt.plot(pushes, obsessive, color="#d6604d", linewidth=2,
+         label="Critic seen as obsessive")
+plt.axhline(0.5, color="black", linestyle="--")
+plt.xlabel("Times the critic pushes")
+plt.ylabel("Probability")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -36,7 +36,7 @@ There are ten candidate predictors, all with zero true effect, and the analysis 
 
 ```{ojs}
 //| echo: false
-import {rng, range, ols, fmt} from "../js/stats.js"
+import {rng, range, ols} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -83,8 +83,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, ols, fmt} from "../js/stats.js"
+import {rng, range, ols} from "../js/stats.js"
 
 viewof n = Inputs.range([30, 500], {value: 80, step: 10, label: "Observations per dataset"})
 viewof realEffect = Inputs.range([0, 0.5], {value: 0, step: 0.05, label: "True effect of predictor #1 (others zero)"})
@@ -109,6 +115,71 @@ Plot.plot({
   marks: [Plot.cell(grid, {x: "pred", y: "rep", fill: d => d.sig ? (d.est > 0 ? "#2166ac" : "#d6604d") : "#f0f0f0", inset: 1})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Random in, random out: regressions on pure noise still find "effects".
+n <- 80 # observations per dataset # <1>
+real_effect <- 0 # true effect of predictor 1 (the others are zero)
+set.seed(79) # <2>
+
+# 25 datasets, each a regression of y on 10 predictors
+sig <- t(replicate(25, {
+  X <- matrix(rnorm(n * 10), n) # <3>
+  y <- real_effect * X[, 1] + rnorm(n)
+  tab <- summary(lm(y ~ X))$coefficients[-1, ]
+  abs(tab[, 1] / tab[, 2]) > 1.96 # <4>
+}))
+cat(sum(rowSums(sig) > 0), " of 25 datasets have at least one ",
+  "'significant' predictor\nPredictor 1 is significant in ",
+  sum(sig[, 1]), " of 25\n",
+  sep = ""
+)
+
+image(1:10, 1:25, t(sig), # <5>
+  col = c("grey90", "#d6604d"),
+  xlab = "Predictor", ylab = "Dataset"
+)
+```
+1. The page's controls: observations per dataset and the true effect of the first predictor (the rest are zero).
+2. Fixes the random numbers so the run is reproducible.
+3. Ten predictors that are pure noise.
+4. Which predictors come out significant in each dataset.
+5. A grid of 25 datasets by 10 predictors. Something is significant in most datasets, and it is a different something each time.
+
+## Python {.unlisted}
+
+```{.python}
+# Random in, random out: regressions on pure noise still find "effects".
+import numpy as np
+import matplotlib.pyplot as plt
+
+n = 80           # observations per dataset
+real_effect = 0  # true effect of predictor 1 (the others are zero)
+rng = np.random.default_rng(79)
+
+# 25 datasets, each a regression of y on 10 predictors
+sig = np.zeros((25, 10), dtype=bool)
+for rep in range(25):
+    X = np.column_stack([np.ones(n), rng.normal(size=(n, 10))])
+    y = real_effect * X[:, 1] + rng.normal(size=n)
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    s2 = np.sum((y - X @ beta) ** 2) / (n - 11)
+    se = np.sqrt(s2 * np.diag(np.linalg.inv(X.T @ X)))
+    sig[rep] = np.abs(beta / se)[1:] > 1.96
+print(f"{np.sum(sig.any(axis=1))} of 25 datasets have at least one "
+      f"'significant' predictor\nPredictor 1 is significant in "
+      f"{sig[:, 0].sum()} of 25")
+
+plt.imshow(sig, cmap="Reds", aspect="auto", vmin=0, vmax=1.5,
+           extent=[0.5, 10.5, 25.5, 0.5])
+plt.xlabel("Predictor")
+plt.ylabel("Dataset")
+plt.show()
+```
+
+:::
 
 </details>
 

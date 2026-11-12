@@ -36,7 +36,7 @@ There are 1,000 people. Compare how much height actually predicts an outcome wit
 
 ```{ojs}
 //| echo: false
-import {rng, range, lm, cor, fmt} from "../js/stats.js"
+import {rng, range, cor, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -76,8 +76,14 @@ html`<div class="sim-readout">${md`Correlation of height with the actual outcome
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, lm, cor, fmt} from "../js/stats.js"
+import {rng, range, cor, fmt} from "../js/stats.js"
 
 viewof realSlope = Inputs.range([0, 0.5], {value: 0.1, step: 0.01, label: "Real association: outcome per sd of height"})
 viewof perceived = Inputs.range([0, 1.5], {value: 0.8, step: 0.05, label: "Perceived importance per sd of height"})
@@ -100,6 +106,71 @@ ${Plot.plot({
   ariaDescription: "Horizontal axis: Height (sd). Vertical axis: Felt importance. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 320, height: 260, title: "What height makes people feel", grid: true, x: {label: "Height (sd)"}, y: {label: "Felt importance", domain: [-4, 4]}, marks: [Plot.dot(tall, {x: "h", y: "feel", r: 1.5, fill: "#d6604d", fillOpacity: 0.4}), Plot.linearRegressionY(tall, {x: "h", y: "feel", stroke: "#d6604d"})]})}
 </div>`
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Tall-Person Syndrome: the view from up there exaggerates the advantage.
+real_slope <- 0.1 # real association: outcome per sd of height # <1>
+perceived <- 0.8 # perceived importance per sd of height
+set.seed(110) # <2>
+
+h <- rnorm(1000)
+outcome <- real_slope * h + rnorm(1000) # <3>
+feel <- perceived * h + rnorm(1000, 0, 0.5) # <4>
+cat("Correlation of height with the actual outcome: ",
+  round(cor(h, outcome), 2), "\nWith felt importance: ",
+  round(cor(h, feel), 2), "\n",
+  sep = ""
+)
+
+par(mfrow = c(1, 2)) # <5>
+plot(h, outcome,
+  pch = 19, cex = 0.4, col = "#2166ac", main = "Reality",
+  xlab = "Height (sd)", ylab = "Outcome"
+)
+abline(lm(outcome ~ h), lwd = 2)
+plot(h, feel,
+  pch = 19, cex = 0.4, col = "#d6604d", main = "How it feels",
+  xlab = "Height (sd)", ylab = "Felt importance"
+)
+abline(lm(feel ~ h), lwd = 2)
+```
+1. The page's controls: the real association of height with the outcome, and how important height feels from up there.
+2. Fixes the random numbers so the run is reproducible.
+3. Reality: a small association.
+4. How it feels: a large one, because the tall person notices every time height mattered.
+5. Reality beside the feeling.
+
+## Python {.unlisted}
+
+```{.python}
+# Tall-Person Syndrome: the view from up there exaggerates the advantage.
+import numpy as np
+import matplotlib.pyplot as plt
+
+real_slope = 0.1  # real association: outcome per sd of height
+perceived = 0.8   # perceived importance per sd of height
+rng = np.random.default_rng(110)
+
+h = rng.normal(size=1000)
+outcome = real_slope * h + rng.normal(size=1000)
+feel = perceived * h + rng.normal(0, 0.5, 1000)
+print(f"Correlation of height with the actual outcome: "
+      f"{np.corrcoef(h, outcome)[0, 1]:.2f}")
+print(f"With felt importance: {np.corrcoef(h, feel)[0, 1]:.2f}")
+
+fig, ax = plt.subplots(1, 2, figsize=(9, 4), sharex=True)
+ax[0].scatter(h, outcome, s=4, color="#2166ac")
+ax[0].set_title("Reality")
+ax[1].scatter(h, feel, s=4, color="#d6604d")
+ax[1].set_title("How it feels")
+for a in ax:
+    a.set_xlabel("Height (sd)")
+plt.show()
+```
+
+:::
 
 </details>
 
