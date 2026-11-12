@@ -1,14 +1,14 @@
 ---
 title: "The transitive property of money"
 date: 2026-11-11
-description: "Many of the tech lords are actually tech investors; they've absorbed the prestige of information science through the transitive property of money."
+description: "This is how tech investors have absorbed the prestige of information science."
 order: 155
 theme: "How science behaves"
 kind: "Law or aphorism"
 categories: ["How science behaves", "Law or aphorism"]
 source: "https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/"
 verified: true
-source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list."
+source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
@@ -16,7 +16,7 @@ Entry **#155** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeli
 
 Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
 
-Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list.
+Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026.
 :::
 
 ## What it is

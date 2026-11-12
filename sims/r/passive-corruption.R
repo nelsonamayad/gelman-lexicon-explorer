@@ -20,11 +20,11 @@ print(round(100 * share[41, ]))
 
 matplot(0:40, share, # <4>
   type = "l", lty = 1, lwd = 2, ylim = c(0, 1),
-  col = c("#2166ac", "#d6604d", "#4daf4a"), xlab = "Year",
+  col = c("#2166ac", "#d6604d", "#1a9850"), xlab = "Year",
   ylab = "Share of the field that is bad work"
 )
 legend("topleft", colnames(share),
-  col = c("#2166ac", "#d6604d", "#4daf4a"),
+  col = c("#2166ac", "#d6604d", "#1a9850"),
   lwd = 2, bty = "n"
 )
 

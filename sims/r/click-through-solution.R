@@ -12,7 +12,7 @@ cities <- data.frame( # <3>
   region = sample(c("North", "South", "Coast"), 12, replace = TRUE)
 )
 cities$y2025 <- cities$y2015 + rnorm(12, 5, 8)
-cols <- c(North = "#2166ac", South = "#d6604d", Coast = "#4daf4a")
+cols <- c(North = "#2166ac", South = "#d6604d", Coast = "#1a9850")
 
 if (layer == 1) { # bubbles: eye-catching, hard to compare # <4>
   plot(runif(12), runif(12),

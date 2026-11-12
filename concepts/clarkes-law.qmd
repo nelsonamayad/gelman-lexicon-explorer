@@ -155,7 +155,7 @@ fail <- sapply( # <5>
 print(round(100 * fail)) # GRIM failure rates (%)
 
 barplot(fail, # <6>
-  col = c("#2166ac", "#e6ab02", "#d6604d"), ylim = c(0, 1),
+  col = c("#2166ac", "#b8860b", "#d6604d"), ylim = c(0, 1),
   ylab = "Share of means that fail the GRIM test"
 )
 ```
@@ -202,7 +202,7 @@ fail = [1 - report(k) for k in kinds]
 for k, f in zip(kinds, fail):
     print(f"{k}: {100 * f:.0f}% fail the GRIM test")
 
-plt.bar(kinds, fail, color=["#2166ac", "#e6ab02", "#d6604d"])
+plt.bar(kinds, fail, color=["#2166ac", "#b8860b", "#d6604d"])
 plt.ylim(0, 1)
 plt.ylabel("Share of means that fail the GRIM test")
 plt.show()

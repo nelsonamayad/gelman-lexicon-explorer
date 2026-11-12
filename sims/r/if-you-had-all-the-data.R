@@ -27,7 +27,7 @@ hist(effect, # <7>
   breaks = 50, col = "#2166ac", border = "white", main = "",
   xlab = "Individual treatment effect", ylab = "People"
 )
-abline(v = estimands[1:3], col = c("black", "#d6604d", "#e6ab02"), lwd = 2)
+abline(v = estimands[1:3], col = c("black", "#d6604d", "#b8860b"), lwd = 2)
 abline(v = rct, lty = 2)
 
 # Annotations

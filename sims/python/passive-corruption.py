@@ -16,7 +16,7 @@ def run(s):
 
 share = {"Your setting": run(speak), "Total silence": run(0),
          "Active correction": run(0.3)}
-for (k, v), c in zip(share.items(), ["#2166ac", "#d6604d", "#4daf4a"]):
+for (k, v), c in zip(share.items(), ["#2166ac", "#d6604d", "#1a9850"]):
     print(f"{k}: {100 * v[-1]:.0f}% bad work after 40 years")
     plt.plot(v, color=c, linewidth=2, label=k)
 plt.ylim(0, 1)

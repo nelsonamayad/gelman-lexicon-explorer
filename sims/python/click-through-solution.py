@@ -11,7 +11,7 @@ names = ["Avalon", "Brookfield", "Cedar Falls", "Dunmore", "Eastport",
 y2015 = rng.uniform(20, 80, 12)
 region = rng.choice(["North", "South", "Coast"], 12)
 y2025 = y2015 + rng.normal(5, 8, 12)
-cols = {"North": "#2166ac", "South": "#d6604d", "Coast": "#4daf4a"}
+cols = {"North": "#2166ac", "South": "#d6604d", "Coast": "#1a9850"}
 colors = [cols[r] for r in region]
 
 if layer == 1:    # bubbles: eye-catching, hard to compare

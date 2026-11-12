@@ -23,7 +23,7 @@ cat("Truly outshines ", round(100 * true_pct), "% of rivals; appears to ",
 )
 
 plot(visible, apparent, # <6>
-  type = "l", lwd = 3, col = "#e6ab02",
+  type = "l", lwd = 3, col = "#b8860b",
   xlim = c(1, 0.05), ylim = c(0, 1),
   xlab = "Share of rival lights left uncovered",
   ylab = "Share of visible rivals it outshines"

@@ -14,7 +14,7 @@ cat(
   round(coef(lm(y ~ x + clinic))[["x"]], 2), "\n"
 )
 
-cols <- c("#2166ac", "#d6604d", "#5aae61")
+cols <- c("#2166ac", "#d6604d", "#1a9850")
 plot(x, y, # <4>
   pch = 19, col = if (words) cols[k + 1] else "grey40",
   xlab = "Dose", ylab = "Outcome"

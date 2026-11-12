@@ -27,7 +27,7 @@ if order_by == "value":
     rows.sort(key=lambda d: -d[2])
 elif order_by == "region":
     rows.sort(key=lambda d: (d[1], -d[2]))
-colors = {"Midwest": "#2166ac", "Northeast": "#d6604d", "South": "#4daf4a",
+colors = {"Midwest": "#2166ac", "Northeast": "#d6604d", "South": "#1a9850",
           "West": "#984ea3"}
 y = np.arange(len(rows))[::-1]
 plt.figure(figsize=(6, 10))
