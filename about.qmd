@@ -48,7 +48,7 @@ A few entries also have their simulation written in R, on separate **[Try it in 
 
 ## Corrections
 
-If a page gets something wrong, or claims more than Gelman's post supports, please say so. Every entry page has **Report an issue** and **Edit this page** links. They open the page's source in the project's [GitHub repository](https://github.com/nelsonamayad/gelman-lexicon-explorer), where you can describe the problem or propose a fix directly. Every proposed change is checked automatically before it can go live.
+If a page gets something wrong, or claims more than Gelman's post supports, please say so. Every entry page has **Report an issue** and **Edit this page** links. They open the page's source in the project's [GitHub repository](https://github.com/nelsonamayad/gelman-lexicon-explorer), where you can describe the problem or propose a fix directly. [GitHub Issues](https://github.com/nelsonamayad/gelman-lexicon-explorer/issues) is the one place for corrections and questions; you can also browse the ones already reported there. Every proposed change is checked automatically before it can go live.
 
 ## License
 
