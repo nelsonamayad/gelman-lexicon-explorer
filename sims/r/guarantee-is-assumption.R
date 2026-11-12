@@ -23,7 +23,7 @@ cat("Intervals entirely below the true mean: ",
 )
 
 barplot(table(factor(miss, c("too low", "covers", "too high"))) / 3000, # <5>
-  col = c("#d6604d", "#2166ac", "#e6ab02"),
+  col = c("#d6604d", "#2166ac", "#b8860b"),
   ylab = "Share of intervals"
 )
 abline(h = 0.95, lty = 2)

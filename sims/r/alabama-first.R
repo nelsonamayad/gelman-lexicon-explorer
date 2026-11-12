@@ -15,7 +15,7 @@ states <- switch(order_by, # <4>
   region = states[order(states$region, -states$value), ]
 )
 cols <- c(
-  Midwest = "#2166ac", Northeast = "#d6604d", South = "#4daf4a",
+  Midwest = "#2166ac", Northeast = "#d6604d", South = "#1a9850",
   West = "#984ea3"
 )
 dotchart(rev(states$value), # <5>

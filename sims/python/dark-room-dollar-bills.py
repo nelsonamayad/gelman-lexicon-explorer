@@ -23,7 +23,7 @@ print(f"Truly outshines {100 * true_pct:.0f}% of rivals; appears to outshine "
       f"{100 * apparent[0]:.0f}% with every light visible and "
       f"{100 * apparent[-1]:.0f}% with most covered")
 
-plt.plot(visible, apparent, color="#e6ab02", linewidth=3)
+plt.plot(visible, apparent, color="#b8860b", linewidth=3)
 plt.axhline(true_pct, color="black", linestyle="--")
 plt.xlim(1, 0.05)
 plt.ylim(0, 1)

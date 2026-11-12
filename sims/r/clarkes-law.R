@@ -25,7 +25,7 @@ fail <- sapply( # <5>
 print(round(100 * fail)) # GRIM failure rates (%)
 
 barplot(fail, # <6>
-  col = c("#2166ac", "#e6ab02", "#d6604d"), ylim = c(0, 1),
+  col = c("#2166ac", "#b8860b", "#d6604d"), ylim = c(0, 1),
   ylab = "Share of means that fail the GRIM test"
 )
 

@@ -20,14 +20,14 @@ print(round(100 * paths[31, ], 1))
 
 matplot(0:30, paths, # <6>
   type = "l", lty = 1, lwd = 2,
-  col = c("#2166ac", "#4daf4a", "#d6604d"), ylim = c(0, 0.22),
+  col = c("#2166ac", "#1a9850", "#d6604d"), ylim = c(0, 0.22),
   xlab = "Year", ylab = "Share of analyses with an error"
 )
 legend("topright", c(
   "Your setting", "Every detected error reported",
   "Errors hidden"
 ),
-col = c("#2166ac", "#4daf4a", "#d6604d"), lwd = 2, bty = "n"
+col = c("#2166ac", "#1a9850", "#d6604d"), lwd = 2, bty = "n"
 )
 
 # Annotations

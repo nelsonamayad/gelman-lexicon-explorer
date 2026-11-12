@@ -19,7 +19,7 @@ def run(q):  # error rate over 30 years, 100 analyses a year
 
 paths = {"Your setting": run(report), "Every detected error reported": run(1),
          "Errors hidden": run(0)}
-for (k, p), c in zip(paths.items(), ["#2166ac", "#4daf4a", "#d6604d"]):
+for (k, p), c in zip(paths.items(), ["#2166ac", "#1a9850", "#d6604d"]):
     print(f"{k}: {100 * p[-1]:.1f}% after 30 years")
     plt.plot(p, color=c, linewidth=2, label=k)
 plt.ylim(0, 0.22)

@@ -16,7 +16,7 @@ within = np.linalg.lstsq(X, y, rcond=None)[0][0]
 print(f"Slope ignoring clinics: {overall[0]:.2f}")
 print(f"Slope within clinics: {within:.2f}")
 
-cols = np.array(["#2166ac", "#d6604d", "#5aae61"])
+cols = np.array(["#2166ac", "#d6604d", "#1a9850"])
 plt.scatter(x, y, c=cols[k] if words else "0.25", s=12)
 xs = np.linspace(x.min(), x.max(), 2)
 plt.plot(xs, np.polyval(overall, xs), "k--")

@@ -25,7 +25,7 @@ print(f"Intervals entirely below the true mean: {100 * too_low.mean():.1f}%")
 
 plt.bar(["too low", "covers", "too high"],
         [too_low.mean(), covers.mean(), too_high.mean()],
-        color=["#d6604d", "#2166ac", "#e6ab02"])
+        color=["#d6604d", "#2166ac", "#b8860b"])
 plt.axhline(0.95, color="black", linestyle="--")
 plt.ylabel("Share of intervals")
 plt.show()

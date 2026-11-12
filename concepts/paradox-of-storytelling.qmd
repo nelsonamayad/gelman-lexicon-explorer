@@ -1,14 +1,14 @@
 ---
 title: "The paradox of storytelling"
 date: 2026-11-11
-description: "Learning from anomalies seems to contradict usual principles of science and statistics where we seek representative or unbiased samples."
+description: "We learn when stories confound our expectations, but learning from anomalies seems to contradict usual principles of science and statistics where we seek representative or unbiased samples."
 order: 154
 theme: "Showing and telling"
 kind: "Principle or heuristic"
 categories: ["Showing and telling", "Principle or heuristic"]
 source: "https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/"
 verified: true
-source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list."
+source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
@@ -16,7 +16,7 @@ Entry **#154** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeli
 
 Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
 
-Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists, so the description quotes the linked post, not the list.
+Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026.
 :::
 
 ## What it is

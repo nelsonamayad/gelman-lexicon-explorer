@@ -25,7 +25,7 @@ print(f"A randomized experiment estimates {rct:.2f} "
 
 plt.hist(effect, bins=50, color="#2166ac")
 for v, c in zip(list(estimands.values())[:3],
-                ["black", "#d6604d", "#e6ab02"]):
+                ["black", "#d6604d", "#b8860b"]):
     plt.axvline(v, color=c, linewidth=2)
 plt.axvline(rct, color="black", linestyle="--")
 plt.xlabel("Individual treatment effect")
