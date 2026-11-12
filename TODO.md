@@ -4,9 +4,10 @@ Roughly in priority order within each section. Check items off as they land.
 
 ## Launch
 
-- [ ] Create the public GitHub repository `nelsonamayad/gelman-lexicon-explorer` and push (`_quarto.yml` already points `repo-url`, the navbar icon and the "Edit this page"/"Report an issue" links at it).
+- [x] Create the public GitHub repository `nelsonamayad/gelman-lexicon-explorer` and push (done 12 November 2026; version 0.9 tagged `v0.9`). The "Edit this page" and "Report an issue" links on every page now resolve.
 - [x] Create the Netlify site `gelman-lexicon-explorer` (done with `quarto publish netlify`, recorded in `_publish.yml`).
-- [ ] Add the GitHub secret `NETLIFY_AUTH_TOKEN` so every push to `main` publishes automatically.
+- [ ] Add the GitHub secret `NETLIFY_AUTH_TOKEN` so every push to `main` publishes automatically. Until then the live site is the build from 11 November, without the R and Python tabs; check the first workflow run on the repository's Actions tab, then publish by hand with `quarto publish netlify` if needed.
+- [ ] Next release: bump the `[Version X.Y, date.]{.site-version}` line in `index.qmd`, tag `vX.Y`, push `main` and the tag.
 - [ ] Optionally buy a custom domain, point it at Netlify and put it in `website.site-url`.
 - [ ] Once the site is live, send Andrew Gelman the link. He is the best person to catch misreadings.
 - [x] Add a `LICENSE` (MIT for code) and a license section in `about.qmd` and `README.md` (CC BY 4.0 for the explanations; entry names, definitions and quotes remain Gelman's).
@@ -42,7 +43,8 @@ Today every simulation is Observable JS. Readers who know R would get a lot from
 - [x] Second review (`reviews/gelman-lexicon-explorer-review.md`): rewrote the entries that misread their sources (#19, #35, #111, #116, #118), fixed the #44 and #80 simulations, restored missing attributions and context, fixed altered quotations, and added the two entries missing from the list (#154, #155).
 - [x] Keep quotation marks for real quotations; set illustrative lines in italics (convention stated on the About page).
 - [x] Audit the code of every simulation (bugs found and fixed in 6 pages and in `js/stats.js`).
-- [ ] Keep the list in sync: Gelman adds entries. The two newest (#154, #155) quote their posts because no archived copy of the updated list exists; replace their descriptions with his one-line definitions when one is available.
+- [ ] Keep the list in sync: Gelman adds entries. The two newest (#154, #155) quote their posts because no archived copy of the updated list exists; replace their descriptions with his one-line definitions when one is available. The Sol review (`reviews/sol-review.md`) reports that the live list now has them ("We learn when stories confound our expectations, but ..." and "This is how tech investors have absorbed the prestige of information science."); the Fable review could not reach the list to confirm. Check in a browser, then update both `description` fields, their `source-note` lines, and the sentence about them in `about.qmd` and `CLAUDE.md`.
+- [ ] Check one quotation against its source: the imagined editor's line in Arrow's Other Theorem (weak form) ("We don't usually publish this sort of thing, but, hey, why not?") is in quotation marks; if it isn't Gelman's wording, set it in italics.
 - [x] Show "Report an issue" and "Edit this page" links on every page (`repo-actions` in `_quarto.yml`), so readers can send corrections.
 - [x] Add a `verified: true/false` front-matter field (plus optional `source-note:`) and show a "Source check" line on every entry.
 - [x] Make "Related entries" links bidirectional (`build_groups.py`) and check that every linked page exists (`check_entries.py`).
