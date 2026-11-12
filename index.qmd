@@ -33,7 +33,7 @@ I love Gelman's lexicon page and have learned a lot from reading it through the 
 
 [Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
 
-[Version 0.9, 12 November 2026.]{.site-version}
+[Version 0.9.1, 12 November 2026.]{.site-version}
 :::
 
 ## Browse by theme {#themes}
