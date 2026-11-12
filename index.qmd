@@ -2,11 +2,11 @@
 title: "Andrew Gelman Statistical Lexicon Explorer"
 date: 2026-11-09
 subtitle: "An homage"
-description-meta: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
+description-meta: "Every entry in Andrew Gelman's Handy Statistical Lexicon explained with an interactive simulation that runs in your browser"
 open-graph:
-  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
+  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon explained with an interactive simulation that runs in your browser"
 twitter-card:
-  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon, each explained with an interactive simulation that runs in your browser."
+  description: "Every entry in Andrew Gelman's Handy Statistical Lexicon explained with an interactive simulation that runs in your browser."
 sidebar: false
 toc: false
 page-layout: full
@@ -15,10 +15,10 @@ listing:
   contents: concepts
   type: table
   sort: "order"
-  sort-ui: [order, title]
+  sort-ui: [order, title, reading-time]
   filter-ui: true
   page-size: 200
-  fields: [order, title, description, categories]
+  fields: [order, title, description, categories, reading-time]
   field-display-names:
     order: "#"
     title: "Entry"
@@ -27,11 +27,13 @@ listing:
 ---
 
 ::: {.hero}
-Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for "important methods and concepts related to statistics that are not as well known as they should be." This site gives each of the **155 entries** on the list (as of November 2026) its own page, with an explanation and an interactive simulation that runs in your browser. Entries are numbered in the order Gelman lists them. His list itself isn't numbered, so the numbers are ours.
+Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for *"important methods and concepts related to statistics that are not as well known as they should be."* This site gives each of the **155 entries** on the list (as of November 2026) its own page, with an explanation and an interactive simulation that runs in your browser. Entries are numbered in the order Gelman lists them. His list itself isn't numbered, so the numbers are ours.
 
 I love Gelman's lexicon page and have learned a lot from reading it through the years. With the help of coding agents, I built this homage to the author and to the lexicon itself. Enjoy it.
 
 [Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
+
+[Version 0.9, 12 November 2026.]{.site-version}
 :::
 
 ## Browse by theme {#themes}

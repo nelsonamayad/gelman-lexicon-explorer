@@ -41,7 +41,7 @@ Here 50 group effects are estimated with noise. Set the spread of true effects t
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -89,7 +89,7 @@ Plot.plot({
 //| echo: false
 {
   const c = k => mc.filter(d => d[k]).length;
-  return html`<div class="sim-readout">${md`Black dots are the true effects. No pooling claims **${c("claimClassic")}** non-zero effects, **${c("wrongClassic")}** of them with the wrong sign. The multilevel model claims **${c("claimML")}**, with **${c("wrongML")}** wrong-sign claims. With τ = 0 (pure noise), no pooling still finds "effects" about 5% of the time, while the multilevel model shrinks everything to the mean.`}</div>`;
+  return html`<div class="sim-readout">${md`The small dots are the true effects. No pooling claims **${c("claimClassic")}** non-zero effects, **${c("wrongClassic")}** of them with the wrong sign. The multilevel model claims **${c("claimML")}**, with **${c("wrongML")}** wrong-sign claims. With τ = 0 (pure noise), no pooling still finds "effects" about 5% of the time, while the multilevel model shrinks everything to the mean.`}</div>`;
 }
 ```
 
@@ -98,8 +98,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean} from "../js/stats.js"
 
 viewof tau = Inputs.range([0, 1], {value: 0.1, step: 0.05, label: "Spread of true effects τ"})
 viewof sigma = Inputs.range([0.2, 1], {value: 0.5, step: 0.05, label: "Standard error of each estimate"})
@@ -136,6 +142,99 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Multiple Comparisons: classical tests vs a multilevel model.
+tau <- 0.1 # spread of true effects # <1>
+sigma <- 0.5 # standard error of each estimate
+set.seed(20) # <2>
+
+theta <- rnorm(50, 0, tau) # 50 true effects, mostly tiny
+y <- rnorm(50, theta, sigma) # their noisy estimates # <3>
+
+# Multilevel model (empirical Bayes): shrink toward the mean
+mu <- mean(y)
+tau2 <- max(0, mean((y - mu)^2) - sigma^2) # <4>
+B <- tau2 / (tau2 + sigma^2)
+pm <- mu + B * (y - mu) # posterior means # <5>
+psd <- sqrt(B) * sigma + 1e-9 # posterior sds
+
+claim_classic <- abs(y) > 1.96 * sigma # <6>
+claim_ml <- B > 0 & abs(pm) > 1.96 * psd # <7>
+cat("Classical: ", sum(claim_classic), " 'significant' effects, ",
+  sum(claim_classic & sign(y) != sign(theta)), " with the wrong sign\n",
+  "Multilevel: ", sum(claim_ml), " confident claims, ",
+  sum(claim_ml & sign(pm) != sign(theta)), " with the wrong sign\n",
+  sep = ""
+)
+
+plot(theta, y, # <8>
+  pch = ifelse(claim_classic, 19, 1), col = "#d6604d",
+  xlab = "True effect", ylab = "Estimate"
+)
+points(theta, pm, pch = 19, col = "#2166ac")
+abline(h = c(-1.96, 1.96) * sigma, lty = 2)
+legend("topleft", c(
+  "Raw estimate (filled if significant)",
+  "Multilevel estimate"
+),
+pch = 19, col = c("#d6604d", "#2166ac"), bty = "n"
+)
+```
+1. The page's controls: the spread of the 50 true effects and the standard error of each estimate.
+2. Fixes the random numbers so the run is reproducible.
+3. Fifty noisy estimates of fifty mostly tiny effects.
+4. The multilevel model's estimate of the true spread, from the estimates and their known noise.
+5. Partial pooling: each estimate shrunk toward the mean by the ratio of true spread to total spread.
+6. The classical rule: claim an effect when the raw estimate is significant.
+7. The multilevel rule: claim an effect when the posterior interval excludes zero.
+8. Raw and pooled estimates against the truth, with the significance thresholds dashed. The pooled estimates make fewer and better claims.
+
+## Python {.unlisted}
+
+```{.python}
+# Multiple Comparisons: classical tests vs a multilevel model.
+import numpy as np
+import matplotlib.pyplot as plt
+
+tau = 0.1    # spread of true effects
+sigma = 0.5  # standard error of each estimate
+rng = np.random.default_rng(25)
+
+theta = rng.normal(0, tau, 50)   # 50 true effects, mostly tiny
+y = rng.normal(theta, sigma)     # their noisy estimates
+
+# Multilevel model (empirical Bayes): shrink toward the mean
+mu = y.mean()
+tau2 = max(0, np.mean((y - mu) ** 2) - sigma ** 2)
+B = tau2 / (tau2 + sigma ** 2)
+pm = mu + B * (y - mu)           # posterior means
+psd = np.sqrt(B) * sigma + 1e-9  # posterior sds
+
+claim_classic = np.abs(y) > 1.96 * sigma
+claim_ml = (B > 0) & (np.abs(pm) > 1.96 * psd)
+wrong_classic = claim_classic & (np.sign(y) != np.sign(theta))
+wrong_ml = claim_ml & (np.sign(pm) != np.sign(theta))
+print(f"Classical: {claim_classic.sum()} 'significant' effects, "
+      f"{wrong_classic.sum()} with the wrong sign")
+print(f"Multilevel: {claim_ml.sum()} confident claims, "
+      f"{wrong_ml.sum()} with the wrong sign")
+
+plt.scatter(theta, y, color="#d6604d", label="Raw estimate")
+plt.scatter(theta[claim_classic], y[claim_classic], s=120,
+            facecolors="none", edgecolors="black", label="'Significant'")
+plt.scatter(theta, pm, color="#2166ac", label="Multilevel estimate")
+plt.axhline(1.96 * sigma, color="black", linestyle="--")
+plt.axhline(-1.96 * sigma, color="black", linestyle="--")
+plt.xlabel("True effect")
+plt.ylabel("Estimate")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

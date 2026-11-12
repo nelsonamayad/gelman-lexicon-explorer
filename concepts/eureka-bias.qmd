@@ -97,6 +97,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, fmt} from "../js/stats.js"
 
@@ -136,6 +142,79 @@ Plot.plot({
   marks: [Plot.line(eureka.path, {x: "k", y: "m", stroke: "who", strokeWidth: 2, marker: "circle"}), Plot.ruleY([0], {stroke: "currentColor", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Eureka bias: refusing to let go of a discovery.
+phi <- 0.05 # weight the eureka-biased researcher gives new data # <1>
+set.seed(72) # <2>
+
+se <- 0.3
+first <- max(rnorm(20, 0, se)) # the "discovery": best of 20 noisy looks # <3>
+y <- rnorm(20, 0, se) # 20 follow-ups; the true effect is zero
+w0 <- 1 / se^2
+w <- 1 / se^2
+k <- 1:20
+neutral <- (first * w0 + cumsum(y) * w) / (w0 + k * w) # <4>
+eureka <- (first * w0 + cumsum(y) * w * phi) / (w0 + k * w * phi) # <5>
+
+cat("Discovery: ", round(first, 2), " | belief after 20 follow-ups: ",
+  "neutral ", round(tail(neutral, 1), 2), ", eureka-biased ",
+  round(tail(eureka, 1), 2), "\n",
+  sep = ""
+)
+
+matplot(0:20, cbind(c(first, neutral), c(first, eureka)), # <6>
+  type = "l",
+  lty = 1, lwd = 2, col = c("#2166ac", "#d6604d"),
+  xlab = "Follow-up studies", ylab = "Belief about the effect"
+)
+abline(h = 0, lty = 2)
+legend("topright", c("Neutral updater", "Eureka-biased"),
+  col = c("#2166ac", "#d6604d"), lwd = 2, bty = "n"
+)
+```
+1. The page's control: how much weight the eureka-biased researcher gives each new study, relative to the discovery.
+2. Fixes the random numbers so the run is reproducible.
+3. The discovery: the best of 20 noisy looks at an effect that is really zero.
+4. A neutral updater weights the discovery and each follow-up equally, so belief sinks toward zero.
+5. The eureka-biased updater discounts every follow-up, so the discovery keeps its grip.
+6. Belief after each follow-up study under the two rules.
+
+## Python {.unlisted}
+
+```{.python}
+# Eureka bias: refusing to let go of a discovery.
+import numpy as np
+import matplotlib.pyplot as plt
+
+phi = 0.05  # weight the eureka-biased researcher gives new data
+rng = np.random.default_rng(72)
+
+se = 0.3
+first = rng.normal(0, se, 20).max()  # the "discovery": best of 20 looks
+y = rng.normal(0, se, 20)            # 20 follow-ups; the true effect is zero
+w0 = w = 1 / se ** 2
+k = np.arange(1, 21)
+neutral = (first * w0 + np.cumsum(y) * w) / (w0 + k * w)
+eureka = (first * w0 + np.cumsum(y) * w * phi) / (w0 + k * w * phi)
+
+print(f"Discovery: {first:.2f} | belief after 20 follow-ups: neutral "
+      f"{neutral[-1]:.2f}, eureka-biased {eureka[-1]:.2f}")
+
+plt.plot(range(21), np.r_[first, neutral], color="#2166ac", linewidth=2,
+         label="Neutral updater")
+plt.plot(range(21), np.r_[first, eureka], color="#d6604d", linewidth=2,
+         label="Eureka-biased")
+plt.axhline(0, color="black", linestyle="--")
+plt.xlabel("Follow-up studies")
+plt.ylabel("Belief about the effect")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

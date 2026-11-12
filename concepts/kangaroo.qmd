@@ -40,7 +40,7 @@ A feather weighs 5 grams. The kangaroo's bouncing makes each bathroom-scale read
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -69,7 +69,7 @@ Plot.plot({
   x: {label: "Estimated feather weight (kg)", grid: true},
   y: {label: "Experiments"},
   marks: [
-    Plot.rectY(weighings, Plot.binX({y: "count"}, {x: "est", fill: d => d.sig ? "#d6604d" : "#bbb", thresholds: 50})),
+    Plot.rectY(weighings, Plot.binX({y: "count"}, {x: "est", fill: d => d.sig ? "#d6604d" : "#8a8a8a", thresholds: 50})),
     Plot.ruleX([0.005], {stroke: "#2166ac", strokeWidth: 2}),
     Plot.ruleY([0])
   ]
@@ -91,8 +91,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, fmt} from "../js/stats.js"
 
 viewof bounce = Inputs.range([0.01, 5], {value: 3, step: 0.01, label: "Kangaroo bounce (sd of a reading, kg)"})
 viewof n = Inputs.range([5, 500], {value: 30, step: 5, label: "Readings with and without the feather"})
@@ -115,12 +121,84 @@ Plot.plot({
   x: {label: "Estimated feather weight (kg)", grid: true},
   y: {label: "Experiments"},
   marks: [
-    Plot.rectY(weighings, Plot.binX({y: "count"}, {x: "est", fill: d => d.sig ? "#d6604d" : "#bbb", thresholds: 50})),
+    Plot.rectY(weighings, Plot.binX({y: "count"}, {x: "est", fill: d => d.sig ? "#d6604d" : "#8a8a8a", thresholds: 50})),
     Plot.ruleX([0.005], {stroke: "#2166ac", strokeWidth: 2}),
     Plot.ruleY([0])
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Kangaroo: weighing a feather on a bouncing kangaroo.
+bounce <- 3 # kangaroo bounce: sd of one reading (kg) # <1>
+n <- 30 # readings with the feather, and again without it
+feather <- 0.005 # true weight of the feather (kg)
+set.seed(52) # <2>
+
+# 1,000 experiments: the difference between the two average readings
+est <- replicate(1000, mean(rnorm(n, 40 + feather, bounce)) - # <3>
+  mean(rnorm(n, 40, bounce)))
+se <- bounce * sqrt(2 / n) # <4>
+sig <- abs(est) > 1.96 * se # <5>
+
+cat("Significant experiments:", sum(sig), "of 1000\n")
+cat(
+  "Their estimates average", round(mean(abs(est[sig])) / feather),
+  "times the true weight\n"
+)
+cat("Significant estimates with negative weight:", sum(est[sig] < 0), "\n")
+
+breaks <- hist(est, breaks = 50, plot = FALSE)$breaks
+hist(est, # <6>
+  breaks = breaks, col = "grey80", border = "white", main = "",
+  xlab = "Estimated feather weight (kg)", ylab = "Experiments"
+)
+hist(est[sig], breaks = breaks, col = "#d6604d", border = "white", add = TRUE)
+abline(v = feather, col = "#2166ac", lwd = 2)
+```
+1. The page's controls: how much the kangaroo's bouncing makes each reading vary, how many readings are taken, and the feather's true weight.
+2. Fixes the random numbers so the run is reproducible.
+3. A thousand experiments. Each weighs the kangaroo n times with the feather and n times without, and takes the difference of the averages.
+4. The standard error of that difference, which the bouncing dominates.
+5. Which experiments come out statistically significant.
+6. The histogram of estimated feather weights, significant ones in red. The blue line is the feather's true weight, invisible at this scale.
+
+## Python {.unlisted}
+
+```{.python}
+# Kangaroo: weighing a feather on a bouncing kangaroo.
+import numpy as np
+import matplotlib.pyplot as plt
+
+bounce = 3        # kangaroo bounce: sd of one reading (kg)
+n = 30            # readings with the feather, and again without it
+feather = 0.005   # true weight of the feather (kg)
+rng = np.random.default_rng(52)
+
+# 1,000 experiments: the difference between the two average readings
+est = (rng.normal(40 + feather, bounce, (1000, n)).mean(axis=1)
+       - rng.normal(40, bounce, (1000, n)).mean(axis=1))
+se = bounce * np.sqrt(2 / n)
+sig = np.abs(est) > 1.96 * se
+
+print(f"Significant experiments: {sig.sum()} of 1000")
+print(f"Their estimates average {np.abs(est[sig]).mean() / feather:.0f} "
+      "times the true weight")
+print(f"Significant estimates with negative weight: {(est[sig] < 0).sum()}")
+
+bins = np.histogram_bin_edges(est, 50)
+plt.hist(est, bins, color="0.8", label="All experiments")
+plt.hist(est[sig], bins, color="#d6604d", label="Significant")
+plt.axvline(feather, color="#2166ac", linewidth=2)
+plt.xlabel("Estimated feather weight (kg)")
+plt.ylabel("Experiments")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

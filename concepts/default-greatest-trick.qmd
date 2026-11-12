@@ -32,7 +32,7 @@ Take one common invisible default: **complete-case analysis**. Most regression s
 
 ## Simulated example
 
-We estimate average income from a survey. Low-income respondents are more likely to skip the question. The default "just drop missing rows" gives one answer, and imputation using a related covariate gives another.
+We estimate average income from a survey. Low-income respondents are more likely to skip the question. The default *just drop missing rows* gives one answer, and imputation using a related covariate gives another.
 
 ```{ojs}
 //| echo: false
@@ -89,6 +89,12 @@ html`<div class="sim-readout">${md`**${fmt(100 * est.share, 0)}%** of respondent
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, lm, fmt} from "../js/stats.js"
 
@@ -126,6 +132,77 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Default, the greatest trick it ever pulled: silently dropping missing data.
+miss_strength <- 1.5 # how strongly low income predicts skipping the question # <1>
+set.seed(38) # <2>
+
+educ <- rnorm(2000)
+income <- 50 + 12 * educ + rnorm(2000, 0, 10)
+missing <- runif(2000) < plogis(-1.5 - miss_strength * (income - 50) / 12) # <3>
+
+fit <- lm(income ~ educ, subset = !missing) # impute from education # <4>
+imputed <- ifelse(missing, predict(fit, data.frame(educ = educ)), income)
+
+cat("Skipped the question: ", round(100 * mean(missing)), "%\n", sep = "")
+cat(
+  "Truth:", round(mean(income), 1), "| drop missing rows (the default):",
+  round(mean(income[!missing]), 1), "| impute from education:", # <5>
+  round(mean(imputed), 1), "\n"
+)
+
+est <- c(
+  Truth = mean(income), "Drop missing rows" = mean(income[!missing]),
+  "Impute" = mean(imputed)
+)
+dotchart(est, # <6>
+  pch = 19, col = c("black", "#d6604d", "#2166ac"),
+  xlab = "Estimated average income"
+)
+```
+1. The page's control: how strongly a low income predicts skipping the income question.
+2. Fixes the random numbers so the run is reproducible.
+3. Who skips the question: the poorer, the likelier. Missingness depends on the outcome itself.
+4. An imputation model: predict the missing incomes from education, which everyone answered.
+5. Three answers: the truth, the software's silent default of dropping incomplete rows, and the imputed average.
+6. The default's answer is biased upward, and nothing in the output says a choice was made.
+
+## Python {.unlisted}
+
+```{.python}
+# Default, the greatest trick it ever pulled: silently dropping missing data.
+import numpy as np
+import matplotlib.pyplot as plt
+
+miss_strength = 1.5  # how strongly low income predicts skipping the question
+rng = np.random.default_rng(38)
+
+educ = rng.normal(size=2000)
+income = 50 + 12 * educ + rng.normal(0, 10, 2000)
+p_miss = 1 / (1 + np.exp(1.5 + miss_strength * (income - 50) / 12))
+missing = rng.uniform(size=2000) < p_miss
+
+slope, intercept = np.polyfit(educ[~missing], income[~missing], 1)
+imputed = np.where(missing, intercept + slope * educ, income)
+
+print(f"Skipped the question: {100 * missing.mean():.0f}%")
+print(f"Truth: {income.mean():.1f} | drop missing rows (the default): "
+      f"{income[~missing].mean():.1f} | impute from education: "
+      f"{imputed.mean():.1f}")
+
+est = {"Truth": income.mean(), "Drop missing rows": income[~missing].mean(),
+       "Impute": imputed.mean()}
+plt.scatter(list(est.values()), list(est), s=80,
+            color=["black", "#d6604d", "#2166ac"])
+plt.xlabel("Estimated average income")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

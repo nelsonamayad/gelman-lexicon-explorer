@@ -103,6 +103,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, sd, lm, cor, fmt} from "../js/stats.js"
 
@@ -146,6 +152,82 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# A chicken: Bill James's check of a fielding rating, in miniature.
+adjust <- FALSE # FALSE: rate by raw assists; TRUE: adjust for team # <1>
+gb_effect <- 0.8 # how much team ground balls drive assists
+set.seed(118) # <2>
+
+gb <- rep(rnorm(30), each = 2) # team ground-ball tendency, 2 per team
+skill <- rnorm(60) # fielders' true skill
+assists <- 300 + 15 * skill + 40 * gb_effect * gb + rnorm(60, 0, 10) # <3>
+score <- if (adjust) resid(lm(assists ~ gb)) else assists # <4>
+rating <- as.vector(scale(score))
+
+top10 <- order(rating, decreasing = TRUE)[1:10] # <5>
+cut <- sort(gb, decreasing = TRUE)[20] # top third of fielders by team
+cat("Top-10 fielders on ground-ball teams:", sum(gb[top10] >= cut), "of 10\n")
+cat("Correlation with team ground balls:", round(cor(rating, gb), 2), "\n")
+cat("Correlation with true skill:", round(cor(rating, skill), 2), "\n")
+
+plot(gb, rating, # <6>
+  pch = 19, col = "#2166ac",
+  xlab = "Team ground-ball tendency (sd units)",
+  ylab = "Fielder rating (sd units)"
+)
+abline(lm(rating ~ gb), col = "#d6604d", lwd = 2)
+abline(h = 0)
+```
+1. The page's controls: whether to adjust for the team's ground balls, and how much those ground balls drive assists.
+2. Fixes the random numbers so the run is reproducible.
+3. A fielder's assists depend on his skill and on how many ground balls his pitchers give up: the chance factor Total Baseball ignored.
+4. The two models. Raw assists, as Total Baseball did, or assists after regressing out the team's ground-ball tendency.
+5. The posterior check: do the ten top-rated fielders all happen to play for ground-ball teams? Skill is unrelated to team, so they shouldn't.
+6. Each fielder's rating against his team's ground-ball tendency. A sloping line is the absurd inference Bill James noticed.
+
+## Python {.unlisted}
+
+```{.python}
+# A chicken: Bill James's check of a fielding rating, in miniature.
+import numpy as np
+import matplotlib.pyplot as plt
+
+adjust = False   # False: rate by raw assists; True: adjust for team
+gb_effect = 0.8  # how much team ground balls drive assists
+rng = np.random.default_rng(118)
+
+gb = np.repeat(rng.normal(size=30), 2)  # team tendency, 2 fielders per team
+skill = rng.normal(size=60)             # fielders' true skill
+assists = 300 + 15 * skill + 40 * gb_effect * gb + rng.normal(0, 10, 60)
+if adjust:
+    slope, intercept = np.polyfit(gb, assists, 1)
+    score = assists - (intercept + slope * gb)
+else:
+    score = assists
+rating = (score - score.mean()) / score.std(ddof=1)
+
+top10 = np.argsort(-rating)[:10]
+cut = np.sort(gb)[::-1][19]  # top third of fielders by team
+print(f"Top-10 fielders on ground-ball teams: {(gb[top10] >= cut).sum()}"
+      " of 10")
+print(f"Correlation with team ground balls: "
+      f"{np.corrcoef(rating, gb)[0, 1]:.2f}")
+print(f"Correlation with true skill: {np.corrcoef(rating, skill)[0, 1]:.2f}")
+
+slope, intercept = np.polyfit(gb, rating, 1)
+xs = np.linspace(gb.min(), gb.max(), 2)
+plt.scatter(gb, rating, color="#2166ac")
+plt.plot(xs, intercept + slope * xs, color="#d6604d", linewidth=2)
+plt.axhline(0, color="black", linewidth=0.8)
+plt.xlabel("Team ground-ball tendency (sd units)")
+plt.ylabel("Fielder rating (sd units)")
+plt.show()
+```
+
+:::
 
 </details>
 

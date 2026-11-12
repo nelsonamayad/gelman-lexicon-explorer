@@ -89,6 +89,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, dnorm, fmt} from "../js/stats.js"
 
@@ -121,6 +127,106 @@ Plot.plot({
   marks: [Plot.dot(camel, {fy: "like", y: "prior", x: "mean", fill: "prior", r: 7}), Plot.ruleX([1], {stroke: "currentColor", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The camel that is the likelihood: the data model outweighs the prior.
+n_out <- 3 # number of outliers # <1>
+out_size <- 10 # outlier size
+set.seed(99) # <2>
+
+y <- c(rnorm(30, 1, 1), out_size + rnorm(n_out)) # <3>
+grid <- seq(-4, 12, by = 0.02) # grid of values for the mean
+post_mean <- function(prior_sd, likelihood) { # <4>
+  loglik <- sapply(grid, function(m) {
+    if (likelihood == "normal") {
+      sum(dnorm(y, m, 1, log = TRUE))
+    } else {
+      sum(dt(y - m, df = 3, log = TRUE))
+    }
+  })
+  lp <- dnorm(grid, 0, prior_sd, log = TRUE) + loglik
+  w <- exp(lp - max(lp))
+  sum(w * grid) / sum(w)
+}
+res <- sapply(c(1, 10), function(s) { # <5>
+  sapply(
+    c("normal", "t3"),
+    function(l) post_mean(s, l)
+  )
+})
+colnames(res) <- c("prior sd 1", "prior sd 10")
+print(round(res, 3)) # posterior means
+cat(
+  "Changing the prior moves the estimate by",
+  round(abs(res["normal", 1] - res["normal", 2]), 3), "(the gnat)\n"
+)
+cat(
+  "Changing the likelihood moves it by",
+  round(abs(res["normal", 2] - res["t3", 2]), 3), "(the camel)\n"
+)
+
+barplot(res, # <6>
+  beside = TRUE, col = c("#d6604d", "#2166ac"),
+  ylab = "Posterior mean",
+  legend.text = c("Normal", "Student-t (3 df)")
+)
+```
+1. The page's controls: how many outliers there are and how far out they sit.
+2. Fixes the random numbers so the run is reproducible.
+3. Thirty ordinary observations plus a few outliers.
+4. The posterior mean of the location, computed on a grid, under a normal or a Student-t likelihood and a normal prior of the given width.
+5. All four combinations: two priors by two likelihoods.
+6. Changing the prior barely moves the estimate (the gnat). Changing the likelihood moves it a lot (the camel).
+
+## Python {.unlisted}
+
+```{.python}
+# The camel that is the likelihood: the data model outweighs the prior.
+import math
+import numpy as np
+import matplotlib.pyplot as plt
+
+n_out = 3      # number of outliers
+out_size = 10  # outlier size
+rng = np.random.default_rng(99)
+
+y = np.concatenate([rng.normal(1, 1, 30), out_size + rng.normal(size=n_out)])
+grid = np.arange(-4, 12.001, 0.02)  # grid of values for the mean
+
+
+def post_mean(prior_sd, likelihood):
+    z = y[None, :] - grid[:, None]
+    if likelihood == "normal":
+        loglik = (-0.5 * z ** 2).sum(axis=1)
+    else:  # Student-t with 3 degrees of freedom (up to a constant)
+        loglik = (-2 * np.log1p(z ** 2 / 3)).sum(axis=1)
+    lp = -0.5 * (grid / prior_sd) ** 2 + loglik
+    w = np.exp(lp - lp.max())
+    return (w * grid).sum() / w.sum()
+
+
+res = {(l, s): post_mean(s, l) for l in ("normal", "t3") for s in (1, 10)}
+for (l, s), m in res.items():
+    print(f"{l:6s} likelihood, prior sd {s:2d}: posterior mean {m:.3f}")
+print(f"Changing the prior moves the estimate by "
+      f"{abs(res['normal', 1] - res['normal', 10]):.3f} (the gnat)")
+print(f"Changing the likelihood moves it by "
+      f"{abs(res['normal', 10] - res['t3', 10]):.3f} (the camel)")
+
+x = np.arange(2)
+plt.bar(x - 0.2, [res["normal", 1], res["normal", 10]], 0.4,
+        color="#d6604d", label="Normal")
+plt.bar(x + 0.2, [res["t3", 1], res["t3", 10]], 0.4, color="#2166ac",
+        label="Student-t (3 df)")
+plt.xticks(x, ["Prior sd 1", "Prior sd 10"])
+plt.ylabel("Posterior mean")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

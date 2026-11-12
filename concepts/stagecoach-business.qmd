@@ -76,7 +76,7 @@ Plot.plot({
   x: {label: "Position in text"},
   y: {label: "Signal", grid: true},
   marks: [
-    Plot.dot(ride.series, {x: "i", y: "raw", r: 1, fill: "#bbb"}),
+    Plot.dot(ride.series, {x: "i", y: "raw", r: 1, fill: "#8a8a8a"}),
     Plot.line(ride.series, {x: "i", y: "msg", stroke: "currentColor", strokeDasharray: "4 3"}),
     Plot.line(ride.series, {x: "i", y: "reader", stroke: "#2166ac", strokeWidth: 2})
   ]
@@ -107,6 +107,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
 
@@ -134,7 +140,7 @@ Plot.plot({
   x: {label: "Position in text"},
   y: {label: "Signal", grid: true},
   marks: [
-    Plot.dot(ride.series, {x: "i", y: "raw", r: 1, fill: "#bbb"}),
+    Plot.dot(ride.series, {x: "i", y: "raw", r: 1, fill: "#8a8a8a"}),
     Plot.line(ride.series, {x: "i", y: "msg", stroke: "currentColor", strokeDasharray: "4 3"}),
     Plot.line(ride.series, {x: "i", y: "reader", stroke: "#2166ac", strokeWidth: 2})
   ]
@@ -149,6 +155,88 @@ Plot.plot({
   marks: [Plot.line(ride.curve, {x: "w", y: "err", stroke: "#2166ac"}), Plot.dot(ride.curve.filter(d => d.w === padding), {x: "w", y: "err", r: 6, fill: "#d6604d"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# As They Say in the Stagecoach Business: remove the padding and the ride
+# gets rough. How much smoothing helps you read the signal?
+padding <- 1 # smoothing window (odd number of points) # <1>
+set.seed(28) # <2>
+
+n <- 200
+i <- 1:n
+msg <- sin(i / 18) + 0.5 * sin(i / 7) # the message
+obs <- msg + rnorm(n, 0, 0.6) # what arrives # <3>
+smooth <- function(w) { # <4>
+  sapply(i, function(k) {
+    mean(obs[max(1, k - (w - 1) / 2):min(n, k + (w - 1) / 2)])
+  })
+}
+err <- sapply(seq(1, 61, 2), function(w) sqrt(mean((smooth(w) - msg)^2))) # <5>
+best <- seq(1, 61, 2)[which.min(err)]
+cat("Error with padding ", padding, ": ",
+  round(sqrt(mean((smooth(padding) - msg)^2)), 3), "\nBest padding: ",
+  best, " (error ", round(min(err), 3), ")\n",
+  sep = ""
+)
+
+plot(i, obs, # <6>
+  col = "grey70", pch = 19, cex = 0.5, xlab = "Time",
+  ylab = "Signal"
+)
+lines(i, msg, lty = 2, lwd = 2)
+lines(i, smooth(padding), col = "#2166ac", lwd = 2)
+```
+1. The page's control: the smoothing window, the padding in the stagecoach line.
+2. Fixes the random numbers so the run is reproducible.
+3. The message plus noise: what arrives.
+4. A running mean over a window of w points.
+5. The error of the smoothed signal against the true message, for every window width.
+6. The noisy observations, the true message dashed and the smoothed signal in blue. Too little padding and the ride is rough; too much and the message blurs.
+
+## Python {.unlisted}
+
+```{.python}
+# As They Say in the Stagecoach Business: remove the padding and the ride
+# gets rough. How much smoothing helps you read the signal?
+import numpy as np
+import matplotlib.pyplot as plt
+
+padding = 1  # smoothing window (odd number of points)
+rng = np.random.default_rng(28)
+
+n = 200
+i = np.arange(n)
+msg = np.sin(i / 18) + 0.5 * np.sin(i / 7)  # the message
+obs = msg + rng.normal(0, 0.6, n)           # what arrives
+
+
+def smooth(w):
+    h = (w - 1) // 2
+    return np.array([obs[max(0, k - h):min(n, k + h + 1)].mean()
+                     for k in i])
+
+
+def err(w):
+    return np.sqrt(np.mean((smooth(w) - msg) ** 2))
+
+
+widths = range(1, 62, 2)
+best = min(widths, key=err)
+print(f"Error with padding {padding}: {err(padding):.3f}")
+print(f"Best padding: {best} (error {err(best):.3f})")
+
+plt.scatter(i, obs, s=6, color="0.7")
+plt.plot(i, msg, "k--", linewidth=2, label="Message")
+plt.plot(i, smooth(padding), color="#2166ac", linewidth=2, label="Reader")
+plt.xlabel("Time")
+plt.ylabel("Signal")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

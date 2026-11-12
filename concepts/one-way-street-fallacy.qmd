@@ -20,11 +20,11 @@ Source check: ✓ The explanation was checked against the source.
 
 ## What it is
 
-Many changes can push an outcome either way. An intervention can help some people and hurt others. A behavioral nudge can raise or lower participation. A policy can increase or decrease a risk. The one-way street fallacy is reasoning as if the change could only go in the direction you happen to be thinking about: "this can only help," *the worst case is no effect.*
+Many changes can push an outcome either way. An intervention can help some people and hurt others. A behavioral nudge can raise or lower participation. A policy can increase or decrease a risk. The one-way street fallacy is reasoning as if the change could only go in the direction you happen to be thinking about: *this can only help,* *the worst case is no effect.*
 
 ## Why it matters
 
-The fallacy hides costs and risks. Interventions get promoted as "can't hurt, might help," and analyses count only the people who benefited. Effects with mixed signs get summarized by their positive part. Statistically, it is like running a one-sided test or using a one-sided prior without justification. You never look for the effect that goes the other way, so you never find it.
+The fallacy hides costs and risks. Interventions get promoted as *can't hurt, might help,* and analyses count only the people who benefited. Effects with mixed signs get summarized by their positive part. Statistically, it is like running a one-sided test or using a one-sided prior without justification. You never look for the effect that goes the other way, so you never find it.
 
 ## How it works
 
@@ -81,6 +81,12 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt, pct} from "../js/stats.js"
 
@@ -107,6 +113,69 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The One-Way Street Fallacy: an average effect hides effects in both
+# directions.
+mu <- -0.2 # average effect # <1>
+sigma <- 1 # spread of individual effects
+set.seed(45) # <2>
+
+tau <- rnorm(5000, mu, sigma) # each person's own effect # <3>
+cat("Average effect: ", round(mean(tau), 2), "\n",
+  round(100 * mean(tau > 0)), "% are helped (average +", # <4>
+  round(mean(tau[tau > 0]), 2), "), ", round(100 * mean(tau <= 0)),
+  "% are hurt (average ", round(mean(tau[tau <= 0]), 2), ")\n",
+  sep = ""
+)
+
+hist(tau, # <5>
+  breaks = 60, col = ifelse(seq(-5, 5, length = 60) > 0,
+    "#2166ac", "#d6604d"
+  ),
+  border = "white", main = "", xlab = "Individual effect",
+  ylab = "People"
+)
+abline(v = c(0, mean(tau)), lty = c(2, 1), lwd = c(1, 2))
+```
+1. The page's controls: the average effect and how much individual effects vary around it.
+2. Fixes the random numbers so the run is reproducible.
+3. Each person's own effect, drawn around the average.
+4. The share helped and the share hurt, with the average effect in each group.
+5. The distribution of individual effects. An average on one side of zero does not make it a one-way street.
+
+## Python {.unlisted}
+
+```{.python}
+# The One-Way Street Fallacy: an average effect hides effects in both
+# directions.
+import numpy as np
+import matplotlib.pyplot as plt
+
+mu = -0.2   # average effect
+sigma = 1   # spread of individual effects
+rng = np.random.default_rng(45)
+
+tau = rng.normal(mu, sigma, 5000)  # each person's own effect
+helped, hurt = tau[tau > 0], tau[tau <= 0]
+print(f"Average effect: {tau.mean():.2f}")
+print(f"{100 * helped.size / tau.size:.0f}% are helped (average "
+      f"+{helped.mean():.2f}), {100 * hurt.size / tau.size:.0f}% are hurt "
+      f"(average {hurt.mean():.2f})")
+
+bins = np.linspace(tau.min(), tau.max(), 61)
+plt.hist(hurt, bins=bins, color="#d6604d", label="Hurt")
+plt.hist(helped, bins=bins, color="#2166ac", label="Helped")
+plt.axvline(tau.mean(), color="black", linewidth=2)
+plt.xlabel("Individual effect")
+plt.ylabel("People")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

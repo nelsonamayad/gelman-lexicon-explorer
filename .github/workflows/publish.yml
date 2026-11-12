@@ -56,6 +56,18 @@ jobs:
       - name: Check entries
         run: python3 scripts/check_entries.py
 
+      # Every entry's code tabs show R and Python versions of its simulation
+      # (sims/r/*.R, base R only; sims/python/*.py, NumPy and Matplotlib).
+      # Run them all so a broken one fails the build.
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+
+      - name: Install NumPy and Matplotlib
+        run: python3 -m pip install --quiet numpy matplotlib
+
+      - name: Run the R and Python simulations
+        run: python3 scripts/check_code.py
+
       - name: Set up Quarto
         uses: quarto-dev/quarto-actions/setup@v2
         with:

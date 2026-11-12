@@ -85,6 +85,12 @@ html`<div class="sim-readout">${md`On average the observer rates Y's work **${fm
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
 
@@ -115,6 +121,63 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Steelmanning: adopting X's framing of Y biases your view of Y.
+w <- 0.6 # how much the observer adopts X's framing # <1>
+exag <- 1 # how much X caricatures Y
+set.seed(142) # <2>
+
+q_Y <- rnorm(500) # true quality of Y's work
+direct <- q_Y + rnorm(500, 0, 0.5) # the observer's own look
+x_account <- q_Y - exag + rnorm(500, 0, 0.5) # X's description of Y # <3>
+view <- (1 - w) * direct + w * x_account # <4>
+cat(
+  "On average the observer rates Y's work", round(mean(view - q_Y), 2),
+  "relative to its true quality\n"
+)
+
+plot(q_Y, view, # <5>
+  pch = 19, cex = 0.5, col = "#d6604d",
+  xlab = "True quality of Y's work", ylab = "Observer's view"
+)
+abline(0, 1, lty = 2)
+```
+1. The page's controls: how much the observer adopts X's framing of Y, and how much X caricatures Y.
+2. Fixes the random numbers so the run is reproducible.
+3. X's account of Y's work: systematically worse than it is.
+4. The observer's view: a mix of their own look and X's account. Steelmanning X means weighting X's framing.
+5. The observer's view against Y's true quality. Bending over backward for X means being unfair to Y.
+
+## Python {.unlisted}
+
+```{.python}
+# Steelmanning: adopting X's framing of Y biases your view of Y.
+import numpy as np
+import matplotlib.pyplot as plt
+
+w = 0.6     # how much the observer adopts X's framing
+exag = 1    # how much X caricatures Y
+rng = np.random.default_rng(142)
+
+q_Y = rng.normal(size=500)                       # true quality of Y's work
+direct = q_Y + rng.normal(0, 0.5, 500)           # the observer's own look
+x_account = q_Y - exag + rng.normal(0, 0.5, 500)  # X's description of Y
+view = (1 - w) * direct + w * x_account
+print(f"On average the observer rates Y's work {np.mean(view - q_Y):.2f} "
+      "relative to its true quality")
+
+plt.scatter(q_Y, view, s=6, color="#d6604d")
+lim = [q_Y.min(), q_Y.max()]
+plt.plot(lim, lim, "k--")
+plt.xlabel("True quality of Y's work")
+plt.ylabel("Observer's view")
+plt.show()
+```
+
+:::
 
 </details>
 

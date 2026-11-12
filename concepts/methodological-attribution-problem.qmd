@@ -20,7 +20,7 @@ Source check: ✓ The explanation was checked against the source.
 
 ## What it is
 
-When a skilled statistician produces a good analysis, observers credit the method: "Bayesian methods work," "bootstrapping saved the day." Much of the value actually came from the statistician's judgment: careful data cleaning, asking the right question, sensible model checking, good graphs. Because skilled statisticians tend to favor particular methods, method and skill are confounded, and the method gets the credit.
+When a skilled statistician produces a good analysis, observers credit the method: *Bayesian methods work,* *bootstrapping saved the day.* Much of the value actually came from the statistician's judgment: careful data cleaning, asking the right question, sensible model checking, good graphs. Because skilled statisticians tend to favor particular methods, method and skill are confounded, and the method gets the credit.
 
 Gelman calls it his "second meta-principle of statistics": the contributions of a good consultant or collaborator "will often be attributed to the statistician's methods or philosophy rather than to the artful efforts of the statistician himself or herself." His examples: Don Rubin finds scientists to be fundamentally Bayesian, Brad Efron finds his collaborators most convinced by permutation tests and p-values, and Judea Pearl finds that graphical models describe how people think about causality. Gelman doesn't doubt that each is reporting accurately. The point is that what made each collaboration work may have been the person as much as the method.
 
@@ -91,6 +91,12 @@ html`<div class="sim-readout">${md`Naive credit to the method (difference in ave
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, ols, invLogit, fmt} from "../js/stats.js"
 
@@ -122,6 +128,68 @@ Plot.plot({
   marks: [Plot.dot(analysts, {x: "skill", y: "q", fill: "group", r: 2, fillOpacity: 0.5})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Methodological Attribution Problem: credit the analyst, not the method.
+method_effect <- 0.1 # true effect of the fancy method # <1>
+selection <- 2 # how strongly skill predicts using it
+set.seed(40) # <2>
+
+skill <- rnorm(1000)
+uses_method <- rbinom(1000, 1, plogis(selection * skill)) # <3>
+quality <- method_effect * uses_method + skill + rnorm(1000, 0, 0.5)
+
+naive <- mean(quality[uses_method == 1]) - mean(quality[uses_method == 0]) # <4>
+adjusted <- coef(lm(quality ~ uses_method + skill))[["uses_method"]] # <5>
+cat("Naive credit to the method:", round(naive, 2), "\n")
+cat("Adjusted for skill: ", round(adjusted, 2), " (true effect ",
+  method_effect, ")\n",
+  sep = ""
+)
+
+boxplot(quality ~ uses_method, # <6>
+  names = c("Standard method", "Fancy method"),
+  col = c("grey70", "#2166ac"), xlab = "",
+  ylab = "Quality of the analysis"
+)
+```
+1. The page's controls: the fancy method's true effect on quality, and how strongly skilled analysts gravitate to it.
+2. Fixes the random numbers so the run is reproducible.
+3. Skilled analysts are more likely to use the fancy method.
+4. The credit the method gets if you compare analyses that used it with those that didn't.
+5. The credit it deserves, once the analyst's skill is accounted for.
+6. Quality by method. The gap is mostly the analysts, not the method.
+
+## Python {.unlisted}
+
+```{.python}
+# The Methodological Attribution Problem: credit the analyst, not the method.
+import numpy as np
+import matplotlib.pyplot as plt
+
+method_effect = 0.1  # true effect of the fancy method
+selection = 2        # how strongly skill predicts using it
+rng = np.random.default_rng(40)
+
+skill = rng.normal(size=1000)
+uses = rng.binomial(1, 1 / (1 + np.exp(-selection * skill)))
+quality = method_effect * uses + skill + rng.normal(0, 0.5, 1000)
+
+naive = quality[uses == 1].mean() - quality[uses == 0].mean()
+X = np.column_stack([np.ones(1000), uses, skill])
+adjusted = np.linalg.lstsq(X, quality, rcond=None)[0][1]
+print(f"Naive credit to the method: {naive:.2f}")
+print(f"Adjusted for skill: {adjusted:.2f} (true effect {method_effect})")
+
+plt.boxplot([quality[uses == 0], quality[uses == 1]], patch_artist=True)
+plt.xticks([1, 2], ["Standard method", "Fancy method"])
+plt.ylabel("Quality of the analysis")
+plt.show()
+```
+
+:::
 
 </details>
 

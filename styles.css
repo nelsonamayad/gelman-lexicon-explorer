@@ -6,7 +6,7 @@
    drops to a serif default while the fonts load or if they are blocked. */
 
 :root {
-  --bs-body-font-family: "Source Sans 3", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bs-body-font-family: "News Cycle", "News Gothic MN", "Franklin Gothic Book", "Arial Narrow", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
   --bs-font-monospace: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
 
@@ -15,11 +15,113 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, .title, .topic-name, .navbar-title {
-  font-family: "Source Serif 4", Georgia, "Times New Roman", serif;
+  font-family: var(--bs-body-font-family);
+  font-weight: 700;
 }
 
 code, pre, kbd, samp {
   font-family: var(--bs-font-monospace);
+}
+
+/* ---------- Navbar ----------
+   Icons come from the `icon:` fields in _quarto.yml. The navbar is blue with
+   light text in light mode and light blue with dark text in dark mode, so the
+   hover and active highlights mix in currentColor and work in both. */
+
+#quarto-header .navbar {
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.navbar .nav-link {
+  border-radius: 0.4rem;
+  white-space: nowrap;
+  transition: background-color 0.15s ease;
+}
+
+/* With icons the menu needs more room: between the collapsed (phone and
+   tablet) navbar and wide screens, show the logo without the long title. */
+@media (min-width: 992px) and (max-width: 1399.98px) {
+  .navbar-brand .navbar-title {
+    display: none;
+  }
+}
+
+.navbar .nav-link .bi,
+.navbar .dropdown-item .bi {
+  margin-right: 0.3rem;
+}
+
+.navbar .dropdown-item .bi {
+  color: var(--bs-primary);
+  width: 1.1rem;
+  display: inline-block;
+}
+
+@media (min-width: 992px) {
+  .navbar .nav-link:hover,
+  .navbar .nav-link:focus-visible,
+  .navbar .nav-link.show {
+    background-color: color-mix(in srgb, currentColor 13%, transparent);
+  }
+  .navbar .nav-link.active {
+    background-color: color-mix(in srgb, currentColor 20%, transparent);
+  }
+}
+
+.navbar .dropdown-menu {
+  border-radius: 0.5rem;
+  box-shadow: 0 0.5rem 1.25rem rgba(0, 0, 0, 0.15);
+  padding: 0.35rem;
+}
+
+.navbar .dropdown-item {
+  border-radius: 0.35rem;
+  padding: 0.35rem 0.7rem;
+}
+
+/* ---------- Page titles and headings ---------- */
+
+#title-block-header .title {
+  letter-spacing: -0.01em;
+}
+
+#title-block-header .description {
+  font-size: 1.1rem;
+  color: var(--bs-secondary-color);
+}
+
+main h2:not(.unlisted) {
+  padding-bottom: 0.3rem;
+  border-bottom: 2px solid rgba(var(--bs-primary-rgb), 0.25);
+}
+
+.callout {
+  border-radius: 0.5rem;
+}
+
+/* "Show simulation code" and its language tabs. */
+details.code-fold > summary {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 999px;
+  font-size: 0.9rem;
+  color: var(--bs-secondary-color);
+  cursor: pointer;
+}
+
+details.code-fold > summary:hover {
+  color: var(--bs-primary);
+  border-color: var(--bs-primary);
+}
+
+details.code-fold[open] > summary {
+  margin-bottom: 0.75rem;
+}
+
+.sim-code .panel-tabset .nav-tabs .nav-link {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.85rem;
 }
 
 /* ---------- Home page ---------- */
@@ -32,6 +134,14 @@ code, pre, kbd, samp {
 
 .hero .btn {
   margin-top: 0.5rem;
+}
+
+/* Site version, shown under the hero buttons. */
+.site-version {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.85rem;
+  color: var(--bs-secondary-color);
 }
 
 .topic-grid {
@@ -76,10 +186,13 @@ code, pre, kbd, samp {
 }
 
 .topic-name {
-  font-family: var(--bs-headings-font-family, inherit);
   font-weight: 700;
   font-size: 1.1rem;
   color: var(--bs-primary);
+}
+
+.topic-icon {
+  margin-right: 0.45rem;
 }
 
 .topic-count {

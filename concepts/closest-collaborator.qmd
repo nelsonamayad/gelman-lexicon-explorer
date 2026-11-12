@@ -42,7 +42,7 @@ An analysis has 40 decisions. Choose how many you document, and see how much of 
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ html`<div class="sim-readout">${md`After 6 months you can reconstruct about **${
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 
 viewof docFrac = Inputs.range([0, 1], {value: 0.3, step: 0.05, label: "Fraction of decisions documented"})
 viewof tau = Inputs.range([1, 24], {value: 4, step: 1, label: "Memory half-life (months)"})
@@ -118,6 +124,74 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Your closest collaborator: you, six months ago.
+doc_frac <- 0.3 # fraction of decisions documented # <1>
+tau <- 4 # memory half-life (months)
+set.seed(104) # <2>
+
+D <- 40
+lambda <- log(2) / tau
+months <- 0:24
+expected <- D * (doc_frac + (1 - doc_frac) * exp(-lambda * months)) # <3>
+recovered <- sapply(months, function(t) { # <4>
+  sum(seq_len(D) <= doc_frac * D | runif(D) < exp(-lambda * t))
+})
+
+cat(
+  "Decisions you can reconstruct after 6 months: about",
+  round(expected[months == 6]), "of 40\n"
+)
+cat("After two years: about", round(expected[months == 24]), "of 40\n")
+
+plot(months, recovered, # <5>
+  pch = 19, col = "#2166ac", ylim = c(0, D),
+  xlab = "Months later", ylab = "Decisions you can reconstruct"
+)
+lines(months, expected, col = "#2166ac")
+abline(h = doc_frac * D, col = "#d6604d", lty = 2) # documentation's floor
+```
+1. The page's controls: the fraction of decisions you wrote down, and how fast memory of the rest fades (its half-life in months).
+2. Fixes the random numbers so the run is reproducible.
+3. The expected number of the 40 decisions you can reconstruct: the documented ones, plus the undocumented ones you still remember.
+4. One simulated you at each delay: documented decisions survive, undocumented ones are remembered with decaying probability.
+5. Reconstructable decisions over two years. The dashed line is the floor set by documentation.
+
+## Python {.unlisted}
+
+```{.python}
+# Your closest collaborator: you, six months ago.
+import numpy as np
+import matplotlib.pyplot as plt
+
+doc_frac = 0.3  # fraction of decisions documented
+tau = 4         # memory half-life (months)
+rng = np.random.default_rng(104)
+
+D, lam = 40, np.log(2) / tau
+months = np.arange(25)
+expected = D * (doc_frac + (1 - doc_frac) * np.exp(-lam * months))
+documented = np.arange(D) < doc_frac * D
+recovered = [np.sum(documented | (rng.uniform(size=D) < np.exp(-lam * t)))
+             for t in months]
+
+print(f"Decisions you can reconstruct after 6 months: about "
+      f"{expected[6]:.0f} of 40")
+print(f"After two years: about {expected[24]:.0f} of 40")
+
+plt.plot(months, recovered, "o", color="#2166ac")
+plt.plot(months, expected, color="#2166ac")
+plt.axhline(doc_frac * D, color="#d6604d", linestyle="--")
+plt.ylim(0, D)
+plt.xlabel("Months later")
+plt.ylabel("Decisions you can reconstruct")
+plt.show()
+```
+
+:::
 
 </details>
 

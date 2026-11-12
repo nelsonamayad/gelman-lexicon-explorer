@@ -36,7 +36,7 @@ A flawed paper is published and its error is discovered later. Change how quickl
 
 ```{ojs}
 //| echo: false
-import {range, sum, fmt, pct} from "../js/stats.js"
+import {range, sum, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -81,8 +81,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {range, sum, fmt, pct} from "../js/stats.js"
+import {range, sum, pct} from "../js/stats.js"
 
 viewof delay = Inputs.range([1, 60], {value: 24, step: 1, label: "Months until the error is found"})
 viewof loudness = Inputs.range([0.01, 1], {value: 0.08, step: 0.01, label: "Correction attention relative to the original"})
@@ -105,6 +111,74 @@ Plot.plot({
   marks: [Plot.areaY(attention, {x: "t", y: "a", fill: "kind", fillOpacity: 0.5, z: "kind"}), Plot.ruleY([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The wedding, never about the marriage: corrections get little attention.
+delay <- 24 # months until the error is found # <1>
+loudness <- 0.08 # correction attention relative to the original
+half_life <- 6 # attention half-life (months)
+# Deterministic: no random numbers.
+
+t <- 0:120
+lam <- log(2) / half_life
+wedding <- 100 * exp(-lam * t) # the publication # <2>
+marriage <- ifelse(t >= delay, 100 * loudness * exp(-lam * (t - delay)), 0) # <3>
+cat("The correction gets ", round(100 * sum(marriage) / sum(wedding), 1),
+  "% as much attention as the original\nBy the time the error is ",
+  "found, ", round(100 * (1 - exp(-lam * delay))), "% of the paper's ",
+  "attention is already spent\n",
+  sep = ""
+)
+
+matplot(t, cbind(wedding, marriage), # <4>
+  type = "l", lty = 1, lwd = 2,
+  col = c("#2166ac", "#d6604d"), xlab = "Months since publication",
+  ylab = "Attention"
+)
+legend("topright", c("Original publication", "Correction"),
+  col = c("#2166ac", "#d6604d"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: how long until the error is found, how loud the correction is relative to the original, and how fast attention fades. There is no seed: the model is deterministic.
+2. Attention to the publication, the wedding, decaying from the day it appears.
+3. Attention to the correction, the marriage: later, quieter, and decaying just as fast.
+4. Both over ten years. By the time the error is found, most of the attention has already been spent.
+
+## Python {.unlisted}
+
+```{.python}
+# The wedding, never about the marriage: corrections get little attention.
+import numpy as np
+import matplotlib.pyplot as plt
+
+delay = 24     # months until the error is found
+loudness = 0.08  # correction attention relative to the original
+half_life = 6  # attention half-life (months)
+# Deterministic: no random numbers.
+
+t = np.arange(121)
+lam = np.log(2) / half_life
+wedding = 100 * np.exp(-lam * t)                       # the publication
+marriage = np.where(t >= delay,
+                    100 * loudness * np.exp(-lam * (t - delay)), 0)
+print(f"The correction gets {100 * marriage.sum() / wedding.sum():.1f}% as "
+      "much attention as the original")
+print(f"By the time the error is found, "
+      f"{100 * (1 - np.exp(-lam * delay)):.0f}% of the paper's attention "
+      "is already spent")
+
+plt.plot(t, wedding, color="#2166ac", linewidth=2,
+         label="Original publication")
+plt.plot(t, marriage, color="#d6604d", linewidth=2, label="Correction")
+plt.xlabel("Months since publication")
+plt.ylabel("Attention")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

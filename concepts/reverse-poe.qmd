@@ -24,11 +24,11 @@ Source check: ✓ The explanation was checked against the source.
 
 ## Why it matters
 
-When sincere scientific claims become indistinguishable from satire, it's a sign that the field's quality control has broken down. Reviewers and readers have stopped asking "does this make any sense?" Reverse Poes are useful warning signals. If your first reaction to a finding is "this must be a joke," take that seriously as a prior, even when the paper comes with all the trappings of seriousness.
+When sincere scientific claims become indistinguishable from satire, it's a sign that the field's quality control has broken down. Reviewers and readers have stopped asking *does this make any sense?* Reverse Poes are useful warning signals. If your first reaction to a finding is *this must be a joke,* take that seriously as a prior, even when the paper comes with all the trappings of seriousness.
 
 ## How it works
 
-A toy picture. Give each text an "absurdity score." Parodies and sincere work each have a distribution of scores. Readers use a threshold, so anything above it is "probably a joke." When sincere work includes a heavy right tail of absurd claims, much of it lands above the threshold. Those are the Reverse Poes. The more the two distributions overlap, the harder it is to tell satire from science.
+A toy picture. Give each text an "absurdity score." Parodies and sincere work each have a distribution of scores. Readers use a threshold, so anything above it is *probably a joke.* When sincere work includes a heavy right tail of absurd claims, much of it lands above the threshold. Those are the Reverse Poes. The more the two distributions overlap, the harder it is to tell satire from science.
 
 ## Simulated example
 
@@ -36,7 +36,7 @@ There are 2,000 sincere papers and 300 parodies. Move the sincere distribution's
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -84,8 +84,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof tail = Inputs.range([0, 0.4], {value: 0.08, step: 0.01, label: "Share of sincere papers with absurd claims"})
 viewof threshold = Inputs.range([1, 5], {value: 3, step: 0.1, label: "Reader's 'must be a joke' threshold"})
@@ -112,6 +118,80 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Reverse Poe: sincere work so absurd that readers take it for parody.
+tail <- 0.08 # share of sincere papers with absurd claims # <1>
+threshold <- 3 # reader's "must be a joke" threshold
+set.seed(63) # <2>
+
+# Absurdity score of 2000 sincere papers and 300 parodies
+sincere <- ifelse(runif(2000) < tail, rnorm(2000, 4, 0.8), # <3>
+  rnorm(2000, 1, 0.8)
+)
+parody <- rnorm(300, 4.2, 0.8) # <4>
+rp <- sum(sincere > threshold) # <5>
+cat(rp + sum(parody > threshold), " texts look like jokes; ", rp,
+  " of them (", round(100 * rp / (rp + sum(parody > threshold))),
+  "%) are sincere\n",
+  sep = ""
+)
+
+breaks <- seq(-3, 8, by = 0.25)
+hist(sincere, # <6>
+  breaks = breaks, col = adjustcolor("#2166ac", 0.6),
+  border = "white", main = "", xlab = "Absurdity score",
+  ylab = "Texts"
+)
+hist(parody,
+  breaks = breaks, col = adjustcolor("#d6604d", 0.6),
+  border = "white", add = TRUE
+)
+abline(v = threshold, lty = 2)
+legend("topright", c("Sincere", "Parody"),
+  fill = c("#2166ac", "#d6604d"),
+  bty = "n"
+)
+```
+1. The page's controls: the share of sincere papers with absurd claims, and the absurdity at which a reader decides it must be a joke.
+2. Fixes the random numbers so the run is reproducible.
+3. Sincere papers, most of them ordinary, a tail of them absurd.
+4. Parodies, which are absurd by design.
+5. The reverse Poes: sincere papers absurd enough to be taken for parody.
+6. Absurdity scores of sincere work and parody. Where the distributions overlap, the reader cannot tell them apart.
+
+## Python {.unlisted}
+
+```{.python}
+# Reverse Poe: sincere work so absurd that readers take it for parody.
+import numpy as np
+import matplotlib.pyplot as plt
+
+tail = 0.08     # share of sincere papers with absurd claims
+threshold = 3   # reader's "must be a joke" threshold
+rng = np.random.default_rng(63)
+
+# Absurdity score of 2000 sincere papers and 300 parodies
+sincere = np.where(rng.uniform(size=2000) < tail, rng.normal(4, 0.8, 2000),
+                   rng.normal(1, 0.8, 2000))
+parody = rng.normal(4.2, 0.8, 300)
+rp, pp = np.sum(sincere > threshold), np.sum(parody > threshold)
+print(f"{rp + pp} texts look like jokes; {rp} of them "
+      f"({100 * rp / (rp + pp):.0f}%) are sincere")
+
+bins = np.arange(-3, 8.01, 0.25)
+plt.hist(sincere, bins=bins, color="#2166ac", alpha=0.6, label="Sincere")
+plt.hist(parody, bins=bins, color="#d6604d", alpha=0.6, label="Parody")
+plt.axvline(threshold, color="black", linestyle="--")
+plt.xlabel("Absurdity score")
+plt.ylabel("Texts")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

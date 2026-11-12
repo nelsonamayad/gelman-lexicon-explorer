@@ -32,11 +32,11 @@ Model a source as *reliable* (makes occasional errors, usually corrects them) or
 
 ## Simulated example
 
-Two sources make the same false claims at the same times. One corrects them. The other never does. Watch a reader's posterior belief that each source is reliable. There is no randomness in this model: it is a deterministic calculator, so the same settings always give the same answer and there is no random seed.
+A toy model, our own. Two sources make the same false claims at the same times. One corrects them. The other never does. Watch a reader's posterior belief that each source is reliable. There is no randomness in this model: it is a deterministic calculator, so the same settings always give the same answer and there is no random seed.
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {range, pct} from "../js/stats.js"
 
 viewof nErrors = Inputs.range([1, 10], {value: 4, step: 1, label: "Number of falsehoods exposed"})
 viewof pCorrectReliable = Inputs.range([0.5, 1], {value: 0.8, step: 0.05, label: "Pr(reliable source corrects an error)"})
@@ -121,6 +127,80 @@ Plot.plot({
   marks: [Plot.line(mcbroom, {x: "k", y: "p", stroke: "who", strokeWidth: 2, marker: "circle"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# McBroom's Law: sources that never correct their errors lose credibility.
+n_errors <- 4 # number of falsehoods exposed # <1>
+p_fix_reliable <- 0.8 # chance a reliable source corrects an error
+p_fix_unreliable <- 0.3 # chance an unreliable source corrects an error
+# Deterministic: no random numbers. A reader starts 80% sure the source is
+# reliable; an exposed error is 3 times likelier from an unreliable source.
+
+lr_error <- log(0.1 / 0.3) # <2>
+lr_fix <- log(p_fix_reliable / p_fix_unreliable) # <3>
+lr_no_fix <- log((1 - p_fix_reliable) / (1 - p_fix_unreliable))
+k <- 0:n_errors
+corrects <- plogis(log(0.8 / 0.2) + k * (lr_error + lr_fix)) # <4>
+never <- plogis(log(0.8 / 0.2) + k * (lr_error + lr_no_fix)) # <5>
+
+cat("Belief the source is reliable after ", n_errors, " exposed errors: ",
+  "corrects ", round(100 * tail(corrects, 1)), "% | never corrects ",
+  round(100 * tail(never, 1)), "%\n",
+  sep = ""
+)
+
+matplot(k, cbind(corrects, never), # <6>
+  type = "b", pch = 19, lty = 1,
+  col = c("#2166ac", "#d6604d"), ylim = c(0, 1),
+  xlab = "Falsehoods exposed", ylab = "Belief the source is reliable"
+)
+legend("bottomleft", c("Takes accountability", "Never takes accountability"),
+  col = c("#2166ac", "#d6604d"), pch = 19, bty = "n"
+)
+```
+1. The page's controls: how many falsehoods are exposed, and how likely a reliable and an unreliable source are to correct one. There is no seed: the model is deterministic.
+2. Each exposed error is evidence against reliability, because unreliable sources make more of them.
+3. A correction is evidence for reliability, because reliable sources correct more often.
+4. The reader's belief after each error for a source that corrects.
+5. The same for a source that never corrects: the same errors, plus the extra evidence of silence.
+6. Belief in the source's reliability as the errors mount. The refusal to correct is the more informative part.
+
+## Python {.unlisted}
+
+```{.python}
+# McBroom's Law: sources that never correct their errors lose credibility.
+import numpy as np
+import matplotlib.pyplot as plt
+
+n_errors = 4             # number of falsehoods exposed
+p_fix_reliable = 0.8     # chance a reliable source corrects an error
+p_fix_unreliable = 0.3   # chance an unreliable source corrects an error
+# Deterministic: no random numbers. A reader starts 80% sure the source is
+# reliable; an exposed error is 3 times likelier from an unreliable source.
+
+lr_error = np.log(0.1 / 0.3)
+lr_fix = np.log(p_fix_reliable / p_fix_unreliable)
+lr_no_fix = np.log((1 - p_fix_reliable) / (1 - p_fix_unreliable))
+k = np.arange(n_errors + 1)
+corrects = 1 / (1 + np.exp(-(np.log(4) + k * (lr_error + lr_fix))))
+never = 1 / (1 + np.exp(-(np.log(4) + k * (lr_error + lr_no_fix))))
+
+print(f"Belief the source is reliable after {n_errors} exposed errors: "
+      f"corrects {100 * corrects[-1]:.0f}% | never corrects "
+      f"{100 * never[-1]:.0f}%")
+
+plt.plot(k, corrects, "o-", color="#2166ac", label="Takes accountability")
+plt.plot(k, never, "o-", color="#d6604d", label="Never takes accountability")
+plt.ylim(0, 1)
+plt.xlabel("Falsehoods exposed")
+plt.ylabel("Belief the source is reliable")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

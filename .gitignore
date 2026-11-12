@@ -10,5 +10,9 @@ _site/
 /*.html
 /site_libs/
 concepts/*.html
-topics/*.html
+themes/*.html
+kinds/*.html
+r/*.html
+**/*-listing.json
 **/*_files/
+__pycache__/

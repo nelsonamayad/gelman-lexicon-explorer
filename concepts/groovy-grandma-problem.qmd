@@ -39,7 +39,7 @@ An online poll weighted to the correct age distribution. Vary how strongly "groo
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sum, fmt} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -98,8 +98,14 @@ html`<div class="sim-readout">${md`Among older *respondents*, **${fmt(100 * gran
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sum, fmt} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 
 viewof groovy = Inputs.range([0, 4], {value: 2.5, step: 0.1, label: "How much grooviness boosts response among older people"})
 viewof seed = Inputs.range([1, 500], {value: 149, step: 1, label: "Random seed"})
@@ -141,6 +147,85 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Groovy Grandma Problem: weighting fixes the age mix, not grooviness.
+groovy <- 2.5 # how much grooviness boosts response among older people # <1>
+set.seed(149) # <2>
+
+N <- 60000
+old <- rbinom(N, 1, 0.4)
+g <- rbinom(N, 1, ifelse(old == 1, 0.15, 0.5)) # "groovy" # <3>
+support <- rbinom(N, 1, 0.35 + 0.3 * g - 0.1 * old)
+resp <- runif(N) < plogis(-3 + ifelse(old == 1, -1 + groovy * g, 0.5 * g)) # <4>
+
+cell <- function(o) mean(support[resp & old == o])
+weighted <- 0.4 * cell(1) + 0.6 * cell(0) # weighted to the census age mix # <5>
+cat("Groovy among older respondents: ",
+  round(100 * mean(g[resp & old == 1])), "% (15% in the population)\n",
+  sep = ""
+)
+cat("Truth: ", round(100 * mean(support), 1), "% | weighted estimate: ",
+  round(100 * weighted, 1), "%\n",
+  sep = ""
+)
+
+est <- c(
+  Truth = mean(support), "Raw sample" = mean(support[resp]),
+  "Weighted by age" = weighted
+)
+dotchart(100 * est, # <6>
+  pch = 19, col = c("black", "#d6604d", "#d6604d"),
+  xlab = "Support (%)"
+)
+```
+1. The page's control: how much being groovy raises an older person's chance of answering the survey.
+2. Fixes the random numbers so the run is reproducible.
+3. Grooviness is rare among the old and common among the young, and it predicts the outcome.
+4. Who responds: older people rarely, unless they are groovy.
+5. Weighting fixes the age mix, but the older respondents are still the groovy ones.
+6. The truth, the raw sample and the weighted estimate. The weights adjusted for the wrong variable.
+
+## Python {.unlisted}
+
+```{.python}
+# The Groovy Grandma Problem: weighting fixes the age mix, not grooviness.
+import numpy as np
+import matplotlib.pyplot as plt
+
+groovy = 2.5  # how much grooviness boosts response among older people
+rng = np.random.default_rng(149)
+
+N = 60000
+old = rng.binomial(1, 0.4, N)
+g = rng.binomial(1, np.where(old == 1, 0.15, 0.5))  # "groovy"
+support = rng.binomial(1, 0.35 + 0.3 * g - 0.1 * old)
+logit = -3 + np.where(old == 1, -1 + groovy * g, 0.5 * g)
+resp = rng.uniform(size=N) < 1 / (1 + np.exp(-logit))
+
+
+def cell(o):
+    return support[resp & (old == o)].mean()
+
+
+weighted = 0.4 * cell(1) + 0.6 * cell(0)  # weighted to the census age mix
+print(f"Groovy among older respondents: "
+      f"{100 * g[resp & (old == 1)].mean():.0f}% (15% in the population)")
+print(f"Truth: {100 * support.mean():.1f}% | weighted estimate: "
+      f"{100 * weighted:.1f}%")
+
+est = {"Truth": support.mean(), "Raw sample": support[resp].mean(),
+       "Weighted by age": weighted}
+plt.scatter([100 * v for v in est.values()], list(est), s=80,
+            color=["black", "#d6604d", "#d6604d"])
+plt.xlabel("Support (%)")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

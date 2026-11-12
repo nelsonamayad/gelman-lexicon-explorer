@@ -73,7 +73,7 @@ Plot.plot({
   marginLeft: 230,
   x: {label: "RMSE across 500 questions", grid: true},
   y: {label: null},
-  marks: [Plot.barX(analysts, {y: "who", x: "rmse", fill: (d, i) => ["#999", "#2166ac", "#d6604d"][i]}), Plot.ruleX([0])]
+  marks: [Plot.barX(analysts, {y: "who", x: "rmse", fill: (d, i) => ["#8a8a8a", "#2166ac", "#d6604d"][i]}), Plot.ruleX([0])]
 })
 ```
 
@@ -86,6 +86,12 @@ html`<div class="sim-readout">${md`Error: raw survey **${fmt(analysts[0].rmse, 3
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
@@ -119,9 +125,78 @@ Plot.plot({
   marginLeft: 230,
   x: {label: "RMSE across 500 questions", grid: true},
   y: {label: null},
-  marks: [Plot.barX(analysts, {y: "who", x: "rmse", fill: (d, i) => ["#999", "#2166ac", "#d6604d"][i]}), Plot.ruleX([0])]
+  marks: [Plot.barX(analysts, {y: "who", x: "rmse", fill: (d, i) => ["#8a8a8a", "#2166ac", "#d6604d"][i]}), Plot.ruleX([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Chestertonian Principle: extreme skepticism is a form of credulity.
+survey_bias <- 0.08 # survey bias, known in direction and correctable # <1>
+alt_bias <- 0.12 # spread of the alternative source's unknown bias
+set.seed(65) # <2>
+
+truth <- runif(500, 0.1, 0.9) # 500 questions about attitudes
+survey <- truth - survey_bias * rnorm(500, 1, 0.3) + rnorm(500, 0, 0.03) # <3>
+corrected <- survey + survey_bias # model-based correction # <4>
+alternative <- truth + rnorm(500, 0, alt_bias) + rnorm(500, 0, 0.03) # <5>
+
+rmse <- sapply( # <6>
+  list(
+    "Trusts raw survey" = survey,
+    "Corrects survey biases" = corrected,
+    "Extreme skeptic" = alternative
+  ),
+  function(est) sqrt(mean((est - truth)^2))
+)
+print(round(rmse, 3))
+
+par(mar = c(4, 11, 1, 1))
+barplot(rev(rmse),
+  horiz = TRUE, las = 1,
+  col = c("#d6604d", "#2166ac", "grey70"),
+  xlab = "Root-mean-square error"
+)
+```
+1. The page's controls: the survey's bias, whose direction is known, and the spread of the alternative source's unknown bias.
+2. Fixes the random numbers so the run is reproducible.
+3. Five hundred survey estimates, each biased downward by roughly the known amount.
+4. The modeler's move: correct the known bias and accept what is left.
+5. The extreme skeptic rejects the survey and trusts another source whose bias is unknown and goes either way.
+6. Root-mean-square error of the three strategies. Rejecting a flawed-but-understood source for an unknown one is credulity, not skepticism.
+
+## Python {.unlisted}
+
+```{.python}
+# The Chestertonian Principle: extreme skepticism is a form of credulity.
+import numpy as np
+import matplotlib.pyplot as plt
+
+survey_bias = 0.08  # survey bias, known in direction and correctable
+alt_bias = 0.12     # spread of the alternative source's unknown bias
+rng = np.random.default_rng(65)
+
+truth = rng.uniform(0.1, 0.9, 500)  # 500 questions about attitudes
+survey = (truth - survey_bias * rng.normal(1, 0.3, 500)
+          + rng.normal(0, 0.03, 500))
+corrected = survey + survey_bias  # model-based correction
+alternative = truth + rng.normal(0, alt_bias, 500) + rng.normal(0, 0.03, 500)
+
+rmse = {"Trusts raw survey": survey, "Corrects survey biases": corrected,
+        "Extreme skeptic": alternative}
+rmse = {k: np.sqrt(np.mean((v - truth) ** 2)) for k, v in rmse.items()}
+for k, v in rmse.items():
+    print(f"{k}: root-mean-square error {v:.3f}")
+
+plt.barh(list(rmse)[::-1], list(rmse.values())[::-1],
+         color=["#d6604d", "#2166ac", "0.7"])
+plt.xlabel("Root-mean-square error")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

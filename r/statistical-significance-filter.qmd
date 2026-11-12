@@ -21,12 +21,12 @@ R draws different random numbers from the entry page, so the individual dots dif
 
 ```{webr}
 set.seed(42)
-theta <- 0.2   # true effect
-se    <- 0.25  # standard error of each study
-n_rep <- 400   # number of replications
+theta <- 0.2 # true effect
+se <- 0.25 # standard error of each study
+n_rep <- 400 # number of replications
 
 est <- rnorm(n_rep, mean = theta, sd = se)
-sig <- abs(est) > 1.96 * se          # statistically significant at the 5% level
+sig <- abs(est) > 1.96 * se # statistically significant at the 5% level
 
 power <- pnorm(theta / se - 1.96) + pnorm(-theta / se - 1.96)
 avg_sig <- mean(abs(est[sig]))
@@ -35,12 +35,18 @@ cat("Power:", round(power, 2), "\n")
 cat("Significant replications:", sum(sig), "of", n_rep, "\n")
 cat("Average magnitude of the significant estimates:", round(avg_sig, 2), "\n")
 cat("Exaggeration ratio:", round(avg_sig / theta, 1), "\n")
-cat("Significant estimates with the wrong sign:", sum(sign(est[sig]) != sign(theta)), "\n")
+cat(
+  "Significant estimates with the wrong sign:",
+  sum(sign(est[sig]) != sign(theta)), "
+"
+)
 
-plot(est, pch = ifelse(sig, 19, 1), col = ifelse(sig, "#d6604d", "grey50"),
-     xlab = "Replication", ylab = "Estimated effect")
-abline(h = c(-1.96, 1.96) * se, lty = 2, col = "grey50")  # significance thresholds
-abline(h = theta, col = "#2166ac", lwd = 2)                # the true effect
+plot(est,
+  pch = ifelse(sig, 19, 1), col = ifelse(sig, "#d6604d", "grey50"),
+  xlab = "Replication", ylab = "Estimated effect"
+)
+abline(h = c(-1.96, 1.96) * se, lty = 2, col = "grey50") # thresholds
+abline(h = theta, col = "#2166ac", lwd = 2) # the true effect
 abline(h = 0)
 ```
 
@@ -55,13 +61,15 @@ exaggeration <- function(theta, se, n_sims = 1e5) {
   mean(abs(est[sig])) / theta
 }
 
-se     <- 0.25
+se <- 0.25
 thetas <- seq(0.05, 1, by = 0.05)
-power  <- pnorm(thetas / se - 1.96) + pnorm(-thetas / se - 1.96)
-ratio  <- sapply(thetas, exaggeration, se = se)
+power <- pnorm(thetas / se - 1.96) + pnorm(-thetas / se - 1.96)
+ratio <- sapply(thetas, exaggeration, se = se)
 
-plot(power, ratio, type = "b", pch = 19, log = "y",
-     xlab = "Power", ylab = "Exaggeration ratio (log scale)")
+plot(power, ratio,
+  type = "b", pch = 19, log = "y",
+  xlab = "Power", ylab = "Exaggeration ratio (log scale)"
+)
 abline(h = 1, lty = 2)
 round(data.frame(power, ratio)[c(1, 4, 8, 12, 20), ], 2)
 ```

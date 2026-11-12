@@ -23,39 +23,51 @@ Each group has a true effect drawn from a distribution with spread `tau`, and is
 
 ```{webr}
 set.seed(17)
-J     <- 50     # groups
-tau   <- 0.1    # spread of the true effects (try 0: pure noise)
-sigma <- 0.5    # standard error of each group's estimate
+J <- 50 # groups
+tau <- 0.1 # spread of the true effects (try 0: pure noise)
+sigma <- 0.5 # standard error of each group's estimate
 
-theta <- rnorm(J, mean = 0, sd = tau)       # true effects
-y     <- rnorm(J, mean = theta, sd = sigma)  # noisy estimates
+theta <- rnorm(J, mean = 0, sd = tau) # true effects
+y <- rnorm(J, mean = theta, sd = sigma) # noisy estimates
 
 # Multilevel: estimate the variance of the true effects, then shrink
-mu   <- mean(y)
+mu <- mean(y)
 tau2 <- max(0, mean((y - mu)^2) - sigma^2)
-B    <- tau2 / (tau2 + sigma^2)   # share of the observed variation that is real
-pm   <- mu + B * (y - mu)         # partially pooled estimates
-psd  <- sqrt(B) * sigma           # their standard errors
+B <- tau2 / (tau2 + sigma^2) # share of the observed variation that is real
+pm <- mu + B * (y - mu) # partially pooled estimates
+psd <- sqrt(B) * sigma # their standard errors
 
 claim_np <- abs(y) > 1.96 * sigma
 claim_ml <- B > 0 & abs(pm) > 1.96 * psd
 data.frame(
-  approach   = c("No pooling", "Multilevel"),
-  claims     = c(sum(claim_np), sum(claim_ml)),
-  wrong_sign = c(sum(claim_np & sign(y) != sign(theta)),
-                 sum(claim_ml & sign(pm) != sign(theta)))
+  approach = c("No pooling", "Multilevel"),
+  claims = c(sum(claim_np), sum(claim_ml)),
+  wrong_sign = c(
+    sum(claim_np & sign(y) != sign(theta)),
+    sum(claim_ml & sign(pm) != sign(theta))
+  )
 )
 
 o <- order(y)
-plot(seq_len(J), theta[o], pch = 19, cex = 0.6, ylim = range(y - 2 * sigma, y + 2 * sigma),
-     xlab = "Group (sorted by raw estimate)", ylab = "Estimate ± 1.96 se")
-segments(seq_len(J) - 0.15, (y - 1.96 * sigma)[o], seq_len(J) - 0.15, (y + 1.96 * sigma)[o],
-         col = adjustcolor("#d6604d", 0.6))
-segments(seq_len(J) + 0.15, (pm - 1.96 * psd)[o], seq_len(J) + 0.15, (pm + 1.96 * psd)[o],
-         col = "#2166ac", lwd = 2)
+plot(seq_len(J), theta[o],
+  pch = 19, cex = 0.6, ylim = range(y - 2 * sigma, y + 2 * sigma),
+  xlab = "Group (sorted by raw estimate)", ylab = "Estimate ± 1.96 se"
+)
+segments(
+  seq_len(J) - 0.15, (y - 1.96 * sigma)[o],
+  seq_len(J) - 0.15, (y + 1.96 * sigma)[o],
+  col = adjustcolor("#d6604d", 0.6)
+)
+segments(
+  seq_len(J) + 0.15, (pm - 1.96 * psd)[o],
+  seq_len(J) + 0.15, (pm + 1.96 * psd)[o],
+  col = "#2166ac", lwd = 2
+)
 abline(h = 0)
-legend("topleft", c("No pooling", "Multilevel", "True effect"), bty = "n",
-       col = c("#d6604d", "#2166ac", "black"), lty = c(1, 1, NA), pch = c(NA, NA, 19))
+legend("topleft", c("No pooling", "Multilevel", "True effect"),
+  bty = "n",
+  col = c("#d6604d", "#2166ac", "black"), lty = c(1, 1, NA), pch = c(NA, NA, 19)
+)
 ```
 
 ## Repeat it a thousand times
@@ -65,16 +77,24 @@ One simulated world can be lucky or unlucky. Averaging over many worlds shows ho
 ```{webr}
 one_world <- function(tau, sigma = 0.5, J = 50) {
   theta <- rnorm(J, 0, tau)
-  y     <- rnorm(J, theta, sigma)
-  mu    <- mean(y)
-  B     <- max(0, mean((y - mu)^2) - sigma^2) / (max(0, mean((y - mu)^2) - sigma^2) + sigma^2)
-  pm    <- mu + B * (y - mu)
-  c(no_pooling = sum(abs(y) > 1.96 * sigma & sign(y) != sign(theta)),
-    multilevel = sum(B > 0 & abs(pm) > 1.96 * sqrt(B) * sigma & sign(pm) != sign(theta)))
+  y <- rnorm(J, theta, sigma)
+  mu <- mean(y)
+  tau2_hat <- max(0, mean((y - mu)^2) - sigma^2)
+  B <- tau2_hat / (tau2_hat + sigma^2)
+  pm <- mu + B * (y - mu)
+  c(
+    no_pooling = sum(abs(y) > 1.96 * sigma & sign(y) != sign(theta)),
+    multilevel = sum(
+      B > 0 & abs(pm) > 1.96 * sqrt(B) * sigma & sign(pm) != sign(theta)
+    )
+  )
 }
 
 # Average number of confident claims with the wrong sign, per 50 groups.
-# With tau = 0 every true effect is zero, so every confident claim counts as wrong.
-sapply(c(tau_0 = 0, tau_0.1 = 0.1, tau_0.5 = 0.5),
-       function(tau) rowMeans(replicate(1000, one_world(tau))))
+# With tau = 0 every true effect is zero, so every confident claim counts
+# as wrong.
+sapply(
+  c(tau_0 = 0, tau_0.1 = 0.1, tau_0.5 = 0.5),
+  function(tau) rowMeans(replicate(1000, one_world(tau)))
+)
 ```

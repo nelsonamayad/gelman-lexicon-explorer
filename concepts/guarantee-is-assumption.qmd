@@ -20,7 +20,7 @@ Source check: ✓ The explanation was checked against the source.
 
 ## What it is
 
-Statistical methods are often sold with guarantees: *this interval is guaranteed to have 95% coverage,* "randomization guarantees unbiasedness," *this procedure controls the false discovery rate.* Each guarantee is a theorem, and theorems have hypotheses. When you hear "guarantee," Gelman says, translate it as "assumption," and then ask whether the assumption holds.
+Statistical methods are often sold with guarantees: *this interval is guaranteed to have 95% coverage,* *randomization guarantees unbiasedness,* *this procedure controls the false discovery rate.* Each guarantee is a theorem, and theorems have hypotheses. When you hear "guarantee," Gelman says, translate it as "assumption," and then ask whether the assumption holds.
 
 ## Why it matters
 
@@ -36,7 +36,7 @@ Simulate the coverage of the "guaranteed" 95% t-interval for a mean when the dat
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -86,8 +86,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, pct} from "../js/stats.js"
 
 viewof skew = Inputs.range([0.01, 2], {value: 1.2, step: 0.01, label: "Skewness (log-normal sigma)"})
 viewof n = Inputs.range([5, 200], {value: 15, step: 5, label: "Sample size"})
@@ -116,6 +122,83 @@ Plot.plot({
   marks: [Plot.barX(guarantee.reps, Plot.groupY({x: "proportion"}, {y: "miss", fill: d => d.miss === "Covers" ? "#2166ac" : "#d6604d"})), Plot.ruleX([0.95], {stroke: "currentColor", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# When researchers say "guarantee", they mean an assumption.
+skew <- 1.2 # skewness: sigma of the log-normal distribution # <1>
+n <- 15 # sample size
+set.seed(115) # <2>
+
+true_mean <- exp(skew^2 / 2)
+tcrit <- qt(0.975, n - 1)
+miss <- replicate(3000, {
+  y <- rlnorm(n, 0, skew) # <3>
+  half <- tcrit * sd(y) / sqrt(n) # <4>
+  if (mean(y) + half < true_mean) {
+    "too low"
+  } else if (mean(y) - half > true_mean) "too high" else "covers"
+})
+
+cat("Coverage of the 'guaranteed' 95% t-interval: ",
+  round(100 * mean(miss == "covers"), 1), "%\n",
+  sep = ""
+)
+cat("Intervals entirely below the true mean: ",
+  round(100 * mean(miss == "too low"), 1), "%\n",
+  sep = ""
+)
+
+barplot(table(factor(miss, c("too low", "covers", "too high"))) / 3000, # <5>
+  col = c("#d6604d", "#2166ac", "#e6ab02"),
+  ylab = "Share of intervals"
+)
+abline(h = 0.95, lty = 2)
+```
+1. The page's controls: how skewed the data are and the sample size.
+2. Fixes the random numbers so the run is reproducible.
+3. Log-normal data: incomes, response times, anything with a long right tail.
+4. The textbook t-interval, whose 95% guarantee assumes normal data.
+5. How often the interval covers, falls entirely below, or entirely above the true mean. The dashed line is the guaranteed 95%.
+
+## Python {.unlisted}
+
+```{.python}
+# When researchers say "guarantee", they mean an assumption.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+skew = 1.2  # skewness: sigma of the log-normal distribution
+n = 15      # sample size
+rng = np.random.default_rng(115)
+
+# 97.5% quantile of the t distribution, from a series in 1/df
+z = NormalDist().inv_cdf(0.975)
+df = n - 1
+tcrit = (z + (z ** 3 + z) / (4 * df)
+         + (5 * z ** 5 + 16 * z ** 3 + 3 * z) / (96 * df ** 2))
+
+true_mean = np.exp(skew ** 2 / 2)
+y = rng.lognormal(0, skew, (3000, n))
+m, half = y.mean(axis=1), tcrit * y.std(axis=1, ddof=1) / np.sqrt(n)
+too_low, too_high = m + half < true_mean, m - half > true_mean
+covers = ~too_low & ~too_high
+
+print(f"Coverage of the 'guaranteed' 95% t-interval: "
+      f"{100 * covers.mean():.1f}%")
+print(f"Intervals entirely below the true mean: {100 * too_low.mean():.1f}%")
+
+plt.bar(["too low", "covers", "too high"],
+        [too_low.mean(), covers.mean(), too_high.mean()],
+        color=["#d6604d", "#2166ac", "#e6ab02"])
+plt.axhline(0.95, color="black", linestyle="--")
+plt.ylabel("Share of intervals")
+plt.show()
+```
+
+:::
 
 </details>
 

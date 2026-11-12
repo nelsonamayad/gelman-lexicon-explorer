@@ -36,7 +36,7 @@ The true effect is zero, and 30 reasonable specifications give correlated estima
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -74,8 +74,8 @@ Plot.plot({
   x: {label: "Specification (sorted by estimate)"},
   y: {label: "Estimate ± 1.96 se", grid: true},
   marks: [
-    Plot.ruleX(specs, {x: "rank", y1: "lo", y2: "hi", stroke: d => d.reported ? "#d6604d" : "#bbb", strokeWidth: d => d.reported ? 3 : 1.5}),
-    Plot.dot(specs, {x: "rank", y: "est", fill: d => d.reported ? "#d6604d" : "#999", r: 3}),
+    Plot.ruleX(specs, {x: "rank", y1: "lo", y2: "hi", stroke: d => d.reported ? "#d6604d" : "#8a8a8a", strokeWidth: d => d.reported ? 3 : 1.5}),
+    Plot.dot(specs, {x: "rank", y: "est", fill: d => d.reported ? "#d6604d" : "#8a8a8a", r: 3}),
     Plot.ruleY([0]),
     Plot.ruleY([trueEff], {stroke: "#2166ac", strokeDasharray: "4 3"})
   ]
@@ -95,8 +95,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 
 viewof trueEff = Inputs.range([0, 0.5], {value: 0, step: 0.05, label: "True effect"})
 viewof corr = Inputs.range([0, 0.95], {value: 0.7, step: 0.05, label: "Correlation among specifications"})
@@ -128,13 +134,96 @@ Plot.plot({
   x: {label: "Specification (sorted by estimate)"},
   y: {label: "Estimate ± 1.96 se", grid: true},
   marks: [
-    Plot.ruleX(specs, {x: "rank", y1: "lo", y2: "hi", stroke: d => d.reported ? "#d6604d" : "#bbb", strokeWidth: d => d.reported ? 3 : 1.5}),
-    Plot.dot(specs, {x: "rank", y: "est", fill: d => d.reported ? "#d6604d" : "#999", r: 3}),
+    Plot.ruleX(specs, {x: "rank", y1: "lo", y2: "hi", stroke: d => d.reported ? "#d6604d" : "#8a8a8a", strokeWidth: d => d.reported ? 3 : 1.5}),
+    Plot.dot(specs, {x: "rank", y: "est", fill: d => d.reported ? "#d6604d" : "#8a8a8a", r: 3}),
     Plot.ruleY([0]),
     Plot.ruleY([trueEff], {stroke: "#2166ac", strokeDasharray: "4 3"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Robustness checks: 30 specifications, only a few of them reported.
+true_eff <- 0 # true effect # <1>
+corr <- 0.7 # correlation among specifications
+set.seed(118) # <2>
+
+se <- 0.15
+# Only datasets where some specification is significant become a paper
+tries <- 0
+repeat {
+  tries <- tries + 1
+  common <- rnorm(1, 0, se)
+  est <- true_eff + sqrt(corr) * common + sqrt(1 - corr) * rnorm(30, 0, se) # <3>
+  if (any(abs(est) > 1.96 * se) || tries >= 500) break # <4>
+}
+main <- est[which.max(abs(est))] # the headline specification # <5>
+reported <- order(abs(est - main))[1:6] # and five "robustness checks" # <6>
+cat("Datasets tried before a significant one: ", tries, "\n",
+  "Significant: ", sum(abs(est[reported]) > 1.96 * se), " of 6 reported",
+  " specifications, ", sum(abs(est) > 1.96 * se), " of all 30\n",
+  sep = ""
+)
+
+o <- order(est)
+plot(est[o], 1:30, # <7>
+  pch = 19, xlim = range(est) + c(-0.3, 0.3),
+  col = ifelse(o %in% reported, "#d6604d", "grey50"),
+  xlab = "Estimate with 95% interval", ylab = "Specification"
+)
+segments(est[o] - 1.96 * se, 1:30, est[o] + 1.96 * se, 1:30,
+  col = ifelse(o %in% reported, "#d6604d", "grey70")
+)
+abline(v = c(0, true_eff), lty = c(1, 2))
+```
+1. The page's controls: the true effect and how correlated the 30 specifications are.
+2. Fixes the random numbers so the run is reproducible.
+3. Thirty reasonable specifications of the same analysis, with correlated estimates.
+4. Only a dataset in which some specification is significant becomes a paper.
+5. The headline specification: the most significant one.
+6. The robustness checks: the five specifications that agree most closely with the headline.
+7. All 30 specifications, the reported six in red. The table was chosen, not discovered.
+
+## Python {.unlisted}
+
+```{.python}
+# Robustness checks: 30 specifications, only a few of them reported.
+import numpy as np
+import matplotlib.pyplot as plt
+
+true_eff = 0  # true effect
+corr = 0.7    # correlation among specifications
+rng = np.random.default_rng(120)
+
+se = 0.15
+# Only datasets where some specification is significant become a paper
+for tries in range(1, 501):
+    common = rng.normal(0, se)
+    est = (true_eff + np.sqrt(corr) * common
+           + np.sqrt(1 - corr) * rng.normal(0, se, 30))
+    if np.any(np.abs(est) > 1.96 * se):
+        break
+main = est[np.argmax(np.abs(est))]            # the headline specification
+reported = np.argsort(np.abs(est - main))[:6]  # and five "robustness checks"
+sig = np.abs(est) > 1.96 * se
+print(f"Datasets tried before a significant one: {tries}")
+print(f"Significant: {sig[reported].sum()} of 6 reported specifications, "
+      f"{sig.sum()} of all 30")
+
+o = np.argsort(est)
+cols = np.where(np.isin(o, reported), "#d6604d", "0.5")
+plt.errorbar(est[o], np.arange(30), xerr=1.96 * se, fmt="none",
+             ecolor=cols)
+plt.scatter(est[o], np.arange(30), c=cols, zorder=3)
+plt.axvline(0, color="black")
+plt.xlabel("Estimate with 95% interval (red: reported)")
+plt.ylabel("Specification")
+plt.show()
+```
+
+:::
 
 </details>
 

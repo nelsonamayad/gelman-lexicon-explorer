@@ -66,7 +66,7 @@ Plot.plot({
   height: 260,
   x: {label: "Estimate of the treatment effect (true = 0.3)", grid: true},
   y: {label: "Replications"},
-  color: {legend: true, domain: ["Preregistered (the floor)", "Plus labeled exploratory analysis"], range: ["#999", "#2166ac"]},
+  color: {legend: true, domain: ["Preregistered (the floor)", "Plus labeled exploratory analysis"], range: ["#8a8a8a", "#2166ac"]},
   marks: [
     Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "floorEst", fill: () => "Preregistered (the floor)", fillOpacity: 0.5, thresholds: 40})),
     Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "adjEst", fill: () => "Plus labeled exploratory analysis", fillOpacity: 0.6, thresholds: 40})),
@@ -88,6 +88,12 @@ Plot.plot({
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, sd, ols, fmt, pct} from "../js/stats.js"
@@ -114,7 +120,7 @@ Plot.plot({
   height: 260,
   x: {label: "Estimate of the treatment effect (true = 0.3)", grid: true},
   y: {label: "Replications"},
-  color: {legend: true, domain: ["Preregistered (the floor)", "Plus labeled exploratory analysis"], range: ["#999", "#2166ac"]},
+  color: {legend: true, domain: ["Preregistered (the floor)", "Plus labeled exploratory analysis"], range: ["#8a8a8a", "#2166ac"]},
   marks: [
     Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "floorEst", fill: () => "Preregistered (the floor)", fillOpacity: 0.5, thresholds: 40})),
     Plot.rectY(prereg, Plot.binX({y: "count"}, {x: "adjEst", fill: () => "Plus labeled exploratory analysis", fillOpacity: 0.6, thresholds: 40})),
@@ -123,6 +129,93 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Preregistration: a plan that adjusts for a baseline covariate.
+rho <- 0.7 # correlation of the baseline covariate with the outcome # <1>
+n <- 60 # participants per arm
+set.seed(133) # <2>
+
+effect <- 0.3
+res <- t(replicate(500, {
+  z <- rep(1:0, each = n)
+  x <- rnorm(2 * n)
+  y <- effect * z + rho * x + sqrt(1 - rho^2) * rnorm(2 * n)
+  floor <- t.test(y[z == 1], y[z == 0]) # difference in means # <3>
+  adj <- summary(lm(y ~ z + x))$coefficients["z", 1:2] # <4>
+  c(
+    floor_est = unname(diff(rev(floor$estimate))),
+    floor_se = floor$stderr, adj_est = adj[[1]], adj_se = adj[[2]]
+  )
+}))
+cover <- function(e, s) mean(abs(res[, e] - effect) < 1.96 * res[, s]) # <5>
+cat("Difference in means: average se ", round(mean(res[, "floor_se"]), 3),
+  ", coverage ", round(100 * cover("floor_est", "floor_se")), "%\n",
+  "Adjusted for baseline: average se ", round(mean(res[, "adj_se"]), 3),
+  ", coverage ", round(100 * cover("adj_est", "adj_se")), "%\n",
+  sep = ""
+)
+
+boxplot(res[, c("floor_est", "adj_est")], # <6>
+  col = c("grey70", "#2166ac"),
+  names = c("Difference in means", "Adjusted for baseline"),
+  ylab = "Estimated effect"
+)
+abline(h = effect, lty = 2)
+```
+1. The page's controls: how strongly the baseline covariate predicts the outcome, and the participants per arm.
+2. Fixes the random numbers so the run is reproducible.
+3. The preregistered floor: a plain difference in means.
+4. The preregistered plan's better analysis: adjust for the baseline covariate, which was named in advance.
+5. Coverage of each method's intervals, to show the adjustment is honest.
+6. Both estimates across 500 trials. Preregistration is a floor, not a ceiling: the planned adjustment is more precise and just as valid.
+
+## Python {.unlisted}
+
+```{.python}
+# Preregistration: a plan that adjusts for a baseline covariate.
+import numpy as np
+import matplotlib.pyplot as plt
+
+rho = 0.7  # correlation of the baseline covariate with the outcome
+n = 60     # participants per arm
+rng = np.random.default_rng(133)
+
+effect = 0.3
+z = np.repeat([1, 0], n)
+floor_est, floor_se, adj_est, adj_se = [], [], [], []
+for _ in range(500):
+    x = rng.normal(size=2 * n)
+    y = effect * z + rho * x + np.sqrt(1 - rho ** 2) * rng.normal(size=2 * n)
+    t, c = y[z == 1], y[z == 0]
+    floor_est.append(t.mean() - c.mean())   # difference in means
+    floor_se.append(np.sqrt(t.var(ddof=1) / n + c.var(ddof=1) / n))
+    X = np.column_stack([np.ones(2 * n), z, x])  # adjusted regression
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    s2 = np.sum((y - X @ beta) ** 2) / (2 * n - 3)
+    adj_est.append(beta[1])
+    adj_se.append(np.sqrt(s2 * np.linalg.inv(X.T @ X)[1, 1]))
+
+
+def cover(e, s):
+    return 100 * np.mean(np.abs(np.array(e) - effect) < 1.96 * np.array(s))
+
+
+print(f"Difference in means: average se {np.mean(floor_se):.3f}, "
+      f"coverage {cover(floor_est, floor_se):.0f}%")
+print(f"Adjusted for baseline: average se {np.mean(adj_se):.3f}, "
+      f"coverage {cover(adj_est, adj_se):.0f}%")
+
+plt.boxplot([floor_est, adj_est])
+plt.xticks([1, 2], ["Difference in means", "Adjusted for baseline"])
+plt.axhline(effect, color="black", linestyle="--")
+plt.ylabel("Estimated effect")
+plt.show()
+```
+
+:::
 
 </details>
 

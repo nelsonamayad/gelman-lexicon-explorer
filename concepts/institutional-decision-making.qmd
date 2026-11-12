@@ -38,7 +38,7 @@ An agency oversees 2,000 homes. Each home has an uncertain true radon level. A m
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sum, pnorm, dnorm, fmt} from "../js/stats.js"
+import {rng, range, sum, dnorm, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -94,7 +94,7 @@ Plot.plot({
   x: {label: "Net benefit per home ($)", grid: true},
   y: {label: null},
   marks: [
-    Plot.barX(policies, {y: "policy", x: "perHome", fill: d => d.policy === "Decision analysis" ? "#2166ac" : "#bbb", sort: {y: "x", reverse: true}}),
+    Plot.barX(policies, {y: "policy", x: "perHome", fill: d => d.policy === "Decision analysis" ? "#2166ac" : "#8a8a8a", sort: {y: "x", reverse: true}}),
     Plot.ruleX([0])
   ]
 })
@@ -114,8 +114,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sum, pnorm, dnorm, fmt} from "../js/stats.js"
+import {rng, range, sum, dnorm, fmt} from "../js/stats.js"
 
 viewof testCost = Inputs.range([0, 300], {value: 50, step: 10, label: "Cost of a test ($)"})
 viewof fixCost = Inputs.range([500, 3000], {value: 1500, step: 100, label: "Cost of remediation ($)"})
@@ -165,11 +171,108 @@ Plot.plot({
   x: {label: "Net benefit per home ($)", grid: true},
   y: {label: null},
   marks: [
-    Plot.barX(policies, {y: "policy", x: "perHome", fill: d => d.policy === "Decision analysis" ? "#2166ac" : "#bbb", sort: {y: "x", reverse: true}}),
+    Plot.barX(policies, {y: "policy", x: "perHome", fill: d => d.policy === "Decision analysis" ? "#2166ac" : "#8a8a8a", sort: {y: "x", reverse: true}}),
     Plot.ruleX([0])
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Institutional decision making: when to test homes for radon.
+test_cost <- 50 # cost of a test ($) # <1>
+fix_cost <- 1500 # cost of remediation ($)
+benefit <- 700 # health value per unit of radon removed ($)
+set.seed(5) # <2>
+
+s <- 0.6 # model's predictive sd (log scale)
+pred <- rnorm(2000, 0.4, 0.7) # predicted log radon for each home # <3>
+level <- exp(rnorm(2000, pred, s)) # true radon level
+gain <- function(l) pmax(benefit * (l - 1) - fix_cost, 0) # test, then fix
+fix_gain <- function(l) benefit * pmax(l - 1, 0) - fix_cost # fix, no test
+
+# Expected values over each home's predictive distribution (grid over z)
+z <- seq(-4, 4, by = 0.05)
+wz <- dnorm(z) * 0.05
+L <- exp(outer(pred, s * z, "+"))
+e_fix <- benefit * (pmax(L - 1, 0) %*% wz) - fix_cost # <4>
+e_test <- gain(L) %*% wz - test_cost # <5>
+best <- pmax(0, e_fix, e_test) # <6>
+decision <- ifelse(best == 0, 0, ifelse(best == e_fix, fix_gain(level),
+  gain(level) - test_cost
+))
+per_home <- c(
+  "Do nothing" = 0, "Remediate all" = mean(fix_gain(level)),
+  "Test all" = mean(gain(level) - test_cost),
+  "Decision analysis" = mean(decision)
+)
+print(round(per_home)) # net value per home ($)
+
+par(mar = c(4, 9, 1, 1))
+barplot(per_home, # <7>
+  horiz = TRUE, las = 1,
+  col = c("grey70", "grey70", "grey70", "#2166ac"),
+  xlab = "Net value per home ($)"
+)
+```
+1. The page's controls: the cost of a radon test, the cost of remediation, and the health value of each unit of radon removed.
+2. Fixes the random numbers so the run is reproducible.
+3. A model's prediction of each home's radon level, with uncertainty.
+4. The expected value of remediating without testing, averaged over the home's predictive distribution.
+5. The expected value of testing first and remediating only if the test warrants it.
+6. The decision analysis: for each home, do nothing, remediate, or test, whichever has the highest expected value.
+7. Net value per home of the four policies. Making the decision home by home, from the model's uncertainty, beats every blanket rule.
+
+## Python {.unlisted}
+
+```{.python}
+# Institutional decision making: when to test homes for radon.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+test_cost = 50   # cost of a test ($)
+fix_cost = 1500  # cost of remediation ($)
+benefit = 700    # health value per unit of radon removed ($)
+rng = np.random.default_rng(5)
+
+s = 0.6                               # model's predictive sd (log scale)
+pred = rng.normal(0.4, 0.7, 2000)     # predicted log radon for each home
+level = np.exp(rng.normal(pred, s))   # true radon level
+
+
+def gain(lv):        # test first, fix only if worth it
+    return np.maximum(0, benefit * (lv - 1) - fix_cost)
+
+
+def fix_gain(lv):    # fix without testing
+    return benefit * np.maximum(0, lv - 1) - fix_cost
+
+
+# Expected values over each home's predictive distribution (grid over z)
+z = np.arange(-4, 4.001, 0.05)
+wz = np.array([NormalDist().pdf(v) for v in z]) * 0.05
+L = np.exp(pred[:, None] + s * z[None, :])
+e_fix = benefit * (np.maximum(0, L - 1) @ wz) - fix_cost
+e_test = gain(L) @ wz - test_cost
+best = np.maximum(0, np.maximum(e_fix, e_test))
+decision = np.where(best == 0, 0, np.where(best == e_fix, fix_gain(level),
+                                           gain(level) - test_cost))
+per_home = {"Do nothing": 0, "Remediate all": fix_gain(level).mean(),
+            "Test all": (gain(level) - test_cost).mean(),
+            "Decision analysis": decision.mean()}
+for k, v in per_home.items():
+    print(f"{k}: {v:.0f} dollars per home")
+
+plt.barh(list(per_home), list(per_home.values()),
+         color=["0.7", "0.7", "0.7", "#2166ac"])
+plt.xlabel("Net value per home ($)")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

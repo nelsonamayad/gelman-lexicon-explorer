@@ -24,7 +24,7 @@ A result that happens to be correct is not much use if you can't tell it's corre
 
 ## Why it matters
 
-Code fails silently and models fail quietly. One check, such as "the sampler converged" or *the coefficient has the expected sign,* catches some errors and misses others. Several *independent* checks catch far more. Without such a web, a correct result and an incorrect one look the same to the analyst, and so do their published versions.
+Code fails silently and models fail quietly. One check, such as *the sampler converged* or *the coefficient has the expected sign,* catches some errors and misses others. Several *independent* checks catch far more. Without such a web, a correct result and an incorrect one look the same to the analyst, and so do their published versions.
 
 ## How it works
 
@@ -42,7 +42,7 @@ An analysis may contain a bug. Add independent checks, each with modest power, a
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -75,7 +75,7 @@ Plot.plot({
   x: {label: "Number of checks"},
   y: {label: "Share of bugs that get through", domain: [0, 1], tickFormat: "%", grid: true},
   marks: [
-    Plot.line(web, {x: "K", y: "theory", stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line(web, {x: "K", y: "theory", stroke: "#8a8a8a", strokeDasharray: "4 3"}),
     Plot.line(web, {x: "K", y: "missed", stroke: "#2166ac", strokeWidth: 2}),
     Plot.dot(web, {x: "K", y: "missed", fill: "#2166ac"})
   ]
@@ -92,8 +92,14 @@ html`<div class="sim-readout">${md`With one check, **${pct(web[1].missed)}** of 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof pCatch = Inputs.range([0.1, 0.9], {value: 0.4, step: 0.05, label: "Power of each check"})
 viewof shared = Inputs.range([0, 1], {value: 0, step: 0.05, label: "Correlation between checks (shared blind spots)"})
@@ -120,12 +126,76 @@ Plot.plot({
   x: {label: "Number of checks"},
   y: {label: "Share of bugs that get through", domain: [0, 1], tickFormat: "%", grid: true},
   marks: [
-    Plot.line(web, {x: "K", y: "theory", stroke: "#999", strokeDasharray: "4 3"}),
+    Plot.line(web, {x: "K", y: "theory", stroke: "#8a8a8a", strokeDasharray: "4 3"}),
     Plot.line(web, {x: "K", y: "missed", stroke: "#2166ac", strokeWidth: 2}),
     Plot.dot(web, {x: "K", y: "missed", fill: "#2166ac"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Web of Trust: more checks catch more bugs, unless they share blind spots.
+p_catch <- 0.4 # power of each check # <1>
+shared <- 0 # correlation between checks (shared blind spots)
+set.seed(106) # <2>
+
+K <- 0:8
+missed <- sapply(K, function(k) {
+  mean(replicate(4000, {
+    blind <- runif(1) < shared # the bug is in a common blind spot # <3>
+    !any(!blind & runif(k) < p_catch) # <4>
+  }))
+})
+cat("Share of bugs that get through: 1 check ", round(100 * missed[2]),
+  "%, 5 checks ", round(100 * missed[6]), "%, 8 checks ",
+  round(100 * missed[9], 1), "%\n",
+  sep = ""
+)
+
+plot(K, missed, # <5>
+  type = "b", pch = 19, col = "#2166ac", ylim = c(0, 1),
+  xlab = "Number of independent checks", ylab = "Share of bugs missed"
+)
+lines(K, (1 - p_catch)^K, lty = 2)
+```
+1. The page's controls: the power of each check and how much the checks share blind spots.
+2. Fixes the random numbers so the run is reproducible.
+3. Some bugs sit in a blind spot that every check shares.
+4. A bug gets through if no check catches it.
+5. The share of bugs missed against the number of checks, with the independent-checks curve dashed. Each weak strand helps, as long as the strands are independent.
+
+## Python {.unlisted}
+
+```{.python}
+# Web of Trust: more checks catch more bugs, unless they share blind spots.
+import numpy as np
+import matplotlib.pyplot as plt
+
+p_catch = 0.4  # power of each check
+shared = 0     # correlation between checks (shared blind spots)
+rng = np.random.default_rng(106)
+
+K = np.arange(9)
+missed = []
+for k in K:
+    blind = rng.uniform(size=4000) < shared   # bug in a common blind spot
+    caught = (rng.uniform(size=(4000, k)) < p_catch).any(axis=1) & ~blind
+    missed.append(np.mean(~caught))
+print(f"Share of bugs that get through: 1 check {100 * missed[1]:.0f}%, "
+      f"5 checks {100 * missed[5]:.0f}%, 8 checks {100 * missed[8]:.1f}%")
+
+plt.plot(K, missed, "o-", color="#2166ac", label="Simulated")
+plt.plot(K, (1 - p_catch) ** K, "k--", label="Independent-checks ideal")
+plt.ylim(0, 1)
+plt.xlabel("Number of independent checks")
+plt.ylabel("Share of bugs missed")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

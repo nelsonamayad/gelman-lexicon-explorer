@@ -36,7 +36,7 @@ Compare the coverage the textbook promises (95%) with the coverage of the proced
 
 ```{ojs}
 //| echo: false
-import {rng, range, ols, fmt, pct} from "../js/stats.js"
+import {rng, range, ols, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -91,8 +91,14 @@ html`<div class="sim-readout">${md`The analyst dropped x₂ in **${pct(practice[
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, ols, fmt, pct} from "../js/stats.js"
+import {rng, range, ols, pct} from "../js/stats.js"
 
 viewof beta2 = Inputs.range([0, 0.6], {value: 0.2, step: 0.02, label: "True effect of x₂ (β₂)"})
 viewof rhoX = Inputs.range([0, 0.95], {value: 0.7, step: 0.05, label: "Correlation between x₁ and x₂"})
@@ -130,6 +136,103 @@ Plot.plot({
   marks: [Plot.barX(practice, {y: "proc", x: "cov", fill: (d, i) => i ? "#d6604d" : "#2166ac"}), Plot.ruleX([0.95], {stroke: "currentColor", strokeDasharray: "4 3"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Theoretical statistics is the theory of applied statistics: analyze the
+# procedure people actually use.
+beta2 <- 0.2 # true effect of x2 # <1>
+rho_x <- 0.7 # correlation between x1 and x2
+set.seed(121) # <2>
+
+beta1 <- 0.5
+n <- 80
+res <- t(replicate(1000, {
+  x1 <- rnorm(n)
+  x2 <- rho_x * x1 + sqrt(1 - rho_x^2) * rnorm(n)
+  y <- beta1 * x1 + beta2 * x2 + rnorm(n)
+  full <- summary(lm(y ~ x1 + x2))$coefficients
+  in_full <- abs(full["x1", 1] - beta1) < 1.96 * full["x1", 2] # <3>
+  drop <- abs(full["x2", 3]) < 1.96 # pretest: drop x2 if n.s. # <4>
+  if (drop) {
+    red <- summary(lm(y ~ x1))$coefficients # <5>
+    in_used <- abs(red["x1", 1] - beta1) < 1.96 * red["x1", 2]
+  } else {
+    in_used <- in_full
+  }
+  c(textbook = in_full, practice = in_used, dropped = drop)
+}))
+cat("x2 dropped in ", round(100 * mean(res[, "dropped"])), "% of datasets\n",
+  "Coverage of the reported 95% interval: textbook ",
+  round(100 * mean(res[, "textbook"]), 1), "%, as practiced ",
+  round(100 * mean(res[, "practice"]), 1), "%\n",
+  sep = ""
+)
+
+barplot(100 * colMeans(res[, 1:2]), # <6>
+  col = c("#2166ac", "#d6604d"),
+  names.arg = c("Always fit the full model", "Pretest, drop, report"),
+  ylab = "Coverage of the 95% interval (%)", ylim = c(0, 100)
+)
+abline(h = 95, lty = 2)
+```
+1. The page's controls: the true effect of the second predictor and its correlation with the first.
+2. Fixes the random numbers so the run is reproducible.
+3. The textbook procedure: always fit the full model and report its interval.
+4. The procedure as practiced: pretest the second predictor and drop it if it isn't significant.
+5. After dropping it, report the reduced model's interval as if nothing had happened.
+6. Coverage of the two procedures. The theory that matters is the theory of what analysts actually do.
+
+## Python {.unlisted}
+
+```{.python}
+# Theoretical statistics is the theory of applied statistics: analyze the
+# procedure people actually use.
+import numpy as np
+import matplotlib.pyplot as plt
+
+beta2 = 0.2  # true effect of x2
+rho_x = 0.7  # correlation between x1 and x2
+rng = np.random.default_rng(121)
+
+beta1, n = 0.5, 80
+
+
+def ols(X, y):  # coefficients and standard errors, with an intercept
+    X = np.column_stack([np.ones(len(y)), X])
+    beta, *_ = np.linalg.lstsq(X, y, rcond=None)
+    s2 = np.sum((y - X @ beta) ** 2) / (len(y) - X.shape[1])
+    return beta, np.sqrt(s2 * np.diag(np.linalg.inv(X.T @ X)))
+
+
+textbook = practice = dropped = 0
+for _ in range(1000):
+    x1 = rng.normal(size=n)
+    x2 = rho_x * x1 + np.sqrt(1 - rho_x ** 2) * rng.normal(size=n)
+    y = beta1 * x1 + beta2 * x2 + rng.normal(size=n)
+    b, se = ols(np.column_stack([x1, x2]), y)
+    in_full = abs(b[1] - beta1) < 1.96 * se[1]
+    textbook += in_full
+    if abs(b[2] / se[2]) < 1.96:          # pretest: drop x2 if n.s.
+        dropped += 1
+        b, se = ols(x1, y)
+        practice += abs(b[1] - beta1) < 1.96 * se[1]
+    else:
+        practice += in_full
+print(f"x2 dropped in {dropped / 10:.0f}% of datasets")
+print(f"Coverage of the reported 95% interval: textbook "
+      f"{textbook / 10:.1f}%, as practiced {practice / 10:.1f}%")
+
+plt.bar(["Always fit the full model", "Pretest, drop, report"],
+        [textbook / 10, practice / 10], color=["#2166ac", "#d6604d"])
+plt.axhline(95, color="black", linestyle="--")
+plt.ylim(0, 100)
+plt.ylabel("Coverage of the 95% interval (%)")
+plt.show()
+```
+
+:::
 
 </details>
 

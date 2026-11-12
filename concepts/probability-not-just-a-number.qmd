@@ -78,7 +78,7 @@ Plot.plot({
   marginLeft: 110,
   x: {label: "Probability", domain: [0, 1], tickFormat: "%", grid: true},
   y: {label: null, domain: net.map(d => d.stmt)},
-  marks: [Plot.barX(net, {y: "stmt", x: "p", fill: (d, i) => i < 2 ? "#999" : "#2166ac"}), Plot.text(net, {y: "stmt", x: "p", text: d => pct(d.p), dx: 4, textAnchor: "start"})]
+  marks: [Plot.barX(net, {y: "stmt", x: "p", fill: (d, i) => i < 2 ? "#8a8a8a" : "#2166ac"}), Plot.text(net, {y: "stmt", x: "p", text: d => pct(d.p), dx: 4, textAnchor: "start"})]
 })
 ```
 
@@ -91,6 +91,12 @@ html`<div class="sim-readout">${md`The headline numbers (grey) don't change. Wit
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, qnorm, fmt, pct} from "../js/stats.js"
@@ -123,9 +129,77 @@ Plot.plot({
   marginLeft: 110,
   x: {label: "Probability", domain: [0, 1], tickFormat: "%", grid: true},
   y: {label: null, domain: net.map(d => d.stmt)},
-  marks: [Plot.barX(net, {y: "stmt", x: "p", fill: (d, i) => i < 2 ? "#999" : "#2166ac"}), Plot.text(net, {y: "stmt", x: "p", text: d => pct(d.p), dx: 4, textAnchor: "start"})]
+  marks: [Plot.barX(net, {y: "stmt", x: "p", fill: (d, i) => i < 2 ? "#8a8a8a" : "#2166ac"}), Plot.text(net, {y: "stmt", x: "p", text: d => pct(d.p), dx: 4, textAnchor: "start"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# A probability isn't just a number: correlated outcomes in two states.
+p_A <- 0.7 # P(win state A) = P(win state B) # <1>
+rho <- 0.7 # correlation between the states' outcomes
+set.seed(114) # <2>
+
+N <- 40000
+cut <- qnorm(1 - p_A)
+z1 <- rnorm(N)
+z2 <- rho * z1 + sqrt(1 - rho^2) * rnorm(N) # <3>
+A <- z1 > cut
+B <- z2 > cut
+probs <- c( # <4>
+  "P(A)" = mean(A), "P(B)" = mean(B), "P(A and B)" = mean(A & B),
+  "P(B | won A)" = mean(B[A]), "P(B | lost A)" = mean(B[!A])
+)
+print(round(probs, 2))
+cat(
+  "If the states were independent, P(A and B) would be",
+  round(p_A^2, 2), "\n"
+)
+
+par(mar = c(4, 8, 1, 1))
+barplot(rev(probs), # <5>
+  horiz = TRUE, las = 1, xlim = c(0, 1),
+  col = "#2166ac", xlab = "Probability"
+)
+```
+1. The page's controls: the probability of winning each state, and the correlation between the two outcomes.
+2. Fixes the random numbers so the run is reproducible.
+3. The two states' outcomes share a common component, so they move together.
+4. The marginal probabilities, the joint probability and the conditionals. The number 0.7 alone determines none of the last three.
+5. The probabilities side by side. A probability comes with a joint distribution, not just a number.
+
+## Python {.unlisted}
+
+```{.python}
+# A probability isn't just a number: correlated outcomes in two states.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+p_A = 0.7  # P(win state A) = P(win state B)
+rho = 0.7  # correlation between the states' outcomes
+rng = np.random.default_rng(114)
+
+N = 40000
+cut = NormalDist().inv_cdf(1 - p_A)
+z1 = rng.normal(size=N)
+z2 = rho * z1 + np.sqrt(1 - rho ** 2) * rng.normal(size=N)
+A, B = z1 > cut, z2 > cut
+probs = {"P(A)": A.mean(), "P(B)": B.mean(), "P(A and B)": (A & B).mean(),
+         "P(B | won A)": B[A].mean(), "P(B | lost A)": B[~A].mean()}
+for k, v in probs.items():
+    print(f"{k}: {v:.2f}")
+print(f"If the states were independent, P(A and B) would be {p_A ** 2:.2f}")
+
+plt.barh(list(probs)[::-1], list(probs.values())[::-1], color="#2166ac")
+plt.xlim(0, 1)
+plt.xlabel("Probability")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

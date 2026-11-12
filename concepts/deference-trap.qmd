@@ -36,7 +36,7 @@ Run 15 generations of a literature, with 100 studies per generation. Each builds
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -94,8 +94,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pct} from "../js/stats.js"
 
 viewof baseError = Inputs.range([0, 0.3], {value: 0.1, step: 0.01, label: "Chance a new study is wrong on its own"})
 viewof inherit = Inputs.range([0, 1], {value: 0.4, step: 0.05, label: "Chance a wrong foundation compromises a study"})
@@ -133,6 +139,108 @@ Plot.plot({
   marks: [Plot.line(trap, {x: "gen", y: "share", stroke: "label", strokeWidth: 2, marker: "circle"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Deference Trap: errors spread through a literature that never checks itself.
+base_error <- 0.1 # chance a new study is wrong on its own # <1>
+inherit <- 0.4 # chance a wrong foundation compromises a study
+check_rate <- 0.2 # share of wrong studies caught by meta-science each round
+set.seed(87) # <2>
+
+run <- function(check) { # <3>
+  wrong <- runif(100) < base_error
+  flagged <- rep(FALSE, 100)
+  share <- mean(wrong)
+  for (g in 1:15) { # 15 generations of 100 studies
+    flagged <- flagged | (wrong & runif(length(wrong)) < check) # <4>
+    usable <- which(!flagged)
+    if (length(usable) == 0) usable <- seq_along(wrong)
+    new <- runif(100) < base_error
+    for (k in 1:3) { # each new study builds on three earlier ones
+      cited <- usable[sample.int(length(usable), 100, replace = TRUE)]
+      new <- new | (wrong[cited] & runif(100) < inherit) # <5>
+    }
+    keep <- max(1, length(wrong) - 199):length(wrong) # the last 200
+    wrong <- c(wrong[keep], new)
+    flagged <- c(flagged[keep], rep(FALSE, 100))
+    share <- c(share, mean(new))
+  }
+  share
+}
+deference <- run(0)
+checked <- run(check_rate)
+
+cat("Compromised after 15 generations: ", round(100 * tail(deference, 1)),
+  "% with pure deference, ", round(100 * tail(checked, 1)),
+  "% with meta-science checking\n",
+  sep = ""
+)
+
+matplot(0:15, cbind(deference, checked), # <6>
+  type = "l", lty = 1, lwd = 2,
+  col = c("#d6604d", "#2166ac"), ylim = c(0, 1), xlab = "Generation",
+  ylab = "Share of new studies compromised"
+)
+legend("topleft", c("No meta-science", "With meta-science checking"),
+  col = c("#d6604d", "#2166ac"), lwd = 2, bty = "n"
+)
+```
+1. The page's controls: how often a new study is wrong on its own, how often a wrong foundation compromises a study that builds on it, and how much of the wrong work meta-science catches each round.
+2. Fixes the random numbers so the run is reproducible.
+3. Fifteen generations of 100 studies, with or without meta-science checking.
+4. Checking: some of the wrong studies get flagged and are no longer built on.
+5. Deference: each new study builds on three earlier ones and inherits their errors.
+6. The share of new studies compromised, generation by generation.
+
+## Python {.unlisted}
+
+```{.python}
+# Deference Trap: errors spread through a literature that never checks itself.
+import numpy as np
+import matplotlib.pyplot as plt
+
+base_error = 0.1  # chance a new study is wrong on its own
+inherit = 0.4     # chance a wrong foundation compromises a study
+check_rate = 0.2  # share of wrong studies caught by meta-science each round
+rng = np.random.default_rng(87)
+
+
+def run(check):
+    wrong = rng.uniform(size=100) < base_error
+    flagged = np.zeros(100, dtype=bool)
+    share = [wrong.mean()]
+    for _ in range(15):      # 15 generations of 100 studies
+        flagged |= wrong & (rng.uniform(size=wrong.size) < check)
+        usable = np.flatnonzero(~flagged)
+        if usable.size == 0:
+            usable = np.arange(wrong.size)
+        new = rng.uniform(size=100) < base_error
+        for _ in range(3):   # each new study builds on three earlier ones
+            cited = rng.choice(usable, 100)
+            new |= wrong[cited] & (rng.uniform(size=100) < inherit)
+        wrong = np.concatenate([wrong[-200:], new])  # keep the last 200
+        flagged = np.concatenate([flagged[-200:], np.zeros(100, bool)])
+        share.append(new.mean())
+    return share
+
+
+deference, checked = run(0), run(check_rate)
+print(f"Compromised after 15 generations: {100 * deference[-1]:.0f}% with "
+      f"pure deference, {100 * checked[-1]:.0f}% with meta-science checking")
+
+plt.plot(deference, color="#d6604d", linewidth=2, label="No meta-science")
+plt.plot(checked, color="#2166ac", linewidth=2,
+         label="With meta-science checking")
+plt.ylim(0, 1)
+plt.xlabel("Generation")
+plt.ylabel("Share of new studies compromised")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

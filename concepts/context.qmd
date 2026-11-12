@@ -43,7 +43,7 @@ This toy model is our own. It takes one frame Gelman mentions, "prominent skepti
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, fmt} from "../js/stats.js"
 
 viewof readers = Inputs.range([10, 1000], {value: 100, step: 10, label: "Readers (thousands)"})
 viewof oneIn = Inputs.range([100, 10000], {value: 1000, step: 100, label: "Chance a dead device revives in a year: 1 in"})
@@ -114,6 +120,58 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Context: in the coincidence frame, how often does an uncanny event happen?
+readers <- 100 # readers (thousands) # <1>
+one_in <- 1000 # chance a dead device revives in a year: 1 in ...
+special <- 3 # days a year that carry special meaning
+set.seed(111) # <2>
+
+lambda <- readers * 1000 / one_in * special / 365 # expected per year # <3>
+per_year <- rpois(50, lambda) # 50 simulated years # <4>
+
+cat("Expected coincidences per year:", round(lambda, 1), "\n")
+cat("Years (of 50) with at least one:", sum(per_year > 0), "\n")
+
+plot(1975:2024, per_year, # <5>
+  type = "h", lwd = 4, col = "#2166ac",
+  xlab = "Year", ylab = "Readers with an uncanny revival"
+)
+```
+1. The page's controls: how many readers there are, how rare the event is, and how many days a year would count as uncanny.
+2. Fixes the random numbers so the run is reproducible.
+3. The expected number of uncanny coincidences per year, once the whole context is counted: many readers, many devices, several meaningful days.
+4. Fifty simulated years of coincidences.
+5. Coincidences per year. In the right frame, the uncanny is routine.
+
+## Python {.unlisted}
+
+```{.python}
+# Context: in the coincidence frame, how often does an uncanny event happen?
+import numpy as np
+import matplotlib.pyplot as plt
+
+readers = 100   # readers (thousands)
+one_in = 1000   # chance a dead device revives in a year: 1 in ...
+special = 3     # days a year that carry special meaning
+rng = np.random.default_rng(111)
+
+lam = readers * 1000 / one_in * special / 365  # expected per year
+per_year = rng.poisson(lam, 50)                 # 50 simulated years
+
+print(f"Expected coincidences per year: {lam:.1f}")
+print(f"Years (of 50) with at least one: {(per_year > 0).sum()}")
+
+plt.vlines(np.arange(1975, 2025), 0, per_year, color="#2166ac", linewidth=4)
+plt.xlabel("Year")
+plt.ylabel("Readers with an uncanny revival")
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -95,6 +95,12 @@ html`<div class="sim-readout">${md`Regression coefficient: **${fmt(aee[0].value)
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, ols, fmt} from "../js/stats.js"
 
@@ -130,6 +136,81 @@ Plot.plot({
   marks: [Plot.barX(aee, {y: "what", x: "value", fill: (d, i) => i ? "#d6604d" : "#2166ac"}), Plot.ruleX([0])]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The "All Else Equal" Fallacy: a regression coefficient vs an intervention.
+beta <- 0.5 # direct effect of X on Y # <1>
+delta <- -1 # how Z responds to X
+gamma <- 0.8 # effect of Z on Y
+set.seed(17) # <2>
+
+simulate <- function(shift) {
+  x <- rnorm(2000) + shift
+  z <- delta * x + rnorm(2000) # <3>
+  data.frame(x, z, y = beta * x + gamma * z + rnorm(2000))
+}
+obs <- simulate(0)
+coef <- coef(lm(y ~ x + z, data = obs))[["x"]] # "all else equal" # <4>
+after <- simulate(1) # raise X by 1 and let Z respond
+total <- mean(after$y) - mean(obs$y) # <5>
+
+cat("Regression coefficient (all else equal):", round(coef, 2), "\n")
+cat("Actual effect of raising X by 1:", round(total, 2), "\n")
+cat("Theory, beta + gamma * delta:", beta + gamma * delta, "\n")
+
+barplot(c("Regression coefficient" = coef, "Actual effect" = total), # <6>
+  horiz = TRUE, col = c("#2166ac", "#d6604d"), xlim = c(-2.5, 2.5),
+  xlab = "Change in Y", las = 1, cex.names = 0.8
+)
+abline(v = 0)
+```
+1. The page's controls: the direct effect of X on Y, how Z responds to X, and the effect of Z on Y.
+2. Fixes the random numbers so the run is reproducible.
+3. Z responds to X. That is what makes holding Z constant different from intervening on X.
+4. The regression coefficient on X, which holds Z fixed: the all-else-equal comparison.
+5. What actually happens to Y when X is raised by one unit and Z is allowed to respond.
+6. The two numbers side by side. They agree only when Z does not respond to X.
+
+## Python {.unlisted}
+
+```{.python}
+# The "All Else Equal" Fallacy: a regression coefficient vs an intervention.
+import numpy as np
+import matplotlib.pyplot as plt
+
+beta = 0.5    # direct effect of X on Y
+delta = -1    # how Z responds to X
+gamma = 0.8   # effect of Z on Y
+rng = np.random.default_rng(17)
+
+
+def simulate(shift):
+    x = rng.normal(size=2000) + shift
+    z = delta * x + rng.normal(size=2000)
+    return x, z, beta * x + gamma * z + rng.normal(size=2000)
+
+
+x, z, y = simulate(0)
+X = np.column_stack([np.ones_like(x), x, z])
+coef = np.linalg.lstsq(X, y, rcond=None)[0][1]  # "all else equal"
+_, _, y_after = simulate(1)       # raise X by 1 and let Z respond
+total = y_after.mean() - y.mean()
+
+print(f"Regression coefficient (all else equal): {coef:.2f}")
+print(f"Actual effect of raising X by 1: {total:.2f}")
+print(f"Theory, beta + gamma * delta: {beta + gamma * delta:.2f}")
+
+plt.barh(["Regression coefficient", "Actual effect"], [coef, total],
+         color=["#2166ac", "#d6604d"])
+plt.axvline(0, color="black", linewidth=0.8)
+plt.xlim(-2.5, 2.5)
+plt.xlabel("Change in Y")
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -64,7 +64,7 @@ Plot.plot({
   height: 280,
   x: {label: "Scruple (standardized)", grid: true},
   y: {label: "Share of group", tickFormat: "%"},
-  color: {legend: true, range: ["#999", "#d6604d"], domain: ["Everyone else", "Top 2% by citations"]},
+  color: {legend: true, range: ["#8a8a8a", "#d6604d"], domain: ["Everyone else", "Top 2% by citations"]},
   marks: [Plot.rectY(careers, Plot.binX({y: "proportion-facet"}, {x: "S", fill: "group", fillOpacity: 0.55, thresholds: 30, mixBlendMode: "multiply"}))],
   facet: undefined
 })
@@ -82,6 +82,12 @@ Plot.plot({
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, mean, fmt} from "../js/stats.js"
@@ -106,11 +112,88 @@ Plot.plot({
   height: 280,
   x: {label: "Scruple (standardized)", grid: true},
   y: {label: "Share of group", tickFormat: "%"},
-  color: {legend: true, range: ["#999", "#d6604d"], domain: ["Everyone else", "Top 2% by citations"]},
+  color: {legend: true, range: ["#8a8a8a", "#d6604d"], domain: ["Everyone else", "Top 2% by citations"]},
   marks: [Plot.rectY(careers, Plot.binX({y: "proportion-facet"}, {x: "S", fill: "group", fillOpacity: 0.55, thresholds: 30, mixBlendMode: "multiply"}))],
   facet: undefined
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Originality, ambition, and lack of scruple: who rises to the top?
+reward <- 1 # how much citations reward exaggeration # <1>
+set.seed(151) # <2>
+
+N <- 5000
+O <- rnorm(N)
+A <- rnorm(N)
+S <- rnorm(N) # originality, ambition, scruple
+exaggeration <- pmax(0, A - S) # <3>
+cites <- O + reward * exaggeration + rnorm(N, 0, 0.5) # <4>
+top <- rank(-cites) <= 100 # the top 2% by citations # <5>
+
+means <- rbind(
+  "Top 2% by citations" = c(
+    mean(O[top]), mean(A[top]),
+    mean(S[top])
+  ),
+  "Everyone else" = c(
+    mean(O[!top]), mean(A[!top]),
+    mean(S[!top])
+  )
+)
+colnames(means) <- c("Originality", "Ambition", "Scruple")
+print(round(means, 2))
+
+barplot(means, # <6>
+  beside = TRUE, col = c("#d6604d", "grey70"),
+  ylab = "Average (standard units)", legend.text = TRUE,
+  args.legend = list(x = "topright", bty = "n")
+)
+abline(h = 0)
+```
+1. The page's control: how much citations reward exaggeration.
+2. Fixes the random numbers so the run is reproducible.
+3. Exaggeration happens when ambition exceeds scruple.
+4. Citations reward originality, and exaggeration too.
+5. The top 2% by citations.
+6. The top group against everyone else on originality, ambition and scruple. Selection on citations selects for the combination.
+
+## Python {.unlisted}
+
+```{.python}
+# Originality, ambition, and lack of scruple: who rises to the top?
+import numpy as np
+import matplotlib.pyplot as plt
+
+reward = 1  # how much citations reward exaggeration
+rng = np.random.default_rng(151)
+
+N = 5000
+O, A, S = rng.normal(size=(3, N))  # originality, ambition, scruple
+exaggeration = np.maximum(0, A - S)
+cites = O + reward * exaggeration + rng.normal(0, 0.5, N)
+top = np.argsort(-cites).argsort() < 100  # the top 2% by citations
+
+traits = {"Originality": O, "Ambition": A, "Scruple": S}
+for name, v in traits.items():
+    print(f"{name}: top 2% {v[top].mean():.2f}, "
+          f"everyone else {v[~top].mean():.2f}")
+
+x = np.arange(3)
+plt.bar(x - 0.2, [v[top].mean() for v in traits.values()], 0.4,
+        color="#d6604d", label="Top 2% by citations")
+plt.bar(x + 0.2, [v[~top].mean() for v in traits.values()], 0.4,
+        color="0.7", label="Everyone else")
+plt.xticks(x, list(traits))
+plt.axhline(0, color="black")
+plt.ylabel("Average (standard units)")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

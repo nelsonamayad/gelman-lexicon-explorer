@@ -4,12 +4,18 @@ date: 2026-11-09
 author:
   - name: Nelson Amaya D
     url: https://github.com/nelsonamayad
-  - name: Claude Opus 5.5
+  - name: Claude Fable 5.1
 sidebar: false
 toc: true
 ---
 
-The **Andrew Gelman Statistical Lexicon Explorer** is a study aid built around Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/), created by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Opus 5.5. It is an independent project. It is not affiliated with or endorsed by Andrew Gelman, and any mistakes in it are ours.
+## What is this?
+
+The **Andrew Gelman Statistical Lexicon Explorer** is a study aid built around Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/), created by [Nelson Amaya D](https://github.com/nelsonamayad) and Claude Fable 5.1.
+
+::: {.callout-warning title="Not affiliated with Andrew Gelman"}
+This is an independent project. It is not affiliated with, endorsed by or reviewed by Andrew Gelman. The entry names and definitions are his; the explanations and simulations are ours, and so are any mistakes in them.
+:::
 
 ## Where the entries come from
 
@@ -36,6 +42,8 @@ Quotation marks on these pages are kept for words someone actually said or wrote
 
 Every simulation runs in your browser with [Observable JS](https://quarto.org/docs/interactive/ojs/). There is no server: everything is computed in your browser. All pages share the helper functions in `js/stats.js`: a seeded random number generator, common distributions and regression routines. That means a given random seed always reproduces the same draws. Click **Show simulation code** under a simulation to see all of its code.
 
+The code comes in three languages, on tabs: the Observable JS that runs on the page, and the same simulation written in R and in Python, so you can copy it and run it on your own computer. The R versions use only base R. The Python versions use NumPy and Matplotlib. Each one prints the result in words and draws the chart. Where a simulation draws random numbers, each language uses its own random number generator, so the exact numbers differ a little from the page's, but they show the same pattern. The tab you pick is remembered on every page.
+
 A few entries also have their simulation written in R, on separate **[Try it in R](r/index.qmd)** pages. These run R itself in your browser with [webR](https://docs.r-wasm.org/webr/latest/), so you can edit the code and run it again. webR is a large download, so it loads only on those pages.
 
 ## Corrections
@@ -58,21 +66,23 @@ Like any web page, these pages are fetched from third-party servers that see you
 
 ## How this site was built
 
-The site was built over a few days in November 2026 by [Nelson Amaya D](https://github.com/nelsonamayad) working with Claude Opus 5.5, an AI model made by Anthropic, through Anthropic's coding agent, Claude Code. Nelson chose what to build and how it should be organized, made the editorial decisions and reviewed the results. Claude drafted most of the text and the code. The work went in five stages.
+The site was built over a few days in November 2026 by [Nelson Amaya D](https://github.com/nelsonamayad) working with Claude Fable 5.1, an AI model made by Anthropic, through Anthropic's coding agent, Claude Code. Nelson chose what to build and how it should be organized, made the editorial decisions and reviewed the results. Claude drafted most of the text and the code. The work went in six stages.
 
 1. **A template, then a page for every entry.** Starting from Gelman's lexicon post, we wrote a template that every page follows: Gelman's definition, what the idea is, why it matters, how it works, a simulation, key takeaways, related entries and the source. Then came a page for each of the 153 entries on the list at the time, each with its own simulation.
 2. **Checking against the sources.** Gelman's blog blocks automated access, so each explanation was compared with an archived copy of its source post from the Internet Archive's [Wayback Machine](https://web.archive.org). Several entries turned out not to mean what their names suggest, and those pages were rewritten. Each page's **Source check** line records the result.
 3. **Grouping and navigation.** Every entry was given a theme and a kind. A script generates the theme and kind pages, the cards on the home page, the sidebar and the *Related entries* lists, and it makes every related-entry link go both ways.
-4. **Reviews.** Two reviews of the whole site found real problems: explanations that misread their source, two simulations with coding errors, missing attributions, and illustrative lines set in quotation marks as if someone had said them. All of these were fixed. The second review also prompted a line-by-line audit of every simulation's code, which found and fixed several more bugs, and it pointed out two entries Gelman had added to his list since March 2026, which now have pages too.
+4. **Reviews.** Three reviews of the whole site found real problems: explanations that misread their source, two simulations with coding errors, missing attributions, and illustrative lines set in quotation marks as if someone had said them. All of these were fixed. The second review also prompted a line-by-line audit of every simulation's code, which found and fixed several more bugs, and it pointed out two entries Gelman had added to his list since March 2026, which now have pages too. The third review checked every page against the site's own conventions and darkened the chart colors that were too faint to read in either light or dark mode.
 5. **Try it in R.** A pilot of four simulations rewritten in R that you can edit and run in your browser.
+6. **R and Python versions.** Every simulation was then translated into base R and into Python, and each entry's code now has a tab for each language. Every translation was run to check that it works and shows the entry's point. Where a language's own random draws happened not to show it, that version's default seed was changed.
 
 What the site is made of:
 
 - [Quarto](https://quarto.org) builds the static site. Its look comes from a single `_brand.yml` file with the colors, fonts, logo and light and dark themes.
 - The simulations are written in [Observable JS](https://observablehq.com/documentation/cells/observable-javascript) and drawn with [Observable Plot](https://observablehq.com/plot/). They share one small library, `js/stats.js`, with seeded random numbers, common distributions and regression routines.
 - The [Try it in R](r/index.qmd) pages use [webR](https://docs.r-wasm.org/webr/latest/) through the [quarto-live](https://r-wasm.github.io/quarto-live/) extension.
-- Short Python scripts generate the theme and kind pages and check the site. One checks every page's structure, chart descriptions for screen readers, random seeds and links. Another loads every page in a headless browser and fails if any simulation shows an error.
-- On every proposed change, GitHub Actions runs both checks. The site is hosted on [Netlify](https://www.netlify.com).
+- The R and Python versions are plain scripts, one per entry and language, that the build copies into each page's code tabs.
+- Short Python scripts generate the theme and kind pages and check the site. One checks every page's structure, chart descriptions for screen readers, random seeds and links. Another loads every page in a headless browser and fails if any simulation shows an error. A third runs every R and Python version.
+- On every proposed change, GitHub Actions runs all three checks. The site is hosted on [Netlify](https://www.netlify.com).
 
 All of the source is in the project's [GitHub repository](https://github.com/nelsonamayad/gelman-lexicon-explorer). To build the site yourself, install Quarto, Python and Google Chrome, then run:
 
@@ -80,5 +90,6 @@ All of the source is in the project's [GitHub repository](https://github.com/nel
 quarto preview                     # live-reloading local server
 quarto render                      # build the static site into _site/
 python scripts/check_entries.py    # check every entry's structure and links
+python scripts/check_code.py       # run every R and Python version
 python scripts/check_pages.py      # load every page in a browser
 ```

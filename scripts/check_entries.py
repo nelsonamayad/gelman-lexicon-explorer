@@ -10,6 +10,12 @@ Checks:
   - simulations that draw random numbers (rng(...)) expose a "Random seed"
     control and pass `seed` to rng(); deterministic ones need no seed
   - the generated "Show simulation code" block is present (build_groups.py)
+  - every entry has R and Python versions (sims/r/<slug>.R and
+    sims/python/<slug>.py) shown in its code tabs, with lines of at most 78
+    characters; scripts/check_code.py runs them
+  - every R script has Quarto code annotations: `# <n>` markers whose numbers
+    1..k match the items of its `# Annotations` trailer (build_groups.py
+    turns the trailer into the list under the R tab)
   - every local .qmd link resolves
   - Related-entry links are reciprocal (build_groups.py fixes this)
 
@@ -69,6 +75,27 @@ def main():
             say("uses unseeded Math.random")
         if "```{ojs}" in text and "<!-- Simulation code: generated" not in text:
             say("no generated 'Show simulation code' block (run build_groups.py)")
+        for lang, rel_path in [("R", f"sims/r/{slug}.R"), ("Python", f"sims/python/{slug}.py")]:
+            full = os.path.join(ROOT, rel_path)
+            if not os.path.exists(full):
+                say(f"missing {lang} version of the simulation ({rel_path})")
+            elif f"## {lang} {{.unlisted}}" not in text:
+                say(f"{lang} version not in the code tabs (run build_groups.py)")
+            else:
+                script = open(full, encoding="utf-8").read()
+                trailer = script.rfind("\n# Annotations\n")
+                code = script if trailer < 0 else script[:trailer]
+                # Quarto renders a trailing `# <n>` marker as a small circle, so it doesn't
+                # count; the annotation trailer is shown as text, not code.
+                if any(len(re.sub(r"\s*# <\d+>$", "", line)) > 78 for line in code.splitlines()):
+                    say(f"{rel_path} has lines over 78 characters (they scroll sideways on the page)")
+                if lang == "R":
+                    marks = sorted({int(m) for m in re.findall(r"# <(\d+)>$", code, re.M)})
+                    items = sorted(int(m) for m in re.findall(r"^# (\d+)\. ", script[trailer:], re.M)) if trailer >= 0 else []
+                    if not marks or trailer < 0:
+                        say(f"{rel_path} has no code annotations (`# <1>` markers and a `# Annotations` trailer)")
+                    elif marks != items or marks != list(range(1, len(marks) + 1)):
+                        say(f"{rel_path}: annotation markers {marks} don't match the trailer items {items}")
 
         for target in re.findall(r"\]\(([^)#\s]+\.qmd)(?:#[^)]*)?\)", text):
             if target.startswith("http"):

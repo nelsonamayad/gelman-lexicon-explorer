@@ -60,15 +60,15 @@ cities = {
 layer.startsWith("1")
   ? Plot.plot({
   ariaLabel: "The Click-Through Solution: chart 1 of 2",
-  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 340, x: {axis: null}, y: {axis: null}, r: {range: [5, 45]}, color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
+  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 340, x: {axis: null}, y: {axis: null}, r: {range: [5, 45]}, color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850"]},
       marks: [Plot.dot(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), r: "y2025", fill: "region", fillOpacity: 0.7}),
               Plot.text(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), text: "name", fill: "white", fontWeight: "bold", fontSize: 10})]})
   : layer.startsWith("2")
   ? Plot.plot({
   ariaLabel: "The Click-Through Solution: chart 2 of 2",
   ariaDescription: "Horizontal axis: Index (2015 → 2025). The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 360, marginLeft: 90, x: {label: "Index (2015 → 2025)", grid: true}, y: {label: null, domain: cities.slice().sort((a, b) => b.y2025 - a.y2025).map(d => d.name)},
-      color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
-      marks: [Plot.link(cities, {y1: "name", y2: "name", x1: "y2015", x2: "y2025", stroke: "#bbb", markerEnd: "arrow"}), Plot.dot(cities, {y: "name", x: "y2025", fill: "region", r: 5}), Plot.dot(cities, {y: "name", x: "y2015", stroke: "#999", r: 3})]})
+      color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850"]},
+      marks: [Plot.link(cities, {y1: "name", y2: "name", x1: "y2015", x2: "y2025", stroke: "#8a8a8a", markerEnd: "arrow"}), Plot.dot(cities, {y: "name", x: "y2025", fill: "region", r: 5}), Plot.dot(cities, {y: "name", x: "y2015", stroke: "#8a8a8a", r: 3})]})
   : html`<table class="table table-sm" style="max-width: 520px;"><thead><tr><th>City</th><th>Region</th><th style="text-align:right">2015</th><th style="text-align:right">2025</th><th style="text-align:right">Change</th></tr></thead>
       <tbody>${cities.map(d => html`<tr><td>${d.name}</td><td>${d.region}</td><td style="text-align:right">${fmt(d.y2015, 1)}</td><td style="text-align:right">${fmt(d.y2025, 1)}</td><td style="text-align:right">${fmt(d.y2025 - d.y2015, 1)}</td></tr>`)}</tbody></table>
       <p><small>Source: simulated data, generated in your browser (seed ${seed}).</small></p>`
@@ -83,6 +83,12 @@ html`<div class="sim-readout">${md`${layer.startsWith("1") ? "Eye-catching, but 
 
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
+
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
 
 ```{.js}
 import {rng, range, fmt} from "../js/stats.js"
@@ -99,19 +105,109 @@ cities = {
 layer.startsWith("1")
   ? Plot.plot({
   ariaLabel: "The Click-Through Solution: chart 1 of 2",
-  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 340, x: {axis: null}, y: {axis: null}, r: {range: [5, 45]}, color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
+  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 340, x: {axis: null}, y: {axis: null}, r: {range: [5, 45]}, color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850"]},
       marks: [Plot.dot(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), r: "y2025", fill: "region", fillOpacity: 0.7}),
               Plot.text(cities, {x: (d, i) => i % 4, y: (d, i) => Math.floor(i / 4), text: "name", fill: "white", fontWeight: "bold", fontSize: 10})]})
   : layer.startsWith("2")
   ? Plot.plot({
   ariaLabel: "The Click-Through Solution: chart 2 of 2",
   ariaDescription: "Horizontal axis: Index (2015 → 2025). The chart updates with the controls above it, and the summary below the charts states the result in words.",height: 360, marginLeft: 90, x: {label: "Index (2015 → 2025)", grid: true}, y: {label: null, domain: cities.slice().sort((a, b) => b.y2025 - a.y2025).map(d => d.name)},
-      color: {legend: true, range: ["#2166ac", "#d6604d", "#5aae61"]},
-      marks: [Plot.link(cities, {y1: "name", y2: "name", x1: "y2015", x2: "y2025", stroke: "#bbb", markerEnd: "arrow"}), Plot.dot(cities, {y: "name", x: "y2025", fill: "region", r: 5}), Plot.dot(cities, {y: "name", x: "y2015", stroke: "#999", r: 3})]})
+      color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850"]},
+      marks: [Plot.link(cities, {y1: "name", y2: "name", x1: "y2015", x2: "y2025", stroke: "#8a8a8a", markerEnd: "arrow"}), Plot.dot(cities, {y: "name", x: "y2025", fill: "region", r: 5}), Plot.dot(cities, {y: "name", x: "y2015", stroke: "#8a8a8a", r: 3})]})
   : html`<table class="table table-sm" style="max-width: 520px;"><thead><tr><th>City</th><th>Region</th><th style="text-align:right">2015</th><th style="text-align:right">2025</th><th style="text-align:right">Change</th></tr></thead>
       <tbody>${cities.map(d => html`<tr><td>${d.name}</td><td>${d.region}</td><td style="text-align:right">${fmt(d.y2015, 1)}</td><td style="text-align:right">${fmt(d.y2025, 1)}</td><td style="text-align:right">${fmt(d.y2025 - d.y2015, 1)}</td></tr>`)}</tbody></table>
       <p><small>Source: simulated data, generated in your browser (seed ${seed}).</small></p>`
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Click-Through Solution: three layers for three audiences.
+layer <- 2 # 1: grab attention, 2: compare, 3: check the numbers # <1>
+set.seed(125) # <2>
+
+cities <- data.frame( # <3>
+  name = c(
+    "Avalon", "Brookfield", "Cedar Falls", "Dunmore", "Eastport",
+    "Fairview", "Glenwood", "Harbor City", "Ironton", "Juniper",
+    "Kingsley", "Lakeside"
+  ),
+  y2015 = runif(12, 20, 80),
+  region = sample(c("North", "South", "Coast"), 12, replace = TRUE)
+)
+cities$y2025 <- cities$y2015 + rnorm(12, 5, 8)
+cols <- c(North = "#2166ac", South = "#d6604d", Coast = "#4daf4a")
+
+if (layer == 1) { # bubbles: eye-catching, hard to compare # <4>
+  plot(runif(12), runif(12),
+    cex = sqrt(cities$y2025) / 1.5, pch = 19,
+    col = adjustcolor(cols[cities$region], 0.6), axes = FALSE,
+    xlab = "", ylab = ""
+  )
+} else if (layer == 2) { # positions on a common scale: easy to compare # <5>
+  o <- order(cities$y2025)
+  dotchart(cities$y2025[o],
+    labels = cities$name[o], pch = 19,
+    col = cols[cities$region[o]], xlim = range(cities[, c(2, 4)]),
+    xlab = "Value (2015 open circles, 2025 dots)"
+  )
+  points(cities$y2015[o], seq_along(o), pch = 1)
+} else { # the numbers, for checking and reuse # <6>
+  print(transform(cities,
+    change = round(y2025 - y2015, 1),
+    y2015 = round(y2015, 1), y2025 = round(y2025, 1)
+  ))
+}
+```
+1. The page's control: which of the three layers to show.
+2. Fixes the random numbers so the run is reproducible.
+3. Twelve made-up cities with a value in 2015 and in 2025.
+4. Layer 1, for grabbing attention: bubbles, eye-catching and hard to compare.
+5. Layer 2, for comparing: positions on a common scale, with the earlier value as an open circle.
+6. Layer 3, for checking and reuse: the numbers themselves.
+
+## Python {.unlisted}
+
+```{.python}
+# The Click-Through Solution: three layers for three audiences.
+import numpy as np
+import matplotlib.pyplot as plt
+
+layer = 2  # 1: grab attention, 2: compare, 3: check the numbers
+rng = np.random.default_rng(125)
+
+names = ["Avalon", "Brookfield", "Cedar Falls", "Dunmore", "Eastport",
+         "Fairview", "Glenwood", "Harbor City", "Ironton", "Juniper",
+         "Kingsley", "Lakeside"]
+y2015 = rng.uniform(20, 80, 12)
+region = rng.choice(["North", "South", "Coast"], 12)
+y2025 = y2015 + rng.normal(5, 8, 12)
+cols = {"North": "#2166ac", "South": "#d6604d", "Coast": "#4daf4a"}
+colors = [cols[r] for r in region]
+
+if layer == 1:    # bubbles: eye-catching, hard to compare
+    plt.scatter(rng.uniform(size=12), rng.uniform(size=12), s=y2025 * 20,
+                c=colors, alpha=0.6)
+    plt.axis("off")
+    plt.show()
+elif layer == 2:  # positions on a common scale: easy to compare
+    o = np.argsort(y2025)
+    y = np.arange(12)
+    plt.scatter(y2015[o], y, facecolors="none", edgecolors="black",
+                label="2015")
+    plt.scatter(y2025[o], y, c=[colors[i] for i in o], label="2025")
+    plt.yticks(y, [names[i] for i in o])
+    plt.xlabel("Value")
+    plt.legend()
+    plt.tight_layout()
+    plt.show()
+else:             # the numbers, for checking and reuse
+    for i in range(12):
+        print(f"{names[i]:12s} {region[i]:6s} {y2015[i]:6.1f} {y2025[i]:6.1f}"
+              f" {y2025[i] - y2015[i]:+6.1f}")
+```
+
+:::
 
 </details>
 

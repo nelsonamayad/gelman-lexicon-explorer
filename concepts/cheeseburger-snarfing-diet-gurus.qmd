@@ -86,6 +86,12 @@ html`<div class="sim-readout">${md`Guru's evidence: ratings up by **${fmt(teachi
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, mean, sd, fmt} from "../js/stats.js"
 
@@ -120,6 +126,105 @@ Plot.plot({
   marks: [Plot.dot(teaching.sections, {x: "gain", y: "rating", fill: d => d.treated ? "New method" : "Old method", r: 6})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Cheeseburger-snarfing diet gurus: evaluating teaching by ratings.
+learn_effect <- 0.05 # true effect on learning (sd units) # <1>
+enthusiasm <- 0.8 # novelty/enthusiasm boost to ratings
+set.seed(95) # <2>
+
+sections <- t(sapply(1:20, function(k) { # <3>
+  treated <- k %% 2 == 1
+  inst <- rnorm(1, 0, 0.3) # instructor effect
+  pre <- rnorm(40)
+  post <- 0.6 * pre + inst + treated * learn_effect + rnorm(40, 0, 0.8)
+  rating <- 3.5 + inst + treated * enthusiasm * 0.5 + rnorm(40, 0, 0.6) # <4>
+  c(treated = treated, gain = mean(post - 0.6 * pre), rating = mean(rating))
+}))
+compare <- function(v) { # <5>
+  a <- v[sections[, "treated"] == 1]
+  b <- v[sections[, "treated"] == 0]
+  c(diff = mean(a) - mean(b), se = sqrt(var(a) / 10 + var(b) / 10))
+}
+rating <- compare(sections[, "rating"])
+learning <- compare(sections[, "gain"])
+
+cat(
+  "Ratings up by", round(rating["diff"], 2), "points (se",
+  round(rating["se"], 2), ")\n"
+)
+cat(
+  "Effect on learning:", round(learning["diff"], 2), "sd (se",
+  round(learning["se"], 2), "); true effect", learn_effect, "\n"
+)
+
+plot(sections[, "gain"], sections[, "rating"], # <6>
+  pch = 19,
+  col = ifelse(sections[, "treated"] == 1, "#d6604d", "#2166ac"),
+  xlab = "Learning gain (section average)",
+  ylab = "Student rating (section average)"
+)
+legend("topleft", c("New method", "Old method"),
+  pch = 19,
+  col = c("#d6604d", "#2166ac"), bty = "n"
+)
+```
+1. The page's controls: the new method's true effect on learning, and how much novelty and enthusiasm lift the ratings.
+2. Fixes the random numbers so the run is reproducible.
+3. Twenty course sections, alternating between the new and the old method, each with an instructor effect, a pre-test and a post-test.
+4. Student ratings respond to the instructor and to enthusiasm, not to what was learned.
+5. The treated-minus-control difference and its standard error, for ratings and for learning gains.
+6. Each section's rating against its learning gain. The new method wins on ratings and does nothing for learning.
+
+## Python {.unlisted}
+
+```{.python}
+# Cheeseburger-snarfing diet gurus: evaluating teaching by ratings.
+import numpy as np
+import matplotlib.pyplot as plt
+
+learn_effect = 0.05  # true effect on learning (sd units)
+enthusiasm = 0.8     # novelty/enthusiasm boost to ratings
+rng = np.random.default_rng(91)
+
+treated, gain, rating = [], [], []
+for k in range(20):
+    t = k % 2 == 0
+    inst = rng.normal(0, 0.3)  # instructor effect
+    pre = rng.normal(size=40)
+    post = 0.6 * pre + inst + t * learn_effect + rng.normal(0, 0.8, 40)
+    rate = 3.5 + inst + t * enthusiasm * 0.5 + rng.normal(0, 0.6, 40)
+    treated.append(t)
+    gain.append(np.mean(post - 0.6 * pre))
+    rating.append(rate.mean())
+treated, gain, rating = map(np.array, (treated, gain, rating))
+
+
+def compare(v):
+    a, b = v[treated], v[~treated]
+    se = np.sqrt(a.var(ddof=1) / 10 + b.var(ddof=1) / 10)
+    return a.mean() - b.mean(), se
+
+
+r_diff, r_se = compare(rating)
+l_diff, l_se = compare(gain)
+print(f"Ratings up by {r_diff:.2f} points (se {r_se:.2f})")
+print(f"Effect on learning: {l_diff:.2f} sd (se {l_se:.2f}); "
+      f"true effect {learn_effect}")
+
+plt.scatter(gain[treated], rating[treated], color="#d6604d",
+            label="New method")
+plt.scatter(gain[~treated], rating[~treated], color="#2166ac",
+            label="Old method")
+plt.xlabel("Learning gain (section average)")
+plt.ylabel("Student rating (section average)")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

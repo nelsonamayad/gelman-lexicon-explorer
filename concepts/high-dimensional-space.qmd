@@ -42,7 +42,7 @@ Draw 5,000 points from a $d$-dimensional standard normal and look at their dista
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sd, quantile, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, sd, quantile, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, sd, fmt, pct} from "../js/stats.js"
 
 viewof d = Inputs.range([1, 500], {value: 100, step: 1, label: "Dimension d"})
 viewof seed = Inputs.range([1, 500], {value: 132, step: 1, label: "Random seed"})
@@ -114,6 +120,63 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# In high-dimensional space, no one can hear you scream.
+d <- 100 # dimension # <1>
+set.seed(132) # <2>
+
+dist <- sqrt(rowSums(matrix(rnorm(5000 * d), ncol = d)^2)) # from the mode # <3>
+
+cat("Distance from the mode: ", round(mean(dist), 2), " +/- ",
+  round(sd(dist), 2), " (sqrt(d) = ", round(sqrt(d), 2), ")\n",
+  sep = ""
+)
+cat("Share of draws within distance 1 of the mode: ",
+  round(100 * mean(dist < 1), 2), "%\n",
+  sep = ""
+)
+
+hist(dist, # <4>
+  breaks = 40, col = "#2166ac", border = "white", main = "",
+  xlim = c(0, max(dist)), xlab = "Distance from the mode",
+  ylab = "Draws"
+)
+abline(v = 0, col = "#d6604d", lwd = 3)
+```
+1. The page's control: the number of dimensions.
+2. Fixes the random numbers so the run is reproducible.
+3. The distance from the mode of 5,000 draws from a standard normal in d dimensions. It concentrates near the square root of d.
+4. The histogram of distances. The mode, in red at zero, is where the density is highest and where no draw ever goes.
+
+## Python {.unlisted}
+
+```{.python}
+# In high-dimensional space, no one can hear you scream.
+import numpy as np
+import matplotlib.pyplot as plt
+
+d = 100  # dimension
+rng = np.random.default_rng(132)
+
+dist = np.sqrt((rng.normal(size=(5000, d)) ** 2).sum(axis=1))  # from mode
+
+print(f"Distance from the mode: {dist.mean():.2f} +/- {dist.std(ddof=1):.2f}"
+      f" (sqrt(d) = {np.sqrt(d):.2f})")
+print(f"Share of draws within distance 1 of the mode: "
+      f"{100 * np.mean(dist < 1):.2f}%")
+
+plt.hist(dist, bins=40, color="#2166ac")
+plt.axvline(0, color="#d6604d", linewidth=3)
+plt.xlim(0, dist.max())
+plt.xlabel("Distance from the mode")
+plt.ylabel("Draws")
+plt.show()
+```
+
+:::
 
 </details>
 

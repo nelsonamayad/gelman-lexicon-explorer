@@ -27,7 +27,10 @@ Today every simulation is Observable JS. Readers who know R would get a lot from
   - [Multiple Comparisons](concepts/multiple-comparisons.qmd): `lmer` partial pooling compared with `lm` with no pooling.
   - [16](concepts/sixteen.qmd): a power simulation with `lm(y ~ a * b)`.
   - [Mathematical Simplicity](concepts/mathematical-simplicity.qmd): the golf geometry model fitted with `optim`.
-- [ ] **Template section.** Add an optional "Try it in R" section to `_template.qmd`, after the OJS simulation, containing the same model in a short, readable R script.
+- [x] **R and Python code on every entry.** Every entry's "Show simulation code" block has Observable JS, R (base R) and Python (NumPy and Matplotlib) tabs, from `sims/r/` and `sims/python/`; `_template.qmd` describes the scripts and `scripts/check_code.py` runs them all in CI.
+- [x] **Tidyverse style and code annotations for the R scripts.** All 155 scripts restyled with `styler` (tidyverse style, one statement per line, no `T`/`C` variable names) and given Quarto code annotations (`# <n>` markers plus a `# Annotations` trailer that `build_groups.py` turns into the numbered list under the R tab; `check_entries.py` enforces both). Single-letter mathematical symbols such as `X`, `N` and `K` keep their case to match the formulas on the pages.
+- [ ] **Run the R tab in the page.** The R scripts are copy-and-run today. A "Run in the browser" button could load webR on demand (only when clicked, to keep pages light) and run the entry's script.
+- [ ] Check the default seeds of the multiple-comparisons simulation in all three languages: its empirical-Bayes shortcut ignores the uncertainty in the estimated mean, so for some seeds the multilevel model "confidently" claims all 50 effects (R seed 23 does). The defaults are fine; the slider can reach the bad cases.
 - [x] **Keep pages light.** webR downloads tens of MB when a page with R cells opens, so the R versions live on separate pages under `r/` and the entry pages stay instant.
 - [ ] **Packages.** Use base R plus packages that exist in the webR repository. Stan-based packages (`rstanarm`, `brms`) won't run in the browser, so offer a "copy this script" button for those.
 - [ ] Optionally do the same for Python with [`quarto-pyodide`](https://github.com/coatless-quarto/pyodide) or `quarto-live`'s Pyodide support, for entries where NumPy, SciPy or statsmodels versions help.
@@ -59,7 +62,7 @@ Today every simulation is Observable JS. Readers who know R would get a lot from
 ## Simulations
 
 - [x] Give every `Plot.plot` an `ariaLabel` and `ariaDescription` (enforced by `check_entries.py`).
-- [ ] **Accessibility.** Check the palette for color-blind readers and text contrast, make sure sliders are keyboard friendly, and test with a real screen reader. (Done: chart labels, named icon links, a labeled filter box, no heading-order problem on the home page.)
+- [ ] **Accessibility.** Check the palette for color-blind readers, make sure sliders are keyboard friendly, and test with a real screen reader. (Done: chart labels, named icon links, a labeled filter box, no heading-order problem on the home page, and chart grays, green and gold darkened to pass 3:1 contrast in both modes.)
 - [ ] **Performance.** A few pages run 10^5–10^6 random draws on every slider move. Debounce the inputs or move the heavy loops into a Web Worker, and run simulations only when they scroll into view.
 - [ ] A "Reset to defaults" button on every simulation.
 - [ ] A "Download this simulation" link that exports the parameters and results as CSV, along with the equivalent R script.

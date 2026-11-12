@@ -39,7 +39,7 @@ Simulate many analysts of varying skill using either a constrained or a free too
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, quantile, fmt} from "../js/stats.js"
+import {rng, range, quantile, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -68,7 +68,7 @@ Plot.plot({
   x: {label: "Analysis quality (1 = best possible)", domain: [-0.5, 1]},
   y: {label: "Analysts", grid: true},
   marks: [Plot.rectY(freedom, Plot.binX({y: "count"}, {x: "q", fill: "tool", thresholds: 40, domain: [-0.5, 1]})), Plot.ruleY([0])],
-  color: {range: ["#999", "#2166ac"]}
+  color: {range: ["#8a8a8a", "#2166ac"]}
 })
 ```
 
@@ -85,8 +85,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, quantile, fmt} from "../js/stats.js"
+import {rng, range, quantile, fmt} from "../js/stats.js"
 
 viewof skill = Inputs.range([0, 1], {value: 0.5, step: 0.05, label: "Average analyst skill"})
 viewof seed = Inputs.range([1, 500], {value: 102, step: 1, label: "Random seed"})
@@ -109,9 +115,66 @@ Plot.plot({
   x: {label: "Analysis quality (1 = best possible)", domain: [-0.5, 1]},
   y: {label: "Analysts", grid: true},
   marks: [Plot.rectY(freedom, Plot.binX({y: "count"}, {x: "q", fill: "tool", thresholds: 40, domain: [-0.5, 1]})), Plot.ruleY([0])],
-  color: {range: ["#999", "#2166ac"]}
+  color: {range: ["#8a8a8a", "#2166ac"]}
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Freedom: it's not user friendly.
+skill <- 0.5 # average analyst skill # <1>
+set.seed(102) # <2>
+
+s <- pmin(1, pmax(0, rnorm(2000, skill, 0.2))) # each analyst
+constrained <- 0.65 + rnorm(2000, 0, 0.05) # good defaults, limited ceiling # <3>
+free <- pmax(-0.5, 0.95 - (1 - s) * abs(rnorm(2000, 0, 0.6))) # skill-bound # <4>
+
+q <- rbind(
+  constrained = quantile(constrained, c(0.1, 0.5)),
+  free = quantile(free, c(0.1, 0.5))
+)
+print(round(q, 2)) # worst 10% and median quality
+
+boxplot( # <5>
+  list(
+    "Constrained, user-friendly" = constrained,
+    "Free, flexible" = free
+  ),
+  col = c("#2166ac", "#d6604d"), ylab = "Quality of the analysis"
+)
+```
+1. The page's control: the average skill of the analysts.
+2. Fixes the random numbers so the run is reproducible.
+3. A constrained, user-friendly tool: good defaults, a limited ceiling, hard to misuse.
+4. A free, flexible tool: a higher ceiling, but the floor depends on the analyst's skill.
+5. The two distributions of analysis quality. Freedom raises the best outcomes and lowers the worst.
+
+## Python {.unlisted}
+
+```{.python}
+# Freedom: it's not user friendly.
+import numpy as np
+import matplotlib.pyplot as plt
+
+skill = 0.5  # average analyst skill
+rng = np.random.default_rng(102)
+
+s = np.clip(rng.normal(skill, 0.2, 2000), 0, 1)          # each analyst
+constrained = 0.65 + rng.normal(0, 0.05, 2000)  # good defaults, low ceiling
+free = np.maximum(-0.5, 0.95 - (1 - s) * np.abs(rng.normal(0, 0.6, 2000)))
+
+for name, q in [("Constrained", constrained), ("Free", free)]:
+    print(f"{name}: median quality {np.median(q):.2f}, "
+          f"worst 10% {np.quantile(q, 0.1):.2f}")
+
+plt.boxplot([constrained, free], patch_artist=True)
+plt.xticks([1, 2], ["Constrained, user-friendly", "Free, flexible"])
+plt.ylabel("Quality of the analysis")
+plt.show()
+```
+
+:::
 
 </details>
 

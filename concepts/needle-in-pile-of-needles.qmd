@@ -36,7 +36,7 @@ There are 43 cities, as in the original study. Background growth differs by city
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, lm, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, lm, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -68,7 +68,7 @@ Plot.plot({
   height: 300,
   x: {label: "Estimated 'effect' of the intervention on growth", grid: true},
   y: {label: "Simulated datasets"},
-  color: {legend: true, range: ["#2166ac", "#999"], domain: ["Claimed effect: growth after 1918", "Placebo: growth before 1918"]},
+  color: {legend: true, range: ["#2166ac", "#8a8a8a"], domain: ["Claimed effect: growth after 1918", "Placebo: growth before 1918"]},
   marks: [
     Plot.rectY(needles, Plot.binX({y: "count"}, {x: "est", fill: "period", fillOpacity: 0.55, thresholds: 50, mixBlendMode: "multiply"})),
     Plot.ruleX([beta], {stroke: "#d6604d", strokeWidth: 2}),
@@ -90,8 +90,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, lm, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, lm, fmt} from "../js/stats.js"
 
 viewof beta = Inputs.range([0, 0.5], {value: 0.05, step: 0.01, label: "True effect of the intervention (β)"})
 viewof confound = Inputs.range([0, 1], {value: 0.6, step: 0.05, label: "Correlation of intervention with background growth"})
@@ -117,7 +123,7 @@ Plot.plot({
   height: 300,
   x: {label: "Estimated 'effect' of the intervention on growth", grid: true},
   y: {label: "Simulated datasets"},
-  color: {legend: true, range: ["#2166ac", "#999"], domain: ["Claimed effect: growth after 1918", "Placebo: growth before 1918"]},
+  color: {legend: true, range: ["#2166ac", "#8a8a8a"], domain: ["Claimed effect: growth after 1918", "Placebo: growth before 1918"]},
   marks: [
     Plot.rectY(needles, Plot.binX({y: "count"}, {x: "est", fill: "period", fillOpacity: 0.55, thresholds: 50, mixBlendMode: "multiply"})),
     Plot.ruleX([beta], {stroke: "#d6604d", strokeWidth: 2}),
@@ -125,6 +131,78 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Looking for a needle in a pile of needles: a placebo test.
+beta <- 0.05 # true effect of the intervention # <1>
+confound <- 0.6 # correlation of the intervention with background growth
+set.seed(88) # <2>
+
+# 500 replications of a 43-city study
+est <- t(replicate(500, {
+  g <- rnorm(43) # background growth of each city
+  x <- confound * g + sqrt(1 - confound^2) * rnorm(43) # intervention # <3>
+  pre <- g + rnorm(43, 0, 0.5) # growth before 1918 # <4>
+  post <- g + beta * x + rnorm(43, 0, 0.5) # growth after 1918
+  c(placebo = coef(lm(pre ~ x))[[2]], claimed = coef(lm(post ~ x))[[2]]) # <5>
+}))
+avg <- sprintf("%.2f", colMeans(est))
+cat("Average estimate: claimed effect ", avg[2], ", placebo (before 1918) ",
+  avg[1], ", true effect ", beta, "\n",
+  sep = ""
+)
+
+boxplot(est, # <6>
+  names = c("Placebo: before 1918", "Claimed: after 1918"),
+  col = c("grey70", "#2166ac"), ylab = "Estimated effect"
+)
+abline(h = beta, lty = 2)
+```
+1. The page's controls: the intervention's true effect, and how correlated it is with the cities' background growth.
+2. Fixes the random numbers so the run is reproducible.
+3. Cities that were already growing were likelier to adopt the intervention.
+4. The placebo outcome: growth before the intervention, which it cannot have caused.
+5. The claimed effect and the placebo estimate, from the same regression on each period.
+6. The two estimates across 500 replications. The placebo finds the same effect, so the needle is just another needle.
+
+## Python {.unlisted}
+
+```{.python}
+# Looking for a needle in a pile of needles: a placebo test.
+import numpy as np
+import matplotlib.pyplot as plt
+
+beta = 0.05     # true effect of the intervention
+confound = 0.6  # correlation of the intervention with background growth
+rng = np.random.default_rng(88)
+
+
+def slope(x, y):
+    return np.polyfit(x, y, 1)[0]
+
+
+# 500 replications of a 43-city study
+placebo, claimed = [], []
+for _ in range(500):
+    g = rng.normal(size=43)               # background growth of each city
+    x = confound * g + np.sqrt(1 - confound ** 2) * rng.normal(size=43)
+    pre = g + rng.normal(0, 0.5, 43)      # growth before 1918
+    post = g + beta * x + rng.normal(0, 0.5, 43)  # growth after 1918
+    placebo.append(slope(x, pre))
+    claimed.append(slope(x, post))
+print(f"Average estimate: claimed effect {np.mean(claimed):.2f}, placebo "
+      f"(before 1918) {np.mean(placebo):.2f}, true effect {beta}")
+
+plt.boxplot([placebo, claimed])
+plt.xticks([1, 2], ["Placebo: before 1918", "Claimed: after 1918"])
+plt.axhline(beta, color="black", linestyle="--")
+plt.ylabel("Estimated effect")
+plt.show()
+```
+
+:::
 
 </details>
 

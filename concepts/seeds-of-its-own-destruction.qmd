@@ -53,9 +53,9 @@ sample = rng(seed).normals(n)
 html`<div style="display:flex; gap:0.75rem; flex-wrap:wrap">
 ${[["Too coarse", 8], ["Default-ish", 20], ["Your choice", bins], ["Too fine", 160]].map(([label, k]) =>
   Plot.plot({
-  ariaLabel: "Seeds of its own destruction: simulation chart",
-  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 240, height: 180, title: `${label} (${k} bins)`, x: {domain: [-4, 4], label: null}, y: {label: null, ticks: 3},
-    marks: [Plot.rectY(sample, Plot.binX({y: "count"}, {x: d => d, thresholds: range(k + 1).map(i => -4 + 8 * i / k), fill: label === "Your choice" ? "#2166ac" : "#999"})), Plot.ruleY([0])]}))}
+  ariaLabel: `Seeds of its own destruction: ${label} histogram (${k} bins)`,
+  ariaDescription: "Horizontal axis: the sampled value, from -4 to 4. Vertical axis: count per bin. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 240, height: 180, title: `${label} (${k} bins)`, x: {domain: [-4, 4], label: null}, y: {label: null, ticks: 3},
+    marks: [Plot.rectY(sample, Plot.binX({y: "count"}, {x: d => d, thresholds: range(k + 1).map(i => -4 + 8 * i / k), fill: label === "Your choice" ? "#2166ac" : "#8a8a8a"})), Plot.ruleY([0])]}))}
 </div>`
 ```
 
@@ -72,6 +72,12 @@ ${[["Too coarse", 8], ["Default-ish", 20], ["Your choice", bins], ["Too fine", 1
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
 import {rng, range, fmt} from "../js/stats.js"
 
@@ -84,11 +90,74 @@ sample = rng(seed).normals(n)
 html`<div style="display:flex; gap:0.75rem; flex-wrap:wrap">
 ${[["Too coarse", 8], ["Default-ish", 20], ["Your choice", bins], ["Too fine", 160]].map(([label, k]) =>
   Plot.plot({
-  ariaLabel: "Seeds of its own destruction: simulation chart",
-  ariaDescription: "The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 240, height: 180, title: `${label} (${k} bins)`, x: {domain: [-4, 4], label: null}, y: {label: null, ticks: 3},
-    marks: [Plot.rectY(sample, Plot.binX({y: "count"}, {x: d => d, thresholds: range(k + 1).map(i => -4 + 8 * i / k), fill: label === "Your choice" ? "#2166ac" : "#999"})), Plot.ruleY([0])]}))}
+  ariaLabel: `Seeds of its own destruction: ${label} histogram (${k} bins)`,
+  ariaDescription: "Horizontal axis: the sampled value, from -4 to 4. Vertical axis: count per bin. The chart updates with the controls above it, and the summary below the charts states the result in words.",width: 240, height: 180, title: `${label} (${k} bins)`, x: {domain: [-4, 4], label: null}, y: {label: null, ticks: 3},
+    marks: [Plot.rectY(sample, Plot.binX({y: "count"}, {x: d => d, thresholds: range(k + 1).map(i => -4 + 8 * i / k), fill: label === "Your choice" ? "#2166ac" : "#8a8a8a"})), Plot.ruleY([0])]}))}
 </div>`
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Seeds of its own destruction: a histogram that shows its own noise.
+bins <- 40 # number of bins between -4 and 4 # <1>
+n <- 1000 # sample size
+set.seed(112) # <2>
+
+x <- rnorm(n)
+per_bin <- n * (8 / bins) * dnorm(0) # count in a central bin # <3>
+cat("With ", bins, " bins, central bars hold about ", round(per_bin),
+  " points each,\nso their heights wobble by about +/-",
+  round(sqrt(per_bin)), " (", round(100 / sqrt(per_bin)), "%)\n",
+  sep = ""
+)
+
+par(mfrow = c(2, 2), mar = c(3, 3, 2, 1)) # <4>
+for (k in c(
+  "Too coarse" = 8, "Default-ish" = 20, "Your choice" = bins,
+  "Too fine" = 160
+)) {
+  hist(x[abs(x) < 4],
+    breaks = seq(-4, 4, length = k + 1),
+    col = "#2166ac", border = "white", main = paste(k, "bins"),
+    xlab = "", ylab = ""
+  )
+}
+```
+1. The page's controls: the number of bins and the sample size.
+2. Fixes the random numbers so the run is reproducible.
+3. The expected count in a central bin, whose square root is the wobble in the bar heights: the noise the graph should let you see.
+4. The same sample binned four ways. Too coarse hides the noise, too fine drowns the shape; in between, the bar-to-bar jitter is the seed of its own destruction.
+
+## Python {.unlisted}
+
+```{.python}
+# Seeds of its own destruction: a histogram that shows its own noise.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+bins = 40  # number of bins between -4 and 4
+n = 1000   # sample size
+rng = np.random.default_rng(112)
+
+x = rng.normal(size=n)
+per_bin = n * (8 / bins) * NormalDist().pdf(0)  # count in a central bin
+print(f"With {bins} bins, central bars hold about {per_bin:.0f} points "
+      f"each,\nso their heights wobble by about +/-{np.sqrt(per_bin):.0f} "
+      f"({100 / np.sqrt(per_bin):.0f}%)")
+
+fig, axes = plt.subplots(2, 2, figsize=(8, 6))
+choices = [("Too coarse", 8), ("Default-ish", 20), ("Your choice", bins),
+           ("Too fine", 160)]
+for ax, (label, k) in zip(axes.flat, choices):
+    ax.hist(x, bins=np.linspace(-4, 4, k + 1), color="#2166ac")
+    ax.set_title(f"{label}: {k} bins")
+plt.tight_layout()
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -36,7 +36,7 @@ Follow the share of bad work in a field over 40 years. Vary its growth advantage
 
 ```{ojs}
 //| echo: false
-import {range, fmt, pct} from "../js/stats.js"
+import {range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -66,7 +66,7 @@ Plot.plot({
   height: 280,
   x: {label: "Years"},
   y: {label: "Share of the literature that is bad work", domain: [0, 1], tickFormat: "%", grid: true},
-  color: {legend: true, domain: ["Your setting", "Total silence", "Active correction"], range: ["#2166ac", "#d6604d", "#5aae61"]},
+  color: {legend: true, domain: ["Your setting", "Total silence", "Active correction"], range: ["#2166ac", "#d6604d", "#1a9850"]},
   marks: [Plot.line(field, {x: "t", y: "bad", stroke: "label", strokeWidth: d => d.label === "Your setting" ? 3 : 1.5})]
 })
 ```
@@ -84,8 +84,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {range, fmt, pct} from "../js/stats.js"
+import {range, pct} from "../js/stats.js"
 
 viewof adv = Inputs.range([0, 0.3], {value: 0.12, step: 0.01, label: "Growth advantage of bad work"})
 viewof speak = Inputs.range([0, 0.5], {value: 0.05, step: 0.01, label: "Pr(someone who knows speaks up) per year"})
@@ -109,10 +115,81 @@ Plot.plot({
   height: 280,
   x: {label: "Years"},
   y: {label: "Share of the literature that is bad work", domain: [0, 1], tickFormat: "%", grid: true},
-  color: {legend: true, domain: ["Your setting", "Total silence", "Active correction"], range: ["#2166ac", "#d6604d", "#5aae61"]},
+  color: {legend: true, domain: ["Your setting", "Total silence", "Active correction"], range: ["#2166ac", "#d6604d", "#1a9850"]},
   marks: [Plot.line(field, {x: "t", y: "bad", stroke: "label", strokeWidth: d => d.label === "Your setting" ? 3 : 1.5})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Passive Corruption: silence lets bad work take over a field.
+adv <- 0.12 # growth advantage of bad work # <1>
+speak <- 0.05 # probability someone who knows speaks up, per year
+# Deterministic: no random numbers. Bad work starts at 10% of the field.
+
+run <- function(s) { # <2>
+  bad <- 0.1
+  for (t in 1:40) {
+    b <- bad[t] * (1 + adv) * (1 - s) # <3>
+    bad <- c(bad, b / (b + (1 - bad[t])))
+  }
+  bad
+}
+share <- cbind(
+  "Your setting" = run(speak), "Total silence" = run(0),
+  "Active correction" = run(0.3)
+)
+cat("Share of the field that is bad work after 40 years (%):\n")
+print(round(100 * share[41, ]))
+
+matplot(0:40, share, # <4>
+  type = "l", lty = 1, lwd = 2, ylim = c(0, 1),
+  col = c("#2166ac", "#d6604d", "#4daf4a"), xlab = "Year",
+  ylab = "Share of the field that is bad work"
+)
+legend("topleft", colnames(share),
+  col = c("#2166ac", "#d6604d", "#4daf4a"),
+  lwd = 2, bty = "n"
+)
+```
+1. The page's controls: how much faster bad work spreads than good work, and how often someone who knows speaks up. There is no seed: the model is deterministic.
+2. The share of the field that is bad work over 40 years, for a given rate of speaking up.
+3. Each year bad work grows by its advantage and shrinks by the share that gets called out.
+4. Three futures: your setting, total silence, and active correction. Silence is not neutral.
+
+## Python {.unlisted}
+
+```{.python}
+# Passive Corruption: silence lets bad work take over a field.
+import matplotlib.pyplot as plt
+
+adv = 0.12    # growth advantage of bad work
+speak = 0.05  # probability someone who knows speaks up, per year
+# Deterministic: no random numbers. Bad work starts at 10% of the field.
+
+
+def run(s):
+    bad = [0.1]
+    for _ in range(40):
+        b = bad[-1] * (1 + adv) * (1 - s)
+        bad.append(b / (b + 1 - bad[-1]))
+    return bad
+
+
+share = {"Your setting": run(speak), "Total silence": run(0),
+         "Active correction": run(0.3)}
+for (k, v), c in zip(share.items(), ["#2166ac", "#d6604d", "#4daf4a"]):
+    print(f"{k}: {100 * v[-1]:.0f}% bad work after 40 years")
+    plt.plot(v, color=c, linewidth=2, label=k)
+plt.ylim(0, 1)
+plt.xlabel("Year")
+plt.ylabel("Share of the field that is bad work")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

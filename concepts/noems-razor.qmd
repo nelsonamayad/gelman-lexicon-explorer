@@ -39,11 +39,11 @@ If $k$ of the $n$ errors favor the source, the likelihood ratio is $\left(\frac{
 
 ## Simulated example
 
-Start with a charitable prior, so malice is unlikely. Observe a run of errors, each of which either favors the source or doesn't. Watch the posterior probability of malice.
+A toy model, our own. Start with a charitable prior, so malice is unlikely. Observe a run of errors, each of which either favors the source or doesn't. Watch the posterior probability of malice.
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -77,8 +77,8 @@ Plot.plot({
   y: {label: "Posterior probability of malice", domain: [0, 1], tickFormat: "%", grid: true},
   marks: [
     Plot.line(razor, {x: "n", y: "p", stroke: "#2166ac", strokeWidth: 2}),
-    Plot.dot(razor.slice(1), {x: "n", y: "p", r: 5, fill: d => d.f ? "#d6604d" : "#5aae61"}),
-    Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "4 3"})
+    Plot.dot(razor.slice(1), {x: "n", y: "p", r: 5, fill: d => d.f ? "#d6604d" : "#1a9850"}),
+    Plot.ruleY([0.5], {stroke: "#8a8a8a", strokeDasharray: "4 3"})
   ]
 })
 ```
@@ -93,8 +93,14 @@ html`<div class="sim-readout">${md`Of 15 errors, **${razor.at(-1).fav}** favored
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof prior = Inputs.range([0.01, 0.5], {value: 0.05, step: 0.01, label: "Prior probability of malice (charitable)"})
 viewof truth = Inputs.radio(["Honest mistakes", "Motivated distortion"], {value: "Motivated distortion", label: "What's really going on"})
@@ -122,11 +128,79 @@ Plot.plot({
   y: {label: "Posterior probability of malice", domain: [0, 1], tickFormat: "%", grid: true},
   marks: [
     Plot.line(razor, {x: "n", y: "p", stroke: "#2166ac", strokeWidth: 2}),
-    Plot.dot(razor.slice(1), {x: "n", y: "p", r: 5, fill: d => d.f ? "#d6604d" : "#5aae61"}),
-    Plot.ruleY([0.5], {stroke: "#999", strokeDasharray: "4 3"})
+    Plot.dot(razor.slice(1), {x: "n", y: "p", r: 5, fill: d => d.f ? "#d6604d" : "#1a9850"}),
+    Plot.ruleY([0.5], {stroke: "#8a8a8a", strokeDasharray: "4 3"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Noem's Razor: when a pattern of convenient errors stops looking innocent.
+prior <- 0.05 # prior probability of malice (charitable) # <1>
+truth <- "Motivated distortion" # or "Honest mistakes"
+set.seed(153) # <2>
+
+# Each error either favors the person's side or not. Honest mistakes favor
+# them half the time; motivated distortion 90% of the time.
+p_fav <- if (truth == "Honest mistakes") 0.5 else 0.9 # <3>
+fav <- runif(15) < p_fav
+log_odds <- qlogis(prior) + # <4>
+  cumsum(ifelse(fav, log(0.9 / 0.5), log(0.1 / 0.5)))
+belief <- c(prior, plogis(log_odds))
+cat(sum(fav), " of 15 errors favored their side; belief in malice ",
+  "rises from ", round(100 * prior), "% to ", round(100 * belief[16]),
+  "%\n",
+  sep = ""
+)
+
+plot(0:15, belief, # <5>
+  type = "b", pch = c(1, ifelse(fav, 19, 1)),
+  col = "#d6604d", ylim = c(0, 1), xlab = "Errors observed",
+  ylab = "Probability of malice"
+)
+abline(h = 0.5, lty = 2)
+```
+1. The page's controls: a charitable prior probability of malice, and what is really going on.
+2. Fixes the random numbers so the run is reproducible.
+3. Honest mistakes favor the person's side half the time; motivated distortion, nine times in ten.
+4. Bayesian updating after each error, with a likelihood ratio of 0.9 to 0.5 for a convenient error and 0.1 to 0.5 for an inconvenient one.
+5. The posterior probability of malice after each error (filled dots are errors that favored them). One-sided errors overwhelm charity.
+
+## Python {.unlisted}
+
+```{.python}
+# Noem's Razor: when a pattern of convenient errors stops looking innocent.
+import numpy as np
+import matplotlib.pyplot as plt
+
+prior = 0.05  # prior probability of malice (charitable)
+truth = "Motivated distortion"  # or "Honest mistakes"
+rng = np.random.default_rng(150)
+
+# Each error either favors the person's side or not. Honest mistakes favor
+# them half the time; motivated distortion 90% of the time.
+p_fav = 0.5 if truth == "Honest mistakes" else 0.9
+fav = rng.uniform(size=15) < p_fav
+steps = np.where(fav, np.log(0.9 / 0.5), np.log(0.1 / 0.5))
+log_odds = np.log(prior / (1 - prior)) + np.cumsum(steps)
+belief = np.concatenate([[prior], 1 / (1 + np.exp(-log_odds))])
+print(f"{fav.sum()} of 15 errors favored their side; belief in malice "
+      f"rises from {100 * prior:.0f}% to {100 * belief[-1]:.0f}%")
+
+plt.plot(belief, "-", color="#d6604d")
+plt.scatter(np.arange(1, 16)[fav], belief[1:][fav], color="#d6604d",
+            label="Error favored their side")
+plt.axhline(0.5, color="black", linestyle="--")
+plt.ylim(0, 1)
+plt.xlabel("Errors observed")
+plt.ylabel("Probability of malice")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

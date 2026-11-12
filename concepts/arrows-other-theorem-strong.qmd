@@ -37,7 +37,7 @@ We run many meta-analyses of a literature with *no true effect*. Each underlying
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, pValue, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pValue, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -69,7 +69,7 @@ Plot.plot({
   x: {label: "Publications per result (m)", domain: [1, 2, 3, 4, 5]},
   y: {label: "False-positive rate of meta-analysis", grid: true, tickFormat: "%", domain: [0, 0.6]},
   marks: [
-    Plot.barY(meta, {x: "m", y: "fpr", fill: d => d.m === m ? "#d6604d" : "#bbb"}),
+    Plot.barY(meta, {x: "m", y: "fpr", fill: d => d.m === m ? "#d6604d" : "#8a8a8a"}),
     Plot.ruleY([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
   ]
 })
@@ -85,8 +85,14 @@ html`<div class="sim-readout">${md`With each of ${K} null studies published **${
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, pValue, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, pValue, pct} from "../js/stats.js"
 
 viewof m = Inputs.range([1, 5], {value: 5, step: 1, label: "Times each result is published (m)"})
 viewof K = Inputs.range([2, 20], {value: 6, step: 1, label: "Independent studies (K)"})
@@ -112,11 +118,76 @@ Plot.plot({
   x: {label: "Publications per result (m)", domain: [1, 2, 3, 4, 5]},
   y: {label: "False-positive rate of meta-analysis", grid: true, tickFormat: "%", domain: [0, 0.6]},
   marks: [
-    Plot.barY(meta, {x: "m", y: "fpr", fill: d => d.m === m ? "#d6604d" : "#bbb"}),
+    Plot.barY(meta, {x: "m", y: "fpr", fill: d => d.m === m ? "#d6604d" : "#8a8a8a"}),
     Plot.ruleY([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Arrow's Other Theorem (strong form): one result counted m times.
+m <- 5 # times each result is published # <1>
+K <- 6 # independent studies, all of a true effect of zero
+set.seed(34) # <2>
+
+fpr <- sapply(1:5, function(mm) {
+  pooled <- rowMeans(matrix(rnorm(2000 * K), ncol = K)) # 2,000 analyses # <3>
+  se <- 1 / sqrt(K * mm) # naive standard error, counting copies # <4>
+  mean(2 * pnorm(-abs(pooled) / se) < 0.05)
+})
+cat(
+  "False-positive rate with each result published", m, "times:",
+  paste0(round(100 * fpr[m], 1), "%"), "\n"
+)
+
+barplot(fpr, # <5>
+  names.arg = 1:5, ylim = c(0, 0.6),
+  col = ifelse(1:5 == m, "#d6604d", "grey70"),
+  xlab = "Publications per result (m)",
+  ylab = "False-positive rate of the meta-analysis"
+)
+abline(h = 0.05, lty = 2)
+```
+1. The page's controls: how many times each result is published, and how many independent studies there really are.
+2. Fixes the random numbers so the run is reproducible.
+3. Two thousand meta-analyses, each pooling K independent studies of a true effect of zero.
+4. A naive meta-analysis counts every copy as a new study, so its standard error shrinks as if there were K times m studies.
+5. The false-positive rate at each number of copies. The dashed line is the nominal 5%.
+
+## Python {.unlisted}
+
+```{.python}
+# Arrow's Other Theorem (strong form): one result counted m times.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+m = 5  # times each result is published
+K = 6  # independent studies, all of a true effect of zero
+rng = np.random.default_rng(34)
+N = NormalDist()
+
+fpr = []
+for mm in range(1, 6):
+    pooled = rng.normal(size=(2000, K)).mean(axis=1)  # 2,000 analyses
+    se = 1 / np.sqrt(K * mm)     # naive standard error, counting copies
+    p = np.array([2 * N.cdf(-abs(v) / se) for v in pooled])
+    fpr.append((p < 0.05).mean())
+print(f"False-positive rate with each result published {m} times: "
+      f"{100 * fpr[m - 1]:.1f}%")
+
+plt.bar(range(1, 6), fpr,
+        color=["#d6604d" if i == m else "0.7" for i in range(1, 6)])
+plt.axhline(0.05, color="black", linestyle="--")
+plt.ylim(0, 0.6)
+plt.xlabel("Publications per result (m)")
+plt.ylabel("False-positive rate of the meta-analysis")
+plt.show()
+```
+
+:::
 
 </details>
 

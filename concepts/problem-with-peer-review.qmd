@@ -32,11 +32,11 @@ Suppose each reviewer independently catches an *idiosyncratic* error with probab
 
 ## Simulated example
 
-Simulate papers containing either idiosyncratic or field-wide errors, each reviewed by $k$ peers. Compare detection rates.
+A toy model, our own. Simulate papers containing either idiosyncratic or field-wide errors, each reviewed by $k$ peers. Compare detection rates.
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -88,8 +88,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof pCatch = Inputs.range([0.1, 0.9], {value: 0.5, step: 0.05, label: "Reviewer skill: Pr(catch an error they understand)"})
 viewof m = Inputs.range([0, 1], {value: 0.85, step: 0.05, label: "Share of the field sharing the misconception"})
@@ -121,6 +127,80 @@ Plot.plot({
   marks: [Plot.line(review, {x: "k", y: "rate", stroke: "type", strokeWidth: 2, marker: "circle"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The problem with peer review: more reviewers don't catch shared errors.
+p_catch <- 0.5 # reviewer skill: chance of catching an error they see # <1>
+m <- 0.85 # share of the field sharing the misconception
+set.seed(61) # <2>
+
+reviewers <- c(1, 2, 3, 4, 5, 6, 8, 10)
+caught <- sapply(reviewers, function(k) {
+  hit <- function(shared) {
+    replicate(2000, {
+      blind <- shared & runif(k) < m # this reviewer shares the error # <3>
+      any(!blind & runif(k) < p_catch) # <4>
+    })
+  }
+  c(idiosyncratic = mean(hit(FALSE)), shared = mean(hit(TRUE)))
+})
+cat("With 10 reviewers: an idiosyncratic error is caught ",
+  round(100 * caught[1, 8]), "% of the time, a shared misconception ",
+  round(100 * caught[2, 8]), "%\n",
+  sep = ""
+)
+
+matplot(reviewers, t(caught), # <5>
+  type = "b", pch = 19, lty = 1,
+  ylim = c(0, 1), col = c("#2166ac", "#d6604d"),
+  xlab = "Number of reviewers", ylab = "Share of errors caught"
+)
+legend("right", c("Idiosyncratic error", "Shared misconception"),
+  col = c("#2166ac", "#d6604d"), pch = 19, bty = "n"
+)
+```
+1. The page's controls: a reviewer's skill at catching errors they can see, and the share of the field that shares the misconception.
+2. Fixes the random numbers so the run is reproducible.
+3. For a shared misconception, each reviewer is probably blind to it, because they are a peer.
+4. The error is caught if any reviewer both sees it and catches it.
+5. Detection against the number of reviewers. Adding peers helps with idiosyncratic errors and barely at all with the one they all share.
+
+## Python {.unlisted}
+
+```{.python}
+# The problem with peer review: more reviewers don't catch shared errors.
+import numpy as np
+import matplotlib.pyplot as plt
+
+p_catch = 0.5  # reviewer skill: chance of catching an error they see
+m = 0.85       # share of the field sharing the misconception
+rng = np.random.default_rng(61)
+
+reviewers = [1, 2, 3, 4, 5, 6, 8, 10]
+caught = {"Idiosyncratic error": [], "Shared misconception": []}
+for k in reviewers:
+    for kind, shared in [("Idiosyncratic error", False),
+                         ("Shared misconception", True)]:
+        blind = shared & (rng.uniform(size=(2000, k)) < m)
+        hit = (~blind & (rng.uniform(size=(2000, k)) < p_catch)).any(axis=1)
+        caught[kind].append(hit.mean())
+print(f"With 10 reviewers: an idiosyncratic error is caught "
+      f"{100 * caught['Idiosyncratic error'][-1]:.0f}% of the time, "
+      f"a shared misconception "
+      f"{100 * caught['Shared misconception'][-1]:.0f}%")
+
+for (kind, v), c in zip(caught.items(), ["#2166ac", "#d6604d"]):
+    plt.plot(reviewers, v, "o-", color=c, label=kind)
+plt.ylim(0, 1)
+plt.xlabel("Number of reviewers")
+plt.ylabel("Share of errors caught")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 

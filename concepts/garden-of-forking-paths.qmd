@@ -42,7 +42,7 @@ Under a true null (the treatment does nothing), a study has two outcome measures
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, variance, pValue, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pValue, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -109,7 +109,7 @@ Plot.plot({
       {k: "Preregistered (one fixed test)", v: garden.pre},
       {k: "Forking paths (one test, data-chosen)", v: garden.forked},
       {k: `Fishing (best of ${garden.paths} tests)`, v: garden.fished}
-    ], {y: "k", x: "v", fill: (d, i) => ["#999", "#d6604d", "#67001f"][i]}),
+    ], {y: "k", x: "v", fill: (d, i) => ["#8a8a8a", "#d6604d", "#67001f"][i]}),
     Plot.ruleX([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
   ]
 })
@@ -125,8 +125,14 @@ html`<div class="sim-readout">${md`Under the null, the preregistered test is "si
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, variance, pValue, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pValue, pct} from "../js/stats.js"
 
 viewof forks = Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"})
 viewof n = Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"})
@@ -187,11 +193,163 @@ Plot.plot({
       {k: "Preregistered (one fixed test)", v: garden.pre},
       {k: "Forking paths (one test, data-chosen)", v: garden.forked},
       {k: `Fishing (best of ${garden.paths} tests)`, v: garden.fished}
-    ], {y: "k", x: "v", fill: (d, i) => ["#999", "#d6604d", "#67001f"][i]}),
+    ], {y: "k", x: "v", fill: (d, i) => ["#8a8a8a", "#d6604d", "#67001f"][i]}),
     Plot.ruleX([0.05], {stroke: "currentColor", strokeDasharray: "4 3"})
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# The Garden of Forking Paths: one test, chosen by looking at the data.
+n <- 100 # participants per arm # <1>
+set.seed(44) # <2>
+
+p_value <- function(a, b) { # two-sample test (normal approximation)
+  z <- (mean(a) - mean(b)) / sqrt(var(a) / length(a) + var(b) / length(b))
+  2 * pnorm(-abs(z))
+}
+trim <- function(a) a[abs(a - mean(a)) < 2.5 * sd(a)]
+diff <- function(a, b) abs(mean(a) - mean(b))
+make <- function() { # heavy-ish tails, so outliers occur; no true effect # <3>
+  y1 <- rt(n, 5)
+  data.frame(y1,
+    y2 = 0.5 * y1 + sqrt(0.75) * rt(n, 5),
+    sex = rbinom(n, 1, 0.5)
+  )
+}
+pick <- function(D, grp, out) D[[out]][grp == "all" | D$sex == grp]
+
+res <- t(replicate(1000, {
+  trt <- make()
+  ctl <- make()
+  # 1. Preregistered: always the same test
+  pre <- p_value(trt$y1, ctl$y1) < 0.05 # <4>
+  # 2. Forking paths: three choices made by looking at the data
+  out <- if (diff(trt$y2, ctl$y2) > diff(trt$y1, ctl$y1)) "y2" else "y1" # <5>
+  d0 <- diff(pick(trt, 0, out), pick(ctl, 0, out))
+  d1 <- diff(pick(trt, 1, out), pick(ctl, 1, out))
+  grp <- if (d1 > 2 * d0) 1 else if (d0 > 2 * d1) 0 else "all"
+  a <- pick(trt, grp, out)
+  b <- pick(ctl, grp, out)
+  if (diff(trim(a), trim(b)) > diff(a, b)) {
+    a <- trim(a)
+    b <- trim(b)
+  }
+  forked <- p_value(a, b) < 0.05 # <6>
+  # 3. Fishing: test all 12 paths and report the smallest p-value
+  ps <- c() # <7>
+  for (o in c("y1", "y2")) {
+    for (tr in c(FALSE, TRUE)) {
+      for (g in c("all", 0, 1)) {
+        a <- pick(trt, g, o)
+        b <- pick(ctl, g, o)
+        if (tr) {
+          a <- trim(a)
+          b <- trim(b)
+        }
+        ps <- c(ps, p_value(a, b))
+      }
+    }
+  }
+  c(preregistered = pre, forking_paths = forked, fishing = min(ps) < 0.05)
+}))
+rates <- colMeans(res)
+print(round(100 * rates, 1)) # false-positive rates (%), true effect zero
+
+barplot(rates, # <8>
+  col = c("grey60", "#d6604d", "#67001f"), ylim = c(0, 0.5),
+  ylab = "False-positive rate (true effect is zero)"
+)
+abline(h = 0.05, lty = 2)
+```
+1. The page's control: participants per arm.
+2. Fixes the random numbers so the run is reproducible.
+3. One arm of one study: two outcomes, a sex variable and heavy-ish tails so outliers occur. The true effect is zero.
+4. The preregistered researcher always runs the same test.
+5. The forking-paths researcher looks at the data, not at p-values, and chooses the outcome with the larger difference, then a subgroup, then whether to drop outliers.
+6. That researcher computes exactly one p-value.
+7. The fishing researcher runs all twelve paths and reports the best.
+8. False-positive rates. One data-chosen test lands between the nominal rate and fishing: no fishing was needed, only forks.
+
+## Python {.unlisted}
+
+```{.python}
+# The Garden of Forking Paths: one test, chosen by looking at the data.
+from statistics import NormalDist
+import numpy as np
+import matplotlib.pyplot as plt
+
+n = 100  # participants per arm
+rng = np.random.default_rng(44)
+N = NormalDist()
+
+
+def p_value(a, b):
+    """Two-sample test (normal approximation)."""
+    se = np.sqrt(a.var(ddof=1) / len(a) + b.var(ddof=1) / len(b))
+    return 2 * N.cdf(-abs(a.mean() - b.mean()) / se)
+
+
+def trim(a):
+    return a[np.abs(a - a.mean()) < 2.5 * a.std(ddof=1)]
+
+
+def diff(a, b):
+    return abs(a.mean() - b.mean())
+
+
+def make():
+    """Heavy-ish tails, so outliers occur; the true effect is zero."""
+    y1 = rng.standard_t(5, n)
+    y2 = 0.5 * y1 + np.sqrt(0.75) * rng.standard_t(5, n)
+    return {"y1": y1, "y2": y2, "sex": rng.binomial(1, 0.5, n)}
+
+
+def pick(D, grp, out):
+    return D[out] if grp == "all" else D[out][D["sex"] == grp]
+
+
+pre = forked = fished = 0
+for _ in range(1000):
+    T, C = make(), make()
+    # 1. Preregistered: always the same test
+    pre += p_value(T["y1"], C["y1"]) < 0.05
+    # 2. Forking paths: three choices made by looking at the data
+    out = "y2" if diff(T["y2"], C["y2"]) > diff(T["y1"], C["y1"]) else "y1"
+    d0 = diff(pick(T, 0, out), pick(C, 0, out))
+    d1 = diff(pick(T, 1, out), pick(C, 1, out))
+    grp = 1 if d1 > 2 * d0 else 0 if d0 > 2 * d1 else "all"
+    a, b = pick(T, grp, out), pick(C, grp, out)
+    if diff(trim(a), trim(b)) > diff(a, b):
+        a, b = trim(a), trim(b)
+    forked += p_value(a, b) < 0.05
+    # 3. Fishing: test all 12 paths and report the smallest p-value
+    ps = []
+    for o in ("y1", "y2"):
+        for tr in (False, True):
+            for g in ("all", 0, 1):
+                a, b = pick(T, g, o), pick(C, g, o)
+                if tr:
+                    a, b = trim(a), trim(b)
+                ps.append(p_value(a, b))
+    fished += min(ps) < 0.05
+
+rates = {"Preregistered": pre / 1000, "Forking paths": forked / 1000,
+         "Fishing (best of 12)": fished / 1000}
+for k, v in rates.items():
+    print(f"{k}: {100 * v:.1f}% false positives (true effect zero)")
+
+plt.bar(list(rates), list(rates.values()),
+        color=["0.6", "#d6604d", "#67001f"])
+plt.axhline(0.05, color="black", linestyle="--")
+plt.ylim(0, 0.5)
+plt.ylabel("False-positive rate (true effect is zero)")
+plt.show()
+```
+
+:::
 
 </details>
 

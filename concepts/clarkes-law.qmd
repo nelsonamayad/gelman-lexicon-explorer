@@ -36,7 +36,7 @@ Studies report means of 1–7 Likert items with small samples. Compare the GRIM-
 
 ```{ojs}
 //| echo: false
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -85,8 +85,14 @@ html`<div class="sim-readout">${md`GRIM failure rates: honest **${pct(grim[0].fa
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, fmt, pct} from "../js/stats.js"
+import {rng, range, pct} from "../js/stats.js"
 
 viewof errorRate = Inputs.range([0, 1], {value: 0.4, step: 0.05, label: "Sloppiness: Pr(a reported mean has an error)"})
 viewof seed = Inputs.range([1, 500], {value: 59, step: 1, label: "Random seed"})
@@ -118,6 +124,91 @@ Plot.plot({
   marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#f4a582" : "#d6604d"})]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# Clarke's Law: the GRIM test can't tell crappy research from fraud.
+error_rate <- 0.4 # sloppiness: probability a reported mean has an error # <1>
+set.seed(59) # <2>
+
+r2 <- function(x) round(x, 2)
+grim_ok <- function(m, n) { # can n integers have mean m (to 2 decimals)? # <3>
+  k <- round(m * n)
+  any(sprintf("%.2f", r2((k - 1):(k + 1) / n)) == sprintf("%.2f", m))
+}
+report <- function(type) { # <4>
+  replicate(2000, {
+    n <- sample(10:40, 1)
+    m <- r2(mean(sample(1:7, n, replace = TRUE))) # a 1-7 rating scale
+    if (type == "Sloppy" && runif(1) < error_rate) {
+      m <- r2(m + sample(c(-1, 1), 1) * sample(1:9, 1) / 100)
+    }
+    if (type == "Fabricated") m <- r2(runif(1, 2, 6))
+    grim_ok(m, n)
+  })
+}
+fail <- sapply( # <5>
+  c("Honest", "Sloppy", "Fabricated"),
+  function(type) 1 - mean(report(type))
+)
+print(round(100 * fail)) # GRIM failure rates (%)
+
+barplot(fail, # <6>
+  col = c("#2166ac", "#e6ab02", "#d6604d"), ylim = c(0, 1),
+  ylab = "Share of means that fail the GRIM test"
+)
+```
+1. The page's control: how often a sloppy researcher's reported mean contains an error.
+2. Fixes the random numbers so the run is reproducible.
+3. The GRIM test: with n integer responses, can any integer total divided by n give the reported mean to two decimals?
+4. Two thousand reported means from honest, sloppy or fabricated research. Sloppy means get a small transcription error; fabricated ones are made up.
+5. The share of each kind that fails the test.
+6. Honest means never fail. Sloppy and fabricated ones both do, and the test cannot tell the two apart: sufficiently crappy research is indistinguishable from fraud.
+
+## Python {.unlisted}
+
+```{.python}
+# Clarke's Law: the GRIM test can't tell crappy research from fraud.
+import numpy as np
+import matplotlib.pyplot as plt
+
+error_rate = 0.4  # sloppiness: probability a reported mean has an error
+rng = np.random.default_rng(59)
+
+
+def grim_ok(m, n):
+    """Can n integers have a mean that rounds to m (2 decimals)?"""
+    k = round(m * n)
+    return any(f"{round(s / n, 2):.2f}" == f"{m:.2f}"
+               for s in (k - 1, k, k + 1))
+
+
+def report(kind):
+    ok = []
+    for _ in range(2000):
+        n = int(rng.integers(10, 41))
+        m = round(rng.integers(1, 8, n).mean(), 2)  # a 1-7 rating scale
+        if kind == "Sloppy" and rng.uniform() < error_rate:
+            m = round(m + rng.choice([-1, 1]) * rng.integers(1, 10) / 100, 2)
+        if kind == "Fabricated":
+            m = round(rng.uniform(2, 6), 2)
+        ok.append(grim_ok(m, n))
+    return np.mean(ok)
+
+
+kinds = ["Honest", "Sloppy", "Fabricated"]
+fail = [1 - report(k) for k in kinds]
+for k, f in zip(kinds, fail):
+    print(f"{k}: {100 * f:.0f}% fail the GRIM test")
+
+plt.bar(kinds, fail, color=["#2166ac", "#e6ab02", "#d6604d"])
+plt.ylim(0, 1)
+plt.ylabel("Share of means that fail the GRIM test")
+plt.show()
+```
+
+:::
 
 </details>
 

@@ -36,7 +36,7 @@ Many decisions at various signal-to-noise ratios. Compare the eyeball analyst wi
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 ```
 
 ```{ojs}
@@ -69,7 +69,7 @@ Plot.plot({
   height: 300,
   x: {type: "log", label: "Signal-to-noise ratio (effect / sd per observation)"},
   y: {label: "Accuracy deciding the sign", domain: [0.4, 1], tickFormat: "%", grid: true},
-  color: {legend: true, domain: ["Eyeballing", "Statistical analysis", "Value added (the beach)"], range: ["#999", "#2166ac", "#e6ab02"]},
+  color: {legend: true, domain: ["Eyeballing", "Statistical analysis", "Value added (the beach)"], range: ["#8a8a8a", "#2166ac", "#b8860b"]},
   marks: [
     Plot.areaY(beach, {x: "snr", y1: "eye", y2: "stat", fill: () => "Value added (the beach)", fillOpacity: 0.35}),
     Plot.line(beach, {x: "snr", y: "eye", stroke: () => "Eyeballing", strokeWidth: 2}),
@@ -91,8 +91,14 @@ Plot.plot({
 <details class="code-fold sim-code">
 <summary>Show simulation code</summary>
 
+The R version uses base R, and the Python version uses NumPy and Matplotlib. Where the simulation draws random numbers, each language draws its own, so exact numbers differ slightly but show the same pattern. The numbered markers in the R code are explained under it.
+
+::: {.panel-tabset group="sim-language"}
+
+## Observable JS {.unlisted}
+
 ```{.js}
-import {rng, range, mean, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, fmt} from "../js/stats.js"
 
 viewof n = Inputs.range([5, 200], {value: 30, step: 5, label: "Observations per decision"})
 viewof seed = Inputs.range([1, 500], {value: 135, step: 1, label: "Random seed"})
@@ -119,7 +125,7 @@ Plot.plot({
   height: 300,
   x: {type: "log", label: "Signal-to-noise ratio (effect / sd per observation)"},
   y: {label: "Accuracy deciding the sign", domain: [0.4, 1], tickFormat: "%", grid: true},
-  color: {legend: true, domain: ["Eyeballing", "Statistical analysis", "Value added (the beach)"], range: ["#999", "#2166ac", "#e6ab02"]},
+  color: {legend: true, domain: ["Eyeballing", "Statistical analysis", "Value added (the beach)"], range: ["#8a8a8a", "#2166ac", "#b8860b"]},
   marks: [
     Plot.areaY(beach, {x: "snr", y1: "eye", y2: "stat", fill: () => "Value added (the beach)", fillOpacity: 0.35}),
     Plot.line(beach, {x: "snr", y: "eye", stroke: () => "Eyeballing", strokeWidth: 2}),
@@ -127,6 +133,82 @@ Plot.plot({
   ]
 })
 ```
+
+## R {.unlisted}
+
+```{.r}
+# That narrow beach: where statistics beats eyeballing the data.
+n <- 30 # observations per decision # <1>
+set.seed(135) # <2>
+
+# For each signal-to-noise ratio, 600 decisions about the sign of an effect
+snr <- 10^(-2 + 0:24 * 0.125) # <3>
+res <- t(sapply(snr, function(s) {
+  hits <- replicate(600, {
+    sign <- if (runif(1) < 0.5) 1 else -1
+    y <- rnorm(n, sign * s, 1)
+    glance <- median(y[1:3]) # eyeball: a quick look at 3 points # <4>
+    c(eye = sign(glance) == sign, stat = sign(mean(y)) == sign)
+  })
+  rowMeans(hits)
+}))
+gap <- res[, "stat"] - res[, "eye"] # <5>
+cat("Statistics helps most at signal/noise ", signif(snr[which.max(gap)], 2),
+  ": ", round(100 * res[which.max(gap), "stat"]), "% right vs ",
+  round(100 * res[which.max(gap), "eye"]), "% by eye\n",
+  sep = ""
+)
+
+matplot(snr, res, # <6>
+  type = "l", lty = 1, lwd = 2, log = "x",
+  col = c("#d6604d", "#2166ac"), ylim = c(0.5, 1),
+  xlab = "Signal-to-noise ratio", ylab = "Share of correct decisions"
+)
+legend("topleft", c("Eyeball", "Statistics"),
+  col = c("#d6604d", "#2166ac"), lwd = 2, bty = "n"
+)
+```
+1. The page's control: observations per decision.
+2. Fixes the random numbers so the run is reproducible.
+3. Signal-to-noise ratios from hopeless to obvious.
+4. Eyeballing: a quick look at three points. Statistics: the mean of all n.
+5. How much statistics adds, at each ratio.
+6. Both methods' accuracy. At the left nothing works; at the right anyone can see it; statistics matters only on the narrow beach between.
+
+## Python {.unlisted}
+
+```{.python}
+# That narrow beach: where statistics beats eyeballing the data.
+import numpy as np
+import matplotlib.pyplot as plt
+
+n = 30  # observations per decision
+rng = np.random.default_rng(135)
+
+# For each signal-to-noise ratio, 600 decisions about the sign of an effect
+snr = 10 ** (-2 + np.arange(25) * 0.125)
+eye, stat = [], []
+for s in snr:
+    sign = np.where(rng.uniform(size=600) < 0.5, 1, -1)
+    y = rng.normal(sign[:, None] * s, 1, (600, n))
+    glance = np.median(y[:, :3], axis=1)  # eyeball: a quick look at 3 points
+    eye.append(np.mean(np.sign(glance) == sign))
+    stat.append(np.mean(np.sign(y.mean(axis=1)) == sign))
+eye, stat = np.array(eye), np.array(stat)
+k = np.argmax(stat - eye)
+print(f"Statistics helps most at signal/noise {snr[k]:.2g}: "
+      f"{100 * stat[k]:.0f}% right vs {100 * eye[k]:.0f}% by eye")
+
+plt.semilogx(snr, eye, color="#d6604d", linewidth=2, label="Eyeball")
+plt.semilogx(snr, stat, color="#2166ac", linewidth=2, label="Statistics")
+plt.ylim(0.5, 1)
+plt.xlabel("Signal-to-noise ratio")
+plt.ylabel("Share of correct decisions")
+plt.legend()
+plt.show()
+```
+
+:::
 
 </details>
 
