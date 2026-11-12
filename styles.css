@@ -14,7 +14,7 @@ body {
   font-family: var(--bs-body-font-family);
 }
 
-h1, h2, h3, h4, h5, h6, .title, .topic-name, .navbar-title {
+h1, h2, h3, h4, h5, h6, .title, .topic-name {
   font-family: var(--bs-body-font-family);
   font-weight: 700;
 }
@@ -36,14 +36,6 @@ code, pre, kbd, samp {
   border-radius: 0.4rem;
   white-space: nowrap;
   transition: background-color 0.15s ease;
-}
-
-/* With icons the menu needs more room: between the collapsed (phone and
-   tablet) navbar and wide screens, show the logo without the long title. */
-@media (min-width: 992px) and (max-width: 1399.98px) {
-  .navbar-brand .navbar-title {
-    display: none;
-  }
 }
 
 .navbar .nav-link .bi,

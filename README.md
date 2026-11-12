@@ -8,8 +8,6 @@
 
 **Visit the site: <https://gelman-lexicon-explorer.netlify.app>**
 
-[![The Lexicon Explorer](assets/social-card.png)](https://gelman-lexicon-explorer.netlify.app)
-
 Since 2009, Andrew Gelman has kept a running list of short, funny names for
 "important methods and concepts related to statistics that are not as well
 known as they should be": the statistical significance filter, the garden of
@@ -63,8 +61,7 @@ issue** and **Edit this page** links that come straight here.
   without the check failing first.
 - **Adding or rewriting an entry?** Start from `_template.qmd`. The conventions
   (page structure, quotation rules, how the simulations and the R and Python
-  scripts are written) are documented in [CLAUDE.md](CLAUDE.md), and planned
-  improvements are in [TODO.md](TODO.md).
+  scripts are written) are documented in [CLAUDE.md](CLAUDE.md).
 
 ## Run it locally
 
