@@ -16,3 +16,6 @@ r/*.html
 **/*-listing.json
 **/*_files/
 __pycache__/
+
+# Local planning notes, not published.
+TODO.md

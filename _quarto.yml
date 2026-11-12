@@ -47,7 +47,7 @@ website:
   navbar:
     logo: assets/logo.svg
     logo-alt: "Lexicon Explorer logo"
-    title: ""
+    title: false
     # Icons are Bootstrap Icons (https://icons.getbootstrap.com). The theme and
     # kind icons match ICONS in scripts/build_groups.py (the home-page cards).
     left:
