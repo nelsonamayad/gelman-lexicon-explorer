@@ -1,7 +1,6 @@
 ---
 title: "Andrew Gelman Statistical Lexicon Explorer"
 date: 2026-11-09
-subtitle: "An homage"
 description-meta: "Every entry in Andrew Gelman's Handy Statistical Lexicon explained with an interactive simulation that runs in your browser"
 open-graph:
   description: "Every entry in Andrew Gelman's Handy Statistical Lexicon explained with an interactive simulation that runs in your browser"
@@ -10,6 +9,10 @@ twitter-card:
 sidebar: false
 toc: false
 page-layout: full
+# The page draws its own hero (below); styles.css hides Quarto's title block
+# on pages with this class.
+title-block-style: none
+body-classes: home-page
 listing:
   id: entries
   contents: concepts
@@ -26,15 +29,76 @@ listing:
     categories: "Theme · Kind · Level"
 ---
 
-::: {.hero}
-Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for *"important methods and concepts related to statistics that are not as well known as they should be."* This site gives each of the **155 entries** on the list (as of November 2026) its own page, with an explanation and an interactive simulation that runs in your browser. Entries are numbered in the order Gelman lists them. His list itself isn't numbered, so the numbers are ours.
+::::: {.home-hero}
+:::: {.home-hero-text}
+[An homage to Andrew Gelman's Handy Statistical Lexicon]{.home-kicker}
 
-I love Gelman's lexicon page and have learned a lot from reading it through the years. With the help of coding agents, I built this homage to the author and to the lexicon itself. Enjoy it.
+# Andrew Gelman Statistical Lexicon Explorer {.home-title .unnumbered .unlisted}
 
-[Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
+[Every entry in the lexicon, explained, with a simulation you can play with.]{.home-lead}
+
+Since 2009, Andrew Gelman has kept a running [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/) on his blog: short, funny names for *"important methods and concepts related to statistics that are not as well known as they should be."* This site gives each of the **155 entries** on the list (as of November 2026) its own page, with an explanation and an interactive simulation that runs in your browser.
+
+[I love Gelman's lexicon page and have learned a lot from reading it through the years. With the help of coding agents, I built this homage to the author and to the lexicon itself. Enjoy it.]{.home-note}
+
+[Start here](start-here.qmd){.btn .btn-primary .btn-lg .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .btn-lg .me-2} [About this site](about.qmd){.btn .btn-link}
 
 [Version 0.10, 13 November 2026.]{.site-version}
-:::
+::::
+
+:::: {.home-hero-chart}
+{{< include _hero-chart.md >}}
+::::
+:::::
+
+```{=html}
+<div class="home-stats">
+  <a class="home-stat" href="#all-entries"><span class="stat-n">155</span><span class="stat-l">entries, in Gelman's order</span></a>
+  <a class="home-stat" href="start-here.html"><span class="stat-n">155</span><span class="stat-l">simulations to play with</span></a>
+  <a class="home-stat" href="concepts/kangaroo.html#simulated-example"><span class="stat-n">3</span><span class="stat-l">languages for each: Observable JS, R, Python</span></a>
+  <a class="home-stat" href="start-here.html#more-tours"><span class="stat-n">4</span><span class="stat-l">guided tours</span></a>
+</div>
+
+<section class="home-today" id="entry-of-the-day" aria-labelledby="today-label" hidden>
+  <div class="today-label" id="today-label"><i class="bi bi-calendar-heart" aria-hidden="true"></i> Entry of the day</div>
+  <div class="today-body">
+    <span class="today-num"></span>
+    <a class="today-title" href="#"></a>
+    <p class="today-def"></p>
+    <p class="today-tags"></p>
+  </div>
+  <div class="today-actions">
+    <a class="btn btn-primary today-go" href="#">Read it and run the simulation</a>
+    <a class="btn btn-link" href="random.html">Or a random one</a>
+  </div>
+</section>
+
+<script>
+// Entry of the day: the same entry for everyone on a given (UTC) day, read
+// from the table of every entry further down this page. Stays hidden without
+// JavaScript.
+document.addEventListener("DOMContentLoaded", function () {
+  var rows = Array.prototype.slice.call(document.querySelectorAll("#listing-entries tbody tr"));
+  if (!rows.length) return;
+  var num = function (r) { return Number((r.querySelector(".listing-order") || {}).textContent) || 0; };
+  rows.sort(function (a, b) { return num(a) - num(b); });
+  var row = rows[Math.floor(Date.now() / 86400000) % rows.length];
+  var link = row.querySelector("a.listing-title");
+  var box = document.getElementById("entry-of-the-day");
+  if (!link || !box) return;
+  box.querySelector(".today-num").textContent = "#" + num(row);
+  box.querySelector(".today-title").textContent = link.textContent;
+  box.querySelector(".today-title").href = link.getAttribute("href");
+  box.querySelector(".today-go").href = link.getAttribute("href");
+  box.querySelector(".today-def").textContent = (row.querySelector(".listing-description") || {}).textContent || "";
+  // Theme, kind and level, separated by commas; one theme name has a comma of its own.
+  var tags = ((row.querySelector(".listing-categories") || {}).textContent || "").trim()
+    .replace("Causes, samples and populations", "Causes samples and populations");
+  box.querySelector(".today-tags").textContent = tags.split(",").map(function (s) { return s.trim().replace("Causes samples", "Causes, samples"); }).join(" · ");
+  box.hidden = false;
+});
+</script>
+```
 
 ## Browse by theme {#themes}
 
