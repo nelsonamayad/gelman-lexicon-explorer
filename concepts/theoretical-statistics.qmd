@@ -5,15 +5,21 @@ description: "The theory of applied statistics."
 order: 121
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Advanced"
+categories: ["Thinking about statistics", "Law or aphorism", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2017/05/26/theoretical-statistics-theory-applied-statistics-think/"
+search-terms: "post-selection inference, pretest estimator, model selection"
 verified: true
+image: "../assets/cards/theoretical-statistics.png"
+image-alt: "#121 Theoretical statistics: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#121** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Theoretical statistics is the theory of applied statistics: how to think about what we do](https://statmodeling.stat.columbia.edu/2017/05/26/theoretical-statistics-theory-applied-statistics-think/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: post-selection inference, pretest estimator, model selection.
 
 Source check: ✓ The explanation was checked against the source.
 :::

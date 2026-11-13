@@ -5,16 +5,19 @@ description: "This is how tech investors have absorbed the prestige of informati
 order: 155
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/"
 verified: true
+image: "../assets/cards/transitive-property-of-money.png"
+image-alt: "#155 The transitive property of money: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#155** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Computer scientists today are in the position of economists in the early 2000s and Freudian psychiatrists in the 1950s](https://statmodeling.stat.columbia.edu/2026/08/11/computer-scientists-today-are-like-economists-in-the-early-2000s-and-freudian-psychiatrists-in-the-1950s/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026.
 :::

@@ -5,15 +5,18 @@ description: "Those hypotheses that are unable to be killed by mere evidence. (f
 order: 47
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/"
 verified: true
+image: "../assets/cards/more-vampirical-than-empirical.png"
+image-alt: "#47 More Vampirical Than Empirical: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#47** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“Statistical chemotherapy”: Jeremy Freese adds a new item to the lexicon!](https://statmodeling.stat.columbia.edu/2014/06/18/jeremy-freese-adds-new-item-lexicon/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -80,7 +83,7 @@ Plot.plot({
 //| echo: false
 {
   const end = w => vamp.filter(d => d.who === w).at(-1).p;
-  return html`<div class="sim-readout">${md`After 20 attempts, the empirical updater's belief is **${pct(end("Empirical"), 1)}** and the vampirical updater's is **${pct(end("Vampirical"), 1)}**. Every "hidden moderator" story throws away a piece of evidence. Push the slider to 1 and the hypothesis is immortal.`}</div>`;
+  return html`<div class="sim-readout">${md`After 20 attempts, the empirical updater's belief is **${pct(end("Empirical"), 1)}** and the vampirical updater's is **${pct(end("Vampirical"), 1)}**. Every "hidden moderator" story throws away a piece of evidence. Push the slider to 1 and the hypothesis is immortal. The toy shows how explaining away failures stops learning; it doesn't say that any particular moderator story is wrong.`}</div>`;
 }
 ```
 

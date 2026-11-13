@@ -5,15 +5,18 @@ description: "That's what I want to ask you."
 order: 49
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2015/01/25/tell-dont-know/"
 verified: true
+image: "../assets/cards/tell-me-what-you-dont-know.png"
+image-alt: "#49 Tell Me What You Don't Know: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#49** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Tell me what you don't know](https://statmodeling.stat.columbia.edu/2015/01/25/tell-dont-know/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

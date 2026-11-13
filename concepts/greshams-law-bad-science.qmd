@@ -5,15 +5,18 @@ description: "Every minute you spend staring at some bad paper, trying to figure
 order: 124
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2020/01/24/the-latest-perry-preschool-analysis-noisy-data-noisy-methods-flexible-summarizing-big-claims/"
 verified: true
+image: "../assets/cards/greshams-law-bad-science.png"
+image-alt: "#124 Gresham's Law of bad science: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#124** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The latest Perry Preschool analysis: noisy data + noisy methods + flexible summarizing = big claims](https://statmodeling.stat.columbia.edu/2020/01/24/the-latest-perry-preschool-analysis-noisy-data-noisy-methods-flexible-summarizing-big-claims/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

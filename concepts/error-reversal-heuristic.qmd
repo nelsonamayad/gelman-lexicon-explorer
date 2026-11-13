@@ -5,16 +5,19 @@ description: "How would you have reacted if the mistake had gone in the opposite
 order: 144
 theme: "How science behaves"
 kind: "Principle or heuristic"
-categories: ["How science behaves", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/12/13/how-a-simple-math-error-sparked-a-panic-about-black-plastic-kitchen-utensils/#comment-2386053"
 verified: true
+image: "../assets/cards/error-reversal-heuristic.png"
+image-alt: "#144 The Error-Reversal Heuristic: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The story came from Dean Eckles, credited in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#144** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How a simple math error sparked a panic about black plastic kitchen utensils](https://statmodeling.stat.columbia.edu/2024/12/13/how-a-simple-math-error-sparked-a-panic-about-black-plastic-kitchen-utensils/#comment-2386053).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The story came from Dean Eckles, credited in Gelman's post.
 :::

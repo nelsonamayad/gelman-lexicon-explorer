@@ -5,16 +5,19 @@ description: "Any result can be published no more than five times."
 order: 33
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/"
 verified: true
+image: "../assets/cards/arrows-other-theorem-weak.png"
+image-alt: "#33 Arrow's Other Theorem (weak form): an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The theorem is Tex's joke, as told in Gelman's post; the model is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#33** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Arrow's other theorem](https://statmodeling.stat.columbia.edu/2011/04/arrows_other_th/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The theorem is Tex's joke, as told in Gelman's post; the model is ours.
 :::

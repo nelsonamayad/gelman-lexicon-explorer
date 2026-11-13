@@ -7,6 +7,9 @@ project:
   resources:
     - js/stats.js
     - assets/
+    # The R and Python scripts, fetched by the "Run in your browser" buttons
+    # (_sim-tools.html).
+    - sims/
   # Removes the ES6 polyfill script Quarto adds next to MathJax.
   post-render: scripts/post_render.py
 
@@ -82,9 +85,21 @@ website:
             icon: quote
           - href: kinds/advice.qmd
             icon: chat-left-text
-      - href: start-here.qmd
-        text: Start here
+      - text: Tours
         icon: signpost-2
+        menu:
+          - href: start-here.qmd
+            text: Start here
+            icon: signpost-2
+          - href: tours/reviewers.qmd
+            text: For reviewers and editors
+            icon: clipboard-check
+          - href: tours/surveys.qmd
+            text: For survey researchers
+            icon: ui-checks
+          - href: tours/bayesian-beginners.qmd
+            text: For Bayesian beginners
+            icon: diagram-3
       - href: random.qmd
         text: Random entry
         icon: shuffle
@@ -138,7 +153,10 @@ format:
       method: mathjax
       url: "https://cdn.jsdelivr.net/npm/mathjax@4.1.3/tex-chtml.js"
     include-in-header: _analytics.html
-    include-after-body: _a11y.html
+    include-after-body:
+      - _a11y.html
+      # Reset, CSV download and run-in-browser buttons for each simulation.
+      - _sim-tools.html
     toc: true
     toc-title: "On this page"
     code-fold: true

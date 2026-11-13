@@ -5,22 +5,25 @@ description: "Even if the advice or criticism is annoying, it makes sense to lis
 order: 10
 theme: "How science behaves"
 kind: "Principle or heuristic"
-categories: ["How science behaves", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/"
 verified: true
+image: "../assets/cards/backseat-driver-principle.png"
+image-alt: "#10 The Backseat Driver Principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#10** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The backseat driver principle](https://statmodeling.stat.columbia.edu/2007/06/22/the_backseat_dr/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
 
 ## What it is
 
-Gelman's framing: "The driver overestimates his control over the situation ... The backseat driver ('Whoa—you're taking that curve too fast!') underestimates the driver's control. As a driver, I listen to the passengers because they provide a useful corrective." More generally: "I'll take anybody's advice seriously." A backseat driver is irritating, but sometimes they spot the pedestrian you missed. The principle is that the *annoyingness* of criticism tells you little about whether it is *correct*. A referee who is rude, a commenter who nitpicks or a colleague who keeps asking "did you check X?" may still be pointing at a real problem, and the cost of checking is usually small next to the cost of driving into a ditch.
+Gelman's framing: "The driver overestimates his control over the situation ... The backseat driver ('Whoa—you're taking that curve too fast!') underestimates the driver's control. As a driver, I listen to the passengers because they provide a useful corrective." More generally: "I'll take anybody's advice seriously." A backseat driver is irritating, but sometimes they spot the pedestrian you missed. The principle is that the *annoyingness* of criticism tells you little about whether it is *correct*. A referee who is rude, a commenter who nitpicks or a colleague who keeps asking *did you check X?* may still be pointing at a real problem, and the cost of checking is usually small next to the cost of driving into a ditch.
 
 ## Why it matters
 

@@ -5,15 +5,18 @@ description: "There are no X's in foxholes (where X = people who disagree with m
 order: 30
 theme: "Thinking about statistics"
 kind: "Fallacy"
-categories: ["Thinking about statistics", "Fallacy"]
+difficulty: "Introductory"
+categories: ["Thinking about statistics", "Fallacy", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/"
 verified: true
+image: "../assets/cards/foxhole-fallacy.png"
+image-alt: "#30 The Foxhole Fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#30** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [No Bayesians in foxholes](https://statmodeling.stat.columbia.edu/2006/12/no_bayesians_in/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

@@ -10,5 +10,5 @@ That page doesn't exist. It may have been renamed when the site was reorganized.
 - [Browse all 155 entries](/index.html#all-entries)
 - [Browse by theme](/index.html#themes)
 - [Browse by kind](/index.html#kinds)
-- [Start here](/start-here.html)
+- [Start here](/start-here.html) or one of the [other tours](/start-here.html#more-tours)
 - [Try a random entry](/random.html)

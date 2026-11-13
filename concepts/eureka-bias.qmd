@@ -5,16 +5,19 @@ description: "When you think you made a discovery and then you don't want to giv
 order: 72
 theme: "How science behaves"
 kind: "Fallacy"
-categories: ["How science behaves", "Fallacy"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Fallacy", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/"
 verified: true
+image: "../assets/cards/eureka-bias.png"
+image-alt: "#72 Eureka bias: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The term was suggested by a reader, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#72** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Eureka bias](https://statmodeling.stat.columbia.edu/2018/05/16/eureka-bias-think-made-discovery-dont-want-give-even-turns-interpreted-data-wrong/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The term was suggested by a reader, quoted in Gelman's post.
 :::

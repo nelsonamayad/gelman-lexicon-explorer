@@ -5,16 +5,19 @@ description: "Really just another way of not taking it seriously at all."
 order: 26
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Building and checking models", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/"
 verified: true
+image: "../assets/cards/taking-a-model-too-seriously.png"
+image-alt: "#26 Taking a Model Too Seriously: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Gelman's example is about tail probabilities; the extrapolation simulation is our illustration."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#26** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Just one of these little things](https://statmodeling.stat.columbia.edu/2009/11/just_one_of_the/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source. Gelman's example is about tail probabilities; the extrapolation simulation is our illustration.
 :::

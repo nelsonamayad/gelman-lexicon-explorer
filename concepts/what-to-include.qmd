@@ -5,15 +5,18 @@ description: "Just as we should not publish include any sentences that we do not
 order: 108
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/"
 verified: true
+image: "../assets/cards/what-to-include.png"
+image-alt: "#108 What to include: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#108** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: ["For better or for worse, academics are fascinated by academic rankings . . ."](https://statmodeling.stat.columbia.edu/2015/04/14/statistical-modeling-of-citation-exchange-among-statistics-journals/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

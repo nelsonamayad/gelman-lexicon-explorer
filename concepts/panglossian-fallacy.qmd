@@ -5,16 +5,19 @@ description: "The flip side of the hindsight fallacy."
 order: 116
 theme: "Thinking about statistics"
 kind: "Fallacy"
-categories: ["Thinking about statistics", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178"
 verified: true
+image: "../assets/cards/panglossian-fallacy.png"
+image-alt: "#116 Panglossian Fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The source is a comment by Gelman in a blog discussion of Leicester City's title odds."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#116** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2016/06/02/30183/#comment-276178).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source. The source is a comment by Gelman in a blog discussion of Leicester City's title odds.
 :::

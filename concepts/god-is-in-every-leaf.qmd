@@ -5,15 +5,21 @@ description: "No problem is too small or too trivial if we really do something a
 order: 27
 theme: "Building and checking models"
 kind: "Law or aphorism"
-categories: ["Building and checking models", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Building and checking models", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2005/10/god_is_in_every/"
+search-terms: "missing-value codes, data cleaning"
 verified: true
+image: "../assets/cards/god-is-in-every-leaf.png"
+image-alt: "#27 God is in Every Leaf of Every Tree: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#27** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [God is in every leaf of every tree](https://statmodeling.stat.columbia.edu/2005/10/god_is_in_every/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
+
+Related terms: missing-value codes, data cleaning.
 
 Source check: ✓ The explanation was checked against the source.
 :::

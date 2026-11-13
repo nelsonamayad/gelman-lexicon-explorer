@@ -5,16 +5,19 @@ description: "Even a weak and intermittent beam can appear brilliant, if you loo
 order: 140
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/07/11/ancestor-worship-in-academia-where-does-it-happen/"
 verified: true
+image: "../assets/cards/dark-room-dollar-bills.png"
+image-alt: "#140 In a dark room with many of the lights covered up by opaque dollar bills: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Checked against an archived copy; the reading of the image in the simulation is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#140** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ancestor worship in academia: where does it happen?](https://statmodeling.stat.columbia.edu/2024/07/11/ancestor-worship-in-academia-where-does-it-happen/)
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. Checked against an archived copy; the reading of the image in the simulation is ours.
 :::

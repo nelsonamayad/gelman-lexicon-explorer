@@ -5,15 +5,21 @@ description: "The attitude by which any statistically significant difference is 
 order: 83
 theme: "Causes, samples and populations"
 kind: "Fallacy"
-categories: ["Causes, samples and populations", "Fallacy"]
+difficulty: "Advanced"
+categories: ["Causes, samples and populations", "Fallacy", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/"
+search-terms: "regression discontinuity, natural experiment, instrumental variables"
 verified: true
+image: "../assets/cards/causal-identification-kool-aid.png"
+image-alt: "#83 The Causal Identification Kool-Aid: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#83** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 2019 project: how false beliefs in statistical differences still live in social science and journalism today](https://statmodeling.stat.columbia.edu/2021/04/05/the-2019-project-how-false-beliefs-in-statistical-differences-still-live-in-social-science-and-journalism-today/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: regression discontinuity, natural experiment, instrumental variables.
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -36,13 +42,13 @@ The true discontinuity is **zero**: the outcome is a smooth curve plus noise. Ea
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, ols, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, ols, fmt, pct, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof n = Inputs.range([100, 1000], {value: 200, step: 50, label: "Observations"})
-viewof noiseSd = Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Outcome noise (sd)"})
-viewof seed = Inputs.range([1, 500], {value: 83, step: 1, label: "Random seed"})
+viewof n = debounce(Inputs.range([100, 1000], {value: 200, step: 50, label: "Observations"}))
+viewof noiseSd = debounce(Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Outcome noise (sd)"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 83, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -105,11 +111,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, ols, fmt, pct} from "../js/stats.js"
+import {rng, range, mean, ols, fmt, pct, debounce} from "../js/stats.js"
 
-viewof n = Inputs.range([100, 1000], {value: 200, step: 50, label: "Observations"})
-viewof noiseSd = Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Outcome noise (sd)"})
-viewof seed = Inputs.range([1, 500], {value: 83, step: 1, label: "Random seed"})
+viewof n = debounce(Inputs.range([100, 1000], {value: 200, step: 50, label: "Observations"}))
+viewof noiseSd = debounce(Inputs.range([0.2, 2], {value: 1, step: 0.1, label: "Outcome noise (sd)"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 83, step: 1, label: "Random seed"}))
 
 rdd = {
   const r = rng(seed);

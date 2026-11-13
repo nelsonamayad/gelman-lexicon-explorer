@@ -5,15 +5,21 @@ description: "None of this should be a surprise."
 order: 82
 theme: "Noise and evidence"
 kind: "Fallacy"
-categories: ["Noise and evidence", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/"
+search-terms: "power analysis, sample size calculation, inflated effect sizes"
 verified: true
+image: "../assets/cards/80-percent-power-lie.png"
+image-alt: "#82 The 80% Power Lie: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#82** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The 80% power lie](https://statmodeling.stat.columbia.edu/2017/12/04/80-power-lie/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: power analysis, sample size calculation, inflated effect sizes.
 
 Source check: ✓ The explanation was checked against the source.
 :::

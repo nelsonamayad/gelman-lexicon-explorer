@@ -5,15 +5,21 @@ description: "A good package should contain the means of its own testing."
 order: 18
 theme: "Building and checking models"
 kind: "Method or technique"
-categories: ["Building and checking models", "Method or technique"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Method or technique", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/"
+search-terms: "fake-data simulation, simulation-based calibration, debugging statistical code"
 verified: true
+image: "../assets/cards/self-cleaning-oven.png"
+image-alt: "#18 The Self-Cleaning Oven: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#18** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Style guide for R code](https://statmodeling.stat.columbia.edu/2007/09/style_guide_for/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: fake-data simulation, simulation-based calibration, debugging statistical code.
 
 Source check: ✓ The explanation was checked against the source.
 :::

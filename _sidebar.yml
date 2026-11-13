@@ -9,173 +9,328 @@ website:
         - section: "Noise and evidence (18)"
           href: themes/noise-and-evidence.qmd
           contents:
-            - concepts/p-values-and-u-values.qmd
-            - concepts/multiple-comparisons.qmd
-            - concepts/statistical-significance-filter.qmd
-            - concepts/garden-of-forking-paths.qmd
-            - concepts/statistical-chemotherapy.qmd
-            - concepts/salad-tongs.qmd
-            - concepts/edlin-factor.qmd
-            - concepts/kangaroo.qmd
-            - concepts/what-does-not-kill.qmd
-            - concepts/correlation-does-not-imply-correlation.qmd
-            - concepts/piranha-principle.qmd
-            - concepts/random-in-random-out.qmd
-            - concepts/sixteen.qmd
-            - concepts/80-percent-power-lie.qmd
-            - concepts/anthropic-principle.qmd
-            - concepts/robustness-checks.qmd
-            - concepts/preregistration.qmd
-            - concepts/premature-collapse.qmd
+            - href: concepts/p-values-and-u-values.qmd
+              text: "8 · P-values and U-values"
+            - href: concepts/multiple-comparisons.qmd
+              text: "25 · Multiple Comparisons"
+            - href: concepts/statistical-significance-filter.qmd
+              text: "32 · The Statistical Significance Filter"
+            - href: concepts/garden-of-forking-paths.qmd
+              text: "44 · The Garden of Forking Paths"
+            - href: concepts/statistical-chemotherapy.qmd
+              text: "48 · Statistical Chemotherapy"
+            - href: concepts/salad-tongs.qmd
+              text: "50 · Salad Tongs"
+            - href: concepts/edlin-factor.qmd
+              text: "51 · The Edlin Factor"
+            - href: concepts/kangaroo.qmd
+              text: "52 · Kangaroo"
+            - href: concepts/what-does-not-kill.qmd
+              text: "62 · The \"What does not kill my statistical significance makes it stronger\" fallacy"
+            - href: concepts/correlation-does-not-imply-correlation.qmd
+              text: "70 · Correlation"
+            - href: concepts/piranha-principle.qmd
+              text: "74 · The Piranha Principle"
+            - href: concepts/random-in-random-out.qmd
+              text: "79 · Random in"
+            - href: concepts/sixteen.qmd
+              text: "80 · 16"
+            - href: concepts/80-percent-power-lie.qmd
+              text: "82 · The 80% Power Lie"
+            - href: concepts/anthropic-principle.qmd
+              text: "119 · Anthropic principle"
+            - href: concepts/robustness-checks.qmd
+              text: "120 · Robustness checks"
+            - href: concepts/preregistration.qmd
+              text: "133 · Preregistration"
+            - href: concepts/premature-collapse.qmd
+              text: "152 · Premature collapsing of the wave function"
         - section: "Building and checking models (31)"
           href: themes/building-and-checking-models.qmd
           contents:
-            - concepts/secret-weapon.qmd
-            - concepts/folk-theorem.qmd
-            - concepts/weakly-informative-priors.qmd
-            - concepts/wwjd.qmd
-            - concepts/self-cleaning-oven.qmd
-            - concepts/taxonomy-of-confusion.qmd
-            - concepts/blessing-of-dimensionality.qmd
-            - concepts/scaffolding.qmd
-            - concepts/ockhamite-tendencies.qmd
-            - concepts/taking-a-model-too-seriously.qmd
-            - concepts/god-is-in-every-leaf.qmd
-            - concepts/pinocchio-principle.qmd
-            - concepts/before-you-had-any-data.qmd
-            - concepts/what-data-it-uses.qmd
-            - concepts/cantors-corner.qmd
-            - concepts/australia-principle.qmd
-            - concepts/breadcrumbs.qmd
-            - concepts/mathematical-simplicity.qmd
-            - concepts/camel-likelihood.qmd
-            - concepts/sqrt-12-5-13.qmd
-            - concepts/freedom-not-user-friendly.qmd
-            - concepts/closest-collaborator.qmd
-            - concepts/web-of-trust.qmd
-            - concepts/a-chicken.qmd
-            - concepts/regularization-and-discovery.qmd
-            - concepts/until-it-runs-twice.qmd
-            - concepts/end-of-novel.qmd
-            - concepts/high-dimensional-space.qmd
-            - concepts/uncertainty-greases-commerce.qmd
-            - concepts/capacity-to-be-upset.qmd
-            - concepts/year-jesus-was-born.qmd
+            - href: concepts/secret-weapon.qmd
+              text: "2 · The Secret Weapon"
+            - href: concepts/folk-theorem.qmd
+              text: "5 · The Folk Theorem of Statistical Computing"
+            - href: concepts/weakly-informative-priors.qmd
+              text: "7 · Weakly Informative Priors"
+            - href: concepts/wwjd.qmd
+              text: "11 · WWJD"
+            - href: concepts/self-cleaning-oven.qmd
+              text: "18 · The Self-Cleaning Oven"
+            - href: concepts/taxonomy-of-confusion.qmd
+              text: "19 · The Taxonomy of Confusion"
+            - href: concepts/blessing-of-dimensionality.qmd
+              text: "20 · The Blessing of Dimensionality"
+            - href: concepts/scaffolding.qmd
+              text: "21 · Scaffolding"
+            - href: concepts/ockhamite-tendencies.qmd
+              text: "22 · Ockhamite Tendencies"
+            - href: concepts/taking-a-model-too-seriously.qmd
+              text: "26 · Taking a Model Too Seriously"
+            - href: concepts/god-is-in-every-leaf.qmd
+              text: "27 · God is in Every Leaf of Every Tree"
+            - href: concepts/pinocchio-principle.qmd
+              text: "31 · The Pinocchio Principle"
+            - href: concepts/before-you-had-any-data.qmd
+              text: "56 · What were you doing before you had any data?"
+            - href: concepts/what-data-it-uses.qmd
+              text: "66 · The most important aspect of a statistical method"
+            - href: concepts/cantors-corner.qmd
+              text: "69 · Cantor's Corner"
+            - href: concepts/australia-principle.qmd
+              text: "75 · The Australia principle"
+            - href: concepts/breadcrumbs.qmd
+              text: "78 · Breadcrumbs"
+            - href: concepts/mathematical-simplicity.qmd
+              text: "90 · Mathematical Simplicity"
+            - href: concepts/camel-likelihood.qmd
+              text: "99 · Camel that is the likelihood"
+            - href: concepts/sqrt-12-5-13.qmd
+              text: "101 · sqrt(12^2 + 5^2)"
+            - href: concepts/freedom-not-user-friendly.qmd
+              text: "102 · Freedom"
+            - href: concepts/closest-collaborator.qmd
+              text: "104 · Your closest collaborator"
+            - href: concepts/web-of-trust.qmd
+              text: "106 · Web of Trust"
+            - href: concepts/a-chicken.qmd
+              text: "118 · A chicken"
+            - href: concepts/regularization-and-discovery.qmd
+              text: "122 · Between regularization and discovery"
+            - href: concepts/until-it-runs-twice.qmd
+              text: "129 · Until it runs twice"
+            - href: concepts/end-of-novel.qmd
+              text: "131 · End of novel. Beginning of job."
+            - href: concepts/high-dimensional-space.qmd
+              text: "132 · In high-dimensional space"
+            - href: concepts/uncertainty-greases-commerce.qmd
+              text: "134 · Uncertainty"
+            - href: concepts/capacity-to-be-upset.qmd
+              text: "146 · The capacity to be upset"
+            - href: concepts/year-jesus-was-born.qmd
+              text: "147 · The year Jesus was born"
         - section: "Causes, samples and populations (14)"
           href: themes/causes-samples-populations.qmd
           contents:
-            - concepts/mister-p.qmd
-            - concepts/usa-today-fallacy.qmd
-            - concepts/second-order-availability-bias.qmd
-            - concepts/all-else-equal-fallacy.qmd
-            - concepts/freshman-fallacy.qmd
-            - concepts/one-way-street-fallacy.qmd
-            - concepts/if-you-had-all-the-data.qmd
-            - concepts/pandora-principle.qmd
-            - concepts/causal-identification-kool-aid.qmd
-            - concepts/strongest-link-fallacy.qmd
-            - concepts/needle-in-pile-of-needles.qmd
-            - concepts/schoolyard-evolutionary-biology.qmd
-            - concepts/canary-variable.qmd
-            - concepts/groovy-grandma-problem.qmd
+            - href: concepts/mister-p.qmd
+              text: "1 · Mister P"
+            - href: concepts/usa-today-fallacy.qmd
+              text: "15 · The USA Today Fallacy"
+            - href: concepts/second-order-availability-bias.qmd
+              text: "16 · Second-Order Availability Bias"
+            - href: concepts/all-else-equal-fallacy.qmd
+              text: "17 · The \"All Else Equal\" Fallacy"
+            - href: concepts/freshman-fallacy.qmd
+              text: "43 · The Freshman Fallacy"
+            - href: concepts/one-way-street-fallacy.qmd
+              text: "45 · The One-Way Street Fallacy"
+            - href: concepts/if-you-had-all-the-data.qmd
+              text: "55 · What would you do if you had all the data?"
+            - href: concepts/pandora-principle.qmd
+              text: "67 · The Pandora Principle"
+            - href: concepts/causal-identification-kool-aid.qmd
+              text: "83 · The Causal Identification Kool-Aid"
+            - href: concepts/strongest-link-fallacy.qmd
+              text: "84 · Strongest-link Fallacy"
+            - href: concepts/needle-in-pile-of-needles.qmd
+              text: "88 · Looking for a needle in a pile of needles"
+            - href: concepts/schoolyard-evolutionary-biology.qmd
+              text: "107 · Schoolyard Evolutionary Biology"
+            - href: concepts/canary-variable.qmd
+              text: "117 · Canary variable"
+            - href: concepts/groovy-grandma-problem.qmd
+              text: "149 · The Groovy Grandma Problem"
         - section: "Showing and telling (19)"
           href: themes/showing-and-telling.qmd
           contents:
-            - concepts/superplot.qmd
-            - concepts/alabama-first.qmd
-            - concepts/stagecoach-business.qmd
-            - concepts/story-time.qmd
-            - concepts/ramanujan-principle.qmd
-            - concepts/chris-rock-effect.qmd
-            - concepts/tell-me-what-you-dont-know.qmd
-            - concepts/uncertainty-interval.qmd
-            - concepts/picture-plus-1000-words.qmd
-            - concepts/toothpaste-feeling.qmd
-            - concepts/hullmans-theorem.qmd
-            - concepts/zero-in-the-neighborhood.qmd
-            - concepts/what-to-include.qmd
-            - concepts/worst-visual-display.qmd
-            - concepts/context.qmd
-            - concepts/seeds-of-its-own-destruction.qmd
-            - concepts/click-through-solution.qmd
-            - concepts/marginal.qmd
-            - concepts/paradox-of-storytelling.qmd
+            - href: concepts/superplot.qmd
+              text: "3 · The Superplot"
+            - href: concepts/alabama-first.qmd
+              text: "14 · Alabama First"
+            - href: concepts/stagecoach-business.qmd
+              text: "28 · As They Say in the Stagecoach Business"
+            - href: concepts/story-time.qmd
+              text: "29 · Story Time"
+            - href: concepts/ramanujan-principle.qmd
+              text: "35 · The Ramanujan Principle"
+            - href: concepts/chris-rock-effect.qmd
+              text: "42 · The Chris Rock Effect"
+            - href: concepts/tell-me-what-you-dont-know.qmd
+              text: "49 · Tell Me What You Don't Know"
+            - href: concepts/uncertainty-interval.qmd
+              text: "54 · Uncertainty Interval"
+            - href: concepts/picture-plus-1000-words.qmd
+              text: "73 · A picture plus 1000 words"
+            - href: concepts/toothpaste-feeling.qmd
+              text: "92 · That toothpaste feeling"
+            - href: concepts/hullmans-theorem.qmd
+              text: "94 · Hullman's Theorem"
+            - href: concepts/zero-in-the-neighborhood.qmd
+              text: "100 · If zero is in the neighborhood"
+            - href: concepts/what-to-include.qmd
+              text: "108 · What to include"
+            - href: concepts/worst-visual-display.qmd
+              text: "109 · The worst visual display of all time"
+            - href: concepts/context.qmd
+              text: "111 · Context"
+            - href: concepts/seeds-of-its-own-destruction.qmd
+              text: "112 · Seeds of its own destruction"
+            - href: concepts/click-through-solution.qmd
+              text: "125 · The Click-Through Solution"
+            - href: concepts/marginal.qmd
+              text: "126 · Marginal"
+            - href: concepts/paradox-of-storytelling.qmd
+              text: "154 · The paradox of storytelling"
         - section: "How science behaves (40)"
           href: themes/how-science-behaves.qmd
           contents:
-            - concepts/pinch-hitter-syndrome.qmd
-            - concepts/backseat-driver-principle.qmd
-            - concepts/arrows-other-theorem-weak.qmd
-            - concepts/arrows-other-theorem-strong.qmd
-            - concepts/methodological-attribution-problem.qmd
-            - concepts/john-yoo-line.qmd
-            - concepts/more-vampirical-than-empirical.qmd
-            - concepts/time-reversal-heuristic.qmd
-            - concepts/status-reversal-heuristic.qmd
-            - concepts/clarkes-law.qmd
-            - concepts/wedding-not-marriage.qmd
-            - concepts/problem-with-peer-review.qmd
-            - concepts/reverse-poe.qmd
-            - concepts/armstrong-principle.qmd
-            - concepts/paradox-of-influence.qmd
-            - concepts/javert-paradox.qmd
-            - concepts/eureka-bias.qmd
-            - concepts/honesty-and-transparency.qmd
-            - concepts/the-horse.qmd
-            - concepts/deference-trap.qmd
-            - concepts/research-incumbency-rule.qmd
-            - concepts/cheeseburger-snarfing-diet-gurus.qmd
-            - concepts/bunch-of-hoops.qmd
-            - concepts/mcbrooms-law.qmd
-            - concepts/mistakes.qmd
-            - concepts/disbelief.qmd
-            - concepts/brilliance.qmd
-            - concepts/passive-corruption.qmd
-            - concepts/greshams-law-bad-science.qmd
-            - concepts/analysts-paradox.qmd
-            - concepts/meritocracy.qmd
-            - concepts/torment-executioner.qmd
-            - concepts/making-errors-inevitable.qmd
-            - concepts/replication-and-firefighting.qmd
-            - concepts/dark-room-dollar-bills.qmd
-            - concepts/error-reversal-heuristic.qmd
-            - concepts/edgelords-dilemma.qmd
-            - concepts/no-obligation-to-share.qmd
-            - concepts/originality-ambition-scruple.qmd
-            - concepts/transitive-property-of-money.qmd
+            - href: concepts/pinch-hitter-syndrome.qmd
+              text: "6 · The Pinch-Hitter Syndrome"
+            - href: concepts/backseat-driver-principle.qmd
+              text: "10 · The Backseat Driver Principle"
+            - href: concepts/arrows-other-theorem-weak.qmd
+              text: "33 · Arrow's Other Theorem (weak form)"
+            - href: concepts/arrows-other-theorem-strong.qmd
+              text: "34 · Arrow's Other Theorem (strong form)"
+            - href: concepts/methodological-attribution-problem.qmd
+              text: "40 · The Methodological Attribution Problem"
+            - href: concepts/john-yoo-line.qmd
+              text: "41 · The John Yoo Line"
+            - href: concepts/more-vampirical-than-empirical.qmd
+              text: "47 · More Vampirical Than Empirical"
+            - href: concepts/time-reversal-heuristic.qmd
+              text: "57 · The Time-Reversal Heuristic"
+            - href: concepts/status-reversal-heuristic.qmd
+              text: "58 · The Status-Reversal Heuristic"
+            - href: concepts/clarkes-law.qmd
+              text: "59 · Clarke's Law"
+            - href: concepts/wedding-not-marriage.qmd
+              text: "60 · The wedding, never about the marriage"
+            - href: concepts/problem-with-peer-review.qmd
+              text: "61 · The problem with peer review"
+            - href: concepts/reverse-poe.qmd
+              text: "63 · Reverse Poe"
+            - href: concepts/armstrong-principle.qmd
+              text: "64 · The (Lance) Armstrong Principle"
+            - href: concepts/paradox-of-influence.qmd
+              text: "68 · The Paradox of Influence"
+            - href: concepts/javert-paradox.qmd
+              text: "71 · The Javert Paradox"
+            - href: concepts/eureka-bias.qmd
+              text: "72 · Eureka bias"
+            - href: concepts/honesty-and-transparency.qmd
+              text: "77 · Honesty and transparency"
+            - href: concepts/the-horse.qmd
+              text: "81 · The Horse"
+            - href: concepts/deference-trap.qmd
+              text: "87 · Deference Trap"
+            - href: concepts/research-incumbency-rule.qmd
+              text: "89 · Research Incumbency Rule"
+            - href: concepts/cheeseburger-snarfing-diet-gurus.qmd
+              text: "91 · Cheeseburger-snarfing diet gurus"
+            - href: concepts/bunch-of-hoops.qmd
+              text: "93 · A bunch of hoops to jump through"
+            - href: concepts/mcbrooms-law.qmd
+              text: "95 · McBroom's Law"
+            - href: concepts/mistakes.qmd
+              text: "96 · Mistakes"
+            - href: concepts/disbelief.qmd
+              text: "103 · Disbelief"
+            - href: concepts/brilliance.qmd
+              text: "105 · Brilliance"
+            - href: concepts/passive-corruption.qmd
+              text: "123 · Passive Corruption"
+            - href: concepts/greshams-law-bad-science.qmd
+              text: "124 · Gresham's Law of bad science"
+            - href: concepts/analysts-paradox.qmd
+              text: "127 · The Analyst's Paradox"
+            - href: concepts/meritocracy.qmd
+              text: "128 · Meritocracy won't happen"
+            - href: concepts/torment-executioner.qmd
+              text: "130 · Torment executioner"
+            - href: concepts/making-errors-inevitable.qmd
+              text: "136 · Making errors is inevitable"
+            - href: concepts/replication-and-firefighting.qmd
+              text: "139 · Replication and firefighting"
+            - href: concepts/dark-room-dollar-bills.qmd
+              text: "140 · In a dark room with many of the lights covered up by opaque dollar bills"
+            - href: concepts/error-reversal-heuristic.qmd
+              text: "144 · The Error-Reversal Heuristic"
+            - href: concepts/edgelords-dilemma.qmd
+              text: "148 · The Edgelord's Dilemma"
+            - href: concepts/no-obligation-to-share.qmd
+              text: "150 · You have no obligation to share your data and code"
+            - href: concepts/originality-ambition-scruple.qmd
+              text: "151 · The combination of originality, ambition, and lack of scruple"
+            - href: concepts/transitive-property-of-money.qmd
+              text: "155 · The transitive property of money"
         - section: "Thinking about statistics (33)"
           href: themes/thinking-about-statistics.qmd
           contents:
-            - concepts/institutional-decision-making.qmd
-            - concepts/conservatism.qmd
-            - concepts/theoretical-vs-applied-statisticians.qmd
-            - concepts/one-sided-bet.qmd
-            - concepts/bayesian.qmd
-            - concepts/bayesians-are-frequentists.qmd
-            - concepts/foxhole-fallacy.qmd
-            - concepts/paradox-of-philosophizing.qmd
-            - concepts/defaults.qmd
-            - concepts/default-greatest-trick.qmd
-            - concepts/defaults-once-set.qmd
-            - concepts/pluralists-dilemma.qmd
-            - concepts/speed-racer-principle.qmd
-            - concepts/chestertonian-principle.qmd
-            - concepts/counterintuitive-not-true.qmd
-            - concepts/evidence-and-truth.qmd
-            - concepts/assumptions-and-rigor.qmd
-            - concepts/bayesian-cringe.qmd
-            - concepts/basketball-or-knitting.qmd
-            - concepts/tall-person-syndrome.qmd
-            - concepts/probability.qmd
-            - concepts/probability-not-just-a-number.qmd
-            - concepts/guarantee-is-assumption.qmd
-            - concepts/panglossian-fallacy.qmd
-            - concepts/theoretical-statistics.qmd
-            - concepts/narrow-beach.qmd
-            - concepts/two-sides-no-vig.qmd
-            - concepts/the-house.qmd
-            - concepts/objects-of-the-class.qmd
-            - concepts/steelmanning.qmd
-            - concepts/physics-is-like-brazil.qmd
-            - concepts/scientific-revolutions-fractal.qmd
-            - concepts/noems-razor.qmd
+            - href: concepts/institutional-decision-making.qmd
+              text: "4 · Institutional decision making"
+            - href: concepts/conservatism.qmd
+              text: "9 · Conservatism"
+            - href: concepts/theoretical-vs-applied-statisticians.qmd
+              text: "12 · Theoretical and Applied Statisticians, how to tell them apart"
+            - href: concepts/one-sided-bet.qmd
+              text: "13 · The Fallacy of the One-Sided Bet"
+            - href: concepts/bayesian.qmd
+              text: "23 · Bayesian"
+            - href: concepts/bayesians-are-frequentists.qmd
+              text: "24 · Bayesians"
+            - href: concepts/foxhole-fallacy.qmd
+              text: "30 · The Foxhole Fallacy"
+            - href: concepts/paradox-of-philosophizing.qmd
+              text: "36 · The Paradox of Philosophizing"
+            - href: concepts/defaults.qmd
+              text: "37 · Defaults"
+            - href: concepts/default-greatest-trick.qmd
+              text: "38 · Default, the greatest trick it ever pulled"
+            - href: concepts/defaults-once-set.qmd
+              text: "39 · Defaults, once set"
+            - href: concepts/pluralists-dilemma.qmd
+              text: "46 · The Pluralist's Dilemma"
+            - href: concepts/speed-racer-principle.qmd
+              text: "53 · The Speed Racer Principle"
+            - href: concepts/chestertonian-principle.qmd
+              text: "65 · The Chestertonian Principle"
+            - href: concepts/counterintuitive-not-true.qmd
+              text: "76 · Just because something is counterintuitive"
+            - href: concepts/evidence-and-truth.qmd
+              text: "85 · Evidence and Truth"
+            - href: concepts/assumptions-and-rigor.qmd
+              text: "86 · Assumptions and Rigor"
+            - href: concepts/bayesian-cringe.qmd
+              text: "97 · The Bayesian cringe"
+            - href: concepts/basketball-or-knitting.qmd
+              text: "98 · Basketball, or knitting"
+            - href: concepts/tall-person-syndrome.qmd
+              text: "110 · Tall-Person Syndrome"
+            - href: concepts/probability.qmd
+              text: "113 · Probability"
+            - href: concepts/probability-not-just-a-number.qmd
+              text: "114 · A probability isn't just a number"
+            - href: concepts/guarantee-is-assumption.qmd
+              text: "115 · When researchers say \"guarantee\""
+            - href: concepts/panglossian-fallacy.qmd
+              text: "116 · Panglossian Fallacy"
+            - href: concepts/theoretical-statistics.qmd
+              text: "121 · Theoretical statistics"
+            - href: concepts/narrow-beach.qmd
+              text: "135 · That narrow beach"
+            - href: concepts/two-sides-no-vig.qmd
+              text: "137 · Two sides, no vig"
+            - href: concepts/the-house.qmd
+              text: "138 · The house"
+            - href: concepts/objects-of-the-class.qmd
+              text: "141 · Objects of the class"
+            - href: concepts/steelmanning.qmd
+              text: "142 · Steelmanning"
+            - href: concepts/physics-is-like-brazil.qmd
+              text: "143 · Physics is like Brazil"
+            - href: concepts/scientific-revolutions-fractal.qmd
+              text: "145 · Scientific revolutions"
+            - href: concepts/noems-razor.qmd
+              text: "153 · Noem's Razor"

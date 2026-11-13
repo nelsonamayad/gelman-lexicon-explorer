@@ -5,15 +5,18 @@ description: "Sources must lose credibility when it is shown they promote falseh
 order: 95
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/"
 verified: true
+image: "../assets/cards/mcbrooms-law.png"
+image-alt: "#95 McBroom's Law: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#95** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [“Sources must lose credibility when it is shown they promote falsehoods, even more when they never take accountability for those falsehoods.”](https://statmodeling.stat.columbia.edu/2021/06/24/sources-must-lose-credibility-when-it-is-shown-they-promote-falsehoods-even-more-when-they-never-take-accountability-for-those-falsehoods/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -79,7 +82,7 @@ Plot.plot({
 //| echo: false
 {
   const end = w => mcbroom.filter(d => d.who === w).at(-1).p;
-  return html`<div class="sim-readout">${md`After ${nErrors} exposed falsehood(s), belief in reliability: **${pct(end("Takes accountability"))}** for the source that corrects, **${pct(end("Never takes accountability"))}** for the one that doesn't. Same errors, very different evidence. The refusal to correct is the most informative part.`}</div>`;
+  return html`<div class="sim-readout">${md`After ${nErrors} exposed falsehood(s), belief in reliability: **${pct(end("Takes accountability"))}** for the source that corrects, **${pct(end("Never takes accountability"))}** for the one that doesn't. Same errors, very different evidence. The refusal to correct is the most informative part. The toy shows why a refusal to correct is evidence about a source; it doesn't measure how reliable any real source is.`}</div>`;
 }
 ```
 

@@ -5,15 +5,21 @@ description: "Multiple comparisons can be a problem, even when there is no \"fis
 order: 44
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
-categories: ["Noise and evidence", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Principle or heuristic", "Intermediate"]
 source: "https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf"
+search-terms: "p-hacking, researcher degrees of freedom, data-dependent analysis, multiverse analysis"
 verified: true
+image: "../assets/cards/garden-of-forking-paths.png"
+image-alt: "#44 The Garden of Forking Paths: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#44** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The garden of forking paths (PDF)](https://sites.stat.columbia.edu/gelman/research/unpublished/p_hacking.pdf).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: p-hacking, researcher degrees of freedom, data-dependent analysis, multiverse analysis.
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -42,13 +48,13 @@ Under a true null (the treatment does nothing), a study has two outcome measures
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, variance, pValue, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pValue, pct, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof forks = Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"})
-viewof n = Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"})
-viewof seed = Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"})
+viewof forks = debounce(Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"}))
+viewof n = debounce(Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -132,11 +138,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, variance, pValue, pct} from "../js/stats.js"
+import {rng, range, mean, variance, pValue, pct, debounce} from "../js/stats.js"
 
-viewof forks = Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"})
-viewof n = Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"})
-viewof seed = Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"})
+viewof forks = debounce(Inputs.checkbox(["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], {value: ["Two outcome measures", "Optional outlier exclusion", "Subgroup by sex"], label: "Forks in the garden"}))
+viewof n = debounce(Inputs.range([20, 400], {value: 100, step: 10, label: "Participants per arm"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 44, step: 1, label: "Random seed"}))
 
 garden = {
   const r = rng(seed);

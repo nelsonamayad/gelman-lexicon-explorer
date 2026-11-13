@@ -5,15 +5,21 @@ description: "It's a floor, not a ceiling."
 order: 133
 theme: "Noise and evidence"
 kind: "Advice"
-categories: ["Noise and evidence", "Advice"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Advice", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/"
+search-terms: "registered report, prespecified analysis, covariate adjustment"
 verified: true
+image: "../assets/cards/preregistration.png"
+image-alt: "#133 Preregistration: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#133** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [What's the difference between Derek Jeter and preregistration?](https://statmodeling.stat.columbia.edu/2022/09/12/whats-the-difference-between-derek-jeter-and-preregistration/)
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Advice](../kinds/advice.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: registered report, prespecified analysis, covariate adjustment.
 
 Source check: ✓ The explanation was checked against the source.
 :::

@@ -10,8 +10,12 @@ Run from the project root after adding an entry or changing either field:
     python scripts/build_groups.py
 
 It writes or updates:
-  - categories: [theme, kind] in each entry (drives the clickable tags and the
-    category filter on the home-page table)
+  - categories: [theme, kind, difficulty] in each entry (drives the clickable
+    tags and the category filter on the home-page table)
+  - a "Related terms" line in the source callout from `search-terms`, so the
+    site search finds an entry by its other names
+  - `image:` and `image-alt:` pointing at the entry's social-media card in
+    assets/cards/ (made by scripts/make_cards.py), when the card exists
   - a "Filed under" line in each entry's source callout, linking to its
     theme and kind pages
   - reciprocal "Related entries" links (if A lists B, B lists A)
@@ -20,7 +24,8 @@ It writes or updates:
   - themes/<slug>.qmd: one page per theme, with entries split into sections by kind
   - kinds/<slug>.qmd: one page per kind, with entries split into sections by theme
   - _group-cards.md: theme and kind cards for the home page
-  - _sidebar.yml: the docked sidebar, with entries grouped by theme in Gelman's order
+  - _sidebar.yml: the docked sidebar, with entries grouped by theme in Gelman's order and
+    labelled with their number in his list
 """
 
 import glob
@@ -82,6 +87,11 @@ ICONS = {
     "advice": "chat-left-text",
 }
 
+# Reading level, a third axis: what a reader needs to know to follow the
+# entry. It becomes the third category tag, so the home-page table can filter
+# on it.
+LEVELS = ["Introductory", "Intermediate", "Advanced"]
+
 PUBLISHED = "2026-11-11"   # date these group pages were first published
 
 
@@ -102,22 +112,34 @@ def read_entries():
             sys.exit(f"{slug}: unknown or missing theme {theme!r}")
         if kind not in kind_names:
             sys.exit(f"{slug}: unknown or missing kind {kind!r}")
+        level = field(text, "difficulty")
+        if level not in LEVELS:
+            sys.exit(f"{slug}: 'difficulty' must be one of {LEVELS}, got {level!r}")
         verified = field(text, "verified")
         if verified not in ("true", "false"):
             sys.exit(f"{slug}: 'verified' must be true or false, got {verified!r}")
         entries.append({"slug": slug, "path": path, "text": text, "theme": theme, "kind": kind,
                         "verified": verified == "true", "source_note": field(text, "source-note"),
-                        "order": int(field(text, "order")), "title": field(text, "title")})
+                        "order": int(field(text, "order")), "title": field(text, "title"),
+                        "level": level, "terms": field(text, "search-terms")})
     return sorted(entries, key=lambda e: e["order"])
 
 
 def sync_entry(e, theme_slug, kind_slug):
-    """Keep categories and the 'Filed under' line in step with theme and kind."""
+    """Keep categories, the 'Filed under' and 'Related terms' lines in step with the front matter."""
     text = e["text"]
-    cats = f'categories: ["{e["theme"]}", "{e["kind"]}"]'
+    cats = f'categories: ["{e["theme"]}", "{e["kind"]}", "{e["level"]}"]'
     text = re.sub(r"^categories: .*$", cats, text, count=1, flags=re.M)
+    # Social-media preview card made by scripts/make_cards.py, if there is one.
+    text = re.sub(r"^image(-alt)?: .*\n", "", text, flags=re.M)
+    if os.path.exists(os.path.join(ROOT, "assets", "cards", f'{e["slug"]}.png')):
+        card = (f'image: "../assets/cards/{e["slug"]}.png"\n'
+                f'image-alt: "#{e["order"]} {e["title"]}: an explanation and an interactive simulation, '
+                f'from the Andrew Gelman Statistical Lexicon Explorer"\n')
+        text = re.sub(r"^(verified: .*\n)", lambda m: m.group(1) + card, text, count=1, flags=re.M)
     filed = (f'Filed under [{e["theme"]}](../themes/{theme_slug}.qmd) · '
-             f'[{e["kind"]}](../kinds/{kind_slug}.qmd).')
+             f'[{e["kind"]}](../kinds/{kind_slug}.qmd) · '
+             f'[{e["level"]}](../index.qmd#category={e["level"]}).')
     if re.search(r"^Filed under ", text, re.M):
         text = re.sub(r"^Filed under .*$", filed, text, count=1, flags=re.M)
     else:
@@ -137,6 +159,12 @@ def sync_entry(e, theme_slug, kind_slug):
         text = re.sub(r"^Source check: .*$", lambda m: check, text, count=1, flags=re.M)
     else:
         text = re.sub(r"^(Filed under .*)$", lambda m: m.group(1) + 2 * chr(10) + check,
+                      text, count=1, flags=re.M)
+    # Other names readers search for (front matter `search-terms`), shown and
+    # so indexed by the site search.
+    text = re.sub(r"^Related terms: .*\n\n", "", text, count=1, flags=re.M)
+    if e["terms"]:
+        text = re.sub(r"^(Source check: .*)$", lambda m: f"Related terms: {e['terms']}." + 2 * chr(10) + m.group(1),
                       text, count=1, flags=re.M)
     text = sync_sim_code(text, e["slug"])
     if text != e["text"]:
@@ -365,7 +393,10 @@ def main():
         lines.append("          contents:")
         for e in entries:
             if e["theme"] == name:
-                lines.append(f"            - concepts/{e['slug']}.qmd")
+                # "32 · The Statistical Significance Filter": the number is the
+                # entry's place in Gelman's list. Titles keep their YAML escapes.
+                lines.append(f"            - href: concepts/{e['slug']}.qmd")
+                lines.append(f'              text: "{e["order"]} · {e["title"]}"')
     with open(os.path.join(ROOT, "_sidebar.yml"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 

@@ -5,15 +5,18 @@ description: "An important characteristic of a good scientist, to recognize anom
 order: 146
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Building and checking models", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/"
 verified: true
+image: "../assets/cards/capacity-to-be-upset.png"
+image-alt: "#146 The capacity to be upset: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#146** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The role of doubt in conceiving research](https://statmodeling.stat.columbia.edu/2023/07/06/the-role-of-doubt-in-conceiving-research-the-capacity-to-be-upset-to-recognize-anomalies-for-what-they-are-and-to-track-them-down-and-figure-out-what-in-our-understanding-is-lacking/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::

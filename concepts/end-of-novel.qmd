@@ -5,16 +5,19 @@ description: "That point at which you make the decision to stop thinking and sta
 order: 131
 theme: "Building and checking models"
 kind: "Advice"
-categories: ["Building and checking models", "Advice"]
+difficulty: "Introductory"
+categories: ["Building and checking models", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/"
 verified: true
+image: "../assets/cards/end-of-novel.png"
+image-alt: "#131 End of novel. Beginning of job.: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The line is John Clute's, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#131** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [End of novel. Beginning of job.](https://statmodeling.stat.columbia.edu/2020/12/28/end-of-novel-beginning-of-job-that-point-at-which-you-make-the-decision-to-stop-thinking-and-start-finishing/)
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The line is John Clute's, quoted in Gelman's post.
 :::

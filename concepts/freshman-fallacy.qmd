@@ -5,15 +5,21 @@ description: "Just because a freshman might raise a question, that does not make
 order: 43
 theme: "Causes, samples and populations"
 kind: "Fallacy"
-categories: ["Causes, samples and populations", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Causes, samples and populations", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/"
+search-terms: "student samples, generalizability, external validity"
 verified: true
+image: "../assets/cards/freshman-fallacy.png"
+image-alt: "#43 The Freshman Fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#43** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Does it matter that a sample is unrepresentative? It depends on the size of the treatment interactions](https://statmodeling.stat.columbia.edu/2013/09/04/does-it-matter-that-a-sample-is-unrepresentative-it-depends-on-the-size-of-the-treatment-interactions/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: student samples, generalizability, external validity.
 
 Source check: ✓ The explanation was checked against the source.
 :::

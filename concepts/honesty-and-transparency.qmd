@@ -5,23 +5,29 @@ description: "They're not enough."
 order: 77
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["How science behaves", "Law or aphorism", "Intermediate"]
 source: "https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf"
+search-terms: "open science, measurement quality, noisy studies"
 verified: true
-source-note: "The column's PDF is a scanned image, so it was checked against Gelman's own summaries of the column in his later articles."
+image: "../assets/cards/honesty-and-transparency.png"
+image-alt: "#77 Honesty and transparency: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
+source-note: "The column's PDF is a scanned image; it was checked by reading the page images and against Gelman's later summary of it."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#77** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Honesty and transparency are not enough (PDF)](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
-Source check: ✓ The explanation was checked against the source. The column's PDF is a scanned image, so it was checked against Gelman's own summaries of the column in his later articles.
+Related terms: open science, measurement quality, noisy studies.
+
+Source check: ✓ The explanation was checked against the source. The column's PDF is a scanned image; it was checked by reading the page images and against Gelman's later summary of it.
 :::
 
 ## What it is
 
-The open-science reforms of preregistration, data sharing and full reporting are good. But an honest, fully transparent study can still be *useless* if its design can't answer the question. Noisy measurements, small samples, weak theory and tiny effects don't become informative because the researcher is open about them. Honesty and transparency are necessary, and they are not sufficient.
+The open-science reforms of preregistration, data sharing and full reporting are good. But an honest, fully transparent study can still be *useless* if its design can't answer the question. Noisy measurements, small samples, weak theory and tiny effects don't become informative because the researcher is open about them. Honesty and transparency are necessary, and they are not sufficient. In the column's words: "Honesty and transparency are not enough, though; I worry that the push toward various desirable *procedural* goals can make people neglect the fundamental *scientific* and *statistical* problems that, ultimately, have driven the replication crisis." And: "It does not matter how honest and careful the researcher is, if the data are just too noisy to learn anything from them."
 
 Gelman put it this way in a later article that summarizes the column: "honesty and transparency are not enough. All the preregistration in the world will not save your study if the data are too remote from the questions of interest." Remoteness can come from a sample that doesn't match the population, treatment and control groups that aren't comparable, unrealistic experimental conditions, or, most simply, biased and noisy measurements. For a study to be ethical, he argues, it should be informative, which means serious attention to measurement, design and data collection.
 
@@ -215,4 +221,4 @@ plt.show()
 
 ## Source
 
-- Andrew Gelman, ["Honesty and transparency are not enough"](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf), *Chance* (2017).
+- Andrew Gelman, ["Honesty and transparency are not enough"](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf), *Chance* 30(1), 37–39 (2017), [doi:10.1080/09332480.2017.1302720](https://doi.org/10.1080/09332480.2017.1302720).

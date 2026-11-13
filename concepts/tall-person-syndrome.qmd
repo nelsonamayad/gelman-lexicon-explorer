@@ -5,15 +5,18 @@ description: "the problem that some people of above-average height have, that th
 order: 110
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Thinking about statistics", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/"
 verified: true
+image: "../assets/cards/tall-person-syndrome.png"
+image-alt: "#110 Tall-Person Syndrome: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#110** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How tall is Jon Lee Anderson?](https://statmodeling.stat.columbia.edu/2013/03/12/how-tall-is-jon-lee-anderson/)
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

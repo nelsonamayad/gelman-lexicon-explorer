@@ -5,16 +5,22 @@ description: "Doesn't mean it's true."
 order: 76
 theme: "Thinking about statistics"
 kind: "Fallacy"
-categories: ["Thinking about statistics", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/"
+search-terms: "base rate, positive predictive value, surprising findings"
 verified: true
+image: "../assets/cards/counterintuitive-not-true.png"
+image-alt: "#76 Just because something is counterintuitive: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The linked post consists of its title alone; the reasoning is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#76** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Just because something is counterintuitive doesn't mean it's true](https://statmodeling.stat.columbia.edu/2007/07/19/just_because_so/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: base rate, positive predictive value, surprising findings.
 
 Source check: ✓ The explanation was checked against the source. The linked post consists of its title alone; the reasoning is ours.
 :::

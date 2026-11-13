@@ -1,0 +1,218 @@
+<script>
+// Tools for every entry's simulation, added after the page loads:
+//   - "Reset to defaults" puts every control back where the page started.
+//   - "Download CSV" saves the current settings and the result text.
+//   - "Run in your browser" under the R and Python code tabs runs that
+//     language's version of the simulation with webR or Pyodide. Nothing is
+//     downloaded until the reader clicks; the versions match the quarto-live
+//     extension used by the "Try it in R" pages, so the browser cache is shared.
+// Included site-wide from _quarto.yml (include-after-body); it does nothing on
+// pages without a "Show simulation code" block.
+(function () {
+  "use strict";
+  var WEBR_URL = "https://webr.r-wasm.org/v0.6.0/webr.mjs";
+  var PYODIDE_URL = "https://cdn.jsdelivr.net/pyodide/v0.28.1/full/pyodide.mjs";
+
+  var section = document.getElementById("simulated-example");
+  var codeBlock = section && section.querySelector("details.sim-code");
+  if (!section || !codeBlock) return;
+  var slug = location.pathname.split("/").pop().replace(/\.html$/, "") || "simulation";
+
+  // ---------- Reset to defaults and CSV download ----------
+
+  // Observable Inputs forms (class "oi-...") expose .value with a setter. A
+  // control's default is its value when it first appears; OJS renders cells
+  // asynchronously, so keep looking for new forms for a few seconds.
+  var defaults = new Map();
+  var copy = function (v) { return Array.isArray(v) ? v.slice() : v; };
+  var controls = function () { return Array.prototype.slice.call(section.querySelectorAll('form[class^="oi-"]')); };
+  var record = function () {
+    controls().forEach(function (f) { if (!defaults.has(f) && "value" in f) defaults.set(f, copy(f.value)); });
+  };
+  var started = Date.now();
+  var poll = setInterval(function () { record(); if (Date.now() - started > 15000) clearInterval(poll); }, 200);
+
+  var tools = document.createElement("div");
+  tools.className = "sim-tools";
+  tools.setAttribute("role", "group");
+  tools.setAttribute("aria-label", "Simulation tools");
+  var reset = document.createElement("button");
+  reset.type = "button";
+  reset.className = "sim-tool";
+  reset.innerHTML = '<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Reset to defaults';
+  var download = document.createElement("button");
+  download.type = "button";
+  download.className = "sim-tool";
+  download.innerHTML = '<i class="bi bi-download" aria-hidden="true"></i> Download settings and result (CSV)';
+  tools.appendChild(reset);
+  tools.appendChild(download);
+  codeBlock.parentNode.insertBefore(tools, codeBlock);
+
+  reset.addEventListener("click", function () {
+    record();
+    defaults.forEach(function (value, form) {
+      if (!document.body.contains(form)) return;
+      var now = form.value;
+      if (JSON.stringify(now) === JSON.stringify(value)) return;
+      form.value = copy(value);
+      form.dispatchEvent(new Event("input", { bubbles: true }));
+    });
+  });
+
+  var csvCell = function (s) { return '"' + String(s).replace(/"/g, '""').replace(/\s+/g, " ").trim() + '"'; };
+  download.addEventListener("click", function () {
+    var rows = [["kind", "name", "value"]];
+    controls().forEach(function (f, i) {
+      var label = f.querySelector("label");
+      var v = f.value;
+      rows.push(["setting", label ? label.textContent : "control " + (i + 1), Array.isArray(v) ? v.join("; ") : v]);
+    });
+    section.querySelectorAll(".sim-readout").forEach(function (r, i) {
+      rows.push(["result", "summary " + (i + 1), r.textContent]);
+    });
+    rows.push(["page", "url", location.href.split("#")[0]]);
+    var blob = new Blob([rows.map(function (r) { return r.map(csvCell).join(","); }).join("\r\n") + "\r\n"],
+      { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = slug + "-simulation.csv";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  });
+
+  // ---------- Run the R or Python version in the browser ----------
+
+  var webR = null, pyodide = null;
+  var getWebR = function (status) {
+    if (!webR) {
+      status("Downloading R (about 30 MB the first time)…");
+      webR = import(WEBR_URL).then(function (m) {
+        var w = new m.WebR();
+        return w.init().then(function () { return w; });
+      });
+    }
+    return webR;
+  };
+  var getPyodide = function (status) {
+    if (!pyodide) {
+      status("Downloading Python with NumPy and Matplotlib (about 25 MB the first time)…");
+      pyodide = import(PYODIDE_URL)
+        .then(function (m) { return m.loadPyodide(); })
+        .then(function (py) {
+          return py.loadPackage(["numpy", "matplotlib"]).then(function () {
+            return py.runPythonAsync('import os\nos.environ["MPLBACKEND"] = "Agg"\nimport matplotlib\nmatplotlib.use("Agg")')
+              .then(function () { return py; });
+          });
+        });
+    }
+    return pyodide;
+  };
+
+  var runR = function (code, status) {
+    return getWebR(status).then(function (w) {
+      status("Running…");
+      return new w.Shelter().then(function (shelter) {
+        return shelter.captureR(code, {
+          withAutoprint: true, captureStreams: true, captureConditions: false,
+          captureGraphics: { width: 960, height: 600 }
+        }).then(function (res) {
+          var text = res.output.filter(function (o) { return o.type === "stdout" || o.type === "stderr"; })
+            .map(function (o) { return o.data; }).join("\n");
+          var images = res.images.map(function (bitmap) {
+            var c = document.createElement("canvas");
+            c.width = bitmap.width; c.height = bitmap.height;
+            c.getContext("2d").drawImage(bitmap, 0, 0);
+            return c.toDataURL("image/png");
+          });
+          shelter.purge();
+          return { text: text, images: images };
+        }, function (err) { shelter.purge(); throw err; });
+      });
+    });
+  };
+
+  var COLLECT = [
+    "import io, base64",
+    "import matplotlib.pyplot as _plt",
+    "_figs = []",
+    "for _n in _plt.get_fignums():",
+    "    _buf = io.BytesIO()",
+    "    _plt.figure(_n).savefig(_buf, format='png', dpi=110, bbox_inches='tight')",
+    "    _figs.append(base64.b64encode(_buf.getvalue()).decode())",
+    "_plt.close('all')",
+    "_figs"
+  ].join("\n");
+  var runPython = function (code, status) {
+    return getPyodide(status).then(function (py) {
+      status("Running…");
+      var lines = [];
+      py.setStdout({ batched: function (s) { lines.push(s); } });
+      py.setStderr({ batched: function (s) { if (!/non-interactive|cannot be shown/.test(s)) lines.push(s); } });
+      var ns = py.globals.get("dict")();
+      return py.runPythonAsync(code, { globals: ns })
+        .then(function () { return py.runPythonAsync(COLLECT, { globals: ns }); })
+        .then(function (figs) {
+          var images = figs.toJs().map(function (b64) { return "data:image/png;base64," + b64; });
+          figs.destroy(); ns.destroy();
+          return { text: lines.join("\n"), images: images };
+        }, function (err) { ns.destroy(); throw err; });
+    });
+  };
+
+  var addRunner = function (pane, lang) {
+    var file = "../sims/" + (lang === "R" ? "r/" + slug + ".R" : "python/" + slug + ".py");
+    var box = document.createElement("div");
+    box.className = "sim-run";
+    var button = document.createElement("button");
+    button.type = "button";
+    button.className = "sim-tool";
+    button.innerHTML = '<i class="bi bi-play-fill" aria-hidden="true"></i> Run the ' + lang +
+      " version in your browser";
+    var note = document.createElement("span");
+    note.className = "sim-run-note";
+    note.textContent = lang === "R"
+      ? "Uses webR. The first run downloads R, which can take a minute."
+      : "Uses Pyodide. The first run downloads Python, which can take a minute.";
+    var out = document.createElement("div");
+    out.className = "sim-run-output";
+    out.setAttribute("aria-live", "polite");
+    box.appendChild(button);
+    box.appendChild(note);
+    box.appendChild(out);
+    pane.appendChild(box);
+    var status = function (msg) { out.innerHTML = ""; var p = document.createElement("p"); p.className = "sim-run-status"; p.textContent = msg; out.appendChild(p); };
+    button.addEventListener("click", function () {
+      button.disabled = true;
+      status("Fetching the script…");
+      fetch(file)
+        .then(function (r) { if (!r.ok) throw new Error("could not load " + file); return r.text(); })
+        .then(function (code) { return (lang === "R" ? runR : runPython)(code, status); })
+        .then(function (res) {
+          out.innerHTML = "";
+          if (res.text.trim()) {
+            var pre = document.createElement("pre");
+            pre.className = "sim-run-text";
+            pre.textContent = res.text;
+            out.appendChild(pre);
+          }
+          res.images.forEach(function (src, i) {
+            var img = document.createElement("img");
+            img.src = src;
+            img.alt = "Chart drawn by the " + lang + " version of the simulation" + (res.images.length > 1 ? " (" + (i + 1) + ")" : "");
+            out.appendChild(img);
+          });
+          button.innerHTML = '<i class="bi bi-arrow-repeat" aria-hidden="true"></i> Run it again';
+        })
+        .catch(function (err) { status("Sorry, it didn't run: " + (err && err.message ? err.message : err)); })
+        .then(function () { button.disabled = false; });
+    });
+  };
+
+  codeBlock.querySelectorAll(".tab-pane").forEach(function (pane) {
+    var tab = codeBlock.querySelector('[aria-controls="' + pane.id + '"]');
+    var name = tab ? tab.textContent.trim() : "";
+    if (name === "R" || name === "Python") addRunner(pane, name);
+  });
+})();
+</script>

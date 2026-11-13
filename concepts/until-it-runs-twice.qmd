@@ -5,16 +5,22 @@ description: "I don't trust anything until it runs. In fact, I don't trust anyth
 order: 129
 theme: "Building and checking models"
 kind: "Law or aphorism"
-categories: ["Building and checking models", "Law or aphorism"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Law or aphorism", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/"
+search-terms: "R-hat, multimodal posterior, multiple chains, reproducibility"
 verified: true
+image: "../assets/cards/until-it-runs-twice.png"
+image-alt: "#129 Until it runs twice: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The post is about where the quote comes from; the reading of running twice is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#129** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Where does this quote come from? “I don’t trust anything until it runs. In fact, I don’t trust anything until it runs twice.”](https://statmodeling.stat.columbia.edu/2022/11/28/who-said-i-dont-trust-anything-until-it-runs-in-fact-i-dont-trust-anything-until-it-runs-twice/)
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: R-hat, multimodal posterior, multiple chains, reproducibility.
 
 Source check: ✓ The explanation was checked against the source. The post is about where the quote comes from; the reading of running twice is ours.
 :::

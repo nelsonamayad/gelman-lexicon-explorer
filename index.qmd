@@ -23,7 +23,7 @@ listing:
     order: "#"
     title: "Entry"
     description: "Gelman's definition"
-    categories: "Theme · Kind"
+    categories: "Theme · Kind · Level"
 ---
 
 ::: {.hero}
@@ -33,7 +33,7 @@ I love Gelman's lexicon page and have learned a lot from reading it through the 
 
 [Start here](start-here.qmd){.btn .btn-primary .me-2} [Random entry](random.qmd){.btn .btn-outline-primary .me-2} [About this site](about.qmd){.btn .btn-link}
 
-[Version 0.9.1, 12 November 2026.]{.site-version}
+[Version 0.10, 13 November 2026.]{.site-version}
 :::
 
 ## Browse by theme {#themes}
@@ -50,7 +50,7 @@ What sort of entry it is, whatever its theme.
 
 ## Every entry {#all-entries}
 
-Entries are numbered in the order they appear in Gelman's list. Type in the filter box to search titles and definitions, click a column header to sort, or click a theme or kind tag to filter.
+Entries are numbered in the order they appear in Gelman's list. Type in the filter box to search titles and definitions, click a column header to sort, or click a theme, kind or level tag (Introductory, Intermediate, Advanced) to filter.
 
 ::: {#entries}
 :::

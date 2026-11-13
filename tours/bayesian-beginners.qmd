@@ -1,0 +1,35 @@
+---
+title: "For Bayesian beginners"
+date: 2026-11-12
+subtitle: "An eleven-stop tour from what probability means to checking a fitted model"
+description: "Eleven lexicon entries for people starting with Bayesian statistics: probability, priors, the likelihood, partial pooling, computation and model checking."
+sidebar: false
+---
+
+Gelman is a Bayesian who spends a lot of time on how Bayesian analyses go wrong. These eleven entries follow a model from its foundations to its checks, in roughly the order you meet the ideas when you start.
+
+## Part 1: Probability and priors
+
+1. **[Probability](../concepts/probability.qmd).** A long-run frequency and a degree of belief, learning from the same coin.
+2. **[Bayesian](../concepts/bayesian.qmd).** Gelman's joke about Bayesians, and what a confident prior in the wrong place does.
+3. **[Weakly Informative Priors](../concepts/weakly-informative-priors.qmd).** What to use when you think you want a noninformative prior.
+4. **[What were you doing before you had any data?](../concepts/before-you-had-any-data.qmd).** Simulate from your prior and see whether you believe the data it implies.
+5. **[The Bayesian cringe](../concepts/bayesian-cringe.qmd).** There is no need to apologize for using what the field already knows.
+
+## Part 2: The rest of the model
+
+6. **[Camel that is the likelihood](../concepts/camel-likelihood.qmd).** The data model usually matters more than the prior everyone argues about.
+7. **[Multiple Comparisons](../concepts/multiple-comparisons.qmd).** Partial pooling instead of corrections: the multilevel model as the everyday Bayesian tool.
+8. **[Bayesians](../concepts/bayesians-are-frequentists.qmd).** Bayesian intervals have a frequency property too, averaged over the prior.
+
+## Part 3: Computing and checking
+
+9. **[The Folk Theorem of Statistical Computing](../concepts/folk-theorem.qmd).** When the sampler struggles, look at the model first.
+10. **[A chicken](../concepts/a-chicken.qmd).** Check a model by its inferences: an implication that makes no sense points to a flaw.
+11. **[Uncertainty Interval](../concepts/uncertainty-interval.qmd).** Say this instead of confidence or credible interval; in most problems they cover alike.
+
+## Where next
+
+- The [building and checking models](../themes/building-and-checking-models.qmd) theme has the rest, including [The Pinocchio Principle](../concepts/pinocchio-principle.qmd) and [In high-dimensional space](../concepts/high-dimensional-space.qmd).
+- The [Try it in R](../r/index.qmd) pages let you edit and run some of these simulations in R.
+- Or go back to the [other tours](../start-here.qmd#more-tours).

@@ -5,15 +5,21 @@ description: "They are frequentists."
 order: 24
 theme: "Thinking about statistics"
 kind: "Principle or heuristic"
-categories: ["Thinking about statistics", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Thinking about statistics", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/"
+search-terms: "frequentist coverage of Bayesian intervals, calibration"
 verified: true
+image: "../assets/cards/bayesians-are-frequentists.png"
+image-alt: "#24 Bayesians: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#24** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Bayesians are frequentists](https://statmodeling.stat.columbia.edu/2018/06/17/bayesians-are-frequentists/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: frequentist coverage of Bayesian intervals, calibration.
 
 Source check: ✓ The explanation was checked against the source.
 :::

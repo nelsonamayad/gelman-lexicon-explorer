@@ -1,0 +1,36 @@
+---
+title: "For reviewers and editors"
+date: 2026-11-12
+subtitle: "A twelve-stop tour for anyone who judges other people's results"
+description: "Twelve lexicon entries for referees, editors and readers of research: noise, forking paths, interactions, power, and how criticism gets heard."
+sidebar: false
+---
+
+You have a manuscript in front of you and a finding that looks striking. These twelve entries are the questions worth asking before you believe it, and the ways the publication system makes those questions easy to skip. Each stop takes a few minutes; move the sliders before you move on.
+
+## Part 1: Is the estimate any good?
+
+1. **[The Statistical Significance Filter](../concepts/statistical-significance-filter.qmd).** A significant estimate from a noisy study is probably an overestimate, sometimes with the wrong sign.
+2. **[Kangaroo](../concepts/kangaroo.qmd).** When the noise dwarfs the effect, the study can't learn anything, and its significant results are mostly noise.
+3. **[The "What does not kill my statistical significance makes it stronger" fallacy](../concepts/what-does-not-kill.qmd).** Significance reached under noisy conditions is weaker evidence, not stronger.
+4. **[The Piranha Principle](../concepts/piranha-principle.qmd).** A literature full of large effects on the same outcome can't all be right.
+
+## Part 2: Is the analysis what it seems?
+
+5. **[The Garden of Forking Paths](../concepts/garden-of-forking-paths.qmd).** One honest, data-dependent analysis can still have a false-positive rate far above 5%.
+6. **[16](../concepts/sixteen.qmd).** A subgroup "finding" needs sixteen times the sample of the main effect.
+7. **[Robustness checks](../concepts/robustness-checks.qmd).** A table of agreeing specifications can be chosen rather than discovered.
+8. **[The Causal Identification Kool-Aid](../concepts/causal-identification-kool-aid.qmd).** A clean design does nothing about noise or a flexible analysis.
+9. **[The 80% Power Lie](../concepts/80-percent-power-lie.qmd).** Power calculations built on published effect sizes promise far more than they deliver.
+
+## Part 3: What happens after publication
+
+10. **[The Time-Reversal Heuristic](../concepts/time-reversal-heuristic.qmd).** Judge the original and the replication as if the replication had come first.
+11. **[Research Incumbency Rule](../concepts/research-incumbency-rule.qmd).** Once published, a flaw has to be much worse to get corrected than it had to be to stop the paper.
+12. **[The problem with peer review](../concepts/problem-with-peer-review.qmd).** Reviewers catch idiosyncratic errors, not the misconceptions the whole field shares.
+
+## Where next
+
+- The [noise and evidence](../themes/noise-and-evidence.qmd) and [how science behaves](../themes/how-science-behaves.qmd) themes have the rest.
+- [Disbelief](../concepts/disbelief.qmd), [The Backseat Driver Principle](../concepts/backseat-driver-principle.qmd) and [The Javert Paradox](../concepts/javert-paradox.qmd) are about the critic's side of the table.
+- Or go back to the [other tours](../start-here.qmd#more-tours).

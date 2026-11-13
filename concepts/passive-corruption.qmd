@@ -5,15 +5,18 @@ description: "They know there's bad work but they don't do anything about it."
 order: 123
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/"
 verified: true
+image: "../assets/cards/passive-corruption.png"
+image-alt: "#123 Passive Corruption: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#123** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It’s worse than you might think: Passive corruption in the social sciences](https://statmodeling.stat.columbia.edu/2023/06/23/its-worse-than-it-sounds-passive-corruption-in-the-social-sciences/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -75,7 +78,7 @@ Plot.plot({
 //| echo: false
 {
   const end = l => field.filter(d => d.label === l).at(-1).bad;
-  return html`<div class="sim-readout">${md`After 40 years, the share of bad work is **${pct(end("Your setting"))}** in your setting, **${pct(end("Total silence"))}** under total silence, and **${pct(end("Active correction"))}** with active correction. Bad work stops spreading when people speak up often enough to offset its advantage, here a ${pct(adv / (1 + adv))} chance per year.`}</div>`;
+  return html`<div class="sim-readout">${md`After 40 years, the share of bad work is **${pct(end("Your setting"))}** in your setting, **${pct(end("Total silence"))}** under total silence, and **${pct(end("Active correction"))}** with active correction. Bad work stops spreading when people speak up often enough to offset its advantage, here a chance of ${pct(adv / (1 + adv))} per year.`}</div>`;
 }
 ```
 

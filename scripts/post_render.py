@@ -8,7 +8,13 @@
    no ads and uses only Google Analytics, loaded after consent (see
    _analytics.html and about.qmd#privacy). Quarto has no option for the
    banner text, so the bundled cookie-consent.js is patched here.
+3. Checks the versions of Observable Plot, Inputs and d3 that Quarto's OJS
+   runtime loads. Quarto hard-codes them (1.12.1: Plot 0.6.11, Inputs 0.10.6,
+   d3 7.8.5) and CI pins Quarto, so they only change when Quarto does. A
+   different version can change chart defaults, so this warns; check the
+   charts with scripts/check_pages.py --readouts and update PINNED.
 """
+import re
 import glob
 import os
 import sys
@@ -44,3 +50,13 @@ if os.path.exists(js):
     elif OURS not in text:
         print("post_render.py: cookie banner text not found in cookie-consent.js; "
               "the stock wording may have changed. Check the banner.", file=sys.stderr)
+
+PINNED = {"@observablehq/plot": "0.6.11", "@observablehq/inputs": "0.10.6", "d3": "7.8.5"}
+runtime = os.path.join(out, "site_libs", "quarto-ojs", "quarto-ojs-runtime.js")
+if os.path.exists(runtime):
+    text = open(runtime, encoding="utf-8").read()
+    for name, want in PINNED.items():
+        m = re.search(r'dependency\("' + re.escape(name) + r'", "([^"]+)"', text)
+        if m and m.group(1) != want:
+            print(f"post_render.py: Quarto now loads {name} {m.group(1)}, not {want}. "
+                  "Chart defaults may have changed; check the pages and update PINNED.", file=sys.stderr)

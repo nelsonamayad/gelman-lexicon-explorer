@@ -5,16 +5,22 @@ description: "When your sample differs systematically from your population withi
 order: 149
 theme: "Causes, samples and populations"
 kind: "Principle or heuristic"
-categories: ["Causes, samples and populations", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Causes, samples and populations", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/"
+search-terms: "nonresponse bias, survey weighting, unrepresentative samples"
 verified: true
+image: "../assets/cards/groovy-grandma-problem.png"
+image-alt: "#149 The Groovy Grandma Problem: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "No archived copy of the post was available, so it was checked against a detailed search-engine summary of the post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#149** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The groovy grandma problem in survey research](https://statmodeling.stat.columbia.edu/2025/06/19/the-groovy-grandma-problem-in-survey-research/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: nonresponse bias, survey weighting, unrepresentative samples.
 
 Source check: ✓ The explanation was checked against the source. No archived copy of the post was available, so it was checked against a detailed search-engine summary of the post.
 :::

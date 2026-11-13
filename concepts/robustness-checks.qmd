@@ -5,15 +5,21 @@ description: "are a joke."
 order: 120
 theme: "Noise and evidence"
 kind: "Law or aphorism"
-categories: ["Noise and evidence", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Law or aphorism", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2018/11/14/robustness-checks-joke/"
+search-terms: "specification curve, multiverse analysis, selective reporting"
 verified: true
+image: "../assets/cards/robustness-checks.png"
+image-alt: "#120 Robustness checks: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#120** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Robustness checks are a joke](https://statmodeling.stat.columbia.edu/2018/11/14/robustness-checks-joke/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: specification curve, multiverse analysis, selective reporting.
 
 Source check: ✓ The explanation was checked against the source.
 :::

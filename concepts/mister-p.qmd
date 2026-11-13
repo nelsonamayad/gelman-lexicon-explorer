@@ -5,16 +5,22 @@ description: "Multilevel regression and poststratification."
 order: 1
 theme: "Causes, samples and populations"
 kind: "Method or technique"
-categories: ["Causes, samples and populations", "Method or technique"]
+difficulty: "Advanced"
+categories: ["Causes, samples and populations", "Method or technique", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/"
+search-terms: "MRP, multilevel regression and poststratification, small-area estimation, survey weighting"
 verified: true
+image: "../assets/cards/mister-p.png"
+image-alt: "#1 Mister P: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The linked post mentions the method in passing; the explanation of it is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#1** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Next Supreme Court Justice](https://statmodeling.stat.columbia.edu/2009/05/the_next_suprem/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: MRP, multilevel regression and poststratification, small-area estimation, survey weighting.
 
 Source check: ✓ The explanation was checked against the source. The linked post mentions the method in passing; the explanation of it is ours.
 :::
@@ -131,7 +137,7 @@ Plot.plot({
 {
   const rmse = m => Math.sqrt(mean(long.filter(d => d.method === m).map(d => (d.est - d.truth) ** 2)));
   const empty = mrp.filter(d => d.n === 0).length;
-  return html`<div class="sim-readout">${md`Root-mean-square error across states: raw means **${fmt(rmse("Raw state mean"), 3)}**, MRP **${fmt(rmse("MRP"), 3)}**. ${empty} state(s) got no respondents at all. The raw approach has nothing to say about them, while MRP still produces an estimate. Dot size is the state's sample size: the small dots are where pooling helps most.`}</div>`;
+  return html`<div class="sim-readout">${md`Root-mean-square error across states: raw means **${fmt(rmse("Raw state mean"), 3)}**, MRP **${fmt(rmse("MRP"), 3)}**. ${empty === 0 ? "Every state got at least one respondent here; lower the sample size and some get none, where the raw approach has nothing to say and MRP still produces an estimate." : `${empty} ${empty === 1 ? "state" : "states"} got no respondents at all. The raw approach has nothing to say about them, while MRP still produces an estimate.`} Dot size is the state's sample size: the small dots are where pooling helps most.`}</div>`;
 }
 ```
 

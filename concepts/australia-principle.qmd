@@ -5,15 +5,21 @@ description: "Build the parts of the model you need, as you need them."
 order: 75
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/"
+search-terms: "informative prior, sex ratio, small effects"
 verified: true
+image: "../assets/cards/australia-principle.png"
+image-alt: "#75 The Australia principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#75** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Prior distributions and the Australia principle](https://statmodeling.stat.columbia.edu/2018/05/20/prior-distributions-australia-principle/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: informative prior, sex ratio, small effects.
 
 Source check: ✓ The explanation was checked against the source.
 :::

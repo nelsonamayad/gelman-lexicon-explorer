@@ -5,16 +5,19 @@ description: "We learn when stories confound our expectations, but learning from
 order: 154
 theme: "Showing and telling"
 kind: "Principle or heuristic"
-categories: ["Showing and telling", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/"
 verified: true
+image: "../assets/cards/paradox-of-storytelling.png"
+image-alt: "#154 The paradox of storytelling: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#154** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Storytelling and Scientific Understanding](https://statmodeling.stat.columbia.edu/2024/01/18/storytelling-and-scientific-understanding-my-talks-with-thomas-basboll-at-johns-hopkins-on-26-apr/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. Added to the lexicon by August 2026. No archived copy of the updated list exists; the definition is the live list's wording as read on 12 November 2026.
 :::

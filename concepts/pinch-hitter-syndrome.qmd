@@ -5,16 +5,19 @@ description: "People whose job it is to do just one thing are not always so good
 order: 6
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/"
 verified: true
+image: "../assets/cards/pinch-hitter-syndrome.png"
+image-alt: "#6 The Pinch-Hitter Syndrome: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Gelman's example is copy editors; the other examples and mechanisms are ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#6** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The pinch-hitter syndrome: a general principle?](https://statmodeling.stat.columbia.edu/2005/01/the_pinchhitter/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. Gelman's example is copy editors; the other examples and mechanisms are ours.
 :::
@@ -39,7 +42,7 @@ Several mechanisms may combine. Gelman's post points to the first, selection. Th
 
 ## Simulated example
 
-A league has 400 hitters with true talent spread around a .260 batting average. The best players start. Pinch hitters come from the remaining players and also face a "cold start" penalty. Compare the batting averages.
+A toy model, our own. A league has 400 hitters with true talent spread around a .260 batting average. The best players start. Pinch hitters come from the remaining players and also face a "cold start" penalty. Compare the batting averages.
 
 ```{ojs}
 //| echo: false

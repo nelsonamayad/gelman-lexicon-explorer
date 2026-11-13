@@ -5,15 +5,21 @@ description: "It greases the wheels of commerce."
 order: 134
 theme: "Building and checking models"
 kind: "Method or technique"
-categories: ["Building and checking models", "Method or technique"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Method or technique", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/"
+search-terms: "golf putting model, model error term, Stan sampling problems"
 verified: true
+image: "../assets/cards/uncertainty-greases-commerce.png"
+image-alt: "#134 Uncertainty: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#134** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Hierarchical model golf putting struggle](https://statmodeling.stat.columbia.edu/2022/02/18/hierarchical-model-golf-putting-struggle/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Method or technique](../kinds/methods.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: golf putting model, model error term, Stan sampling problems.
 
 Source check: ✓ The explanation was checked against the source.
 :::

@@ -5,16 +5,22 @@ description: "Invite it in."
 order: 100
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/"
+search-terms: "y-axis range, axis starting at zero, graphing advice"
 verified: true
+image: "../assets/cards/zero-in-the-neighborhood.png"
+image-alt: "#100 If zero is in the neighborhood: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The numeric threshold in How it works is our own rule of thumb."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#100** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Graphing advice: if zero is in the neighborhood, invite it in](https://statmodeling.stat.columbia.edu/2021/12/17/graphing-advice-if-zero-is-in-the-neighborhood-invite-it-in/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
+
+Related terms: y-axis range, axis starting at zero, graphing advice.
 
 Source check: ✓ The explanation was checked against the source. The numeric threshold in How it works is our own rule of thumb.
 :::
