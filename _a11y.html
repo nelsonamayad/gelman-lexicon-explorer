@@ -1,0 +1,40 @@
+<script>
+// Small accessibility fixes for elements that Quarto generates.
+document.addEventListener("DOMContentLoaded", function () {
+  // Icon-only links (navbar and footer): give the link itself an accessible
+  // name and a tooltip, taken from the icon's aria-label.
+  document.querySelectorAll("a.nav-link, .nav-footer a").forEach(function (a) {
+    if (a.textContent.trim() || a.hasAttribute("aria-label")) return;
+    var icon = a.querySelector("[aria-label]");
+    if (icon) {
+      a.setAttribute("aria-label", icon.getAttribute("aria-label"));
+      a.setAttribute("title", icon.getAttribute("aria-label"));
+    }
+  });
+  // The listing filter box has a placeholder but no label.
+  document.querySelectorAll("input.search").forEach(function (input) {
+    if (!input.getAttribute("aria-label")) input.setAttribute("aria-label", "Filter entries by text");
+  });
+  // Charts and controls are drawn by Observable after the page loads, and
+  // redrawn whenever a control changes, so fix them as they appear:
+  //  - Observable Plot labels inner chart groups ("y-grid", "dot"), which ARIA
+  //    doesn't allow on <g> and which tells a screen reader nothing. The chart
+  //    itself keeps its aria-label and aria-description.
+  //  - An Observable Inputs slider labels its number box but not the slider
+  //    next to it; give the slider the same name.
+  var fix = function (root) {
+    root.querySelectorAll('svg[aria-label] g[aria-label]').forEach(function (g) { g.removeAttribute("aria-label"); });
+    root.querySelectorAll('form[class^="oi-"] input[type="range"]:not([aria-label])').forEach(function (r) {
+      var label = r.form && r.form.querySelector("label");
+      if (label) r.setAttribute("aria-label", label.textContent.trim());
+    });
+  };
+  fix(document);
+  var pending = false;
+  new MutationObserver(function () {
+    if (pending) return;
+    pending = true;
+    requestAnimationFrame(function () { pending = false; fix(document); });
+  }).observe(document.body, { childList: true, subtree: true });
+});
+</script>
