@@ -70,10 +70,8 @@ def main():
                  f'{N} replications of the same study →</text>')
 
     wrong_text = (f", and {wrong} of them {'points' if wrong == 1 else 'point'} the wrong way" if wrong else "")
-    caption = (f"Each dot is the same small study, run again. The {k} red ones came out statistically "
-               f"significant, and on average they are {ratio:.1f} times the true effect{wrong_text}. "
-               f'That is <a href="concepts/statistical-significance-filter.html">the statistical significance '
-               f"filter</a>, one of {155} ideas on this site, each with a simulation you can play with.")
+    caption = (f"Only {k} of these {N} studies cross the significance cutoff. Those eye-catching "
+               f"estimates average {ratio:.1f} times the true effect{wrong_text}.")
     desc = (f"A scatter of {N} replications of one study. The true effect is {THETA}. "
             f"{k} estimates are statistically significant; all are far from the true effect.")
     svg = (f'<svg class="hero-svg" viewBox="0 0 {W} {H}" role="img" aria-labelledby="hero-title hero-desc">'
