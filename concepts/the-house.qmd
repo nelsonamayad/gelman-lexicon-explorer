@@ -5,16 +5,22 @@ description: "It's stronger than the foundations."
 order: 138
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Law or aphorism", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/"
+search-terms: "non-normal errors, central limit theorem, robustness of least squares"
 verified: true
+image: "../assets/cards/the-house.png"
+image-alt: "#138 The house: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Gelman's examples concern theoretical foundations; the simulation takes the word in a narrower technical sense, as labeled."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#138** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The house is stronger than the foundations](https://statmodeling.stat.columbia.edu/2017/10/09/house-stronger-foundations/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: non-normal errors, central limit theorem, robustness of least squares.
 
 Source check: ✓ The explanation was checked against the source. Gelman's examples concern theoretical foundations; the simulation takes the word in a narrower technical sense, as labeled.
 :::

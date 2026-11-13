@@ -5,15 +5,21 @@ description: "Convincing the world it didn't exist."
 order: 38
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Law or aphorism", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/"
+search-terms: "missing data, complete-case analysis, listwise deletion, imputation"
 verified: true
+image: "../assets/cards/default-greatest-trick.png"
+image-alt: "#38 Default, the greatest trick it ever pulled: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#38** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How feminism has made me a better scientist](https://statmodeling.stat.columbia.edu/2018/08/13/feminism-made-better-scientist/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: missing data, complete-case analysis, listwise deletion, imputation.
 
 Source check: ✓ The explanation was checked against the source.
 :::

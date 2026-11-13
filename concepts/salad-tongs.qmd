@@ -5,15 +5,21 @@ description: "Not to be used for painting."
 order: 50
 theme: "Noise and evidence"
 kind: "Law or aphorism"
-categories: ["Noise and evidence", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Law or aphorism", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/"
+search-terms: "dance of the p-values, replication p-values"
 verified: true
+image: "../assets/cards/salad-tongs.png"
+image-alt: "#50 Salad Tongs: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#50** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Uri Simonsohn warns us not to be falsely reassured](https://statmodeling.stat.columbia.edu/2015/08/31/uri-simonsohn-warns-us-not-to-be-falsely-reassured/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: dance of the p-values, replication p-values.
 
 Source check: ✓ The explanation was checked against the source.
 :::

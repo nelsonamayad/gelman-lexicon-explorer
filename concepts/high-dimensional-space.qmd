@@ -5,15 +5,21 @@ description: "No one can hear you scream."
 order: 132
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/"
+search-terms: "typical set, concentration of measure, curse of dimensionality, Hamiltonian Monte Carlo"
 verified: true
+image: "../assets/cards/high-dimensional-space.png"
+image-alt: "#132 In high-dimensional space: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#132** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The typical set and its relevance to Bayesian computation](https://statmodeling.stat.columbia.edu/2020/08/02/the-typical-set-and-its-relevance-to-bayesian-computation/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: typical set, concentration of measure, curse of dimensionality, Hamiltonian Monte Carlo.
 
 Source check: ✓ The explanation was checked against the source.
 :::

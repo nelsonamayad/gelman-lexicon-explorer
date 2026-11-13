@@ -5,15 +5,18 @@ description: "Pain killer in Reno, Nevada."
 order: 130
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/"
 verified: true
+image: "../assets/cards/torment-executioner.png"
+image-alt: "#130 Torment executioner: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#130** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Torment executioners in Reno, Nevada](https://statmodeling.stat.columbia.edu/2024/02/12/torment-executioners-in-reno-nevada/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

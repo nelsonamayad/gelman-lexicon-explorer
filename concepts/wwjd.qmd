@@ -5,16 +5,19 @@ description: "What I think of when I'm stuck on an applied statistics problem."
 order: 11
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Building and checking models", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/"
 verified: true
+image: "../assets/cards/wwjd.png"
+image-alt: "#11 WWJD: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The post doesn't expand the acronym; our reading of it is labeled as such."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#11** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Can our book be used in an econ course??](https://statmodeling.stat.columbia.edu/2007/06/can_our_book_be/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source. The post doesn't expand the acronym; our reading of it is labeled as such.
 :::

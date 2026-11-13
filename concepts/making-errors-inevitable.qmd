@@ -5,21 +5,29 @@ description: "Learning from them is not."
 order: 136
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf"
-verified: false
-source-note: "The source column's PDF is a scanned image without extractable text."
+search-terms: "learning from mistakes, error correction"
+verified: true
+image: "../assets/cards/making-errors-inevitable.png"
+image-alt: "#136 Making errors is inevitable: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
+source-note: "The column's PDF is a scanned image; it was checked by reading the page images."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
-Entry **#136** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Ethics and statistics column (PDF)](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf).
+Entry **#136** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Honesty and transparency are not enough (PDF)](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
-Source check: not verified. The source column's PDF is a scanned image without extractable text. The explanation follows the entry's definition and Gelman's published work; read the source for his own argument.
+Related terms: learning from mistakes, error correction.
+
+Source check: ✓ The explanation was checked against the source. The column's PDF is a scanned image; it was checked by reading the page images.
 :::
 
 ## What it is
+
+The line comes from Gelman's *Chance* column "Honesty and Transparency Are Not Enough", near the end of an argument about the replication crisis. Some unreplicable research involves ethical violations, he writes, and "it is poor behavior for them to refuse to admit they could ever have been wrong—but we can also make mistakes in good faith. Making errors is inevitable; learning from them is not. To learn from errors, we want a system of science that facilitates and provides incentives for such learning; we don't want an attitude that automatically links error to secrecy or dishonesty."
 
 Errors will happen no matter what. Learning from them takes deliberate effort. Learning needs an error to be *detected*, *acknowledged* and *traced to a cause that can be fixed*, and each step can fail. A field, lab or person that doesn't build systems for these steps will keep making the same errors indefinitely.
 
@@ -226,4 +234,4 @@ plt.show()
 
 ## Source
 
-- Andrew Gelman, [Ethics and statistics column, *Chance*](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf).
+- Andrew Gelman, ["Honesty and transparency are not enough"](https://sites.stat.columbia.edu/gelman/research/published/ChanceEthics14.pdf), *Chance* 30(1), 37–39 (2017), [doi:10.1080/09332480.2017.1302720](https://doi.org/10.1080/09332480.2017.1302720).

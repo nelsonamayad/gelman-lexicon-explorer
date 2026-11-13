@@ -5,15 +5,21 @@ description: "Suppose you find a problem with published work. If you just point 
 order: 71
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html"
+search-terms: "post-publication criticism, error correction"
 verified: true
+image: "../assets/cards/javert-paradox.png"
+image-alt: "#71 The Javert Paradox: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#71** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [It's hard to criticize science without looking like an obsessive (Slate)](https://slate.com/technology/2018/03/its-hard-to-criticize-science-without-looking-like-an-obsessive.html).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
+
+Related terms: post-publication criticism, error correction.
 
 Source check: ✓ The explanation was checked against the source.
 :::

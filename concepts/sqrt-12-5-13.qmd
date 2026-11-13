@@ -5,15 +5,21 @@ description: "13."
 order: 101
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["Building and checking models", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/"
+search-terms: "variance components, error budget, adding standard deviations"
 verified: true
+image: "../assets/cards/sqrt-12-5-13.png"
+image-alt: "#101 sqrt(12^2 + 5^2): an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#101** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The most important formula in statistics: sqrt(12\^2+5\^2)=13](https://statmodeling.stat.columbia.edu/2008/10/25/the_most_import/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
+
+Related terms: variance components, error budget, adding standard deviations.
 
 Source check: ✓ The explanation was checked against the source.
 :::

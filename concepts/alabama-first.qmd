@@ -5,15 +5,18 @@ description: "Howard Wainer's term for the common error of plotting in alphabeti
 order: 14
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/"
 verified: true
+image: "../assets/cards/alabama-first.png"
+image-alt: "#14 Alabama First: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#14** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Unalphabetize!](https://statmodeling.stat.columbia.edu/2008/05/unalphabetize/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -77,7 +80,7 @@ Plot.plot({
   marginLeft: 110,
   x: {label: "Simulated outcome", grid: true},
   y: {label: null, domain: sorted.map(d => d.state)},
-  color: {legend: true, range: ["#2166ac", "#d6604d", "#4daf4a", "#984ea3"]},
+  color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850", "#984ea3"]},
   marks: [
     Plot.ruleY(sorted, {y: "state", x1: 30, x2: "value", stroke: "#ddd"}),
     Plot.dot(sorted, {y: "state", x: "value", fill: "region", r: 4})
@@ -129,7 +132,7 @@ Plot.plot({
   marginLeft: 110,
   x: {label: "Simulated outcome", grid: true},
   y: {label: null, domain: sorted.map(d => d.state)},
-  color: {legend: true, range: ["#2166ac", "#d6604d", "#4daf4a", "#984ea3"]},
+  color: {legend: true, range: ["#2166ac", "#d6604d", "#1a9850", "#984ea3"]},
   marks: [
     Plot.ruleY(sorted, {y: "state", x1: 30, x2: "value", stroke: "#ddd"}),
     Plot.dot(sorted, {y: "state", x: "value", fill: "region", r: 4})

@@ -5,16 +5,19 @@ description: "If you push people to promise more than they can deliver, they're 
 order: 64
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/"
 verified: true
+image: "../assets/cards/armstrong-principle.png"
+image-alt: "#64 The (Lance) Armstrong Principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The source post is the one-sentence definition; the examples are ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#64** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Lance Armstrong principle](https://statmodeling.stat.columbia.edu/2017/06/08/lance-armstrong-principle/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The source post is the one-sentence definition; the examples are ours.
 :::

@@ -5,16 +5,19 @@ description: "It's not user friendly."
 order: 102
 theme: "Building and checking models"
 kind: "Law or aphorism"
-categories: ["Building and checking models", "Law or aphorism"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Law or aphorism", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/"
 verified: true
+image: "../assets/cards/freedom-not-user-friendly.png"
+image-alt: "#102 Freedom: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The line is Charles Margossian's, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#102** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Freedom is not user-friendly](https://statmodeling.stat.columbia.edu/2022/01/27/freedom-is-not-user-friendly/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Advanced](../index.qmd#category=Advanced).
 
 Source check: ✓ The explanation was checked against the source. The line is Charles Margossian's, quoted in Gelman's post.
 :::

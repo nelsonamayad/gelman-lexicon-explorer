@@ -5,15 +5,18 @@ description: "Can take you far in social science."
 order: 151
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/"
 verified: true
+image: "../assets/cards/originality-ambition-scruple.png"
+image-alt: "#151 The combination of originality, ambition, and lack of scruple: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#151** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [More on that claim that scientific citations are worth $100,000 each](https://statmodeling.stat.columbia.edu/2021/09/21/more-on-that-claim-that-scientific-citations-are-worth-100000-each/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

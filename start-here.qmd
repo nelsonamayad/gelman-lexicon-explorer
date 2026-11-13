@@ -7,6 +7,16 @@ sidebar: false
 
 The lexicon has 155 entries, in no particular order. If you're not sure where to begin, this tour visits the twelve ideas that the rest of the lexicon most often builds on. Each stop takes a few minutes, and each simulation is worth playing with before you move on.
 
+::: {.callout-tip title="How to read a page"}
+Every entry has the same shape.
+
+1. **The definition** under the title is Gelman's, word for word. The box below it links to his original post and says whether the explanation was checked against it.
+2. **What it is, Why it matters and How it works** explain the idea, from plain words to the statistics behind it.
+3. **The simulation** starts at settings chosen to show the entry's point; the text under the chart says what it shows. Move the sliders to see when the point holds and when it breaks, and use **Reset to defaults** to go back.
+4. **Show simulation code** has the same simulation in Observable JS, R and Python. Copy it, or run the R and Python versions in your browser.
+5. **Related entries** at the end are where to go next.
+:::
+
 ## Part 1: Why so many findings don't hold up
 
 1. **[The Statistical Significance Filter](concepts/statistical-significance-filter.qmd).** Significant estimates from noisy studies are overestimates. This is the idea behind half the lexicon.
@@ -30,6 +40,12 @@ The lexicon has 155 entries, in no particular order. If you're not sure where to
 
 11. **[The Time-Reversal Heuristic](concepts/time-reversal-heuristic.qmd).** A one-line test for how much to trust an original study after a failed replication.
 12. **[The Piranha Principle](concepts/piranha-principle.qmd).** Why a literature full of large effects can't all be right.
+
+## More tours {#more-tours}
+
+- **[For reviewers and editors](tours/reviewers.qmd).** Twelve questions to ask of a striking finding, and how the publication system lets them slide.
+- **[For survey researchers](tours/surveys.qmd).** Ten entries on getting from an unrepresentative sample to a population.
+- **[For Bayesian beginners](tours/bayesian-beginners.qmd).** Eleven entries from what probability means to checking a fitted model.
 
 ## Where next
 

@@ -5,15 +5,18 @@ description: "The peers."
 order: 61
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/"
 verified: true
+image: "../assets/cards/problem-with-peer-review.png"
+image-alt: "#61 The problem with peer review: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#61** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [When does peer review make no damn sense?](https://statmodeling.stat.columbia.edu/2016/02/01/peer-review-make-no-damn-sense/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -79,7 +82,7 @@ Plot.plot({
 //| echo: false
 {
   const at = (k, t) => review.find(d => d.k === k && d.type === t).rate;
-  return html`<div class="sim-readout">${md`With 3 reviewers, idiosyncratic errors are caught **${pct(at(3, "Idiosyncratic error"))}** of the time and field-wide misconceptions **${pct(at(3, "Shared misconception"))}**. Even 10 reviewers catch the shared misconception only **${pct(at(10, "Shared misconception"))}** of the time. More peers don't fix a problem the peers all share.`}</div>`;
+  return html`<div class="sim-readout">${md`With 3 reviewers, idiosyncratic errors are caught **${pct(at(3, "Idiosyncratic error"))}** of the time and field-wide misconceptions **${pct(at(3, "Shared misconception"))}**. Even 10 reviewers catch the shared misconception only **${pct(at(10, "Shared misconception"))}** of the time. More peers don't fix a problem the peers all share. The toy shows why adding reviewers doesn't fix a blind spot they share; it doesn't estimate how many misconceptions a field holds.`}</div>`;
 }
 ```
 

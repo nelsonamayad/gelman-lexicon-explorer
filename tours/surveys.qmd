@@ -1,0 +1,31 @@
+---
+title: "For survey researchers"
+date: 2026-11-12
+subtitle: "A ten-stop tour through samples, weights and populations"
+description: "Ten lexicon entries on survey research: Mister P, weighting and nonresponse, canary variables, and the gap between a sample and a population."
+sidebar: false
+---
+
+Nearly every survey is unrepresentative, and nearly every question is about a population. These ten entries cover how to get from one to the other, how to tell when the adjustment hasn't worked, and how to show the results.
+
+## Part 1: From a sample to a population
+
+1. **[Mister P](../concepts/mister-p.qmd).** Multilevel regression and poststratification: estimates for states and subgroups from a sample with the wrong mix.
+2. **[Theoretical and Applied Statisticians, how to tell them apart](../concepts/theoretical-vs-applied-statisticians.qmd).** Model the outcome given the covariates, then average over the population you care about.
+3. **[The Groovy Grandma Problem](../concepts/groovy-grandma-problem.qmd).** Weighting fixes the variables you weight on, and nothing else.
+4. **[Canary variable](../concepts/canary-variable.qmd).** Hold back a variable whose population value you know, and use it to check the adjustment.
+5. **[What would you do if you had all the data?](../concepts/if-you-had-all-the-data.qmd).** Decide what you are estimating before deciding how.
+
+## Part 2: Seeing and reporting the results
+
+6. **[The Secret Weapon](../concepts/secret-weapon.qmd).** Fit the same model to every survey year and plot all the estimates together.
+7. **[The Superplot](../concepts/superplot.qmd).** Rich people vote Republican and rich states vote Democratic, in one graph.
+8. **[The USA Today Fallacy](../concepts/usa-today-fallacy.qmd).** An average over states is not an average over people.
+9. **[Second-Order Availability Bias](../concepts/second-order-availability-bias.qmd).** The correlations in your own circle are not the population's.
+10. **[The Australia principle](../concepts/australia-principle.qmd).** When the data can't measure a tiny difference, the prior has to.
+
+## Where next
+
+- The [causes, samples and populations](../themes/causes-samples-populations.qmd) theme has the rest.
+- [Multiple Comparisons](../concepts/multiple-comparisons.qmd) explains the partial pooling behind Mister P.
+- Or go back to the [other tours](../start-here.qmd#more-tours).

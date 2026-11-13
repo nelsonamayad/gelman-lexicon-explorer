@@ -5,15 +5,18 @@ description: "Research methods and statistics, as viewed by many researchers."
 order: 93
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/"
 verified: true
+image: "../assets/cards/bunch-of-hoops.png"
+image-alt: "#93 A bunch of hoops to jump through: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#93** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [My thoughts on “What’s Wrong with Social Science and How to Fix It: Reflections After Reading 2578 Papers”](https://statmodeling.stat.columbia.edu/2021/02/08/my-thoughts-on-whats-wrong-with-social-science-and-how-to-fix-it-reflections-after-reading-2578-papers/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -80,7 +83,7 @@ Plot.plot({
 //| echo: false
 {
   const ppv = k => { const p = hoops.filter(d => d[k]); return p.filter(d => d.real).length / Math.max(1, p.length); };
-  return html`<div class="sim-readout">${md`Among findings that pass the hoops, **${pct(ppv("hoops"))}** are true, ${ppv("hoops") - pi < 0.15 ? "barely better than" : "compared with"} the base rate of ${pct(pi)}. Among findings that pass the substantive check, **${pct(ppv("substantive"))}** are true. ${ppv("hoops") - pi < 0.15 ? "Hoops anyone can clear don't tell you much." : "Hoops only help when false findings can't clear them easily: raise the gaming slider and watch them stop working."}`}</div>`;
+  return html`<div class="sim-readout">${md`Among findings that pass the hoops, **${pct(ppv("hoops"))}** are true, ${ppv("hoops") - pi < 0.15 ? "barely better than" : "compared with"} the base rate of ${pct(pi)}. Among findings that pass the substantive check, **${pct(ppv("substantive"))}** are true. ${ppv("hoops") - pi < 0.15 ? "Hoops anyone can clear don't tell you much." : "Hoops only help when false findings can't clear them easily: raise the gaming slider and watch them stop working."} The toy shows why a check is worth something only if false findings can fail it; it doesn't estimate how many real checks are hoops.`}</div>`;
 }
 ```
 

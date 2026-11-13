@@ -5,16 +5,19 @@ description: "You can't have one without the other."
 order: 86
 theme: "Thinking about statistics"
 kind: "Principle or heuristic"
-categories: ["Thinking about statistics", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/"
 verified: true
+image: "../assets/cards/assumptions-and-rigor.png"
+image-alt: "#86 Assumptions and Rigor: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The post is a song parody; the explanation of it is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#86** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [‘Sumps and rigor](https://statmodeling.stat.columbia.edu/2019/12/16/sumps-and-rigor/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source. The post is a song parody; the explanation of it is ours.
 :::

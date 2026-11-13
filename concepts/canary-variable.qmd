@@ -5,15 +5,21 @@ description: "Like the canary in the coal mine, a canary variable is something w
 order: 117
 theme: "Causes, samples and populations"
 kind: "Method or technique"
-categories: ["Causes, samples and populations", "Method or technique"]
+difficulty: "Advanced"
+categories: ["Causes, samples and populations", "Method or technique", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2023/02/07/checking-survey-representativeness-by-looking-at-canary-variables"
+search-terms: "nonresponse bias, survey weighting, validation variable"
 verified: true
+image: "../assets/cards/canary-variable.png"
+image-alt: "#117 Canary variable: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#117** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Checking survey representativeness by looking at canary variables](https://statmodeling.stat.columbia.edu/2023/02/07/checking-survey-representativeness-by-looking-at-canary-variables).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Method or technique](../kinds/methods.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: nonresponse bias, survey weighting, validation variable.
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -36,13 +42,13 @@ Simulate 200 surveys. Response depends on demographics, which we adjust for, *an
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, sum, cor, fmt} from "../js/stats.js"
+import {rng, range, mean, sum, cor, fmt, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof hidden = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Strength of hidden selection"})
-viewof canaryLink = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "Canary's correlation with the hidden trait"})
-viewof seed = Inputs.range([1, 500], {value: 117, step: 1, label: "Random seed"})
+viewof hidden = debounce(Inputs.range([0, 2], {value: 1, step: 0.05, label: "Strength of hidden selection"}))
+viewof canaryLink = debounce(Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "Canary's correlation with the hidden trait"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 117, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -105,11 +111,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, sum, cor, fmt} from "../js/stats.js"
+import {rng, range, mean, sum, cor, fmt, debounce} from "../js/stats.js"
 
-viewof hidden = Inputs.range([0, 2], {value: 1, step: 0.05, label: "Strength of hidden selection"})
-viewof canaryLink = Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "Canary's correlation with the hidden trait"})
-viewof seed = Inputs.range([1, 500], {value: 117, step: 1, label: "Random seed"})
+viewof hidden = debounce(Inputs.range([0, 2], {value: 1, step: 0.05, label: "Strength of hidden selection"}))
+viewof canaryLink = debounce(Inputs.range([0, 1], {value: 0.7, step: 0.05, label: "Canary's correlation with the hidden trait"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 117, step: 1, label: "Random seed"}))
 
 canary = {
   const r = rng(seed);

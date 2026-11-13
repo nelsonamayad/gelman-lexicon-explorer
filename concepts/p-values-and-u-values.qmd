@@ -5,16 +5,22 @@ description: "They're different."
 order: 8
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
-categories: ["Noise and evidence", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Noise and evidence", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/"
+search-terms: "posterior predictive p-value, calibration, uniform p-values"
 verified: true
+image: "../assets/cards/p-values-and-u-values.png"
+image-alt: "#8 P-values and U-values: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Checked against the post, which points to Gelman (2003) for the definitions."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#8** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [I hate the so-called Fisher exact test: a pointer to one of my favorite articles](https://statmodeling.stat.columbia.edu/2009/05/i_hate_the_so-c/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: posterior predictive p-value, calibration, uniform p-values.
 
 Source check: ✓ The explanation was checked against the source. Checked against the post, which points to Gelman (2003) for the definitions.
 :::
@@ -42,13 +48,13 @@ We generate 1,000 datasets from a normal model with known variance and compute t
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
+import {rng, range, mean, pnorm, fmt, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof stat = Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"})
-viewof n = Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"})
-viewof seed = Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"})
+viewof stat = debounce(Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"}))
+viewof n = debounce(Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -108,11 +114,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, pnorm, fmt} from "../js/stats.js"
+import {rng, range, mean, pnorm, fmt, debounce} from "../js/stats.js"
 
-viewof stat = Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"})
-viewof n = Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"})
-viewof seed = Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"})
+viewof stat = debounce(Inputs.radio(["Sample mean", "Sample maximum", "Sample variance"], {value: "Sample maximum", label: "Test statistic T(y)"}))
+viewof n = debounce(Inputs.range([5, 100], {value: 20, step: 5, label: "Observations per dataset"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 12, step: 1, label: "Random seed"}))
 
 pvals = {
   const r = rng(seed);

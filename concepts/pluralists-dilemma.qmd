@@ -5,15 +5,18 @@ description: "How to recognize that my philosophy is just one among many, that m
 order: 46
 theme: "Thinking about statistics"
 kind: "Principle or heuristic"
-categories: ["Thinking about statistics", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Principle or heuristic", "Intermediate"]
 source: "https://sites.stat.columbia.edu/gelman/research/published/copss.pdf"
 verified: true
+image: "../assets/cards/pluralists-dilemma.png"
+image-alt: "#46 The Pluralist's Dilemma: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#46** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [How do we choose our default methods? (PDF)](https://sites.stat.columbia.edu/gelman/research/published/copss.pdf).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -84,7 +87,7 @@ Plot.plot({
 {
   const near = landscape.reduce((a, b) => Math.abs(Math.log(b.ratio / myRatio)) < Math.abs(Math.log(a.ratio / myRatio)) ? b : a).ratio;
   const at = m => landscape.find(d => d.ratio === near && d.method === m).rmse;
-  return html`<div class="sim-readout">${md`Near signal/noise ≈ ${near}: separate estimates have RMSE **${fmt(at("Separate estimates"), 3)}**, partial pooling **${fmt(at("Partial pooling"), 3)}**. The advantage of pooling is large when signal is weak and disappears when signal is strong. "My philosophy is better" is a claim *about where my problems lie*. That claim is checkable, and it can be stated without saying everyone else is wrong.`}</div>`;
+  return html`<div class="sim-readout">${md`Near signal/noise ≈ ${near}: separate estimates have RMSE **${fmt(at("Separate estimates"), 3)}**, partial pooling **${fmt(at("Partial pooling"), 3)}**. The advantage of pooling is large when signal is weak and disappears when signal is strong. *My philosophy is better* is a claim about where my problems lie. That claim is checkable, and it can be stated without saying everyone else is wrong.`}</div>`;
 }
 ```
 

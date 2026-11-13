@@ -5,15 +5,18 @@ description: "Once you've considered a possible interaction or bias or confounde
 order: 67
 theme: "Causes, samples and populations"
 kind: "Principle or heuristic"
-categories: ["Causes, samples and populations", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Causes, samples and populations", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/"
 verified: true
+image: "../assets/cards/pandora-principle.png"
+image-alt: "#67 The Pandora Principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#67** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The Pandora principle in statistics, and its malign converse, the ostrich](https://statmodeling.stat.columbia.edu/2017/08/15/pandora-principle-statistics-malign-converse-ostrich/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::

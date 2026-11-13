@@ -5,15 +5,21 @@ description: "When you have computational problems, often there's a problem with
 order: 5
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/"
+search-terms: "MCMC convergence, R-hat, non-identifiability, reparameterization"
 verified: true
+image: "../assets/cards/folk-theorem.png"
+image-alt: "#5 The Folk Theorem of Statistical Computing: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#5** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The folk theorem of statistical computing](https://statmodeling.stat.columbia.edu/2008/05/the_folk_theore/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: MCMC convergence, R-hat, non-identifiability, reparameterization.
 
 Source check: ✓ The explanation was checked against the source.
 :::

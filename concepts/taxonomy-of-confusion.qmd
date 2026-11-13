@@ -5,16 +5,19 @@ description: "What to do when you're stuck."
 order: 19
 theme: "Building and checking models"
 kind: "Advice"
-categories: ["Building and checking models", "Advice"]
+difficulty: "Introductory"
+categories: ["Building and checking models", "Advice", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/"
 verified: true
+image: "../assets/cards/taxonomy-of-confusion.png"
+image-alt: "#19 The Taxonomy of Confusion: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The taxonomy is Rachel's, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#19** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Taxonomy of confusion](https://statmodeling.stat.columbia.edu/2008/09/taxonomy_of_con/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Advice](../kinds/advice.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The taxonomy is Rachel's, quoted in Gelman's post.
 :::
@@ -25,7 +28,7 @@ The taxonomy is not Gelman's own. In the post he quotes Rachel, writing about th
 
 1. Statistics questions that are prerequisite to the course: "get an Intro to Stats book, don't ask the T.A. unless you really must."
 2. Statistics questions that are part of the course: "read the book, ask a friend, then ask the T.A."
-3. "You know what you want statistically but you don't know the name of the function": search for it (for example "R standard deviation") or write the function yourself, then ask a friend, then the T.A.
+3. "You know what you want statistically but you don't know the name of the function": search for it (for example `R standard deviation`) or write the function yourself, then ask a friend, then the T.A.
 4. "You know the function's name but you can't figure out how it works": read the help page (`help(sd)`), then ask a friend, then the T.A.
 5. "You wrote code but you get error messages": debug, by printing things out and breaking the code into smaller steps.
 6. "You wrote code and it doesn't do what you think it should do but there are no errors": debug.

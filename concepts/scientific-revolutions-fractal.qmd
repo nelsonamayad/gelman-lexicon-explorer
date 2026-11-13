@@ -5,15 +5,18 @@ description: "They're fractal."
 order: 145
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Thinking about statistics", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/"
 verified: true
+image: "../assets/cards/scientific-revolutions-fractal.png"
+image-alt: "#145 Scientific revolutions: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#145** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The fractal nature of scientific revolutions](https://statmodeling.stat.columbia.edu/2005/05/20/selfsimilarity/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

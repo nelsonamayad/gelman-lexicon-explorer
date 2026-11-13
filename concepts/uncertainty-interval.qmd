@@ -5,15 +5,21 @@ description: "Say this instead of confidence or credible interval."
 order: 54
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Intermediate"
+categories: ["Showing and telling", "Advice", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/"
+search-terms: "confidence interval, credible interval, coverage"
 verified: true
+image: "../assets/cards/uncertainty-interval.png"
+image-alt: "#54 Uncertainty Interval: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#54** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Instead of “confidence interval,” let’s say “uncertainty interval”](https://statmodeling.stat.columbia.edu/2010/12/21/lets_say_uncert/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: confidence interval, credible interval, coverage.
 
 Source check: ✓ The explanation was checked against the source.
 :::

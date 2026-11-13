@@ -5,16 +5,22 @@ description: "Rubin's second question."
 order: 56
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Advanced"
+categories: ["Building and checking models", "Principle or heuristic", "Advanced"]
 source: "https://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/"
+search-terms: "prior predictive check, Rubin's questions, design"
 verified: true
+image: "../assets/cards/before-you-had-any-data.png"
+image-alt: "#56 What were you doing before you had any data?: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The linked post quotes only Rubin's first question; the reading of the second is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#56** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Philosophy of Bayesian statistics: my reactions to Cox and Mayo](https://statmodeling.stat.columbia.edu/2012/02/01/philosophy-of-bayesian-statistics-my-reactions-to-cox-and-mayo/).
 
-Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Building and checking models](../themes/building-and-checking-models.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Advanced](../index.qmd#category=Advanced).
+
+Related terms: prior predictive check, Rubin's questions, design.
 
 Source check: ✓ The explanation was checked against the source. The linked post quotes only Rubin's first question; the reading of the second is ours.
 :::

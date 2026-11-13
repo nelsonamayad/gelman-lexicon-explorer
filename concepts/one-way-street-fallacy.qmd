@@ -5,15 +5,21 @@ description: "Considering only one possibility of a change that can go in either
 order: 45
 theme: "Causes, samples and populations"
 kind: "Fallacy"
-categories: ["Causes, samples and populations", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Causes, samples and populations", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2013/12/20/discovered-new-fallacy-now-need-name/"
+search-terms: "heterogeneous treatment effects, can't hurt might help"
 verified: true
+image: "../assets/cards/one-way-street-fallacy.png"
+image-alt: "#45 The One-Way Street Fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#45** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Discovered a new fallacy, now need a name](https://statmodeling.stat.columbia.edu/2013/12/20/discovered-new-fallacy-now-need-name/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: heterogeneous treatment effects, can't hurt might help.
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -28,7 +34,7 @@ The fallacy hides costs and risks. Interventions get promoted as *can't hurt, mi
 
 ## How it works
 
-Let individual effects be $\tau_i \sim \mathrm{N}(\mu, \sigma^2)$. A one-way accounting reports something like "the share helped," $\Pr(\tau_i > 0)$, or the average among those helped, $\mathrm{E}[\tau_i \mid \tau_i > 0]$. Both are positive *whatever* the value of $\mu$. Even when $\mu < 0$, so that the policy hurts on average, the one-way summary sounds like good news. The two-way accounting reports $\mu$ along with both tails.
+Let individual effects be $\tau_i \sim \mathrm{N}(\mu, \sigma^2)$. A one-way accounting reports something like *the share helped,* $\Pr(\tau_i > 0)$, or the average among those helped, $\mathrm{E}[\tau_i \mid \tau_i > 0]$. Both are positive *whatever* the value of $\mu$. Even when $\mu < 0$, so that the policy hurts on average, the one-way summary sounds like good news. The two-way accounting reports $\mu$ along with both tails.
 
 ## Simulated example
 
@@ -72,7 +78,7 @@ Plot.plot({
 //| echo: false
 {
   const helped = street.filter(d => d.tau > 0), hurt = street.filter(d => d.tau <= 0);
-  return html`<div class="sim-readout">${md`One-way summary: "The policy helped **${pct(helped.length / street.length)}** of people, by an average of **${fmt(mean(helped.map(d => d.tau)))}**." Two-way summary: it also hurt **${pct(hurt.length / street.length)}**, by an average of **${fmt(mean(hurt.map(d => d.tau)))}**, and the net average effect is **${fmt(mean(street.map(d => d.tau)))}**. Same data, opposite impressions.`}</div>`;
+  return html`<div class="sim-readout">${md`One-way summary: *the policy helped* **${pct(helped.length / street.length)}** *of people, by an average of* **${fmt(mean(helped.map(d => d.tau)))}**. Two-way summary: it also hurt **${pct(hurt.length / street.length)}**, by an average of **${fmt(mean(hurt.map(d => d.tau)))}**, and the net average effect is **${fmt(mean(street.map(d => d.tau)))}**. Same data, opposite impressions.`}</div>`;
 }
 ```
 

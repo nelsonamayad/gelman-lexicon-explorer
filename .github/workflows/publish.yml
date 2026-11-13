@@ -56,6 +56,11 @@ jobs:
       - name: Check entries
         run: python3 scripts/check_entries.py
 
+      # js/stats.js against reference values from R (node is preinstalled on
+      # GitHub's Ubuntu runners).
+      - name: Unit-test the simulation helpers
+        run: node --test tests/stats.test.mjs
+
       # Every entry's code tabs show R and Python versions of its simulation
       # (sims/r/*.R, base R only; sims/python/*.py, NumPy and Matplotlib).
       # Run them all so a broken one fails the build.

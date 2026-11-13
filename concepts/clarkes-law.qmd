@@ -5,15 +5,18 @@ description: "Any sufficiently crappy research is indistinguishable from fraud."
 order: 59
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/"
 verified: true
+image: "../assets/cards/clarkes-law.png"
+image-alt: "#59 Clarke's Law: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#59** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Clarke’s Law: Any sufficiently crappy research is indistinguishable from fraud](https://statmodeling.stat.columbia.edu/2016/06/20/clarkes-law-of-research/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -71,7 +74,7 @@ Plot.plot({
   marginLeft: 90,
   x: {label: "Share of reported means that are GRIM-inconsistent", domain: [0, 1], tickFormat: "%", grid: true},
   y: {label: null},
-  marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#f4a582" : "#d6604d"})]
+  marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#b8860b" : "#d6604d"})]
 })
 ```
 
@@ -121,7 +124,7 @@ Plot.plot({
   marginLeft: 90,
   x: {label: "Share of reported means that are GRIM-inconsistent", domain: [0, 1], tickFormat: "%", grid: true},
   y: {label: null},
-  marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#f4a582" : "#d6604d"})]
+  marks: [Plot.barX(grim, {y: "type", x: "fail", fill: d => d.type === "Honest" ? "#2166ac" : d.type === "Sloppy" ? "#b8860b" : "#d6604d"})]
 })
 ```
 

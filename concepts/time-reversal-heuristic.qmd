@@ -5,15 +5,21 @@ description: "How to think about a published finding that is followed up by a ca
 order: 57
 theme: "How science behaves"
 kind: "Principle or heuristic"
-categories: ["How science behaves", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/"
+search-terms: "failed replication, preregistered replication, anchoring"
 verified: true
+image: "../assets/cards/time-reversal-heuristic.png"
+image-alt: "#57 The Time-Reversal Heuristic: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#57** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The time-reversal heuristic—a new way to think about a published finding that is followed up by a large, preregistered replication (in context of claims about power pose)](https://statmodeling.stat.columbia.edu/2016/01/26/more-power-posing/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
+
+Related terms: failed replication, preregistered replication, anchoring.
 
 Source check: ✓ The explanation was checked against the source.
 :::

@@ -5,16 +5,19 @@ description: "When the numbers are put to bed, the stories come out."
 order: 29
 theme: "Showing and telling"
 kind: "Law or aphorism"
-categories: ["Showing and telling", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2010/10/story_time/"
 verified: true
+image: "../assets/cards/story-time.png"
+image-alt: "#29 Story Time: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "The term is Kaiser Fung's, quoted in Gelman's post."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#29** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Story time](https://statmodeling.stat.columbia.edu/2010/10/story_time/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. The term is Kaiser Fung's, quoted in Gelman's post.
 :::

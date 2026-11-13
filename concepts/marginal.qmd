@@ -5,15 +5,18 @@ description: "Has two opposite meanings: in statistics, it's the integral; in ec
 order: 126
 theme: "Showing and telling"
 kind: "Advice"
-categories: ["Showing and telling", "Advice"]
+difficulty: "Intermediate"
+categories: ["Showing and telling", "Advice", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2006/05/01/marginal_and_ma/"
 verified: true
+image: "../assets/cards/marginal.png"
+image-alt: "#126 Marginal: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#126** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Marginal and marginal](https://statmodeling.stat.columbia.edu/2006/05/01/marginal_and_ma/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Advice](../kinds/advice.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::

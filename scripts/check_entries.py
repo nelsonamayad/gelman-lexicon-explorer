@@ -4,7 +4,7 @@
 
 Checks:
   - required front matter: title, date, description, order (unique, 1..N),
-    theme, kind, categories, source, verified
+    theme, kind, difficulty, categories, source, verified
   - required sections, in order
   - every Plot.plot call sets ariaLabel and ariaDescription (accessibility)
   - simulations that draw random numbers (rng(...)) expose a "Random seed"
@@ -18,6 +18,19 @@ Checks:
     turns the trailer into the list under the R tab)
   - every local .qmd link resolves
   - Related-entry links are reciprocal (build_groups.py fixes this)
+  - the helper import names only helpers the cells use (the import line is
+    shown to readers in the Observable JS tab)
+  - charts use only the approved colors (PALETTE), which keep every
+    meaningful mark at 3:1 contrast or better in light and dark mode
+  - "Law or aphorism" entries label their simulation as a toy model ("toy",
+    "our own" or "made-up") unless the simulation is a real statistical
+    mechanism (REAL_MECHANISM)
+
+It also prints warnings, which don't fail the check, for quoted strings that
+look like hypothetical lines (quotation marks right after "such as", "like",
+"say" and similar, with no attribution nearby). The site's convention is that
+quotation marks are only for words someone actually said or wrote, and
+hypothetical lines go in italics; read each warning and decide.
 
 Run it after editing entries and before committing; it complements the
 headless-browser check described in CLAUDE.md, which catches runtime errors.
@@ -31,11 +44,41 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SECTIONS = ["## What it is", "## Why it matters", "## How it works", "## Simulated example",
             "## Key takeaways", "## Related entries", "## Source"]
-FIELDS = ["title", "date", "description", "order", "theme", "kind", "categories", "source", "verified"]
+FIELDS = ["title", "date", "description", "order", "theme", "kind", "difficulty", "categories", "source",
+          "verified"]
+GENERATED = re.compile(r"<!-- Simulation code: generated.*?<!-- End of generated simulation code. -->", re.S)
+OJS_CELL = re.compile(r"```\{ojs\}\n(.*?)```", re.S)
+
+# Colors allowed in the OJS cells. Blue, red and dark red are the series
+# colors; gray, green and gold are the darkened versions that pass 3:1 on both
+# backgrounds; purple and the two mid grays pass too. #ddd and #f0f0f0 are
+# only for decorative stems and empty cells that carry no information.
+PALETTE = {"#2166ac", "#d6604d", "#67001f", "#8a8a8a", "#1a9850", "#b8860b", "#984ea3",
+           "#777", "#7f7f7f", "#ddd", "#f0f0f0"}
+
+# "Law or aphorism" entries whose simulation shows a real statistical
+# mechanism, so it needs no toy-model label. Every other aphorism entry must
+# say its simulation is a toy model of its own.
+REAL_MECHANISM = {
+    "arrows-other-theorem-strong", "bayesian", "clarkes-law", "conservatism",
+    "correlation-does-not-imply-correlation", "default-greatest-trick", "god-is-in-every-leaf",
+    "guarantee-is-assumption", "honesty-and-transparency", "objects-of-the-class",
+    "paradox-of-philosophizing", "random-in-random-out", "robustness-checks", "salad-tongs",
+    "statistical-chemotherapy", "story-time", "theoretical-statistics",
+    "theoretical-vs-applied-statisticians", "until-it-runs-twice",
+}
+
+# Quotation marks right after these words usually introduce a hypothetical
+# line, which the site sets in italics.
+HYPOTHETICAL_CUE = re.compile(
+    r'\b(such as|like|say|says|saying|asks|asking|thinks|e\.g\.,?|for example,?)\s+"([^"\n]*\s[^"\n]*)"')
+ATTRIBUTION = re.compile(r"Gelman|writes|wrote|post|quot|called|calls|in his words|in their words|"
+                         r"put it|said|the line|the phrase|the term|law|proverb|saying", re.I)
 
 
 def main():
     problems = []
+    warnings = []
     orders = {}
     related = {}
     paths = sorted(glob.glob(os.path.join(ROOT, "concepts", "*.qmd")))
@@ -103,6 +146,27 @@ def main():
             if not os.path.exists(os.path.normpath(os.path.join(os.path.dirname(path), target))):
                 say(f"broken link to {target}")
 
+        body = GENERATED.sub("", text.split("---", 2)[2] if text.startswith("---") else text)
+        cells = OJS_CELL.findall(body)
+        prose = re.sub(r"\[[^\]]*\]\([^)]*\)", "[link]", OJS_CELL.sub("", body))
+        imp = next((m for m in (re.search(r'import \{([^}]*)\} from "\.\./js/stats\.js"', c) for c in cells) if m),
+                   None)
+        if imp:
+            rest = "\n".join(cells).replace(imp.group(0), "")
+            unused = [n.strip() for n in imp.group(1).split(",")
+                      if n.strip() and not re.search(r"\b" + re.escape(n.strip()) + r"\b", rest)]
+            if unused:
+                say(f"imports helpers it never uses: {', '.join(unused)}")
+        colors = {c.lower() for c in re.findall(r"#[0-9a-fA-F]{6}\b|#[0-9a-fA-F]{3}\b", "\n".join(cells))}
+        if colors - PALETTE:
+            say(f"chart colors outside the approved palette: {', '.join(sorted(colors - PALETTE))}")
+        if 'kind: "Law or aphorism"' in fm and slug not in REAL_MECHANISM:
+            if not re.search(r"\btoy\b|our own|made-up", prose, re.I):
+                say("aphorism simulation is not labelled as a toy model ('A toy model, our own.')")
+        for m in HYPOTHETICAL_CUE.finditer(prose):
+            if not ATTRIBUTION.search(prose[max(0, m.start() - 150):m.start()]):
+                warnings.append(f"{slug}: possible hypothetical line in quotation marks: \"{m.group(2)[:70]}\"")
+
         rel = re.search(r"## Related entries\n\n((?:- .*\n)+)", text)
         related[slug] = re.findall(r"\]\(([a-z0-9-]+)\.qmd\)", rel.group(1)) if rel else []
 
@@ -118,9 +182,11 @@ def main():
         if len(slugs) > 1:
             problems.append(f"order {o} used by {slugs}")
 
+    for w in warnings:
+        print("warning:", w)
     for p in problems:
         print(p)
-    print(f"{len(paths)} entries checked, {len(problems)} problem(s)")
+    print(f"{len(paths)} entries checked, {len(problems)} problem(s), {len(warnings)} warning(s)")
     sys.exit(1 if problems else 0)
 
 

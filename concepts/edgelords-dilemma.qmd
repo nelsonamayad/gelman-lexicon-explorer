@@ -5,15 +5,18 @@ description: "It's not so much fun being a contrarian when you're suddenly shari
 order: 148
 theme: "How science behaves"
 kind: "Law or aphorism"
-categories: ["How science behaves", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209"
 verified: true
+image: "../assets/cards/edgelords-dilemma.png"
+image-alt: "#148 The Edgelord's Dilemma: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#148** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [blog comment](https://statmodeling.stat.columbia.edu/2024/12/16/the-exceptions-nancy-hopkins-mit-and-the-fight-for-women-in-science/#comment-2386209).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

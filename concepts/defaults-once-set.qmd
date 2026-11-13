@@ -5,15 +5,18 @@ description: "Hard to change."
 order: 39
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Thinking about statistics", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/"
 verified: true
+image: "../assets/cards/defaults-once-set.png"
+image-alt: "#39 Defaults, once set: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#39** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Defaults, once set, are hard to change.](https://statmodeling.stat.columbia.edu/2015/03/05/defaults-set-hard-change/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

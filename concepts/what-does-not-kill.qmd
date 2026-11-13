@@ -5,15 +5,21 @@ description: "The belief that statistical significance is particularly impressiv
 order: 62
 theme: "Noise and evidence"
 kind: "Fallacy"
-categories: ["Noise and evidence", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/"
+search-terms: "noisy studies, significance under noise, measurement error"
 verified: true
+image: "../assets/cards/what-does-not-kill.png"
+image-alt: "#62 The \"What does not kill my statistical significance makes it stronger\" fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#62** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The “What does not kill my statistical significance makes it stronger” fallacy](https://statmodeling.stat.columbia.edu/2017/02/06/not-kill-statistical-significance-makes-stronger-fallacy/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: noisy studies, significance under noise, measurement error.
 
 Source check: ✓ The explanation was checked against the source.
 :::

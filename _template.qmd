@@ -14,8 +14,15 @@
 # kind:        What sort of entry it is. Exactly one of:
 #                Method or technique · Principle or heuristic · Fallacy ·
 #                Law or aphorism · Advice
-# categories:  Leave as [theme, kind]; scripts/build_groups.py keeps it in sync
-#              and adds the "Filed under" line to the source callout.
+# difficulty:  What a reader needs to follow the entry. Exactly one of:
+#                Introductory (no statistics needed) · Intermediate (p-values,
+#                power, regression, sampling) · Advanced (Bayesian computation,
+#                multilevel models and the like)
+# categories:  Leave as [theme, kind, difficulty]; scripts/build_groups.py keeps
+#              it in sync and adds the "Filed under" line to the source callout.
+# search-terms: Optional. Other names readers might search for, comma-separated,
+#              e.g. "type M error, exaggeration ratio". build_groups.py shows
+#              them as a "Related terms" line, which the site search indexes.
 # source:      URL that the entry links to in the original list.
 # verified:    true once "What it is" has been checked against the source
 #              (archived post, paper or article); false until then.
@@ -32,7 +39,8 @@ description: "Gelman's one-line definition, verbatim."
 order: 0
 theme: "Building and checking models"
 kind: "Principle or heuristic"
-categories: ["Building and checking models", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Building and checking models", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/..."
 verified: false
 ---

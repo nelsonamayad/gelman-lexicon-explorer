@@ -5,15 +5,18 @@ description: "A good analyst has special data analysis and interpretation skills
 order: 127
 theme: "How science behaves"
 kind: "Principle or heuristic"
-categories: ["How science behaves", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["How science behaves", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2024/01/27/pt/"
 verified: true
+image: "../assets/cards/analysts-paradox.png"
+image-alt: "#127 The Analyst's Paradox: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#127** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The paradox of replication studies: A good analyst has special data analysis and interpretation skills. But it’s considered a bad or surprising thing that if you give the same data to different analysts, they come to different conclusions.](https://statmodeling.stat.columbia.edu/2024/01/27/pt/).
 
-Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [How science behaves](../themes/how-science-behaves.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

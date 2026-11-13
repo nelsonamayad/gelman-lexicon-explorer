@@ -5,15 +5,18 @@ description: "The phenomena we can successfully study in statistics will not be 
 order: 119
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
-categories: ["Noise and evidence", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2018/05/23/anthropic-principle-statistics/"
 verified: true
+image: "../assets/cards/anthropic-principle.png"
+image-alt: "#119 Anthropic principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#119** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The anthropic principle in statistics](https://statmodeling.stat.columbia.edu/2018/05/23/anthropic-principle-statistics/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::

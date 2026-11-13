@@ -303,3 +303,26 @@ export function twoGroup(r, n, effect, sigma = 1) {
   const df = (vt + vc) ** 2 / (vt ** 2 / (n - 1) + vc ** 2 / (n - 1));
   return { est, se, df, p: pValue(est, se, df), z: est / se };
 }
+
+// ---------- Inputs ----------
+
+// Wrap a control so the simulation recomputes only when the reader pauses,
+// not on every step of a slider drag. Use it for simulations that take more
+// than a fraction of a second:
+//   viewof n = debounce(Inputs.range([20, 400], {value: 100, label: "n"}))
+// The control's own display (the number box next to a slider) still updates
+// immediately; OJS sees the new value `wait` milliseconds after the last change.
+export function debounce(input, wait = 300) {
+  let timer = null, passing = false;
+  input.addEventListener("input", (event) => {
+    if (passing) return;
+    event.stopImmediatePropagation();
+    clearTimeout(timer);
+    timer = setTimeout(() => {
+      passing = true;
+      input.dispatchEvent(new Event("input", { bubbles: true }));
+      passing = false;
+    }, wait);
+  });
+  return input;
+}

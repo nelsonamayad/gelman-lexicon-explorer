@@ -5,15 +5,18 @@ description: "A spoonful of jargon with our factoids serves a similar function a
 order: 92
 theme: "Showing and telling"
 kind: "Law or aphorism"
-categories: ["Showing and telling", "Law or aphorism"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Law or aphorism", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/"
 verified: true
+image: "../assets/cards/toothpaste-feeling.png"
+image-alt: "#92 That toothpaste feeling: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#92** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Stasi’s back in town. (My last post on Cass Sunstein and Richard Epstein.)](https://statmodeling.stat.columbia.edu/2020/03/31/stasis-back-in-town-my-last-post-on-cass-sunstein-and-richard-epstein/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

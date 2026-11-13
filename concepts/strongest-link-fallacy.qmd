@@ -5,15 +5,18 @@ description: "The idea that a chain of reasoning is as strong as its strongest l
 order: 84
 theme: "Causes, samples and populations"
 kind: "Fallacy"
-categories: ["Causes, samples and populations", "Fallacy"]
+difficulty: "Introductory"
+categories: ["Causes, samples and populations", "Fallacy", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2018/01/08/benefits-limitations-randomized-controlled-trials-agree-deaton-cartwright/"
 verified: true
+image: "../assets/cards/strongest-link-fallacy.png"
+image-alt: "#84 Strongest-link Fallacy: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#84** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Benefits and limitations of randomized controlled trials](https://statmodeling.stat.columbia.edu/2018/01/08/benefits-limitations-randomized-controlled-trials-agree-deaton-cartwright/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source.
 :::

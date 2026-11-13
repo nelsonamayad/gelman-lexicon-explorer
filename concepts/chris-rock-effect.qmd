@@ -5,16 +5,19 @@ description: "Some graphs give the pleasant feature of visualizing things we alr
 order: 42
 theme: "Showing and telling"
 kind: "Principle or heuristic"
-categories: ["Showing and telling", "Principle or heuristic"]
+difficulty: "Introductory"
+categories: ["Showing and telling", "Principle or heuristic", "Introductory"]
 source: "https://statmodeling.stat.columbia.edu/2011/07/05/different_goals/"
 verified: true
+image: "../assets/cards/chris-rock-effect.png"
+image-alt: "#42 The Chris Rock Effect: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 source-note: "Gelman's example is a map of telephone calls; the births example is ours."
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#42** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Different goals, different looks](https://statmodeling.stat.columbia.edu/2011/07/05/different_goals/).
 
-Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Showing and telling](../themes/showing-and-telling.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Introductory](../index.qmd#category=Introductory).
 
 Source check: ✓ The explanation was checked against the source. Gelman's example is a map of telephone calls; the births example is ours.
 :::

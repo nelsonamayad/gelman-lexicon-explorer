@@ -5,15 +5,21 @@ description: "Generalizing from correlations you see in your personal experience
 order: 16
 theme: "Causes, samples and populations"
 kind: "Fallacy"
-categories: ["Causes, samples and populations", "Fallacy"]
+difficulty: "Intermediate"
+categories: ["Causes, samples and populations", "Fallacy", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2005/10/red_and_blue_vo/"
+search-terms: "unrepresentative sample, varying slopes"
 verified: true
+image: "../assets/cards/second-order-availability-bias.png"
+image-alt: "#16 Second-Order Availability Bias: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#16** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Red and blue voters: misunderstandings arising from a second-order availability bias](https://statmodeling.stat.columbia.edu/2005/10/red_and_blue_vo/).
 
-Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd).
+Filed under [Causes, samples and populations](../themes/causes-samples-populations.qmd) · [Fallacy](../kinds/fallacies.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: unrepresentative sample, varying slopes.
 
 Source check: ✓ The explanation was checked against the source.
 :::

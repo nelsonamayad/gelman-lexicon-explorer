@@ -5,15 +5,21 @@ description: "These large effects can't all coherently coexist."
 order: 74
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
-categories: ["Noise and evidence", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/"
+search-terms: "large effects, variance explained, priming, nudges"
 verified: true
+image: "../assets/cards/piranha-principle.png"
+image-alt: "#74 The Piranha Principle: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#74** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [The piranha problem in social psychology / behavioral economics](https://statmodeling.stat.columbia.edu/2017/12/15/piranha-problem-social-psychology-behavioral-economics-button-pushing-model-science-eats/). (Spelled "Pinciple" in the original list.)
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: large effects, variance explained, priming, nudges.
 
 Source check: ✓ The explanation was checked against the source.
 :::

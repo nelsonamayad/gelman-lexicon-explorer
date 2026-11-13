@@ -5,15 +5,21 @@ description: "How much you should scale down published estimates."
 order: 51
 theme: "Noise and evidence"
 kind: "Method or technique"
-categories: ["Noise and evidence", "Method or technique"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Method or technique", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/"
+search-terms: "shrinking published estimates, winner's curse, effect size inflation"
 verified: true
+image: "../assets/cards/edlin-factor.png"
+image-alt: "#51 The Edlin Factor: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#51** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Edlin's rule for routinely scaling down published estimates](https://statmodeling.stat.columbia.edu/2014/02/24/edlins-rule-routinely-scaling-published-estimates/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Method or technique](../kinds/methods.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Method or technique](../kinds/methods.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: shrinking published estimates, winner's curse, effect size inflation.
 
 Source check: ✓ The explanation was checked against the source.
 :::

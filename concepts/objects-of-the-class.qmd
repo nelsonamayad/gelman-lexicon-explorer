@@ -5,15 +5,18 @@ description: "From Foghorn Leghorn to Jacques Cousteau."
 order: 141
 theme: "Thinking about statistics"
 kind: "Law or aphorism"
-categories: ["Thinking about statistics", "Law or aphorism"]
+difficulty: "Intermediate"
+categories: ["Thinking about statistics", "Law or aphorism", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2013/11/16/objects-of-the-class-objects-of-the-class/"
 verified: true
+image: "../assets/cards/objects-of-the-class.png"
+image-alt: "#141 Objects of the class: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#141** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [Objects of the class "Objects of the class"](https://statmodeling.stat.columbia.edu/2013/11/16/objects-of-the-class-objects-of-the-class/).
 
-Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd).
+Filed under [Thinking about statistics](../themes/thinking-about-statistics.qmd) · [Law or aphorism](../kinds/laws-and-aphorisms.qmd) · [Intermediate](../index.qmd#category=Intermediate).
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -46,13 +49,13 @@ A new case belongs to nested classes with different true base rates. Compare pre
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean, fmt, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof nNarrow = Inputs.range([3, 200], {value: 12, step: 1, label: "Members of the narrow class"})
-viewof gapRate = Inputs.range([0, 0.4], {value: 0.2, step: 0.01, label: "How different the narrow class really is"})
-viewof seed = Inputs.range([1, 500], {value: 141, step: 1, label: "Random seed"})
+viewof nNarrow = debounce(Inputs.range([3, 200], {value: 12, step: 1, label: "Members of the narrow class"}))
+viewof gapRate = debounce(Inputs.range([0, 0.4], {value: 0.2, step: 0.01, label: "How different the narrow class really is"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 141, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -102,11 +105,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, fmt} from "../js/stats.js"
+import {rng, range, mean, fmt, debounce} from "../js/stats.js"
 
-viewof nNarrow = Inputs.range([3, 200], {value: 12, step: 1, label: "Members of the narrow class"})
-viewof gapRate = Inputs.range([0, 0.4], {value: 0.2, step: 0.01, label: "How different the narrow class really is"})
-viewof seed = Inputs.range([1, 500], {value: 141, step: 1, label: "Random seed"})
+viewof nNarrow = debounce(Inputs.range([3, 200], {value: 12, step: 1, label: "Members of the narrow class"}))
+viewof gapRate = debounce(Inputs.range([0, 0.4], {value: 0.2, step: 0.01, label: "How different the narrow class really is"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 141, step: 1, label: "Random seed"}))
 
 classes = {
   const r = rng(seed);

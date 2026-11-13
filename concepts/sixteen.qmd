@@ -5,15 +5,21 @@ description: "You need this much more of a sample size to estimate an interactio
 order: 80
 theme: "Noise and evidence"
 kind: "Principle or heuristic"
-categories: ["Noise and evidence", "Principle or heuristic"]
+difficulty: "Intermediate"
+categories: ["Noise and evidence", "Principle or heuristic", "Intermediate"]
 source: "https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect/"
+search-terms: "interaction effect, effect modification, subgroup analysis, power for interactions"
 verified: true
+image: "../assets/cards/sixteen.png"
+image-alt: "#80 16: an explanation and an interactive simulation, from the Andrew Gelman Statistical Lexicon Explorer"
 ---
 
 ::: {.callout-note appearance="minimal" .lexicon-source}
 Entry **#80** in Andrew Gelman's [Handy Statistical Lexicon](https://statmodeling.stat.columbia.edu/2009/05/24/handy_statistic/). Original discussion: [You need 16 times the sample size to estimate an interaction than to estimate a main effect](https://statmodeling.stat.columbia.edu/2018/03/15/need-16-times-sample-size-estimate-interaction-estimate-main-effect/).
 
-Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd).
+Filed under [Noise and evidence](../themes/noise-and-evidence.qmd) · [Principle or heuristic](../kinds/principles.qmd) · [Intermediate](../index.qmd#category=Intermediate).
+
+Related terms: interaction effect, effect modification, subgroup analysis, power for interactions.
 
 Source check: ✓ The explanation was checked against the source.
 :::
@@ -41,13 +47,13 @@ A 2×2 experiment with main effect θ and an interaction of θ/2. For a range of
 
 ```{ojs}
 //| echo: false
-import {rng, range, mean, qnorm, fmt} from "../js/stats.js"
+import {rng, range, mean, qnorm, fmt, debounce} from "../js/stats.js"
 ```
 
 ```{ojs}
-viewof theta = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"})
-viewof intRatio = Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"})
-viewof seed = Inputs.range([1, 500], {value: 80, step: 1, label: "Random seed"})
+viewof theta = debounce(Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"}))
+viewof intRatio = debounce(Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 80, step: 1, label: "Random seed"}))
 ```
 
 ```{ojs}
@@ -104,11 +110,11 @@ The R version uses base R, and the Python version uses NumPy and Matplotlib. Whe
 ## Observable JS {.unlisted}
 
 ```{.js}
-import {rng, range, mean, qnorm, fmt} from "../js/stats.js"
+import {rng, range, mean, qnorm, fmt, debounce} from "../js/stats.js"
 
-viewof theta = Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"})
-viewof intRatio = Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"})
-viewof seed = Inputs.range([1, 500], {value: 80, step: 1, label: "Random seed"})
+viewof theta = debounce(Inputs.range([0.1, 1], {value: 0.4, step: 0.05, label: "Main effect θ (in sd units)"}))
+viewof intRatio = debounce(Inputs.range([0.25, 1], {value: 0.5, step: 0.05, label: "Interaction as a fraction of the main effect"}))
+viewof seed = debounce(Inputs.range([1, 500], {value: 80, step: 1, label: "Random seed"}))
 
 power16 = {
   const r = rng(seed);
