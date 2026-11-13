@@ -35,7 +35,7 @@ listing:
 
 # A field guide to statistical ideas worth knowing. {.home-title .unnumbered .unlisted}
 
-[Explore 155 sharp, surprising concepts through plain-language explanations and simulations you can change in your browser.]{.home-lead}
+[Explore the Handy Statistical Lexicon using simulations you can change in your browser.]{.home-lead}
 
 ::: {.home-actions}
 [Start exploring](start-here.qmd){.btn .btn-primary .btn-lg} [Browse all 155](#all-entries){.btn .btn-outline-light .btn-lg} [Surprise me](random.qmd){.home-random}
