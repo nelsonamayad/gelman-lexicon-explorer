@@ -33,7 +33,7 @@ listing:
 :::: {.home-hero-copy}
 [Andrew Gelman's Handy Statistical Lexicon, illustrated]{.home-kicker}
 
-# A guide to statistical ideas worth knowing. {.home-title .unnumbered .unlisted}
+# A guide to ideas worth knowing. {.home-title .unnumbered .unlisted}
 
 [Explore the lexicon using simulations you can change in your browser.]{.home-lead}
 
