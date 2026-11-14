@@ -31,11 +31,11 @@ listing:
 
 ::::: {.home-hero}
 :::: {.home-hero-copy}
-[Andrew Gelman's Handy Statistical Lexicon, made interactive]{.home-kicker}
+[Andrew Gelman's Handy Statistical Lexicon, illustrated]{.home-kicker}
 
-# A field guide to statistical ideas worth knowing. {.home-title .unnumbered .unlisted}
+# A guide to statistical ideas worth knowing. {.home-title .unnumbered .unlisted}
 
-[Explore the Handy Statistical Lexicon using simulations you can change in your browser.]{.home-lead}
+[Explore the lexicon using simulations you can change in your browser.]{.home-lead}
 
 ::: {.home-actions}
 [Start exploring](start-here.qmd){.btn .btn-primary .btn-lg} [Browse all 155](#all-entries){.btn .btn-outline-light .btn-lg} [Surprise me](random.qmd){.home-random}
