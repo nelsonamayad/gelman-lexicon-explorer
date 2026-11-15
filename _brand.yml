@@ -17,7 +17,7 @@ logo:
   images:
     mark:
       path: assets/logo.svg
-      alt: "Lexicon Explorer logo: a bell curve over a histogram"
+      alt: "Lexicon Explorer logo: overlapping prior, likelihood, and posterior curves"
   small: mark
   medium: mark
 
