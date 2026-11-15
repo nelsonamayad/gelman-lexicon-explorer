@@ -397,6 +397,24 @@ def main():
                 # entry's place in Gelman's list. Titles keep their YAML escapes.
                 lines.append(f"            - href: concepts/{e['slug']}.qmd")
                 lines.append(f'              text: "{e["order"]} · {e["title"]}"')
+    lines += [
+        "    - id: r-labs",
+        '      title: "Try it in R"',
+        "      style: docked",
+        "      contents:",
+        "        - href: r/index.qmd",
+        '          text: "Overview: Fake-data labs"',
+        '        - section: "Simulation labs"',
+        "          contents:",
+        "            - href: r/statistical-significance-filter.qmd",
+        '              text: "Lab 1 · The Significance Filter"',
+        "            - href: r/sixteen.qmd",
+        '              text: "Lab 2 · 16 (Interactions)"',
+        "            - href: r/multiple-comparisons.qmd",
+        '              text: "Lab 3 · Multiple Comparisons"',
+        "            - href: r/mathematical-simplicity.qmd",
+        '              text: "Lab 4 · Mathematical Simplicity"',
+    ]
     with open(os.path.join(ROOT, "_sidebar.yml"), "w", encoding="utf-8") as f:
         f.write("\n".join(lines) + "\n")
 

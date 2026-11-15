@@ -153,7 +153,8 @@ Posit Connect Cloud; its header explains the one-time setup.
 ## Credits and license
 
 Built by [Nelson Amaya D](https://github.com/nelsonamayad) with Claude Fable
-5.1 (Anthropic) through Claude Code. The About page on the site describes how.
+5.1 (Claude Code), Codex (OpenAI Codex) and Gemini (Google Antigravity). The
+About page on the site describes how.
 
 - Code (the simulations, `js/stats.js`, the scripts and workflows): [MIT](LICENSE).
 - Explanations written for this site: [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/).

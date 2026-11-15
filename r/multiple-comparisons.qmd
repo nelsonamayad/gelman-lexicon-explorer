@@ -1,62 +1,73 @@
 ---
 title: "Try it in R: Multiple Comparisons"
 date: 2026-11-11
-description: "No pooling versus multilevel estimates of 50 group effects, simulated in R in your browser with webR."
+order: 3
+description: "Build an empirical-Bayes multilevel shrinkage estimator in base R and compare its false discoveries and accuracy against no pooling."
+categories: ["Building and checking models", "Intermediate"]
 engine: markdown
-filters:
-  - live
-ojs-engine: true
-toc: false
-sidebar: false
-webr:
-  cell-options:
-    autorun: true
 ---
 
-This is the simulation from [Multiple Comparisons](../concepts/multiple-comparisons.qmd), written in R. It runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. The first time, your browser downloads R itself, which can take a minute. Edit any line and click **Run Code** to try it with other values.
+::: {.lab-banner}
+<span>**Lab 3 of 4** · Companion to entry **#25**: [Multiple Comparisons](../concepts/multiple-comparisons.qmd)</span>
+<span>[← Lab 2 (16)](sixteen.qmd) · [Next: Lab 4 (Mathematical Simplicity) →](mathematical-simplicity.qmd)</span>
+:::
 
-R draws different random numbers from the entry page, so the individual intervals differ, but the results tell the same story.
+Classical multiple-comparisons corrections (like Bonferroni) widen confidence intervals to keep you from making false claims, but leave the noisy point estimates untouched. Gelman, Hill, and Yajima (2012) show that **multilevel modeling (partial pooling)** solves the problem more directly: it estimates how much the true group effects vary ($\tau$) relative to the measurement noise ($\sigma$), and pulls noisy extremes toward the overall mean.
 
-## Fifty groups, two ways to estimate them
+## Step 1: Fifty groups and the "winner's curse"
 
-Each group has a true effect drawn from a distribution with spread `tau`, and is measured with standard error `sigma`. *No pooling* takes each estimate at face value. The *multilevel* estimate (here a simple empirical-Bayes version) first estimates how much the true effects vary, then pulls each estimate toward the overall mean by the matching amount.
+Suppose we measure $J = 50$ groups (schools, hospitals, states, or subgroups). Their true effects come from $\theta_j \sim \mathrm{N}(0, \tau^2)$ with $\tau = 0.1$, and each group is measured with noise $\sigma = 0.5$. Let's simulate one world and inspect the group with the largest raw estimate.
 
 ```{webr}
 set.seed(17)
-J <- 50 # groups
-tau <- 0.1 # spread of the true effects (try 0: pure noise)
-sigma <- 0.5 # standard error of each group's estimate
+J <- 50 # number of groups
+tau <- 0.1 # SD of true effects across groups (try 0 for pure noise)
+sigma <- 0.5 # measurement SE within each group
 
-theta <- rnorm(J, mean = 0, sd = tau) # true effects
-y <- rnorm(J, mean = theta, sd = sigma) # noisy estimates
+theta <- rnorm(J, mean = 0, sd = tau) # true group effects
+y <- rnorm(J, mean = theta, sd = sigma) # observed noisy estimates
 
-# Multilevel: estimate the variance of the true effects, then shrink
+top <- which.max(abs(y))
+cat(
+  "Most extreme raw estimate (group ", top, "): y = ", round(y[top], 2),
+  ", but its true effect is theta = ", round(theta[top], 2), "\n",
+  "Groups with |y| > 1.96 * sigma (no pooling): ",
+  sum(abs(y) > 1.96 * sigma), " of ", J, "\n",
+  sep = ""
+)
+```
+
+## Step 2: Three lines of R for partial pooling
+
+The variance of the observed estimates $y_j$ is $\tau^2 + \sigma^2$. Empirical Bayes estimates $\hat\tau^2 = \max\!\big(0,\, \text{Var}(y) - \sigma^2\big)$ and shrinks each group toward the grand mean $\bar y$ by the shrinkage factor $B = \hat\tau^2 / (\hat\tau^2 + \sigma^2)$:
+
+```{webr}
 mu <- mean(y)
 tau2 <- max(0, mean((y - mu)^2) - sigma^2)
-B <- tau2 / (tau2 + sigma^2) # share of the observed variation that is real
-pm <- mu + B * (y - mu) # partially pooled estimates
-psd <- sqrt(B) * sigma # their standard errors
+B <- tau2 / (tau2 + sigma^2) # share of observed variance that is real
+pm <- mu + B * (y - mu) # partially pooled posterior means
+psd <- sqrt(B) * sigma # posterior standard deviations
 
 claim_np <- abs(y) > 1.96 * sigma
 claim_ml <- B > 0 & abs(pm) > 1.96 * psd
-data.frame(
-  approach = c("No pooling", "Multilevel"),
-  claims = c(sum(claim_np), sum(claim_ml)),
-  wrong_sign = c(
+print(data.frame(
+  approach = c("No pooling", "Multilevel (partial pooling)"),
+  confident_claims = c(sum(claim_np), sum(claim_ml)),
+  wrong_sign_claims = c(
     sum(claim_np & sign(y) != sign(theta)),
     sum(claim_ml & sign(pm) != sign(theta))
   )
-)
+))
 
 o <- order(y)
 plot(seq_len(J), theta[o],
-  pch = 19, cex = 0.6, ylim = range(y - 2 * sigma, y + 2 * sigma),
-  xlab = "Group (sorted by raw estimate)", ylab = "Estimate ± 1.96 se"
+  pch = 19, cex = 0.65, ylim = range(y - 2 * sigma, y + 2 * sigma),
+  xlab = "Group (sorted by raw estimate)", ylab = "Estimate ± 1.96 SE"
 )
 segments(
   seq_len(J) - 0.15, (y - 1.96 * sigma)[o],
   seq_len(J) - 0.15, (y + 1.96 * sigma)[o],
-  col = adjustcolor("#d6604d", 0.6)
+  col = adjustcolor("#d6604d", 0.65)
 )
 segments(
   seq_len(J) + 0.15, (pm - 1.96 * psd)[o],
@@ -65,14 +76,21 @@ segments(
 )
 abline(h = 0)
 legend("topleft", c("No pooling", "Multilevel", "True effect"),
-  bty = "n",
-  col = c("#d6604d", "#2166ac", "black"), lty = c(1, 1, NA), pch = c(NA, NA, 19)
+  bty = "n", col = c("#d6604d", "#2166ac", "black"),
+  lty = c(1, 1, NA), pch = c(NA, NA, 19)
 )
 ```
 
-## Repeat it a thousand times
+::: {.lab-experiments}
+<strong class="lab-exp-title"><i class="bi bi-sliders" aria-hidden="true"></i> Predict → Modify → Observe</strong>
 
-One simulated world can be lucky or unlucky. Averaging over many worlds shows how often each approach makes a confident claim with the wrong sign.
+1. **Pure noise ($\tau = 0$).** In Step 1, change `tau <- 0` and re-run both Step 1 and Step 2. How many "significant" claims does no-pooling make out of 50 groups, and how far do the blue multilevel intervals pull back toward zero?
+2. **Strong real differences ($\tau = 0.8$).** Change `tau <- 0.8` (now the true group differences are larger than the measurement noise `sigma = 0.5`) and re-run both cells. Watch how `B` approaches `1` and the blue multilevel intervals automatically stay wide and close to the raw estimates!
+:::
+
+## Step 3: Repeat across 1,000 simulated worlds
+
+Averaging over 1,000 worlds shows the long-run number of wrong-sign claims per 50 groups as $\tau$ varies from $0$ to $0.5$.
 
 ```{webr}
 one_world <- function(tau, sigma = 0.5, J = 50) {
@@ -90,11 +108,61 @@ one_world <- function(tau, sigma = 0.5, J = 50) {
   )
 }
 
-# Average number of confident claims with the wrong sign, per 50 groups.
-# With tau = 0 every true effect is zero, so every confident claim counts
-# as wrong.
-sapply(
-  c(tau_0 = 0, tau_0.1 = 0.1, tau_0.5 = 0.5),
-  function(tau) rowMeans(replicate(1000, one_world(tau)))
+set.seed(25)
+round(
+  sapply(
+    c(tau_0 = 0, tau_0.1 = 0.1, tau_0.5 = 0.5),
+    function(tau) rowMeans(replicate(1000, one_world(tau)))
+  ),
+  2
 )
 ```
+
+## Your turn: compare root-mean-squared error (RMSE) across all 50 groups
+
+Partial pooling doesn't just prevent false-positive claims; by James–Stein theory, it also estimates the 50 true effects $\theta_1, \dots, \theta_{50}$ much more accurately overall.
+
+Complete the code below to compute the root-mean-squared error $\sqrt{\frac{1}{J}\sum_{j=1}^J (\hat\theta_j - \theta_j)^2}$ for both `y` (no pooling) and `pm` (multilevel partial pooling).
+
+```{webr}
+#| exercise: ex_rmse
+#| setup: true
+set.seed(17)
+J <- 50
+tau <- 0.1
+sigma <- 0.5
+theta <- rnorm(J, 0, tau)
+y <- rnorm(J, theta, sigma)
+mu <- mean(y)
+tau2 <- max(0, mean((y - mu)^2) - sigma^2)
+B <- tau2 / (tau2 + sigma^2)
+pm <- mu + B * (y - mu)
+```
+
+```{webr}
+#| exercise: ex_rmse
+#| autorun: false
+# Compute root-mean-squared error against the true vector `theta`:
+rmse_no_pooling <- ______
+rmse_multilevel <- ______
+
+round(c(no_pooling = rmse_no_pooling, multilevel = rmse_multilevel), 3)
+```
+
+::: {.hint exercise="ex_rmse"}
+Use `sqrt(mean((y - theta)^2))` for no pooling and `sqrt(mean((pm - theta)^2))` for the multilevel estimates.
+:::
+
+```{webr}
+#| exercise: ex_rmse
+#| solution: true
+rmse_no_pooling <- sqrt(mean((y - theta)^2))
+rmse_multilevel <- sqrt(mean((pm - theta)^2))
+
+round(c(no_pooling = rmse_no_pooling, multilevel = rmse_multilevel), 3)
+```
+
+## Where next
+
+- Read the full entry: [Multiple Comparisons](../concepts/multiple-comparisons.qmd).
+- Continue to **Lab 4**: [Try it in R: Mathematical Simplicity](mathematical-simplicity.qmd), where a 1-parameter scientific model beats a 2-parameter black-box regression.
