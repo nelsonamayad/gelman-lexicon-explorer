@@ -51,6 +51,19 @@ jobs:
             [ -n "$ts" ] && touch -d "$ts" "$f"
           done
 
+      # GitHub runners start empty. Restore the last successful rendered site
+      # so scripts/render_changed.py can update only stale pages. The cache is
+      # public site output only (no credentials), and a cache miss simply makes
+      # the renderer perform a normal full build. A SHA-specific key makes each
+      # successful run immutable; restore-keys selects the newest predecessor.
+      - name: Restore last rendered site
+        uses: actions/cache@v5
+        with:
+          path: _site
+          key: rendered-site-v1-${{ runner.os }}-${{ github.sha }}
+          restore-keys: |
+            rendered-site-v1-${{ runner.os }}-
+
       # Front matter, section order, plot accessibility labels, seeds, links,
       # reciprocal Related entries.
       - name: Check entries
@@ -78,10 +91,10 @@ jobs:
         with:
           version: 1.12.1
 
-      - name: Render site
-        run: quarto render
+      - name: Render changed pages
+        run: python3 scripts/render_changed.py
 
-      # quarto render only checks OJS syntax. This loads every page in headless
+      # Quarto rendering only checks OJS syntax. This loads every page in headless
       # Chrome (preinstalled on GitHub's Ubuntu runners) and fails on any
       # runtime error box or entry page without a chart.
       - name: Check every page in a browser
