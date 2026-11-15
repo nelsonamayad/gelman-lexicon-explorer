@@ -1,23 +1,22 @@
 ---
 title: "Try it in R: The Statistical Significance Filter"
 date: 2026-11-11
-description: "The significance-filter simulation in R, running in your browser with webR."
+order: 1
+description: "Simulate Type M (exaggeration) and Type S (wrong-sign) errors when noisy studies are filtered by p < 0.05."
+categories: ["Noise and evidence", "Intermediate"]
 engine: markdown
-filters:
-  - live
-ojs-engine: true
-toc: false
-sidebar: false
-webr:
-  cell-options:
-    autorun: true
 ---
 
-This is the simulation from [The Statistical Significance Filter](../concepts/statistical-significance-filter.qmd), written in R. It runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. The first time, your browser downloads R itself, which can take a minute. Edit any line and click **Run Code** to try it with other values.
+::: {.lab-banner}
+<span>**Lab 1 of 4** · Companion to entry **#32**: [The Statistical Significance Filter](../concepts/statistical-significance-filter.qmd)</span>
+<span>[All R labs](index.qmd) · [Next: Lab 2 (16) →](sixteen.qmd)</span>
+:::
 
-R draws different random numbers from the entry page, so the individual dots differ, but the results tell the same story.
+When a study is noisy, only the estimates that happen to come out large clear the $p < 0.05$ bar ($|\hat\theta| > 1.96\,\text{se}$). This lab builds Gelman and Carlin's (2014) **design analysis** from scratch in base R so you can measure how much the significance filter exaggerates true effects (**Type M error**) and how often it flips their sign (**Type S error**).
 
-## One study, replicated 400 times
+## Step 1: One study, replicated 400 times
+
+Suppose a treatment has a true effect of `theta <- 0.2`, and each study estimates it with standard error `se <- 0.25`. At this noise level, the study has only 13% power. Run the code below, then try the three experiments underneath it.
 
 ```{webr}
 set.seed(42)
@@ -28,48 +27,111 @@ n_rep <- 400 # number of replications
 est <- rnorm(n_rep, mean = theta, sd = se)
 sig <- abs(est) > 1.96 * se # statistically significant at the 5% level
 
-power <- pnorm(theta / se - 1.96) + pnorm(-theta / se - 1.96)
+power <- 1 - pnorm(1.96 - theta / se) + pnorm(-1.96 - theta / se)
 avg_sig <- mean(abs(est[sig]))
+wrong_sign <- sum(sign(est[sig]) != sign(theta))
 
-cat("Power:", round(power, 2), "\n")
-cat("Significant replications:", sum(sig), "of", n_rep, "\n")
-cat("Average magnitude of the significant estimates:", round(avg_sig, 2), "\n")
-cat("Exaggeration ratio:", round(avg_sig / theta, 1), "\n")
 cat(
-  "Significant estimates with the wrong sign:",
-  sum(sign(est[sig]) != sign(theta)), "
-"
+  "Power: ", round(100 * power, 1), "%\n",
+  "Significant replications: ", sum(sig), " of ", n_rep, "\n",
+  "Average |estimate| when significant: ", round(avg_sig, 2),
+  " (truth = ", theta, ")\n",
+  "Exaggeration ratio (Type M): ", round(avg_sig / theta, 1), "x\n",
+  "Significant with the wrong sign (Type S): ", wrong_sign, "\n",
+  sep = ""
 )
 
 plot(est,
-  pch = ifelse(sig, 19, 1), col = ifelse(sig, "#d6604d", "grey50"),
+  pch = ifelse(sig, 19, 1), col = ifelse(sig, "#d6604d", "grey65"),
   xlab = "Replication", ylab = "Estimated effect"
 )
-abline(h = c(-1.96, 1.96) * se, lty = 2, col = "grey50") # thresholds
-abline(h = theta, col = "#2166ac", lwd = 2) # the true effect
+abline(h = c(-1.96, 1.96) * se, lty = 2, col = "grey40")
+abline(h = theta, col = "#2166ac", lwd = 2)
 abline(h = 0)
 ```
 
-## Exaggeration grows as power falls
+::: {.lab-experiments}
+<strong class="lab-exp-title"><i class="bi bi-sliders" aria-hidden="true"></i> Predict → Modify → Observe</strong>
 
-Gelman and Carlin's [design analysis](https://doi.org/10.1177/1745691614551642) asks how much a significant estimate overstates the truth, on average, at a given power. Here it is for a range of true effects with the standard error fixed at 0.25.
+1. **Shrink the true effect.** Before editing, predict: if you cut `theta` from `0.2` to `0.05` (keeping `se <- 0.25`), will the average significant estimate `avg_sig` drop toward `0.05`? Change `theta <- 0.05` on line 2 and click **Run Code**. Notice that `avg_sig` stays stuck above `0.50`—because the significance threshold `1.96 * se = 0.49` sets a hard floor on what can be called "significant", inflating the exaggeration ratio past $10\times$.
+2. **Count the wrong-sign "discoveries".** At `theta <- 0.05`, check the last printed line: how many statistically significant estimates point in the *opposite* direction of the true effect?
+3. **Shrink the noise instead.** Keep `theta <- 0.2` and lower `se` from `0.25` to `0.07` (which requires $(0.25 / 0.07)^2 \approx 13$ times as many participants). Watch how the gray dead-zone narrows and the exaggeration ratio drops near `1.1x`.
+:::
+
+## Step 2: How exaggeration grows as power falls
+
+One batch of 400 replications has Monte Carlo noise. Gelman and Carlin's [design analysis](https://doi.org/10.1177/1745691614551642) computes the expected exaggeration ratio across a whole grid of plausible true effects `thetas` for a fixed standard error `se = 0.25`.
 
 ```{webr}
-exaggeration <- function(theta, se, n_sims = 1e5) {
+exaggeration <- function(theta, se, n_sims = 5e4) {
   est <- rnorm(n_sims, mean = theta, sd = se)
   sig <- abs(est) > 1.96 * se
   mean(abs(est[sig])) / theta
 }
 
 se <- 0.25
-thetas <- seq(0.05, 1, by = 0.05)
-power <- pnorm(thetas / se - 1.96) + pnorm(-thetas / se - 1.96)
+thetas <- seq(0.05, 1.0, by = 0.05)
+power <- 1 - pnorm(1.96 - thetas / se) + pnorm(-1.96 - thetas / se)
+set.seed(32)
 ratio <- sapply(thetas, exaggeration, se = se)
 
-plot(power, ratio,
-  type = "b", pch = 19, log = "y",
-  xlab = "Power", ylab = "Exaggeration ratio (log scale)"
+plot(100 * power, ratio,
+  type = "b", pch = 19, col = "#2166ac", log = "y",
+  xlab = "Statistical power (%)", ylab = "Exaggeration ratio (log scale)"
 )
-abline(h = 1, lty = 2)
-round(data.frame(power, ratio)[c(1, 4, 8, 12, 20), ], 2)
+abline(h = c(1, 1.5, 2, 5), lty = 2, col = "grey60")
+round(
+  data.frame(theta = thetas, power_pct = 100 * power, type_m = ratio)[
+    c(1, 2, 4, 8, 12, 20),
+  ],
+  2
+)
 ```
+
+## Your turn: compute the exact Type S (wrong-sign) rate
+
+When $\theta > 0$ and $\hat\theta \sim \mathrm{N}(\theta, \text{se}^2)$, you don't even need random numbers to find the **Type S error rate**—the probability that a statistically significant estimate is negative ($\hat\theta < -1.96\,\text{se}$).
+
+Complete the function `type_s(theta, se)` below using `pPos` (the chance of a significant positive estimate) and `pNeg` (the chance of a significant negative estimate), then compute the Type S rate when `theta = 0.1` and `se = 0.25`.
+
+```{webr}
+#| exercise: ex_type_s
+#| setup: true
+# Clean environment for the exercise
+```
+
+```{webr}
+#| exercise: ex_type_s
+#| autorun: false
+type_s <- function(theta, se) {
+  p_pos <- 1 - pnorm(1.96 - theta / se) # Pr(est > +1.96 * se)
+  p_neg <- pnorm(-1.96 - theta / se) # Pr(est < -1.96 * se)
+  # Return the share of significant estimates that are negative:
+  ______
+}
+
+# Test at theta = 0.1, se = 0.25 (power is about 7%):
+round(100 * type_s(theta = 0.1, se = 0.25), 1)
+```
+
+::: {.hint exercise="ex_type_s"}
+An estimate is significant with Probability `p_pos + p_neg`, and it has the wrong sign (negative when `theta > 0`) with probability `p_neg`. Divide `p_neg` by the total probability of significance `p_pos + p_neg`.
+:::
+
+```{webr}
+#| exercise: ex_type_s
+#| solution: true
+type_s <- function(theta, se) {
+  p_pos <- 1 - pnorm(1.96 - theta / se) # Pr(est > +1.96 * se)
+  p_neg <- pnorm(-1.96 - theta / se) # Pr(est < -1.96 * se)
+  p_neg / (p_pos + p_neg)
+}
+
+# At theta = 0.1, se = 0.25, ~9% of significant findings have the wrong sign:
+round(100 * type_s(theta = 0.1, se = 0.25), 1)
+```
+
+## Where next
+
+- Read the full entry: [The Statistical Significance Filter](../concepts/statistical-significance-filter.qmd).
+- Continue to **Lab 2**: [Try it in R: 16](sixteen.qmd), where the same noise arithmetic explains why subgroup and interaction claims need 16 times the sample size.

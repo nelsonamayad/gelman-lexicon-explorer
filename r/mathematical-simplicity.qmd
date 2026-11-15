@@ -1,23 +1,28 @@
 ---
 title: "Try it in R: Mathematical Simplicity"
 date: 2026-11-11
-description: "The golf-putting geometry model against logistic regression, fitted in R in your browser with webR."
+order: 4
+description: "Fit Gelman and Nolan's geometric golf-putting model by maximum likelihood in base R and compare its extrapolation with logistic regression."
+categories: ["Building and checking models", "Intermediate"]
 engine: markdown
-filters:
-  - live
-ojs-engine: true
-toc: false
-sidebar: false
-webr:
-  cell-options:
-    autorun: true
 ---
 
-This is the simulation from [Mathematical Simplicity](../concepts/mathematical-simplicity.qmd), written in R. It runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. The first time, your browser downloads R itself, which can take a minute. Edit any line and click **Run Code** to try it with other values.
+::: {.lab-banner}
+<span>**Lab 4 of 4** · Companion to entry **#90**: [Mathematical Simplicity](../concepts/mathematical-simplicity.qmd)</span>
+<span>[← Lab 3 (Multiple Comparisons)](multiple-comparisons.qmd) · [All R labs](index.qmd)</span>
+:::
 
-## Two models for golf putts
+A linear or logistic regression is easy to call in software (`glm(y ~ x, family = binomial)`), which makes its algebraic formula feel "simple". Gelman and Nolan's golf-putting example shows why **scientific simplicity** and **algebraic simplicity** often disagree: a model built from the geometry of the ball and the hole has only *one* parameter with a direct physical meaning, and it extrapolates sensibly where logistic regression fails.
 
-Putts are simulated from a geometric model. A putt goes in if its angular error is small enough for the ball to drop into the hole. The geometric model has one parameter, the golfer's angular error `sigma`. The comparison is a logistic regression on distance, with two parameters. Both are fitted to putts from 2 to 20 feet and then extended to 40 feet.
+## Step 1: Geometry vs. logistic regression on putts from 2 to 20 feet
+
+A golf ball (radius $r_{\text{ball}} = 1.68 / 2$ inches) drops into a hole (radius $r_{\text{hole}} = 4.25 / 2$ inches) at distance $x$ feet if the golfer's angular error $\theta \sim \mathrm{N}(0, \sigma^2)$ falls within $\pm \arcsin\!\big((r_{\text{hole}} - r_{\text{ball}}) / x\big)$:
+
+$$
+\Pr(\text{make at distance } x) = 2\,\Phi\!\left(\frac{\arcsin((r_{\text{hole}} - r_{\text{ball}}) / x)}{\sigma}\right) - 1.
+$$
+
+Run the cell below to simulate putts from 2 to 20 feet, fit both the 1-parameter geometric model (with `optimize()`) and a 2-parameter logistic regression (with `glm()`), and extrapolate both out to 40 feet.
 
 ```{webr}
 set.seed(90)
@@ -27,46 +32,126 @@ r_ball <- 1.68 / 2 / 12 # ball radius, in feet
 # Probability of success at distance x for angular error sigma (radians)
 p_geo <- function(x, sigma) 2 * pnorm(asin((r_hole - r_ball) / x) / sigma) - 1
 
-sigma_true <- 1.5 * pi / 180 # 1.5 degrees
-x <- 2:20 # distances, in feet
-n <- rep(200, length(x)) # putts per distance
+sigma_true <- 1.5 * pi / 180 # true angular SD: 1.5 degrees
+x <- 2:20 # observed distances (feet)
+n <- rep(200, length(x)) # putts attempted per distance
 y <- rbinom(length(x), n, p_geo(x, sigma_true))
 
-# Geometric model: one parameter, fitted by maximum likelihood
+# 1. Geometric model: 1 parameter, fitted by maximum likelihood
 nll <- function(sigma) -sum(dbinom(y, n, p_geo(x, sigma), log = TRUE))
 sigma_hat <- optimize(nll, c(0.005, 0.1))$minimum
 
-# Logistic regression: two parameters
+# 2. Logistic regression: 2 parameters (intercept and slope on distance)
 fit <- glm(cbind(y, n - y) ~ x, family = binomial)
 
 cat(
-  "Geometric model: sigma =", round(sigma_hat * 180 / pi, 2),
-  "degrees (truth: 1.5)
-"
+  "Geometric model: sigma_hat = ", round(sigma_hat * 180 / pi, 2),
+  " degrees (truth: 1.5 degrees)\n",
+  sep = ""
 )
+
 grid <- seq(2, 40, by = 0.5)
 plot(x, y / n,
   pch = 19, xlim = c(2, 40), ylim = c(0, 1),
-  xlab = "Distance (feet)", ylab = "Probability of success"
+  xlab = "Distance (feet)", ylab = "Probability of sinking the putt"
 )
 rect(20, -1, 42, 2, col = adjustcolor("grey", 0.2), border = NA)
-text(30, 0.95, "extrapolation")
+text(30, 0.94, "extrapolation (20 to 40 ft)")
 lines(grid, p_geo(grid, sigma_true), lty = 2, col = "grey40")
 lines(grid, p_geo(grid, sigma_hat), col = "#2166ac", lwd = 2)
 lines(grid, predict(fit, data.frame(x = grid), type = "response"),
   col = "#d6604d", lwd = 2
 )
 legend("topright",
-  c("Geometry (1 parameter)", "Logistic (2 parameters)", "Truth"),
+  c("Geometry (1 param)", "Logistic (2 params)", "Truth"),
   col = c("#2166ac", "#d6604d", "grey40"), lty = c(1, 1, 2),
   lwd = c(2, 2, 1), bty = "n"
 )
 
-# Predicted success at 40 feet
 round(c(
-  truth = p_geo(40, sigma_true), geometry = p_geo(40, sigma_hat),
-  logistic = unname(predict(fit, data.frame(x = 40), type = "response"))
+  truth_40ft = p_geo(40, sigma_true),
+  geometry_40ft = p_geo(40, sigma_hat),
+  logistic_40ft = unname(predict(fit, data.frame(x = 40), type = "response"))
 ), 3)
 ```
 
-The logistic curve fits the observed range well, but its two parameters have no physical meaning, and beyond 20 feet it follows the shape of the logistic function rather than the geometry of the putt. The geometric model is harder to write down, and its single parameter is an angle you can interpret.
+::: {.lab-experiments}
+<strong class="lab-exp-title"><i class="bi bi-sliders" aria-hidden="true"></i> Predict → Modify → Observe</strong>
+
+1. **Look at 40 feet.** In the printed numbers at the bottom, compare `truth_40ft` (~19% make rate) with `logistic_40ft` (~1% make rate). Because logistic regression forces log-odds to fall linearly with feet, it plunges toward zero far too fast at long distances.
+2. **Train on an even narrower window.** Change `x <- 2:20` on line 9 to `x <- 2:10` (only short putts observed) and click **Run Code**. Does the 1-parameter geometric model still recover the 20-foot and 40-foot curve accurately?
+3. **Compare AIC.** Add `AIC(fit)` versus `2 * 1 + 2 * nll(sigma_hat)` (1 parameter plus $2 \times \text{negative log-likelihood}$). Which model has the better (lower) AIC even inside the observed range?
+:::
+
+## Your turn: add distance control to the geometric model
+
+In a follow-up post, Gelman added a second physical mechanism: to sink a putt, the golfer must *both* aim within the angle tolerance *and* hit the ball with the right speed (where distance error scales with distance $x$). If the probability of good distance control at distance $x$ is `p_dist(x, sigma_d)`, and angle and distance errors are independent, the combined probability of making the putt is the **product** of the two probabilities.
+
+Complete `p_both(x, sigma_angle, sigma_dist)` below and compare the make curve with and without distance error.
+
+```{webr}
+#| exercise: ex_golf_dist
+#| setup: true
+r_hole <- 4.25 / 2 / 12
+r_ball <- 1.68 / 2 / 12
+p_geo <- function(x, sigma) 2 * pnorm(asin((r_hole - r_ball) / x) / sigma) - 1
+```
+
+```{webr}
+#| exercise: ex_golf_dist
+#| autorun: false
+# Probability that the ball stops within the hole's depth tolerance:
+p_dist <- function(x, sigma_d) {
+  pnorm(1.5 / (sigma_d * x)) - pnorm(-0.5 / (sigma_d * x))
+}
+
+# Combined probability (angle tolerance AND distance tolerance):
+p_both <- function(x, sigma_angle, sigma_d) {
+  ______
+}
+
+grid <- seq(2, 40, by = 0.5)
+plot(grid, p_geo(grid, 1.5 * pi / 180),
+  type = "l", col = "#2166ac", lwd = 2, ylim = c(0, 1),
+  xlab = "Distance (feet)", ylab = "Probability of success"
+)
+lines(grid, p_both(grid, 1.5 * pi / 180, sigma_d = 0.08),
+  col = "#1a9850", lwd = 2
+)
+legend("topright", c("Angle only", "Angle + distance control"),
+  col = c("#2166ac", "#1a9850"), lwd = 2, bty = "n"
+)
+```
+
+::: {.hint exercise="ex_golf_dist"}
+For two independent events (good angle and good distance), multiply their probabilities: `p_geo(x, sigma_angle) * p_dist(x, sigma_d)`.
+:::
+
+```{webr}
+#| exercise: ex_golf_dist
+#| solution: true
+p_dist <- function(x, sigma_d) {
+  pnorm(1.5 / (sigma_d * x)) - pnorm(-0.5 / (sigma_d * x))
+}
+
+p_both <- function(x, sigma_angle, sigma_d) {
+  p_geo(x, sigma_angle) * p_dist(x, sigma_d)
+}
+
+grid <- seq(2, 40, by = 0.5)
+plot(grid, p_geo(grid, 1.5 * pi / 180),
+  type = "l", col = "#2166ac", lwd = 2, ylim = c(0, 1),
+  xlab = "Distance (feet)", ylab = "Probability of success"
+)
+lines(grid, p_both(grid, 1.5 * pi / 180, sigma_d = 0.08),
+  col = "#1a9850", lwd = 2
+)
+legend("topright", c("Angle only", "Angle + distance control"),
+  col = c("#2166ac", "#1a9850"), lwd = 2, bty = "n"
+)
+```
+
+## Where next
+
+- Read the full entry: [Mathematical Simplicity](../concepts/mathematical-simplicity.qmd).
+- Return to [all R labs](index.qmd) or continue exploring the [Start here tour](../start-here.qmd).

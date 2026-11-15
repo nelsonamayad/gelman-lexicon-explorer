@@ -44,6 +44,7 @@ GLOBAL_FILES = [
     ROOT / "_analytics.html",
     ROOT / "_sim-tools.html",
     ROOT / "concepts" / "_metadata.yml",
+    ROOT / "r" / "_metadata.yml",
     ROOT / "scripts" / "post_render.py",
 ]
 GLOBAL_DIRS = [ROOT / "_extensions"]

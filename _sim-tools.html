@@ -16,7 +16,7 @@
   var section = document.getElementById("simulated-example");
   var codeBlock = section && section.querySelector("details.sim-code");
   if (!section || !codeBlock) return;
-  var slug = location.pathname.split("/").pop().replace(/\.html$/, "") || "simulation";
+  var slug = location.pathname.replace(/\/+$/, "").split("/").pop().replace(/\.html$/, "") || "simulation";
 
   // ---------- Reset to defaults and CSV download ----------
 
@@ -160,34 +160,93 @@
     });
   };
 
+  var stripTrailer = function (code) {
+    var i = code.lastIndexOf("\n# Annotations\n");
+    return (i >= 0 ? code.slice(0, i) : code).replace(/\s*# <\d+>$/gm, "").trim() + "\n";
+  };
+
   var addRunner = function (pane, lang) {
     var file = "../sims/" + (lang === "R" ? "r/" + slug + ".R" : "python/" + slug + ".py");
+    var originalCode = null;
     var box = document.createElement("div");
     box.className = "sim-run";
+    var bar = document.createElement("div");
+    bar.className = "sim-run-controls";
     var button = document.createElement("button");
     button.type = "button";
     button.className = "sim-tool";
     button.innerHTML = '<i class="bi bi-play-fill" aria-hidden="true"></i> Run the ' + lang +
       " version in your browser";
+    var editBtn = document.createElement("button");
+    editBtn.type = "button";
+    editBtn.className = "sim-tool";
+    editBtn.innerHTML = '<i class="bi bi-pencil-square" aria-hidden="true"></i> Edit ' + lang + " code";
+    var resetBtn = document.createElement("button");
+    resetBtn.type = "button";
+    resetBtn.className = "sim-tool";
+    resetBtn.hidden = true;
+    resetBtn.innerHTML = '<i class="bi bi-arrow-counterclockwise" aria-hidden="true"></i> Reset code';
     var note = document.createElement("span");
     note.className = "sim-run-note";
     note.textContent = lang === "R"
       ? "Uses webR. The first run downloads R, which can take a minute."
       : "Uses Pyodide. The first run downloads Python, which can take a minute.";
+    var editor = document.createElement("textarea");
+    editor.className = "sim-run-editor";
+    editor.spellcheck = false;
+    editor.setAttribute("aria-label", "Editable " + lang + " simulation code");
+    editor.hidden = true;
     var out = document.createElement("div");
     out.className = "sim-run-output";
     out.setAttribute("aria-live", "polite");
-    box.appendChild(button);
-    box.appendChild(note);
+    bar.appendChild(button);
+    bar.appendChild(editBtn);
+    bar.appendChild(resetBtn);
+    bar.appendChild(note);
+    box.appendChild(bar);
+    box.appendChild(editor);
     box.appendChild(out);
     pane.appendChild(box);
     var status = function (msg) { out.innerHTML = ""; var p = document.createElement("p"); p.className = "sim-run-status"; p.textContent = msg; out.appendChild(p); };
+    var loadOriginal = function () {
+      if (originalCode !== null) return Promise.resolve(originalCode);
+      return fetch(file)
+        .then(function (r) { if (!r.ok) throw new Error("could not load " + file); return r.text(); })
+        .then(function (raw) {
+          originalCode = lang === "R" ? stripTrailer(raw) : raw;
+          if (!editor.value) editor.value = originalCode;
+          return originalCode;
+        });
+    };
+    editBtn.addEventListener("click", function () {
+      if (!editor.hidden) {
+        editor.hidden = true;
+        resetBtn.hidden = true;
+        editBtn.innerHTML = '<i class="bi bi-pencil-square" aria-hidden="true"></i> Edit ' + lang + " code";
+        return;
+      }
+      editBtn.disabled = true;
+      loadOriginal()
+        .then(function () {
+          editor.hidden = false;
+          resetBtn.hidden = false;
+          editBtn.innerHTML = '<i class="bi bi-chevron-up" aria-hidden="true"></i> Hide editor';
+          editor.focus();
+        })
+        .catch(function (err) { status("Sorry, could not load " + file + ": " + err.message); })
+        .then(function () { editBtn.disabled = false; });
+    });
+    resetBtn.addEventListener("click", function () {
+      if (originalCode !== null) editor.value = originalCode;
+    });
     button.addEventListener("click", function () {
       button.disabled = true;
-      status("Fetching the script…");
-      fetch(file)
-        .then(function (r) { if (!r.ok) throw new Error("could not load " + file); return r.text(); })
-        .then(function (code) { return (lang === "R" ? runR : runPython)(code, status); })
+      status(originalCode === null ? "Fetching the script…" : "Running…");
+      loadOriginal()
+        .then(function (code) {
+          var toRun = !editor.hidden && editor.value.trim() ? editor.value : code;
+          return (lang === "R" ? runR : runPython)(toRun, status);
+        })
         .then(function (res) {
           out.innerHTML = "";
           if (res.text.trim()) {

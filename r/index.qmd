@@ -1,21 +1,37 @@
 ---
-title: "Try it in R"
+title: "Try it in R: Interactive Simulation Labs"
 date: 2026-11-11
-description: "Simulations from the lexicon, written in R and running in your browser with webR."
-sidebar: false
+description: "Hands-on R simulation labs from the lexicon, running in your browser with webR."
 toc: false
 listing:
-  contents: "*.qmd"
+  contents:
+    - statistical-significance-filter.qmd
+    - sixteen.qmd
+    - multiple-comparisons.qmd
+    - mathematical-simplicity.qmd
   type: table
-  sort: "title"
-  fields: [title, description]
+  sort: "order"
+  fields: [order, title, description, categories]
   field-display-names:
-    title: "Page"
-    description: "What it does"
+    order: "Lab"
+    title: "Topic"
+    description: "What you will build and test"
+    categories: "Theme · Level"
 ---
 
-A few entries also have their simulation written in R. Each R version runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. You can edit the code and run it again.
+Every entry in the lexicon already includes a base-R version of its simulation under **Show simulation code**. These four **Try it in R** pages go a step further: they are hands-on labs that run R directly in your browser with [webR](https://docs.r-wasm.org/webr/latest/) (R compiled to WebAssembly), with nothing to install.
 
-The R pages are separate from the entries because webR is a large download. The first R page you open downloads R itself, which can take a minute. The entry pages stay fast.
+Each lab breaks a core idea from the [Start here](../start-here.qmd) tour into small, editable steps, gives you concrete **Predict → Modify → Observe** experiments to try on the code, and ends with a short **Your turn** coding exercise with a hint and a worked solution.
 
-This is a pilot with four entries. If it proves useful, more will follow.
+::: {.callout-tip title="The four-step fake-data workflow in R"}
+Throughout his books and blog posts, Andrew Gelman advocates **fake-data simulation** as the best way to understand what a statistical method actually does before trusting it on real data. Every lab here follows the same four-step pattern in base R:
+
+1. **Fix the known truth.** Choose numbers for the true parameters (`theta <- 0.2`, `sigma <- 0.5`, `tau <- 0.1`) so you know the right answer in advance.
+2. **Simulate one fake dataset.** Draw random data from that world (`rnorm()`, `rbinom()`) and plot it to see what a single study looks like.
+3. **Apply the estimator or filter.** Run the rule under study (`abs(est) > 1.96 * se`, regression, partial pooling) and compare its answer with the known truth.
+4. **Repeat across many worlds.** Wrap the single study in `replicate()` or `sapply()` to measure long-run exaggeration (Type M error), wrong-sign claims (Type S error), or out-of-sample fit.
+:::
+
+## Labs in recommended order
+
+Start with Lab 1 and use the links at the bottom of each page (or the sidebar) to step through the sequence. The first lab you open downloads R into your browser (~30 MB), which takes up to a minute once and is cached after that.

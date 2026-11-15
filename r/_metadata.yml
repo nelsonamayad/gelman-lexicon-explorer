@@ -1,0 +1,12 @@
+# Shared settings for the interactive webR simulation labs in r/.
+engine: markdown
+filters:
+  - live
+ojs-engine: true
+toc: true
+toc-title: "In this lab"
+sidebar: r-labs
+webr:
+  cell-options:
+    autorun: true
+    timelimit: 30

@@ -182,6 +182,31 @@ def main():
         if len(slugs) > 1:
             problems.append(f"order {o} used by {slugs}")
 
+    # Also check the interactive R labs under r/*.qmd.
+    webr_re = re.compile(r"```\{webr\}\n(.*?)```", re.S)
+    for rpath in sorted(glob.glob(os.path.join(ROOT, "r", "*.qmd"))):
+        rslug = os.path.basename(rpath)[:-4]
+        if rslug == "index":
+            continue
+        rtext = open(rpath, encoding="utf-8").read()
+        rsay = lambda msg: problems.append(f"r/{rslug}: {msg}")
+        rfm = rtext.split("---", 2)[1] if rtext.startswith("---") else ""
+        for rf in ["title", "date", "order", "description", "engine"]:
+            if not re.search(rf"^{rf}:", rfm, re.M):
+                rsay(f"missing front matter field '{rf}'")
+        if f"../concepts/{rslug}.qmd" not in rtext:
+            rsay(f"does not link to ../concepts/{rslug}.qmd")
+        cpath = os.path.join(ROOT, "concepts", f"{rslug}.qmd")
+        if os.path.exists(cpath) and f"../r/{rslug}.qmd" not in open(cpath, encoding="utf-8").read():
+            rsay(f"concepts/{rslug}.qmd does not link back to ../r/{rslug}.qmd")
+        cells = webr_re.findall(rtext)
+        if not cells:
+            rsay("no {webr} cells found")
+        if any(len(line) > 78 for c in cells for line in c.splitlines()):
+            rsay("has {webr} code lines over 78 characters")
+        if "#| exercise:" in rtext and "#| solution: true" not in rtext:
+            rsay("defines a {webr} exercise without a `#| solution: true` block")
+
     for w in warnings:
         print("warning:", w)
     for p in problems:

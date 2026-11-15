@@ -800,3 +800,172 @@ mjx-container[display="true"] {
   min-height: 24px;
   line-height: 24px;
 }
+
+/* ---------- About page: multi-model workflow depiction ---------- */
+
+.model-loop {
+  margin: 1.5rem 0 2rem;
+  padding: 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.85rem;
+  background: rgba(var(--bs-primary-rgb), 0.03);
+}
+
+.model-loop-lead {
+  max-width: 34rem;
+  margin: 0 auto;
+}
+
+.model-loop-arrow {
+  margin: 0.6rem 0;
+  text-align: center;
+  font-family: var(--bs-font-monospace);
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+}
+
+.model-loop-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.model-node {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--bs-border-color);
+  border-top: 4px solid var(--bs-primary);
+  border-radius: 0.55rem;
+  background: var(--bs-body-bg);
+  font-size: 0.92rem;
+  line-height: 1.4;
+}
+
+.model-node strong {
+  font-size: 1.08rem;
+}
+
+.model-badge {
+  font-family: var(--bs-font-monospace);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--bs-secondary-color);
+}
+
+.model-human {
+  border-top-color: #1d4e89;
+  text-align: center;
+}
+
+.model-claude {
+  border-top-color: #2166ac;
+}
+
+.model-codex {
+  border-top-color: #d6604d;
+}
+
+.model-gemini {
+  border-top-color: #1a9850;
+}
+
+.model-loop-gate {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem 0.6rem;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.9rem;
+  padding: 0.6rem 0.9rem;
+  border: 1px dashed var(--bs-border-color);
+  border-radius: 0.5rem;
+  background: var(--bs-body-bg);
+  font-size: 0.85rem;
+  color: var(--bs-secondary-color);
+}
+
+@media (max-width: 767.98px) {
+  .model-loop-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* ---------- Try it in R labs ---------- */
+
+.lab-banner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1.25rem;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.65rem 1rem;
+  margin-bottom: 1.25rem;
+  border: 1px solid var(--bs-border-color);
+  border-left: 4px solid var(--bs-primary);
+  border-radius: 0.5rem;
+  background: rgba(var(--bs-primary-rgb), 0.05);
+  font-size: 0.92rem;
+}
+
+.lab-experiments {
+  padding: 0.85rem 1.1rem;
+  margin: 0.85rem 0 1.35rem;
+  border: 1px solid var(--bs-border-color);
+  border-left: 4px solid #1a9850;
+  border-radius: 0.5rem;
+  background: var(--bs-body-bg);
+}
+
+.lab-experiments strong.lab-exp-title {
+  display: block;
+  margin-bottom: 0.4rem;
+  font-size: 0.95rem;
+  color: #1a9850;
+}
+
+.quarto-dark .lab-experiments strong.lab-exp-title {
+  color: #66c2a5;
+}
+
+.lab-experiments ol {
+  margin-bottom: 0;
+  padding-left: 1.25rem;
+}
+
+.lab-experiments li {
+  margin-bottom: 0.35rem;
+}
+
+.lab-experiments li:last-child {
+  margin-bottom: 0;
+}
+
+/* Editable script box inside _sim-tools.html */
+.sim-run-editor {
+  display: block;
+  width: 100%;
+  min-height: 11rem;
+  margin-top: 0.6rem;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--bs-border-color);
+  border-radius: 0.4rem;
+  background: var(--bs-body-bg);
+  color: var(--bs-body-color);
+  font-family: var(--bs-font-monospace);
+  font-size: 0.82rem;
+  line-height: 1.4;
+  resize: vertical;
+}
+
+.sim-run-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}

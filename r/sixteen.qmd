@@ -1,40 +1,43 @@
 ---
 title: "Try it in R: 16"
 date: 2026-11-11
-description: "Why an interaction half the size of a main effect needs 16 times the sample size, simulated in R in your browser with webR."
+order: 2
+description: "Verify the 2 × 2 variance algebra showing why an interaction half as large as a main effect requires 16 times the sample size."
+categories: ["Noise and evidence", "Intermediate"]
 engine: markdown
-filters:
-  - live
-ojs-engine: true
-toc: false
-sidebar: false
-webr:
-  cell-options:
-    autorun: true
 ---
 
-This is the simulation from [16](../concepts/sixteen.qmd), written in R. It runs in your browser with [webR](https://docs.r-wasm.org/webr/latest/), a version of R compiled to WebAssembly, so there is nothing to install. The first time, your browser downloads R itself, which can take a minute. Edit any line and click **Run Code** to try it with other values.
+::: {.lab-banner}
+<span>**Lab 2 of 4** · Companion to entry **#80**: [16](../concepts/sixteen.qmd)</span>
+<span>[← Lab 1 (Significance Filter)](statistical-significance-filter.qmd) · [Next: Lab 3 (Multiple Comparisons) →](multiple-comparisons.qmd)</span>
+:::
 
-## Power for a main effect and for an interaction
+Suppose a study is powered to detect a main effect of size $\theta$. Researchers then split the sample in half (men vs. women, younger vs. older) and test an interaction—a **difference of differences**—that is realistically half as large ($\delta = \theta / 2$). Gelman's rule of thumb **16** says that matching the main effect's power for that interaction requires $4^2 = 16$ times as many participants.
 
-A 2×2 experiment with `n` people in each cell and an outcome with standard deviation 1. The main effect is `theta`. The interaction, a difference of differences, is half as large.
+## Step 1: Why the standard error doubles before the effect even shrinks
+
+In a $2 \times 2$ factorial design with `n` participants in each of the four cells and outcome SD $\sigma = 1$, each cell mean has variance $1/n$:
+
+- **Main effect** (average of two differences): $\frac{1}{2}\big[(\bar y_{11} - \bar y_{01}) + (\bar y_{10} - \bar y_{00})\big]$, with standard error $\sqrt{4 / (4n)} = 1/\sqrt{n}$.
+- **Interaction** (difference of two differences): $(\bar y_{11} - \bar y_{01}) - (\bar y_{10} - \bar y_{00})$, with standard error $\sqrt{4 / n} = 2/\sqrt{n}$.
+
+Run the simulation below to compare empirical SEs and power across sample sizes from $n = 10$ to $n = 1{,}280$ per cell.
 
 ```{webr}
 set.seed(80)
-theta <- 0.4 # main effect, in standard-deviation units
-delta <- theta / 2 # interaction (difference of differences): half of theta
+theta <- 0.4 # main effect, in SD units
+delta <- theta / 2 # interaction: half the main effect
 
-# Cells in the order (a, b) = (0,0), (1,0), (0,1), (1,1), coded -1/2 and +1/2
+# Cells in order (a, b) = (0,0), (1,0), (0,1), (1,1), coded -1/2 and +1/2
 a <- c(0, 1, 0, 1) - 0.5
 b <- c(0, 0, 1, 1) - 0.5
 mu <- theta * a + delta * a * b # true cell means
 
 power_at <- function(n, n_sims = 2000) {
-  # Each row is one simulated study: the four observed cell means
   m <- matrix(rnorm(4 * n_sims, sd = 1 / sqrt(n)), ncol = 4) +
     rep(mu, each = n_sims)
-  main <- ((m[, 2] - m[, 1]) + (m[, 4] - m[, 3])) / 2 # se = 1 / sqrt(n)
-  inter <- (m[, 4] - m[, 3]) - (m[, 2] - m[, 1]) # se = 2 / sqrt(n)
+  main <- ((m[, 2] - m[, 1]) + (m[, 4] - m[, 3])) / 2 # SE = 1 / sqrt(n)
+  inter <- (m[, 4] - m[, 3]) - (m[, 2] - m[, 1]) # SE = 2 / sqrt(n)
   c(
     main = mean(abs(main) > 1.96 / sqrt(n)),
     interaction = mean(abs(inter) > 1.96 * 2 / sqrt(n))
@@ -50,21 +53,96 @@ matplot(ns, t(pw),
   col = c("#d6604d", "#2166ac"), ylim = c(0, 1),
   xlab = "People per cell (log scale)", ylab = "Power"
 )
-abline(h = 0.8, lty = 2, col = "grey50")
-legend("bottomright", c("Main effect", "Interaction"),
-  col = c("#d6604d", "#2166ac"),
-  pch = 19, lty = 1, bty = "n"
+abline(h = 0.8, lty = 2, col = "grey40")
+legend("bottomright", c("Main effect", "Interaction (half size)"),
+  col = c("#d6604d", "#2166ac"), pch = 19, lty = 1, bty = "n"
 )
 round(pw, 2)
 ```
 
-## The sample sizes for 80% power
+::: {.lab-experiments}
+<strong class="lab-exp-title"><i class="bi bi-sliders" aria-hidden="true"></i> Predict → Modify → Observe</strong>
 
-The normal approximation gives the same answer without simulation. The interaction's standard error is twice the main effect's, and the interaction is half as large, so its z-score is a quarter of the main effect's. Matching it takes 4² = 16 times the sample.
+1. **Read the horizontal gap at 80% power.** In the table printed under the chart, find the cell size where `main` crosses `0.80` (around `n = 40` to `80` per cell) and where `interaction` crosses `0.80` (around `n = 640` to `1280` per cell).
+2. **What if the interaction is just as big as the main effect?** Change `delta <- theta` on line 3 (a full cross-over or zero-effect-in-one-group interaction) and click **Run Code**. Even when the interaction is *equal* in size to the main effect, how many times larger does `n` have to be for 80% power? *(Answer: $2^2 = 4\times$, because the SE is still twice as large.)*
+:::
+
+## Step 2: Exact sample-size ratio from the normal distribution
+
+We can verify the $16\times$ factor analytically: for 80% power at the 5% two-sided level, a test needs an expected $z$-score of $z_{0.975} + z_{0.80} \approx 1.96 + 0.84 = 2.80$.
 
 ```{webr}
-z <- qnorm(0.975) + qnorm(0.80)
-n_main <- (z * 1 / theta)^2 # people per cell, main effect
-n_int <- (z * 2 / delta)^2 # people per cell, interaction
+z_target <- qnorm(0.975) + qnorm(0.80)
+n_main <- (z_target * 1 / theta)^2 # people per cell for main effect
+n_int <- (z_target * 2 / delta)^2 # people per cell for interaction
 round(c(main_effect = n_main, interaction = n_int, ratio = n_int / n_main), 1)
 ```
+
+## Your turn: how exaggerated are "significant" interactions at main-effect sample sizes?
+
+Suppose a researcher runs a study sized for 80% power on the main effect (`n <- 50` per cell when `theta <- 0.4`), and also tests an interaction whose true size is `delta <- 0.2`.
+
+Complete the code below to simulate 10,000 studies at `n <- 50` per cell and compute:
+1. `exagg`: the average magnitude `mean(abs(inter[sig]))` of the significant interaction estimates divided by the true `delta`.
+2. `wrong_sign`: the fraction of significant interaction estimates that have the wrong sign (`inter[sig] < 0`).
+
+```{webr}
+#| exercise: ex_sixteen
+#| setup: true
+set.seed(80)
+theta <- 0.4
+delta <- 0.2
+```
+
+```{webr}
+#| exercise: ex_sixteen
+#| autorun: false
+set.seed(80)
+n <- 50 # sized for ~80% power on the main effect (theta = 0.4)
+se_int <- 2 / sqrt(n) # interaction SE is 2 / sqrt(n)
+
+inter <- rnorm(10000, mean = delta, sd = se_int)
+sig <- abs(inter) > 1.96 * se_int
+
+exagg <- ______
+wrong_sign <- ______
+
+cat(
+  "Interaction power at n = 50 per cell: ", round(100 * mean(sig), 1), "%\n",
+  "Average significant interaction is ", round(exagg, 1), "x the truth\n",
+  "Share of significant interactions with wrong sign: ",
+  round(100 * wrong_sign, 1), "%\n",
+  sep = ""
+)
+```
+
+::: {.hint exercise="ex_sixteen"}
+Subset `inter` to the significant runs with `inter[sig]`. Then `exagg <- mean(abs(inter[sig])) / delta` and `wrong_sign <- mean(inter[sig] < 0)`.
+:::
+
+```{webr}
+#| exercise: ex_sixteen
+#| solution: true
+set.seed(80)
+n <- 50 # sized for ~80% power on the main effect (theta = 0.4)
+se_int <- 2 / sqrt(n) # interaction SE is 2 / sqrt(n)
+
+inter <- rnorm(10000, mean = delta, sd = se_int)
+sig <- abs(inter) > 1.96 * se_int
+
+exagg <- mean(abs(inter[sig])) / delta
+wrong_sign <- mean(inter[sig] < 0)
+
+cat(
+  "Interaction power at n = 50 per cell: ", round(100 * mean(sig), 1), "%\n",
+  "Average significant interaction is ", round(exagg, 1), "x the truth\n",
+  "Share of significant interactions with wrong sign: ",
+  round(100 * wrong_sign, 1), "%\n",
+  sep = ""
+)
+```
+
+## Where next
+
+- Read the full entry: [16](../concepts/sixteen.qmd).
+- Continue to **Lab 3**: [Try it in R: Multiple Comparisons](multiple-comparisons.qmd), where partial pooling shrinks noisy subgroup estimates toward the overall mean instead of chasing noise.
